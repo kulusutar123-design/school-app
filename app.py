@@ -209,7 +209,7 @@ if menu == "Master Login":
                     else:
                         st.warning("Please fill both fields.")
 
-    # MASTER DASHBOARD (ଯଦି ଲଗ୍ଇନ୍ ହୋଇଥାଏ)
+    # MASTER DASHBOARD
     else:
         col1, col2 = st.columns([8, 2])
         with col1:
@@ -326,7 +326,7 @@ if menu == "Master Login":
                 save_master_data(master_db)
                 st.success("Master profile updated successfully! Please remember your new credentials.")
 
-# ----------------- SCHOOL LOGIN -----------------
+# ----------------- SCHOOL LOGIN (WITH CAPTCHA) -----------------
 elif menu == "School Login":
     st.subheader("🏫 School Portal")
     
@@ -334,14 +334,29 @@ elif menu == "School Login":
         s_id = st.text_input("School ID")
         s_pass = st.text_input("School Password", type="password")
         
+        # CAPTCHA GENERATION
+        if 'school_captcha' not in st.session_state:
+            st.session_state['school_captcha'] = str(random.randint(10000, 99999))
+            
+        st.markdown(f"<div style='margin-top:10px; margin-bottom:10px;'><b>CAPTCHA (କ୍ୟାପ୍ଚା କୋଡ୍):</b> <span style='background-color: #f1f5f9; color:#0f172a; padding: 5px 20px; font-size: 22px; font-weight: bold; letter-spacing: 6px; border: 1px solid #cbd5e1; border-radius: 5px;'>{st.session_state['school_captcha']}</span></div>", unsafe_allow_html=True)
+        
+        entered_captcha = st.text_input("Enter the CAPTCHA code shown above")
+        
         if st.button("Login as School"):
-            if s_id in schools_db and schools_db[s_id]["pass"] == s_pass:
+            if entered_captcha != st.session_state['school_captcha']:
+                st.error("❌ ଭୁଲ୍ CAPTCHA! ଦୟାକରି ସଠିକ୍ କ୍ୟାପ୍ଚା କୋଡ୍ ଦିଅନ୍ତୁ।")
+                st.session_state['school_captcha'] = str(random.randint(10000, 99999))
+                st.rerun()
+            elif s_id in schools_db and schools_db[s_id]["pass"] == s_pass:
                 st.session_state['school_logged_id'] = s_id
+                del st.session_state['school_captcha']
                 st.rerun()
             else:
-                st.error("ଭୁଲ୍ School ID କିମ୍ବା Password!")
+                st.error("❌ ଭୁଲ୍ School ID କିମ୍ବା Password!")
+                st.session_state['school_captcha'] = str(random.randint(10000, 99999))
+                st.rerun()
                 
-    else: # School ଲଗ୍ଇନ୍ ହେବା ପରେ ଦୃଶ୍ୟ (ସହିତ ଲଗ୍ଆଉଟ୍ ବଟନ୍)
+    else: # School ଲଗ୍ଇନ୍ ହେବା ପରେ ଦୃଶ୍ୟ
         cur_school = st.session_state['school_logged_id']
         
         col1, col2 = st.columns([8, 2])
