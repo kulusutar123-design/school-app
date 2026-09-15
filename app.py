@@ -66,6 +66,8 @@ def save_data(schools, students):
 
 schools_db, students_db = load_data()
 
+# Welcome Banner for KULU SUTAR
+st.markdown("<h3 style='text-align: center; color: #0284C7;'>✨ WELCOME KULU SUTAR ✨</h3>", unsafe_allow_html=True)
 st.markdown("<h1 style='text-align: center; color: #1E3A8A;'>🏫 ADVANCED SCHOOL MANAGEMENT SYSTEM</h1>", unsafe_allow_html=True)
 st.markdown("<hr>", unsafe_allow_html=True)
 
@@ -79,7 +81,7 @@ if menu == "Master Login":
     
     if st.button("Login as Master"):
         if m_user == "master" and m_pass == "master123":
-            st.success("ମାଷ୍ଟର୍ ଲଗ୍ଇନ୍ ସଫଳ ହେଲା!")
+            st.success("Welcome KULU SUTAR! ମାଷ୍ଟର୍ ଲଗ୍ଇନ୍ ସଫଳ ହେଲା!")
             st.session_state['master_logged'] = True
         else:
             st.error("ଭୁଲ୍ Master ID କିମ୍ବା Password!")
@@ -126,7 +128,7 @@ elif menu == "School Login":
     
     if st.button("Login as School"):
         if s_id in schools_db and schools_db[s_id]["pass"] == s_pass:
-            st.success(f"ସ୍ୱାଗତମ୍ {schools_db[s_id]['name']}! ଲଗ୍ଇନ୍ ସଫଳ ହେଲା।")
+            st.success(f"Welcome KULU SUTAR! ସ୍ୱାଗତମ୍ {schools_db[s_id]['name']}!")
             st.session_state['school_logged_id'] = s_id
         else:
             st.error("ଭୁଲ୍ School ID କିମ୍ବା Password!")
@@ -142,8 +144,8 @@ elif menu == "School Login":
             st.markdown("### 📝 Student Registration & Subject Marks Entry")
             roll_no = st.text_input("Roll No", key="add_roll")
             st_name = st.text_input("Student Name", key="add_name")
-            father_name = st.text_input("Father's Name", key="add_father")  # Father Name field
-            mother_name = st.text_input("Mother's Name", key="add_mother")  # Mother Name field
+            father_name = st.text_input("Father's Name", key="add_father")
+            mother_name = st.text_input("Mother's Name", key="add_mother")
             dob = st.date_input("DOB", key="add_dob")
             cls = st.text_input("Class", key="add_class")
             
@@ -329,7 +331,7 @@ elif menu == "Student Login":
         try:
             student = students_db[st_school_id][st_roll]
             if student["dob"] == st_dob_input:
-                st.success(f"ସ୍ୱାଗତମ୍ {student['name']}! ଆପଣଙ୍କ ରେଜଲ୍ଟ୍ ତଳେ ଦିଆଗଲା:")
+                st.success(f"Welcome KULU SUTAR! ସ୍ୱାଗତମ୍ {student['name']}! ଆପଣଙ୍କ ରେଜଲ୍ଟ୍ ତଳେ ଦିଆଗଲା:")
                 
                 st.markdown(f"""
                 <div style="border: 2px solid #1E3A8A; padding: 20px; border-radius: 10px; background-color: #f9f9f9;">
