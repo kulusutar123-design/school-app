@@ -157,7 +157,6 @@ classes_list = [str(i) for i in range(1, 11)]
 if menu == "Master Login":
     st.subheader("🔑 Master Administrator Portal")
     
-    # "Register Master" ହଟାଇ ଦିଆଗଲା, କେବଳ ଲଗ୍ଇନ୍ ଏବଂ ଫରଗେଟ୍ ପାସୱାର୍ଡ ଅଛି।
     login_mode = st.radio("Choose Action", ["Login", "Forgot Password"])
     
     if login_mode == "Login":
@@ -211,15 +210,28 @@ if menu == "Master Login":
     # MASTER DASHBOARD
     if st.session_state.get('master_logged', False):
         st.markdown("---")
-        tab1, tab2, tab3, tab4, tab5 = st.tabs(["📊 All IDs Overview", "🏫 Register School", "🎓 Edit Students Data", "🔄 Forgot School Password", "⚙️ Settings (Change ID/Pass)"])
+        tab1, tab2, tab3, tab4, tab5 = st.tabs(["📊 All IDs & Schools", "🏫 Register School", "🎓 Edit Students Data", "🔄 Forgot School Password", "⚙️ Settings (Change ID/Pass)"])
         
         with tab1:
-            st.markdown("### 👁️ Master & System Overview")
-            st.info(f"🔑 **Current Master ID:** {master_db['username']}")
+            st.markdown("### 👁️ System Overview & Manage Schools")
+            st.info("🔒 **ଗୋପନୀୟତା ସୂଚନା:** ଏହି ମାଷ୍ଟର୍ ପ୍ୟାନେଲ୍ କେବଳ ଆପଣଙ୍କୁ (Kulu Sutar) ଦେଖାଯିବ। ଅନ୍ୟ କେହି ଆପଣଙ୍କ ମାଷ୍ଟର୍ ଆଇଡି ଦେଖିପାରିବେ ନାହିଁ।")
             
-            st.markdown("#### 🏫 Registered School IDs:")
-            for s_id, s_info in schools_db.items():
-                st.write(f"- **School ID:** {s_id} (Name: {s_info['name']})")
+            st.markdown("#### 🏫 Registered Schools (View & Delete):")
+            if not schools_db:
+                st.write("କୌଣସି ସ୍କୁଲ୍ ରେଜିଷ୍ଟର୍ ହୋଇନାହିଁ।")
+            else:
+                for s_id, s_info in list(schools_db.items()):
+                    col1, col2, col3 = st.columns([2, 4, 2])
+                    col1.write(f"**School ID:** {s_id}")
+                    col2.write(f"**Name:** {s_info['name']}")
+                    if col3.button(f"🗑️ Delete School", key=f"del_school_{s_id}"):
+                        # ସ୍କୁଲ୍ ଏବଂ ତା'ର ପିଲାମାନଙ୍କୁ ଡିଲିଟ୍ କରିଦିଆଯିବ
+                        del schools_db[s_id]
+                        if s_id in students_db:
+                            del students_db[s_id]
+                        save_data(schools_db, students_db)
+                        st.success(f"School '{s_id}' ସମ୍ପୂର୍ଣ୍ଣ ରୂପେ ଡିଲିଟ୍ ହୋଇଗଲା!")
+                        st.rerun()
                 
             st.markdown("#### 🎓 Registered Student IDs:")
             total_students = 0
@@ -292,11 +304,11 @@ if menu == "Master Login":
                     save_data(schools_db, students_db)
                     st.success("School password changed successfully!")
 
-        # SETTINGS ଟ୍ୟାବ୍ (ମାଷ୍ଟର୍ ଆଇଡି/ପାସୱାର୍ଡ ଅପଡେଟ୍ ପାଇଁ)
         with tab5:
             st.markdown("### ⚙️ Update Master Profile & Contact")
-            up_m_user = st.text_input("Change Master Username", value=master_db.get("username", ""))
-            up_m_pass = st.text_input("Change Master Password", value=master_db.get("password", ""), type="password")
+            st.warning("ଏଠାରେ ଆପଣ ନିଜର ମାଷ୍ଟର୍ ଆଇଡି ଏବଂ ପାସୱାର୍ଡ ବଦଳାଇ ପାରିବେ। ଏହା ସମ୍ପୂର୍ଣ୍ଣ ଗୋପନୀୟ (Private) ରହିବ।")
+            up_m_user = st.text_input("Master Username", value=master_db.get("username", ""))
+            up_m_pass = st.text_input("Master Password", value=master_db.get("password", ""), type="password")
             up_m_email = st.text_input("Recovery Email (For OTP)", value=master_db.get("email", ""))
             up_m_phone = st.text_input("Recovery Phone Number (For OTP)", value=master_db.get("phone", ""))
             
