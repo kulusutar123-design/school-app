@@ -49,55 +49,57 @@ def save_data(schools, students):
     with open(STUDENTS_FILE, "w", encoding="utf-8") as f:
         json.dump(students, f, indent=4)
 
-# --- ସୁନ୍ଦର ରେଜଲ୍ଟ କାର୍ଡ ଡିଜାଇନ୍ ---
+# --- ସୁନ୍ଦର ରାଙ୍କ୍ କାର୍ଡ (RANK CARD) ଡିଜାଇନ୍ (Without Indentation Bugs) ---
 def generate_result_card_html(school_name, st_data, roll_no):
-    res_color = "green" if st_data.get('result') == "PASS" else "red"
-    html_content = f"""
-    <div style="border: 3px solid #1E3A8A; padding: 25px; border-radius: 12px; background-color: #ffffff; color: #000; box-shadow: 0px 4px 10px rgba(0,0,0,0.1); font-family: sans-serif;">
-        <h1 style="text-align: center; color: #1E3A8A; margin-bottom: 5px;">🏫 {school_name}</h1>
-        <h3 style="text-align: center; color: #d32f2f; margin-top: 0px; text-decoration: underline;">OFFICIAL RESULT CARD</h3>
-        <table style="width: 100%; border: none; margin-top: 20px; font-size: 16px;">
-            <tr>
-                <td style="padding: 5px;"><b>Student Name:</b> {st_data.get('name', '')}</td>
-                <td style="padding: 5px; text-align: right;"><b>Roll No (Student ID):</b> {roll_no}</td>
-            </tr>
-            <tr>
-                <td style="padding: 5px;"><b>Father's Name:</b> {st_data.get('father_name', 'N/A')}</td>
-                <td style="padding: 5px; text-align: right;"><b>Class:</b> {st_data.get('class', 'N/A')}</td>
-            </tr>
-            <tr>
-                <td style="padding: 5px;"><b>Mother's Name:</b> {st_data.get('mother_name', 'N/A')}</td>
-                <td style="padding: 5px; text-align: right;"><b>DOB:</b> {st_data.get('dob', '')}</td>
-            </tr>
-        </table>
-        <h4 style="color: #1E3A8A; background-color: #f0f0f0; padding: 8px; margin-top: 20px;">Subject-wise Marks</h4>
-        <table style="width: 100%; border-collapse: collapse; text-align: center;" border="1">
-            <tr style="background-color: #1E3A8A; color: white;">
-                <th style="padding: 10px;">Subject</th>
-                <th style="padding: 10px;">Full Marks</th>
-                <th style="padding: 10px;">Obtained Marks</th>
-            </tr>
-    """
+    res_color = "#15803d" if st_data.get('result') == "PASS" else "#dc2626"
+    bg_color = "#f0fdf4" if st_data.get('result') == "PASS" else "#fef2f2"
+    
+    # ଟେବୁଲ୍ ରୋ' (Row) ଗୁଡ଼ିକୁ ବିନା ସ୍ପେସ୍ ରେ ଯୋଡ଼ିବା ପାଇଁ
+    rows_html = ""
     for sub, m_info in st_data.get('subjects', {}).items():
-        html_content += f"""
+        rows_html += f"<tr><td style='padding: 12px; border: 1px solid #cbd5e1; text-align: left; font-weight: bold;'>{sub}</td><td style='padding: 12px; border: 1px solid #cbd5e1;'>{m_info['full']}</td><td style='padding: 12px; border: 1px solid #cbd5e1; font-weight: bold;'>{m_info['obt']}</td></tr>"
+
+    html_content = f"""
+    <div style="border: 3px solid #1E3A8A; padding: 30px; border-radius: 12px; background-color: #ffffff; color: #1e293b; font-family: Arial, sans-serif; max-width: 850px; margin: auto; box-shadow: 0px 8px 16px rgba(0,0,0,0.15);">
+        <div style="text-align: center; border-bottom: 4px double #1E3A8A; padding-bottom: 15px; margin-bottom: 25px;">
+            <h1 style="color: #1E3A8A; margin: 0; font-size: 32px; text-transform: uppercase; font-weight: 900;">🏫 {school_name}</h1>
+            <h3 style="color: #e11d48; margin: 8px 0 0 0; letter-spacing: 3px; font-weight: bold;">OFFICIAL RANK CARD</h3>
+        </div>
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 16px;">
             <tr>
-                <td style="padding: 8px; text-align: left;"><b>{sub}</b></td>
-                <td style="padding: 8px;">{m_info['full']}</td>
-                <td style="padding: 8px;">{m_info['obt']}</td>
+                <td style="padding: 8px 0;"><b>Student Name:</b> {st_data.get('name', '')}</td>
+                <td style="padding: 8px 0; text-align: right;"><b>Roll No (Student ID):</b> {roll_no}</td>
             </tr>
-        """
-    html_content += f"""
+            <tr>
+                <td style="padding: 8px 0;"><b>Father's Name:</b> {st_data.get('father_name', 'N/A')}</td>
+                <td style="padding: 8px 0; text-align: right;"><b>Class:</b> {st_data.get('class', 'N/A')}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px 0;"><b>Mother's Name:</b> {st_data.get('mother_name', 'N/A')}</td>
+                <td style="padding: 8px 0; text-align: right;"><b>Date of Birth:</b> {st_data.get('dob', '')}</td>
+            </tr>
         </table>
-        <table style="width: 100%; margin-top: 20px; font-size: 18px; border-top: 2px solid #1E3A8A; padding-top: 10px;">
-            <tr>
-                <td><b>Total Marks:</b> {st_data.get('total_obt', 0)} / {st_data.get('total_full', 0)}</td>
-                <td style="text-align: right;"><b>Percentage:</b> {st_data.get('percentage', 0)}%</td>
+        <h4 style="color: #ffffff; background-color: #1E3A8A; padding: 12px; margin: 0; text-align: center; border-top-left-radius: 8px; border-top-right-radius: 8px; letter-spacing: 1px;">SUBJECT-WISE PERFORMANCE</h4>
+        <table style="width: 100%; border-collapse: collapse; text-align: center; margin-bottom: 30px; font-size: 16px; background-color: #f8fafc;">
+            <tr style="background-color: #e2e8f0; color: #1e293b;">
+                <th style="padding: 12px; border: 1px solid #cbd5e1;">Subject</th>
+                <th style="padding: 12px; border: 1px solid #cbd5e1;">Full Marks</th>
+                <th style="padding: 12px; border: 1px solid #cbd5e1;">Obtained Marks</th>
             </tr>
-            <tr>
-                <td><b>Grade:</b> <span style="color: #1E3A8A; font-weight: bold;">{st_data.get('grade', 'N/A')}</span></td>
-                <td style="text-align: right;"><b>Final Result:</b> <span style="color: {res_color}; font-weight: bold;">{st_data.get('result', 'N/A')}</span></td>
-            </tr>
+            {rows_html}
         </table>
+        <div style="background-color: {bg_color}; padding: 20px; border: 2px solid {res_color}; border-radius: 8px;">
+            <table style="width: 100%; font-size: 18px;">
+                <tr>
+                    <td style="padding: 5px 0;"><b>Total Marks:</b> <span style="font-size: 20px;">{st_data.get('total_obt', 0)} / {st_data.get('total_full', 0)}</span></td>
+                    <td style="padding: 5px 0; text-align: center;"><b>Percentage:</b> <span style="font-size: 20px;">{st_data.get('percentage', 0)}%</span></td>
+                    <td style="padding: 5px 0; text-align: right;"><b>Grade:</b> <span style="color: #1E3A8A; font-size: 24px; font-weight: 900;">{st_data.get('grade', 'N/A')}</span></td>
+                </tr>
+            </table>
+            <div style="text-align: center; margin-top: 20px; padding-top: 15px; border-top: 2px dashed {res_color};">
+                <span style="font-size: 20px; font-weight: bold; color: #475569;">FINAL RESULT:</span> <span style="color: {res_color}; font-size: 28px; font-weight: 900; letter-spacing: 2px; margin-left: 10px;">{st_data.get('result', 'N/A')}</span>
+            </div>
+        </div>
     </div>
     """
     return html_content
@@ -108,7 +110,7 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.setFont("Helvetica-Bold", 20)
     c.drawCentredString(300, 750, school_name)
     c.setFont("Helvetica-Bold", 14)
-    c.drawCentredString(300, 730, "OFFICIAL RESULT CARD")
+    c.drawCentredString(300, 730, "OFFICIAL RANK CARD")
     
     c.setFont("Helvetica", 12)
     c.drawString(50, 680, f"Student Name: {st_data.get('name', '')}")
@@ -224,7 +226,7 @@ if menu == "Master Login":
         
         with tab1:
             st.markdown("### 👁️ System Overview & Manage Schools")
-            st.info("🔒 **HIGH SECURITY ALERT:** ଏହି ମାଷ୍ଟର୍ ପ୍ୟାନେଲ୍ କେବଳ ଗୋଟିଏ ହିଁ ଆଇଡି (ଆପଣଙ୍କର) ପାଇଁ ତିଆରି ହୋଇଛି। ଅନ୍ୟ କୌଣସି ମାଷ୍ଟର୍ ଏହି ସିଷ୍ଟମ୍‌ରେ ନାହାଁନ୍ତି କିମ୍ବା ଆସିପାରିବେ ନାହିଁ। ଆପଣଙ୍କ ଡାଟା ୧୦୦% ସୁରକ୍ଷିତ।")
+            st.info("🔒 **HIGH SECURITY ALERT:** ଏହି ମାଷ୍ଟର୍ ପ୍ୟାନେଲ୍ କେବଳ ଗୋଟିଏ ହିଁ ଆଇଡି ପାଇଁ ତିଆରି ହୋଇଛି। ଆପଣଙ୍କ ଡାଟା ୧୦୦% ସୁରକ୍ଷିତ।")
             
             st.markdown("#### 🏫 Registered Schools (View & Delete):")
             if not schools_db:
@@ -315,7 +317,7 @@ if menu == "Master Login":
 
         with tab5:
             st.markdown("### ⚙️ Update Master Profile & Contact")
-            st.warning("ଏଠାରେ ଆପଣ ନିଜର ମାଷ୍ଟର୍ ଆଇଡି ଏବଂ ପାସୱାର୍ଡ ବଦଳାଇ ପାରିବେ। ଏହା ସମ୍ପୂର୍ଣ୍ଣ ଗୋପନୀୟ (Private) ରହିବ।")
+            st.warning("ଏଠାରେ ଆପଣ ନିଜର ମାଷ୍ଟର୍ ଆଇଡି ଏବଂ ପାସୱାର୍ଡ ବଦଳାଇ ପାରିବେ।")
             up_m_user = st.text_input("Master Username", value=master_db.get("username", ""))
             up_m_pass = st.text_input("Master Password", value=master_db.get("password", ""), type="password")
             up_m_email = st.text_input("Recovery Email (For OTP)", value=master_db.get("email", ""))
@@ -324,7 +326,7 @@ if menu == "Master Login":
             if st.button("Save Profile Changes"):
                 master_db.update({"username": up_m_user, "password": up_m_pass, "email": up_m_email, "phone": up_m_phone})
                 save_master_data(master_db)
-                st.success("Master profile updated successfully! Please remember your new credentials.")
+                st.success("Master profile updated successfully!")
 
 # ----------------- SCHOOL LOGIN (WITH CAPTCHA) -----------------
 elif menu == "School Login":
@@ -334,7 +336,6 @@ elif menu == "School Login":
         s_id = st.text_input("School ID")
         s_pass = st.text_input("School Password", type="password")
         
-        # CAPTCHA GENERATION
         if 'school_captcha' not in st.session_state:
             st.session_state['school_captcha'] = str(random.randint(10000, 99999))
             
@@ -356,7 +357,7 @@ elif menu == "School Login":
                 st.session_state['school_captcha'] = str(random.randint(10000, 99999))
                 st.rerun()
                 
-    else: # School ଲଗ୍ଇନ୍ ହେବା ପରେ ଦୃଶ୍ୟ
+    else: 
         cur_school = st.session_state['school_logged_id']
         
         col1, col2 = st.columns([8, 2])
@@ -368,7 +369,6 @@ elif menu == "School Login":
                 st.rerun()
 
         st.markdown("---")
-        
         tab_list, tab_add, tab_edit, tab_report = st.tabs(["📋 My Students & IDs", "Add/Save Student", "Edit/Update by Roll No", "Generate & Print Report"])
         
         with tab_list:
@@ -501,6 +501,7 @@ elif menu == "School Login":
                 st_data = school_students[rep_roll]
                 school_name = schools_db[cur_school]['name']
                 
+                # ଏବେ ସୁନ୍ଦର RANK CARD ଡିଜାଇନ୍ ଦେଖାଯିବ
                 st.markdown(generate_result_card_html(school_name, st_data, rep_roll), unsafe_allow_html=True)
                 
                 col1, col2 = st.columns(2)
@@ -530,6 +531,7 @@ elif menu == "Student Login":
                 st.success(f"Welcome KULU SUTAR! ଆପଣଙ୍କ ରେଜଲ୍ଟ୍ ତଳେ ଦିଆଗଲା:")
                 school_name = schools_db[st_school_id]['name']
                 
+                # ସୁନ୍ଦର RANK CARD ଏଠାରେ ମଧ୍ୟ ଡିସପ୍ଲେ ହେବ
                 st.markdown(generate_result_card_html(school_name, student, st_roll), unsafe_allow_html=True)
                 
                 col1, col2 = st.columns(2)
