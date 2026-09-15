@@ -11,7 +11,7 @@ st.set_page_config(page_title="Advanced School Management System", layout="wide"
 
 SCHOOLS_FILE = "schools.json"
 STUDENTS_FILE = "students.txt"
-MASTER_FILE = "master.json"  # Master ଡାଟା ସେଭ୍ ରଖିବା ପାଇଁ ନୂଆ ଫାଇଲ୍
+MASTER_FILE = "master.json"
 
 # --- ଡାଟା ଲୋଡ୍ ଓ ସେଭ୍ ଫଙ୍କସନ୍ ---
 def load_master_data():
@@ -156,9 +156,9 @@ classes_list = [str(i) for i in range(1, 11)]
 
 # ----------------- MASTER LOGIN -----------------
 if menu == "Master Login":
-    st.subheader("🔑 Master Administrator Login")
+    st.subheader("🔑 Master Administrator Portal")
     
-    login_mode = st.radio("Choose Action", ["Login", "Forgot Password"])
+    login_mode = st.radio("Choose Action", ["Login", "Forgot Password", "Register Master"])
     
     if login_mode == "Login":
         m_user = st.text_input("Master Username")
@@ -173,14 +173,14 @@ if menu == "Master Login":
                 
     elif login_mode == "Forgot Password":
         st.info("Recover your Master Account using Mobile or Email OTP")
-        verify_contact = st.text_input("Enter Registered Mobile No or Email (Default: admin@school.com / 9999999999)")
+        verify_contact = st.text_input(f"Enter Registered Mobile No or Email")
         
         if st.button("Send OTP"):
-            if verify_contact == master_db["email"] or verify_contact == master_db["phone"]:
+            if verify_contact == master_db.get("email") or verify_contact == master_db.get("phone"):
                 otp_code = str(random.randint(1000, 9999))
                 st.session_state['master_otp'] = otp_code
                 st.success("OTP Sent Successfully!")
-                st.info(f"📲 [DEMO SIMULATION] Your OTP is: **{otp_code}** (This would be sent to your mobile/email in a real setup)")
+                st.info(f"📲 [DEMO SIMULATION] Your OTP is: **{otp_code}**")
             else:
                 st.error("Invalid Email or Mobile Number!")
                 
@@ -202,11 +202,29 @@ if menu == "Master Login":
                     master_db["username"] = new_m_user
                     master_db["password"] = new_m_pass
                     save_master_data(master_db)
-                    st.success("Master ID & Password successfully updated! Please refresh/re-login.")
+                    st.success("Master ID & Password successfully updated! Please go to 'Login'.")
                     del st.session_state['master_otp']
                     del st.session_state['otp_verified']
                 else:
                     st.warning("Please fill both fields.")
+
+    elif login_mode == "Register Master":
+        st.info("Register / Set Up Master ID, Password, Mobile No & Email")
+        reg_m_user = st.text_input("Set Master Username")
+        reg_m_pass = st.text_input("Set Master Password", type="password")
+        reg_m_email = st.text_input("Set Email ID (For OTP Verification)")
+        reg_m_phone = st.text_input("Set Mobile Number (For OTP Verification)")
+        
+        if st.button("Register Master Account"):
+            if reg_m_user and reg_m_pass and reg_m_email and reg_m_phone:
+                master_db["username"] = reg_m_user
+                master_db["password"] = reg_m_pass
+                master_db["email"] = reg_m_email
+                master_db["phone"] = reg_m_phone
+                save_master_data(master_db)
+                st.success("Master Registration Successful! You can now login with these credentials.")
+            else:
+                st.error("Please fill all the details to register!")
 
     # MASTER DASHBOARD
     if st.session_state.get('master_logged', False):
@@ -279,8 +297,8 @@ if menu == "Master Login":
 
         with tab4:
             st.markdown("### ⚙️ Update Master Profile & Contact")
-            up_m_user = st.text_input("Change Master Username", value=master_db["username"])
-            up_m_pass = st.text_input("Change Master Password", value=master_db["password"], type="password")
+            up_m_user = st.text_input("Change Master Username", value=master_db.get("username", ""))
+            up_m_pass = st.text_input("Change Master Password", value=master_db.get("password", ""), type="password")
             up_m_email = st.text_input("Recovery Email", value=master_db.get("email", ""))
             up_m_phone = st.text_input("Recovery Phone Number", value=master_db.get("phone", ""))
             
@@ -288,7 +306,6 @@ if menu == "Master Login":
                 master_db.update({"username": up_m_user, "password": up_m_pass, "email": up_m_email, "phone": up_m_phone})
                 save_master_data(master_db)
                 st.success("Master profile updated successfully!")
-
 
 # ----------------- SCHOOL LOGIN -----------------
 elif menu == "School Login":
