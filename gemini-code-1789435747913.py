@@ -27,16 +27,18 @@ if 'subjects' not in st.session_state:
     st.session_state.subjects = [{"name": "ODIA", "fm": 100, "om": 0}]
 if 'otp' not in st.session_state:
     st.session_state.otp = None
+if 'action_type' not in st.session_state:
+    st.session_state.action_type = None
 
 st.set_page_config(page_title="School Management", layout="wide")
 st.title("🏫 School Management System")
 
 if not st.session_state.logged_in:
-    st.subheader("User Login & Registration")
+    st.subheader("User Login, Registration & Password Reset")
     uid = st.text_input("Email / Mobile Number:")
     pwd = st.text_input("Password:", type="password")
     
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
     with col1:
         if st.button("✅ Login", use_container_width=True):
             users = load_data(USER_FILE)
@@ -47,25 +49,43 @@ if not st.session_state.logged_in:
                 st.error("Invalid User ID or Password!")
     
     with col2:
-        if st.button("📲 Get OTP for Registration", use_container_width=True):
+        if st.button("📲 New Registration", use_container_width=True):
             if uid:
                 st.session_state.otp = str(random.randint(100000, 999999))
+                st.session_state.action_type = "register"
                 st.info(f"Your OTP is: {st.session_state.otp} (Please note it down)")
             else:
                 st.warning("Enter Email or Mobile Number first!")
+                
+    with col3:
+        if st.button("🔑 Forgot Password?", use_container_width=True):
+            if uid:
+                users = load_data(USER_FILE)
+                if uid in users:
+                    st.session_state.otp = str(random.randint(100000, 999999))
+                    st.session_state.action_type = "forgot_pwd"
+                    st.info(f"Your Password Reset OTP is: {st.session_state.otp}")
+                else:
+                    st.error("This ID is not registered! Please register first.")
+            else:
+                st.warning("Enter your registered Email or Mobile Number first!")
     
     if st.session_state.otp:
         st.markdown("---")
         entered_otp = st.text_input("Enter 6-digit OTP:")
         new_pwd = st.text_input("Set New Password:", type="password")
-        if st.button("Save & Register"):
+        
+        btn_label = "Reset Password" if st.session_state.action_type == "forgot_pwd" else "Save & Register"
+        
+        if st.button(btn_label):
             if entered_otp == st.session_state.otp:
                 if new_pwd:
                     users = load_data(USER_FILE)
                     users[uid] = new_pwd
                     save_data(USER_FILE, users)
-                    st.success("Registration Successful! Now you can login.")
+                    st.success(f"{btn_label} Successful! Now you can login with your new password.")
                     st.session_state.otp = None
+                    st.session_state.action_type = None
                 else:
                     st.warning("Password cannot be empty!")
             else:
