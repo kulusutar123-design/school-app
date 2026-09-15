@@ -157,7 +157,8 @@ classes_list = [str(i) for i in range(1, 11)]
 if menu == "Master Login":
     st.subheader("🔑 Master Administrator Portal")
     
-    login_mode = st.radio("Choose Action", ["Login", "Forgot Password", "Register Master"])
+    # "Register Master" ହଟାଇ ଦିଆଗଲା, କେବଳ ଲଗ୍ଇନ୍ ଏବଂ ଫରଗେଟ୍ ପାସୱାର୍ଡ ଅଛି।
+    login_mode = st.radio("Choose Action", ["Login", "Forgot Password"])
     
     if login_mode == "Login":
         m_user = st.text_input("Master Username")
@@ -207,30 +208,11 @@ if menu == "Master Login":
                 else:
                     st.warning("Please fill both fields.")
 
-    elif login_mode == "Register Master":
-        st.info("Register / Set Up Master ID, Password, Mobile No & Email")
-        reg_m_user = st.text_input("Set Master Username")
-        reg_m_pass = st.text_input("Set Master Password", type="password")
-        reg_m_email = st.text_input("Set Email ID (For OTP Verification)")
-        reg_m_phone = st.text_input("Set Mobile Number (For OTP Verification)")
-        
-        if st.button("Register Master Account"):
-            if reg_m_user and reg_m_pass and reg_m_email and reg_m_phone:
-                master_db["username"] = reg_m_user
-                master_db["password"] = reg_m_pass
-                master_db["email"] = reg_m_email
-                master_db["phone"] = reg_m_phone
-                save_master_data(master_db)
-                st.success("Master Registration Successful! You can now login with these credentials.")
-            else:
-                st.error("Please fill all the details to register!")
-
     # MASTER DASHBOARD
     if st.session_state.get('master_logged', False):
         st.markdown("---")
-        tab1, tab2, tab3, tab4, tab5 = st.tabs(["📊 All IDs Overview", "🏫 Register School", "🎓 Edit Students Data", "🔄 Forgot School Password", "⚙️ Master Profile Edit"])
+        tab1, tab2, tab3, tab4, tab5 = st.tabs(["📊 All IDs Overview", "🏫 Register School", "🎓 Edit Students Data", "🔄 Forgot School Password", "⚙️ Settings (Change ID/Pass)"])
         
-        # ମାଷ୍ଟର ପାଇଁ ନୂଆ ସ୍ୱତନ୍ତ୍ର ଟ୍ୟାବ୍: ସବୁ ID ଦେଖିବା ପାଇଁ
         with tab1:
             st.markdown("### 👁️ Master & System Overview")
             st.info(f"🔑 **Current Master ID:** {master_db['username']}")
@@ -265,9 +247,7 @@ if menu == "Master Login":
             st.markdown("### 📋 Manage All Students (Master Access)")
             master_school_sel = st.selectbox("Select School", ["--Select--"] + list(schools_db.keys()))
             if master_school_sel != "--Select--":
-                st.write(f"**School:** {schools_db[master_school_sel]['name']}")
                 school_students = students_db.get(master_school_sel, {})
-                
                 if school_students:
                     m_edit_roll = st.selectbox("Select Student Roll No to Edit", list(school_students.keys()))
                     m_curr_st = school_students[m_edit_roll]
@@ -286,7 +266,7 @@ if menu == "Master Login":
                         m_up_obt = st.number_input("Total Obtained Marks", value=float(m_curr_st.get('total_obt', 0)), key="m_up_o")
                         m_up_full = st.number_input("Total Full Marks", value=float(m_curr_st.get('total_full', 300)), key="m_up_full")
                     
-                    if st.button("💾 Force Update Record (Master)"):
+                    if st.button("💾 Force Update Record"):
                         new_per = (m_up_obt / m_up_full * 100) if m_up_full > 0 else 0.0
                         new_res = "PASS" if new_per >= 30 else "FAIL"
                         new_grd = "A+" if new_per >= 90 else "A" if new_per >= 80 else "B" if new_per >= 60 else "C" if new_per >= 40 else "D" if new_per >= 30 else "F"
@@ -298,7 +278,7 @@ if menu == "Master Login":
                             "result": new_res, "grade": new_grd
                         })
                         save_data(schools_db, students_db)
-                        st.success(f"Roll No {m_edit_roll} data updated successfully by Master!")
+                        st.success(f"Roll No {m_edit_roll} data updated successfully!")
                 else:
                     st.warning("No students in this school.")
 
@@ -312,17 +292,18 @@ if menu == "Master Login":
                     save_data(schools_db, students_db)
                     st.success("School password changed successfully!")
 
+        # SETTINGS ଟ୍ୟାବ୍ (ମାଷ୍ଟର୍ ଆଇଡି/ପାସୱାର୍ଡ ଅପଡେଟ୍ ପାଇଁ)
         with tab5:
             st.markdown("### ⚙️ Update Master Profile & Contact")
             up_m_user = st.text_input("Change Master Username", value=master_db.get("username", ""))
             up_m_pass = st.text_input("Change Master Password", value=master_db.get("password", ""), type="password")
-            up_m_email = st.text_input("Recovery Email", value=master_db.get("email", ""))
-            up_m_phone = st.text_input("Recovery Phone Number", value=master_db.get("phone", ""))
+            up_m_email = st.text_input("Recovery Email (For OTP)", value=master_db.get("email", ""))
+            up_m_phone = st.text_input("Recovery Phone Number (For OTP)", value=master_db.get("phone", ""))
             
             if st.button("Save Profile Changes"):
                 master_db.update({"username": up_m_user, "password": up_m_pass, "email": up_m_email, "phone": up_m_phone})
                 save_master_data(master_db)
-                st.success("Master profile updated successfully!")
+                st.success("Master profile updated successfully! Please remember your new credentials.")
 
 # ----------------- SCHOOL LOGIN -----------------
 elif menu == "School Login":
@@ -341,7 +322,6 @@ elif menu == "School Login":
         cur_school = st.session_state['school_logged_id']
         st.markdown("---")
         
-        # ସ୍କୁଲ୍ ପାଇଁ ନୂଆ ସ୍ୱତନ୍ତ୍ର ଟ୍ୟାବ୍: କେବଳ ନିଜ ସ୍କୁଲ୍ ଏବଂ ନିଜ ପିଲାଙ୍କ ID ଦେଖିବା ପାଇଁ
         st.info(f"🏫 **Your School ID:** {cur_school} | **School Name:** {schools_db[cur_school]['name']}")
         
         tab_list, tab_add, tab_edit, tab_report = st.tabs(["📋 My Students & IDs", "Add/Save Student", "Edit/Update by Roll No", "Generate & Print Report"])
