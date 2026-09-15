@@ -19,7 +19,6 @@ def load_master_data():
         with open(MASTER_FILE, "r", encoding="utf-8") as f:
             return json.load(f)
     else:
-        # Default Master Credentials
         return {"username": "master", "password": "master123", "email": "admin@school.com", "phone": "9999999999"}
 
 def save_master_data(data):
@@ -59,7 +58,7 @@ def generate_result_card_html(school_name, st_data, roll_no):
         <table style="width: 100%; border: none; margin-top: 20px; font-size: 16px;">
             <tr>
                 <td style="padding: 5px;"><b>Student Name:</b> {st_data.get('name', '')}</td>
-                <td style="padding: 5px; text-align: right;"><b>Roll No:</b> {roll_no}</td>
+                <td style="padding: 5px; text-align: right;"><b>Roll No (Student ID):</b> {roll_no}</td>
             </tr>
             <tr>
                 <td style="padding: 5px;"><b>Father's Name:</b> {st_data.get('father_name', 'N/A')}</td>
@@ -173,7 +172,7 @@ if menu == "Master Login":
                 
     elif login_mode == "Forgot Password":
         st.info("Recover your Master Account using Mobile or Email OTP")
-        verify_contact = st.text_input(f"Enter Registered Mobile No or Email")
+        verify_contact = st.text_input("Enter Registered Mobile No or Email")
         
         if st.button("Send OTP"):
             if verify_contact == master_db.get("email") or verify_contact == master_db.get("phone"):
@@ -229,9 +228,27 @@ if menu == "Master Login":
     # MASTER DASHBOARD
     if st.session_state.get('master_logged', False):
         st.markdown("---")
-        tab1, tab2, tab3, tab4 = st.tabs(["🏫 Register School", "🎓 All Students Data (View & Edit)", "🔄 Forgot School Password", "⚙️ Master Profile Edit"])
+        tab1, tab2, tab3, tab4, tab5 = st.tabs(["📊 All IDs Overview", "🏫 Register School", "🎓 Edit Students Data", "🔄 Forgot School Password", "⚙️ Master Profile Edit"])
         
+        # ମାଷ୍ଟର ପାଇଁ ନୂଆ ସ୍ୱତନ୍ତ୍ର ଟ୍ୟାବ୍: ସବୁ ID ଦେଖିବା ପାଇଁ
         with tab1:
+            st.markdown("### 👁️ Master & System Overview")
+            st.info(f"🔑 **Current Master ID:** {master_db['username']}")
+            
+            st.markdown("#### 🏫 Registered School IDs:")
+            for s_id, s_info in schools_db.items():
+                st.write(f"- **School ID:** {s_id} (Name: {s_info['name']})")
+                
+            st.markdown("#### 🎓 Registered Student IDs:")
+            total_students = 0
+            for s_id, studs in students_db.items():
+                for r_no, st_info in studs.items():
+                    st.write(f"- **Student ID (Roll No):** {r_no} | **School ID:** {s_id} | Name: {st_info['name']}")
+                    total_students += 1
+            if total_students == 0:
+                st.write("No students registered yet.")
+
+        with tab2:
             st.markdown("### Register New School")
             new_s_id = st.text_input("New School ID (e.g. S002)")
             new_s_name = st.text_input("School Name")
@@ -244,7 +261,7 @@ if menu == "Master Login":
                 else:
                     st.warning("ସମସ୍ତ ଫିଲ୍ଡ ପୂରଣ କରନ୍ତୁ।")
                     
-        with tab2:
+        with tab3:
             st.markdown("### 📋 Manage All Students (Master Access)")
             master_school_sel = st.selectbox("Select School", ["--Select--"] + list(schools_db.keys()))
             if master_school_sel != "--Select--":
@@ -285,7 +302,7 @@ if menu == "Master Login":
                 else:
                     st.warning("No students in this school.")
 
-        with tab3:
+        with tab4:
             st.markdown("### 🔄 Forgot / Reset School Password")
             selected_school = st.selectbox("Select School ID", list(schools_db.keys()))
             new_reset_pass = st.text_input("Enter New Password for this School", type="password")
@@ -295,7 +312,7 @@ if menu == "Master Login":
                     save_data(schools_db, students_db)
                     st.success("School password changed successfully!")
 
-        with tab4:
+        with tab5:
             st.markdown("### ⚙️ Update Master Profile & Contact")
             up_m_user = st.text_input("Change Master Username", value=master_db.get("username", ""))
             up_m_pass = st.text_input("Change Master Password", value=master_db.get("password", ""), type="password")
@@ -324,11 +341,32 @@ elif menu == "School Login":
         cur_school = st.session_state['school_logged_id']
         st.markdown("---")
         
-        tab_add, tab_edit, tab_list, tab_report = st.tabs(["Add/Save Student", "Edit/Update by Roll No", "Student List & Search", "Generate & Print Report"])
+        # ସ୍କୁଲ୍ ପାଇଁ ନୂଆ ସ୍ୱତନ୍ତ୍ର ଟ୍ୟାବ୍: କେବଳ ନିଜ ସ୍କୁଲ୍ ଏବଂ ନିଜ ପିଲାଙ୍କ ID ଦେଖିବା ପାଇଁ
+        st.info(f"🏫 **Your School ID:** {cur_school} | **School Name:** {schools_db[cur_school]['name']}")
         
+        tab_list, tab_add, tab_edit, tab_report = st.tabs(["📋 My Students & IDs", "Add/Save Student", "Edit/Update by Roll No", "Generate & Print Report"])
+        
+        with tab_list:
+            st.markdown("### 📋 Student List, Search & IDs")
+            school_students = students_db.get(cur_school, {})
+            if school_students:
+                st.write(f"Total Students Registered in your school: **{len(school_students)}**")
+                search_query = st.text_input("🔍 Search by Name or Student ID (Roll No)")
+                for r_no, s_info in school_students.items():
+                    if search_query.lower() in r_no.lower() or search_query.lower() in s_info['name'].lower() or search_query == "":
+                        cols = st.columns([3, 3, 2, 2])
+                        cols[0].write(f"**Student ID (Roll No):** {r_no}")
+                        cols[1].write(f"**Name:** {s_info['name']}")
+                        if cols[3].button(f"🗑️ Delete {r_no}", key=f"del_{r_no}"):
+                            del school_students[r_no]
+                            save_data(schools_db, students_db)
+                            st.rerun()
+            else:
+                st.warning("No students registered in your school yet.")
+                
         with tab_add:
             st.markdown("### 📝 Student Registration & Subject Marks Entry")
-            roll_no = st.text_input("Roll No", key="add_roll")
+            roll_no = st.text_input("Roll No (Student ID)", key="add_roll")
             st_name = st.text_input("Student Name", key="add_name")
             father_name = st.text_input("Father's Name", key="add_father")
             mother_name = st.text_input("Mother's Name", key="add_mother")
@@ -430,21 +468,6 @@ elif menu == "School Login":
             else:
                 st.warning("କୌଣସି ଷ୍ଟୁଡେଣ୍ଟ୍ ନାହାଁନ୍ତି।")
 
-        with tab_list:
-            st.markdown("### 📋 Student List, Search & Delete")
-            school_students = students_db.get(cur_school, {})
-            if school_students:
-                search_query = st.text_input("🔍 Search by Name or Roll No")
-                for r_no, s_info in school_students.items():
-                    if search_query.lower() in r_no.lower() or search_query.lower() in s_info['name'].lower() or search_query == "":
-                        cols = st.columns([3, 3, 2, 2])
-                        cols[0].write(f"**Roll:** {r_no}")
-                        cols[1].write(f"**Name:** {s_info['name']}")
-                        if cols[3].button(f"🗑️ Delete {r_no}", key=f"del_{r_no}"):
-                            del school_students[r_no]
-                            save_data(schools_db, students_db)
-                            st.rerun()
-
         with tab_report:
             st.markdown("### 🖨️ Generate & Print Report Cards")
             school_students = students_db.get(cur_school, {})
@@ -472,7 +495,7 @@ elif menu == "Student Login":
     st.subheader("🎓 Student Portal (Result Viewer)")
     st_school_id = st.text_input("School ID", key="st_login_school")
     st_class = st.selectbox("Select Class (1 to 10)", classes_list, key="st_login_class") 
-    st_roll = st.text_input("Roll Number", key="st_login_roll")
+    st_roll = st.text_input("Roll Number (Student ID)", key="st_login_roll")
     st_dob_input = st.text_input("Date of Birth (YYYY-MM-DD)", key="st_login_dob")
     
     if st.button("View Result"):
