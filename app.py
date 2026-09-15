@@ -3,6 +3,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 import json
 import os
+import datetime
 
 st.set_page_config(page_title="Advanced School Management System", layout="wide")
 
@@ -21,41 +22,9 @@ def load_data():
             with open(STUDENTS_FILE, "r", encoding="utf-8") as f:
                 students = json.load(f)
         except:
-            students = {
-                "S001": {
-                    "101": {
-                        "name": "Amit Kumar Sutar",
-                        "father_name": "Jaganath Sutar",
-                        "mother_name": "Basanti Sutar",
-                        "dob": "2008-05-12",
-                        "class": "10",
-                        "subjects": {"Odia": {"full": 100, "obt": 85}, "English": {"full": 100, "obt": 78}, "Math": {"full": 100, "obt": 90}},
-                        "total_full": 300,
-                        "total_obt": 253,
-                        "percentage": 84.33,
-                        "result": "PASS",
-                        "grade": "A"
-                    }
-                }
-            }
+            students = {}
     else:
-        students = {
-            "S001": {
-                "101": {
-                    "name": "Amit Kumar Sutar",
-                    "father_name": "Jaganath Sutar",
-                    "mother_name": "Basanti Sutar",
-                    "dob": "2008-05-12",
-                    "class": "10",
-                    "subjects": {"Odia": {"full": 100, "obt": 85}, "English": {"full": 100, "obt": 78}, "Math": {"full": 100, "obt": 90}},
-                    "total_full": 300,
-                    "total_obt": 253,
-                    "percentage": 84.33,
-                    "result": "PASS",
-                    "grade": "A"
-                }
-            }
-        }
+        students = {}
     return schools, students
 
 def save_data(schools, students):
@@ -63,6 +32,68 @@ def save_data(schools, students):
         json.dump(schools, f, indent=4)
     with open(STUDENTS_FILE, "w", encoding="utf-8") as f:
         json.dump(students, f, indent=4)
+
+def generate_result_card_html(school_name, st_data, roll_no):
+    # ସୁନ୍ଦର ରେଜଲ୍ଟ କାର୍ଡ ଡିଜାଇନ୍ (Table & Styling)
+    html = f"""
+    <div style="border: 4px solid #1E3A8A; padding: 25px; border-radius: 15px; background-color: #ffffff; box-shadow: 0px 4px 8px rgba(0,0,0,0.1); font-family: sans-serif; color: #333;">
+        <div style="text-align: center; border-bottom: 2px solid #1E3A8A; padding-bottom: 10px; margin-bottom: 20px;">
+            <h1 style="color: #1E3A8A; margin: 0; font-size: 28px;">🏫 {school_name}</h1>
+            <h3 style="color: #0284C7; margin: 5px 0 0 0;">OFFICIAL RESULT CARD</h3>
+        </div>
+        
+        <table style="width: 100%; border: none; margin-bottom: 20px;">
+            <tr>
+                <td style="padding: 5px; font-size: 16px;"><b>Student Name:</b> {st_data['name']}</td>
+                <td style="padding: 5px; font-size: 16px; text-align: right;"><b>Roll No:</b> {roll_no}</td>
+            </tr>
+            <tr>
+                <td style="padding: 5px; font-size: 16px;"><b>Father's Name:</b> {st_data.get('father_name', 'N/A')}</td>
+                <td style="padding: 5px; font-size: 16px; text-align: right;"><b>Class:</b> {st_data.get('class', 'N/A')}</td>
+            </tr>
+            <tr>
+                <td style="padding: 5px; font-size: 16px;"><b>Mother's Name:</b> {st_data.get('mother_name', 'N/A')}</td>
+                <td style="padding: 5px; font-size: 16px; text-align: right;"><b>DOB:</b> {st_data['dob']}</td>
+            </tr>
+        </table>
+
+        <h4 style="color: #1E3A8A; border-bottom: 1px solid #ccc; padding-bottom: 5px;">Subject-wise Marks</h4>
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;" border="1">
+            <tr style="background-color: #1E3A8A; color: white;">
+                <th style="padding: 10px; text-align: left;">Subject</th>
+                <th style="padding: 10px; text-align: center;">Full Marks</th>
+                <th style="padding: 10px; text-align: center;">Obtained Marks</th>
+            </tr>
+    """
+    
+    for sub, m_info in st_data.get('subjects', {}).items():
+        html += f"""
+            <tr>
+                <td style="padding: 8px;"><b>{sub}</b></td>
+                <td style="padding: 8px; text-align: center;">{m_info['full']}</td>
+                <td style="padding: 8px; text-align: center;">{m_info['obt']}</td>
+            </tr>
+        """
+        
+    res_color = "green" if st_data.get('result') == "PASS" else "red"
+    
+    html += f"""
+        </table>
+        
+        <table style="width: 100%; border-top: 2px solid #1E3A8A; padding-top: 15px; font-size: 18px;">
+            <tr>
+                <td><b>Total Marks:</b> {st_data.get('total_obt', 0)} / {st_data.get('total_full', 0)}</td>
+                <td style="text-align: right;"><b>Percentage:</b> {st_data.get('percentage', 0)}%</td>
+            </tr>
+            <tr>
+                <td><b>Grade:</b> <span style="color: #0284C7; font-weight: bold;">{st_data.get('grade', 'N/A')}</span></td>
+                <td style="text-align: right;"><b>Final Result:</b> <span style="color: {res_color}; font-weight: bold;">{st_data.get('result', 'N/A')}</span></td>
+            </tr>
+        </table>
+        <p style="text-align: center; margin-top: 30px; font-size: 12px; color: #777;">*This is a computer-generated document. Verified by School Management System.</p>
+    </div>
+    """
+    return html
 
 schools_db, students_db = load_data()
 
@@ -72,6 +103,8 @@ st.markdown("<h1 style='text-align: center; color: #1E3A8A;'>🏫 ADVANCED SCHOO
 st.markdown("<hr>", unsafe_allow_html=True)
 
 menu = st.sidebar.selectbox("🎯 Navigation Menu", ["Master Login", "School Login", "Student Login"])
+
+classes_list = [str(i) for i in range(1, 11)]
 
 # ----------------- MASTER LOGIN -----------------
 if menu == "Master Login":
@@ -122,7 +155,7 @@ if menu == "Master Login":
 
 # ----------------- SCHOOL LOGIN -----------------
 elif menu == "School Login":
-    st.subheader("🏫 School Portal (No Forgot Password option here)")
+    st.subheader("🏫 School Portal")
     s_id = st.text_input("School ID")
     s_pass = st.text_input("School Password", type="password")
     
@@ -146,8 +179,13 @@ elif menu == "School Login":
             st_name = st.text_input("Student Name", key="add_name")
             father_name = st.text_input("Father's Name", key="add_father")
             mother_name = st.text_input("Mother's Name", key="add_mother")
-            dob = st.date_input("DOB", key="add_dob")
-            cls = st.text_input("Class", key="add_class")
+            
+            # DOB ରେଞ୍ଜ୍: 2000 ରୁ 2065
+            min_date = datetime.date(2000, 1, 1)
+            max_date = datetime.date(2065, 12, 31)
+            dob = st.date_input("DOB (2000-2065)", min_value=min_date, max_value=max_date, key="add_dob")
+            
+            cls = st.selectbox("Class", classes_list, key="add_class")
             
             st.markdown("#### 📚 Nijara Ichha Mutabaka Subject Add / Remove & Marks")
             if 'num_subjects' not in st.session_state:
@@ -205,7 +243,7 @@ elif menu == "School Login":
                             "grade": grade
                         }
                         save_data(schools_db, students_db)
-                        st.success(f"Roll No {roll_no} ({st_name}) ସଫଳତାର ସହ `students.txt` ରେ ସେଭ୍ ହୋଇଗଲା!")
+                        st.success(f"Roll No {roll_no} ({st_name}) ସଫଳତାର ସହ ସେଭ୍ ହୋଇଗଲା!")
                     else:
                         st.error("Roll No ଏବଂ Student Name ଦିଅନ୍ତୁ।")
             with c_clear:
@@ -223,7 +261,10 @@ elif menu == "School Login":
                 up_father = st.text_input("Edit Father's Name", value=curr_st.get('father_name', ''), key="up_f")
                 up_mother = st.text_input("Edit Mother's Name", value=curr_st.get('mother_name', ''), key="up_m")
                 up_dob = st.text_input("Edit DOB (YYYY-MM-DD)", value=curr_st['dob'], key="up_d")
-                up_cls = st.text_input("Edit Class", value=curr_st['class'], key="up_c")
+                
+                cls_val = curr_st.get('class', '1')
+                cls_index = classes_list.index(cls_val) if cls_val in classes_list else 0
+                up_cls = st.selectbox("Edit Class", classes_list, index=cls_index, key="up_c")
                 
                 up_total_obt = st.number_input("Update Total Obtained Marks", value=float(curr_st.get('total_obt', 0)), key="up_obt")
                 up_total_full = st.number_input("Update Total Full Marks", value=float(curr_st.get('total_full', 300)), key="up_full")
@@ -278,94 +319,72 @@ elif menu == "School Login":
                 rep_roll = st.selectbox("Select Student Roll No for Report", list(school_students.keys()), key="rep_sel")
                 st_data = school_students[rep_roll]
                 
-                st.markdown(f"""
-                <div style="border: 2px solid #1E3A8A; padding: 20px; border-radius: 10px; background-color: #f9f9f9;">
-                    <h2 style="text-align: center; color: #1E3A8A;">{schools_db[cur_school]['name']}</h2>
-                    <h4 style="text-align: center; color: #555;">Official Statement of Marks</h4>
-                    <hr>
-                    <p><b>Student Name:</b> {st_data['name']} &nbsp;&nbsp;&nbsp;&nbsp; <b>Roll No:</b> {rep_roll}</p>
-                    <p><b>Father's Name:</b> {st_data.get('father_name', 'N/A')} &nbsp;&nbsp;&nbsp;&nbsp; <b>Mother's Name:</b> {st_data.get('mother_name', 'N/A')}</p>
-                    <p><b>DOB:</b> {st_data['dob']} &nbsp;&nbsp;&nbsp;&nbsp; <b>Class:</b> {st_data['class']}</p>
-                    <hr>
-                    <h4>Subject-wise Performance:</h4>
-                """, unsafe_allow_html=True)
+                school_name = schools_db[cur_school]['name']
+                # Call styled HTML function
+                st.markdown(generate_result_card_html(school_name, st_data, rep_roll), unsafe_allow_html=True)
                 
-                for sub, m_info in st_data.get('subjects', {}).items():
-                    st.write(f"- **{sub}**: Full Mark: {m_info['full']} | Obtained Mark: {m_info['obt']}")
-                
-                st.markdown(f"""
-                    <hr>
-                    <p><b>Total Marks:</b> {st_data.get('total_obt', 0)} / {st_data.get('total_full', 0)}</p>
-                    <p><b>Percentage:</b> {st_data.get('percentage', 0)}% &nbsp;&nbsp;&nbsp;&nbsp; <b>Grade:</b> {st_data.get('grade', 'N/A')}</p>
-                    <p><b>Final Result:</b> <span style="color: green; font-weight: bold;">{st_data.get('result', 'N/A')}</span></p>
-                </div>
-                """, unsafe_allow_html=True)
-                
-                if st.button("📥 Generate PDF Report"):
-                    pdf_filename = f"Report_{rep_roll}.pdf"
-                    c = canvas.Canvas(pdf_filename, pagesize=letter)
-                    c.drawString(100, 750, f"School: {schools_db[cur_school]['name']}")
-                    c.drawString(100, 730, f"Student Name: {st_data['name']} (Roll: {rep_roll})")
-                    c.drawString(100, 710, f"Father: {st_data.get('father_name', '')} | Mother: {st_data.get('mother_name', '')}")
-                    c.drawString(100, 680, f"Total Marks: {st_data.get('total_obt')} / {st_data.get('total_full')}")
-                    c.drawString(100, 660, f"Percentage: {st_data.get('percentage')}% | Result: {st_data.get('result')}")
-                    c.save()
-                    
-                    with open(pdf_filename, "rb") as f:
-                        st.download_button("📥 Click Here to Download PDF Report", f, file_name=pdf_filename, mime="application/pdf")
-                
-                if st.button("🖨️ Print Report Card"):
-                    st.markdown("<script>window.print();</script>", unsafe_allow_html=True)
-                    st.success("Print command sent to browser!")
+                c_btn1, c_btn2 = st.columns(2)
+                with c_btn1:
+                    if st.button("📥 Generate PDF Report", key="pdf_school"):
+                        pdf_filename = f"Report_{rep_roll}.pdf"
+                        c = canvas.Canvas(pdf_filename, pagesize=letter)
+                        c.drawString(100, 750, f"School: {school_name}")
+                        c.drawString(100, 730, f"Student Name: {st_data['name']} (Roll: {rep_roll})")
+                        c.drawString(100, 710, f"Father: {st_data.get('father_name', '')} | Mother: {st_data.get('mother_name', '')}")
+                        c.drawString(100, 680, f"Total Marks: {st_data.get('total_obt')} / {st_data.get('total_full')}")
+                        c.drawString(100, 660, f"Percentage: {st_data.get('percentage')}% | Result: {st_data.get('result')}")
+                        c.save()
+                        with open(pdf_filename, "rb") as f:
+                            st.download_button("📥 Click Here to Download PDF", f, file_name=pdf_filename, mime="application/pdf")
+                with c_btn2:
+                    if st.button("🖨️ Print Report Card", key="print_school"):
+                        st.markdown("<script>window.print();</script>", unsafe_allow_html=True)
             else:
                 st.warning("ରିପୋର୍ଟ ଜେନେରେଟ୍ କରିବା ପାଇଁ କୌଣସି ଷ୍ଟୁଡେଣ୍ଟ୍ ନାହାଁନ୍ତି।")
 
-# ----------------- STUDENT LOGIN (Result & Report Card Viewer) -----------------
+# ----------------- STUDENT LOGIN -----------------
 elif menu == "Student Login":
     st.subheader("🎓 Student Portal (Result & Report Card Viewer)")
     st_school_id = st.text_input("School ID", key="st_login_school")
+    st_class = st.selectbox("Select Class (1 to 10)", classes_list, key="st_login_class") 
     st_roll = st.text_input("Roll Number", key="st_login_roll")
     st_dob_input = st.text_input("Date of Birth (YYYY-MM-DD)", key="st_login_dob")
     
     if st.button("View Result"):
         try:
             student = students_db[st_school_id][st_roll]
-            if student["dob"] == st_dob_input:
+            
+            if student["dob"] == st_dob_input and student.get("class") == st_class:
                 st.success(f"Welcome KULU SUTAR! ସ୍ୱାଗତମ୍ {student['name']}! ଆପଣଙ୍କ ରେଜଲ୍ଟ୍ ତଳେ ଦିଆଗଲା:")
                 
-                st.markdown(f"""
-                <div style="border: 2px solid #1E3A8A; padding: 20px; border-radius: 10px; background-color: #f9f9f9;">
-                    <h3 style="text-align: center; color: #1E3A8A;">RESULT CARD</h3>
-                    <p><b>Student Name:</b> {student['name']} &nbsp;&nbsp;&nbsp;&nbsp; <b>Roll No:</b> {st_roll}</p>
-                    <p><b>Father's Name:</b> {student.get('father_name', 'N/A')} &nbsp;&nbsp;&nbsp;&nbsp; <b>Mother's Name:</b> {student.get('mother_name', 'N/A')}</p>
-                    <p><b>DOB:</b> {student['dob']} &nbsp;&nbsp;&nbsp;&nbsp; <b>Class:</b> {student['class']}</p>
-                    <hr>
-                    <h4>Subject Marks:</h4>
-                """, unsafe_allow_html=True)
+                school_name = schools_db[st_school_id]['name']
+                # Show Styled Report Card
+                st.markdown(generate_result_card_html(school_name, student, st_roll), unsafe_allow_html=True)
                 
-                for sub, m_info in student.get('subjects', {}).items():
-                    st.write(f"- **{sub}**: Full Mark: {m_info['full']} | Obtained Mark: {m_info['obt']}")
-                
-                st.markdown(f"""
-                    <hr>
-                    <p><b>Total Marks:</b> {student.get('total_obt', 0)} / {student.get('total_full', 0)}</p>
-                    <p><b>Percentage:</b> {student.get('percentage', 0)}% &nbsp;&nbsp;&nbsp;&nbsp; <b>Grade:</b> {student.get('grade', 'N/A')}</p>
-                    <p><b>Final Result:</b> <span style="color: green; font-weight: bold;">{student.get('result', 'N/A')}</span></p>
-                </div>
-                """, unsafe_allow_html=True)
-                
-                if st.button("📥 Download Result PDF"):
-                    filename = f"Result_{st_roll}.pdf"
-                    c = canvas.Canvas(filename, pagesize=letter)
-                    c.drawString(100, 750, f"Student Result: {student['name']}")
-                    c.drawString(100, 730, f"Roll No: {st_roll} | Class: {student['class']}")
-                    c.drawString(100, 700, f"Total Marks: {student.get('total_obt')} / {student.get('total_full')}")
-                    c.drawString(100, 680, f"Percentage: {student.get('percentage')}% | Result: {student.get('result')}")
+                # Student Print & PDF Buttons
+                col1, col2 = st.columns(2)
+                with col1:
+                    # Fix PDF Generation for Student
+                    pdf_filename = f"Result_{st_roll}.pdf"
+                    c = canvas.Canvas(pdf_filename, pagesize=letter)
+                    c.drawString(100, 750, f"School: {school_name}")
+                    c.drawString(100, 730, f"Student Result: {student['name']} (Roll: {st_roll})")
+                    c.drawString(100, 710, f"Father: {student.get('father_name', '')} | Mother: {student.get('mother_name', '')}")
+                    c.drawString(100, 680, f"Total Marks: {student.get('total_obt')} / {student.get('total_full')}")
+                    c.drawString(100, 660, f"Percentage: {student.get('percentage')}% | Result: {student.get('result')}")
                     c.save()
                     
-                    with open(filename, "rb") as f:
-                        st.download_button("📥 Click Here to Download PDF", f, file_name=filename, mime="application/pdf")
+                    with open(pdf_filename, "rb") as f:
+                        st.download_button("📥 Download PDF", f, file_name=pdf_filename, mime="application/pdf", key="st_pdf_btn")
+                
+                with col2:
+                    # Added Print Button for Student
+                    if st.button("🖨️ Print Result Card", key="st_print_btn"):
+                        st.markdown("<script>window.print();</script>", unsafe_allow_html=True)
+            
+            elif student["dob"] != st_dob_input:
+                st.error("ଭୁଲ୍ Date of Birth! ଫର୍ମାଟ୍ ଧ୍ୟାନ ରଖନ୍ତୁ: YYYY-MM-DD (ଉଦାହରଣ: 2008-05-12)")
             else:
-                st.error("ଭୁଲ୍ Date of Birth!")
+                st.error("ଭୁଲ୍ Class! ଦୟାକରି ସଠିକ୍ କ୍ଲାସ୍ ବାଛନ୍ତୁ।")
         except KeyError:
             st.error("ଭୁଲ୍ School ID କିମ୍ବା Roll Number!")
