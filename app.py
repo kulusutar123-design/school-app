@@ -19,6 +19,7 @@ def load_master_data():
         with open(MASTER_FILE, "r", encoding="utf-8") as f:
             return json.load(f)
     else:
+        # Default High Security Master
         return {"username": "master", "password": "master123", "email": "admin@school.com", "phone": "9999999999"}
 
 def save_master_data(data):
@@ -153,7 +154,7 @@ st.markdown("<hr>", unsafe_allow_html=True)
 menu = st.sidebar.selectbox("🎯 Navigation Menu", ["Master Login", "School Login", "Student Login"])
 classes_list = [str(i) for i in range(1, 11)]
 
-# ----------------- MASTER LOGIN -----------------
+# ----------------- MASTER LOGIN (HIGH SECURITY) -----------------
 if menu == "Master Login":
     st.subheader("🔑 Master Administrator Portal")
     
@@ -223,7 +224,7 @@ if menu == "Master Login":
         
         with tab1:
             st.markdown("### 👁️ System Overview & Manage Schools")
-            st.info("🔒 **ଗୋପନୀୟତା ସୂଚନା:** ଏହି ମାଷ୍ଟର୍ ପ୍ୟାନେଲ୍ କେବଳ ଆପଣଙ୍କୁ (Kulu Sutar) ଦେଖାଯିବ। ଅନ୍ୟ କେହି ଆପଣଙ୍କ ମାଷ୍ଟର୍ ଆଇଡି ଦେଖିପାରିବେ ନାହିଁ।")
+            st.info("🔒 **HIGH SECURITY ALERT:** ଏହି ମାଷ୍ଟର୍ ପ୍ୟାନେଲ୍ କେବଳ ଗୋଟିଏ ହିଁ ଆଇଡି (ଆପଣଙ୍କର) ପାଇଁ ତିଆରି ହୋଇଛି। ଅନ୍ୟ କୌଣସି ମାଷ୍ଟର୍ ଏହି ସିଷ୍ଟମ୍‌ରେ ନାହାଁନ୍ତି କିମ୍ବା ଆସିପାରିବେ ନାହିଁ। ଆପଣଙ୍କ ଡାଟା ୧୦୦% ସୁରକ୍ଷିତ।")
             
             st.markdown("#### 🏫 Registered Schools (View & Delete):")
             if not schools_db:
@@ -340,7 +341,7 @@ elif menu == "School Login":
             else:
                 st.error("ଭୁଲ୍ School ID କିମ୍ବା Password!")
                 
-    else: # School ଲଗ୍ଇନ୍ ହେବା ପରେ ଦୃଶ୍ୟ
+    else: # School ଲଗ୍ଇନ୍ ହେବା ପରେ ଦୃଶ୍ୟ (ସହିତ ଲଗ୍ଆଉଟ୍ ବଟନ୍)
         cur_school = st.session_state['school_logged_id']
         
         col1, col2 = st.columns([8, 2])
