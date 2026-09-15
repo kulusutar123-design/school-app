@@ -157,58 +157,67 @@ classes_list = [str(i) for i in range(1, 11)]
 if menu == "Master Login":
     st.subheader("🔑 Master Administrator Portal")
     
-    login_mode = st.radio("Choose Action", ["Login", "Forgot Password"])
-    
-    if login_mode == "Login":
-        m_user = st.text_input("Master Username")
-        m_pass = st.text_input("Master Password", type="password")
+    if not st.session_state.get('master_logged', False):
+        login_mode = st.radio("Choose Action", ["Login", "Forgot Password"])
         
-        if st.button("Login"):
-            if m_user == master_db["username"] and m_pass == master_db["password"]:
-                st.success("Welcome KULU SUTAR! ମାଷ୍ଟର୍ ଲଗ୍ଇନ୍ ସଫଳ ହେଲା!")
-                st.session_state['master_logged'] = True
-            else:
-                st.error("ଭୁଲ୍ Master ID କିମ୍ବା Password!")
-                
-    elif login_mode == "Forgot Password":
-        st.info("Recover your Master Account using Mobile or Email OTP")
-        verify_contact = st.text_input("Enter Registered Mobile No or Email")
-        
-        if st.button("Send OTP"):
-            if verify_contact == master_db.get("email") or verify_contact == master_db.get("phone"):
-                otp_code = str(random.randint(1000, 9999))
-                st.session_state['master_otp'] = otp_code
-                st.success("OTP Sent Successfully!")
-                st.info(f"📲 [DEMO SIMULATION] Your OTP is: **{otp_code}**")
-            else:
-                st.error("Invalid Email or Mobile Number!")
-                
-        if 'master_otp' in st.session_state:
-            entered_otp = st.text_input("Enter 4-digit OTP")
-            if st.button("Verify OTP"):
-                if entered_otp == st.session_state['master_otp']:
-                    st.success("OTP Verified! You can now reset your Username and Password.")
-                    st.session_state['otp_verified'] = True
+        if login_mode == "Login":
+            m_user = st.text_input("Master Username")
+            m_pass = st.text_input("Master Password", type="password")
+            
+            if st.button("Login"):
+                if m_user == master_db["username"] and m_pass == master_db["password"]:
+                    st.session_state['master_logged'] = True
+                    st.rerun()
                 else:
-                    st.error("Invalid OTP!")
+                    st.error("ଭୁଲ୍ Master ID କିମ୍ବା Password!")
                     
-        if st.session_state.get('otp_verified', False):
-            st.markdown("### 🔄 Reset Master Credentials")
-            new_m_user = st.text_input("New Master Username")
-            new_m_pass = st.text_input("New Master Password", type="password")
-            if st.button("Save New Credentials"):
-                if new_m_user and new_m_pass:
-                    master_db["username"] = new_m_user
-                    master_db["password"] = new_m_pass
-                    save_master_data(master_db)
-                    st.success("Master ID & Password successfully updated! Please go to 'Login'.")
-                    del st.session_state['master_otp']
-                    del st.session_state['otp_verified']
+        elif login_mode == "Forgot Password":
+            st.info("Recover your Master Account using Mobile or Email OTP")
+            verify_contact = st.text_input("Enter Registered Mobile No or Email")
+            
+            if st.button("Send OTP"):
+                if verify_contact == master_db.get("email") or verify_contact == master_db.get("phone"):
+                    otp_code = str(random.randint(1000, 9999))
+                    st.session_state['master_otp'] = otp_code
+                    st.success("OTP Sent Successfully!")
+                    st.info(f"📲 [DEMO SIMULATION] Your OTP is: **{otp_code}**")
                 else:
-                    st.warning("Please fill both fields.")
+                    st.error("Invalid Email or Mobile Number!")
+                    
+            if 'master_otp' in st.session_state:
+                entered_otp = st.text_input("Enter 4-digit OTP")
+                if st.button("Verify OTP"):
+                    if entered_otp == st.session_state['master_otp']:
+                        st.success("OTP Verified! You can now reset your Username and Password.")
+                        st.session_state['otp_verified'] = True
+                    else:
+                        st.error("Invalid OTP!")
+                        
+            if st.session_state.get('otp_verified', False):
+                st.markdown("### 🔄 Reset Master Credentials")
+                new_m_user = st.text_input("New Master Username")
+                new_m_pass = st.text_input("New Master Password", type="password")
+                if st.button("Save New Credentials"):
+                    if new_m_user and new_m_pass:
+                        master_db["username"] = new_m_user
+                        master_db["password"] = new_m_pass
+                        save_master_data(master_db)
+                        st.success("Master ID & Password successfully updated! Please go to 'Login'.")
+                        del st.session_state['master_otp']
+                        del st.session_state['otp_verified']
+                    else:
+                        st.warning("Please fill both fields.")
 
-    # MASTER DASHBOARD
-    if st.session_state.get('master_logged', False):
+    # MASTER DASHBOARD (ଯଦି ଲଗ୍ଇନ୍ ହୋଇଥାଏ)
+    else:
+        col1, col2 = st.columns([8, 2])
+        with col1:
+            st.success("Welcome KULU SUTAR! ମାଷ୍ଟର୍ ସିଷ୍ଟମ୍ କୁ ସ୍ୱାଗତମ୍!")
+        with col2:
+            if st.button("🔴 Logout (Master)", key="m_logout"):
+                st.session_state['master_logged'] = False
+                st.rerun()
+
         st.markdown("---")
         tab1, tab2, tab3, tab4, tab5 = st.tabs(["📊 All IDs & Schools", "🏫 Register School", "🎓 Edit Students Data", "🔄 Forgot School Password", "⚙️ Settings (Change ID/Pass)"])
         
@@ -221,11 +230,10 @@ if menu == "Master Login":
                 st.write("କୌଣସି ସ୍କୁଲ୍ ରେଜିଷ୍ଟର୍ ହୋଇନାହିଁ।")
             else:
                 for s_id, s_info in list(schools_db.items()):
-                    col1, col2, col3 = st.columns([2, 4, 2])
-                    col1.write(f"**School ID:** {s_id}")
-                    col2.write(f"**Name:** {s_info['name']}")
-                    if col3.button(f"🗑️ Delete School", key=f"del_school_{s_id}"):
-                        # ସ୍କୁଲ୍ ଏବଂ ତା'ର ପିଲାମାନଙ୍କୁ ଡିଲିଟ୍ କରିଦିଆଯିବ
+                    c_1, c_2, c_3 = st.columns([2, 4, 2])
+                    c_1.write(f"**School ID:** {s_id}")
+                    c_2.write(f"**Name:** {s_info['name']}")
+                    if c_3.button(f"🗑️ Delete School", key=f"del_school_{s_id}"):
                         del schools_db[s_id]
                         if s_id in students_db:
                             del students_db[s_id]
@@ -320,21 +328,30 @@ if menu == "Master Login":
 # ----------------- SCHOOL LOGIN -----------------
 elif menu == "School Login":
     st.subheader("🏫 School Portal")
-    s_id = st.text_input("School ID")
-    s_pass = st.text_input("School Password", type="password")
     
-    if st.button("Login as School"):
-        if s_id in schools_db and schools_db[s_id]["pass"] == s_pass:
-            st.success(f"Welcome KULU SUTAR! ସ୍ୱାଗତମ୍ {schools_db[s_id]['name']}!")
-            st.session_state['school_logged_id'] = s_id
-        else:
-            st.error("ଭୁଲ୍ School ID କିମ୍ବା Password!")
-
-    if 'school_logged_id' in st.session_state:
-        cur_school = st.session_state['school_logged_id']
-        st.markdown("---")
+    if 'school_logged_id' not in st.session_state:
+        s_id = st.text_input("School ID")
+        s_pass = st.text_input("School Password", type="password")
         
-        st.info(f"🏫 **Your School ID:** {cur_school} | **School Name:** {schools_db[cur_school]['name']}")
+        if st.button("Login as School"):
+            if s_id in schools_db and schools_db[s_id]["pass"] == s_pass:
+                st.session_state['school_logged_id'] = s_id
+                st.rerun()
+            else:
+                st.error("ଭୁଲ୍ School ID କିମ୍ବା Password!")
+                
+    else: # School ଲଗ୍ଇନ୍ ହେବା ପରେ ଦୃଶ୍ୟ
+        cur_school = st.session_state['school_logged_id']
+        
+        col1, col2 = st.columns([8, 2])
+        with col1:
+            st.info(f"🏫 **Your School ID:** {cur_school} | **School Name:** {schools_db[cur_school]['name']}")
+        with col2:
+            if st.button("🔴 Logout (School)", key="s_logout"):
+                del st.session_state['school_logged_id']
+                st.rerun()
+
+        st.markdown("---")
         
         tab_list, tab_add, tab_edit, tab_report = st.tabs(["📋 My Students & IDs", "Add/Save Student", "Edit/Update by Roll No", "Generate & Print Report"])
         
