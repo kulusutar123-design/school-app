@@ -472,7 +472,7 @@ elif menu == "Master Login":
                         
                         school_students[m_edit_roll].update({
                             "name": m_up_name, "gender": m_up_gender, "pen_no": m_up_pen, "apaar_no": m_up_apaar,
-                            "father_name": m_up_father, "mother_name": m_up_mother,
+                            "father_name": up_father, "mother_name": up_mother,
                             "dob": m_up_dob, "class": m_up_cls, "total_obt": m_up_obt,
                             "total_full": m_up_full, "percentage": round(new_per, 2),
                             "result": new_res, "grade": new_grd
@@ -523,8 +523,15 @@ elif menu == "School Login":
         if 'school_captcha' not in st.session_state:
             st.session_state['school_captcha'] = str(random.randint(10000, 99999))
             
-        st.markdown(f"<div style='margin-top:10px; margin-bottom:10px;'><b>CAPTCHA:</b> <span style='background-color: #f1f5f9; color:#0f172a; padding: 5px 20px; font-size: 22px; font-weight: bold; letter-spacing: 6px; border: 1px solid #cbd5e1; border-radius: 5px;'>{st.session_state['school_captcha']}</span></div>", unsafe_allow_html=True)
-        
+        c_cap1, c_cap2 = st.columns([3, 7])
+        with c_cap1:
+            st.markdown(f"<div style='margin-top:10px; margin-bottom:10px;'><b>CAPTCHA:</b> <br><span style='background-color: #f1f5f9; color:#0f172a; padding: 5px 20px; font-size: 22px; font-weight: bold; letter-spacing: 6px; border: 1px solid #cbd5e1; border-radius: 5px; display:inline-block; margin-top:5px;'>{st.session_state['school_captcha']}</span></div>", unsafe_allow_html=True)
+        with c_cap2:
+            st.write("<br>", unsafe_allow_html=True)
+            if st.button("🔄 Refresh CAPTCHA"):
+                st.session_state['school_captcha'] = str(random.randint(10000, 99999))
+                st.rerun()
+                
         entered_captcha = st.text_input("Enter the CAPTCHA code shown above")
         
         if st.button("Login as School"):
@@ -595,7 +602,6 @@ elif menu == "School Login":
             
             min_date = datetime.date(2000, 1, 1)
             max_date = datetime.date(2065, 12, 31)
-            # School add module standard format (DB saves as YYYY-MM-DD string)
             dob = st.date_input("DOB (YYYY-MM-DD)", min_value=min_date, max_value=max_date, key="add_dob")
             
             cls = st.selectbox("Class", classes_list, key="add_class")
@@ -761,7 +767,6 @@ elif menu == "Results":
         
         # ସବୁ ସ୍କୁଲ୍ ଭିତରେ ଖୋଜିବା
         for s_id, school_students in students_db.items():
-            # ୧. Roll No ଦ୍ୱାରା ଖୋଜିବା
             if st_search_query in school_students:
                 potential_student = school_students[st_search_query]
                 if potential_student["dob"] == db_dob_format and potential_student.get("class") == st_class:
@@ -770,7 +775,6 @@ elif menu == "Results":
                     found_school_id = s_id
                     break
             
-            # ୨. ନାମ (Name) ଦ୍ୱାରା ଖୋଜିବା
             if not found_student:
                 for r_no, s_info in school_students.items():
                     if s_info.get("name", "").strip().lower() == search_query_lower:
