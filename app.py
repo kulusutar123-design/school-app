@@ -185,7 +185,7 @@ st.markdown("<h3 style='text-align: center; color: #0284C7; margin-top:-20px;'>�
 st.markdown("<h1 style='text-align: center; color: #1E3A8A; font-size: 30px;'>🏫 ADVANCED SCHOOL MANAGEMENT SYSTEM</h1>", unsafe_allow_html=True)
 st.markdown("<hr style='margin-bottom: 10px;'>", unsafe_allow_html=True)
 
-menu = st.sidebar.selectbox("🎯 Navigation Menu", ["Home Page", "Master Login", "School Login", "Student Login"], index=default_idx)
+menu = st.sidebar.selectbox("🎯 Navigation Menu", ["Home Page", "Master Login", "School Login", "Results"], index=default_idx)
 
 if menu == "Home Page":
     st.query_params["portal"] = "home"
@@ -193,7 +193,7 @@ elif menu == "Master Login":
     st.query_params["portal"] = "master"
 elif menu == "School Login":
     st.query_params["portal"] = "school"
-elif menu == "Student Login":
+elif menu == "Results":
     st.query_params["portal"] = "student"
 
 classes_list = [str(i) for i in range(1, 11)]
@@ -300,7 +300,7 @@ if menu == "Home Page":
         <div class="login-sub">Click here to login as School / College</div>
     </a>
     <a href="?portal=student" target="_self" class="login-card" style="text-decoration: none;">
-        <div class="login-title">🎓 Student Login</div>
+        <div class="login-title">🎓 Results</div>
         <div class="login-sub">Click here to check Student Rank Card</div>
     </a>
     """, unsafe_allow_html=True)
@@ -537,7 +537,7 @@ elif menu == "School Login":
                 st.rerun()
 
         st.markdown("---")
-        st.success("🔗 **Share Direct Student Login Link:** `?portal=student`")
+        st.success("🔗 **Share Direct Results Link:** `?portal=student`")
 
         tab_list, tab_add, tab_edit, tab_report = st.tabs(["📋 My Students & IDs", "Add/Save Student", "Edit/Update by Roll No", "Generate & Print Report"])
         
@@ -708,15 +708,15 @@ elif menu == "School Login":
             else:
                 st.warning("କୌଣସି ଷ୍ଟୁଡେଣ୍ଟ୍ ନାହାଁନ୍ତି।")
 
-# ----------------- STUDENT LOGIN -----------------
-elif menu == "Student Login":
+# ----------------- RESULTS PORTAL -----------------
+elif menu == "Results":
     c_home, c_title = st.columns([1, 8])
     with c_home:
         if st.button("🏠 Home", key="st_home_btn"):
             st.query_params["portal"] = "home"
             st.rerun()
     with c_title:
-        st.subheader("🎓 Student Portal (Result Viewer)")
+        st.subheader("🎓 Results Portal")
         
     st.info("🔗 ଏଠାରେ କୌଣସି School ID ଦରକାର ନାହିଁ। କେବଳ Roll Number କିମ୍ବା Name ଦେଇ ସର୍ଚ୍ଚ କରନ୍ତୁ।")
     
