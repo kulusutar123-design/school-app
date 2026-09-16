@@ -735,7 +735,11 @@ elif menu == "Results":
     with c_title:
         st.subheader("🎓 Results Portal")
         
-    st.info("🔗 ଏଠାରେ କୌଣସି School ID ଦରକାର ନାହିଁ। କେବଳ Roll Number କିମ୍ବା Name ଦେଇ ସର୍ଚ୍ଚ କରନ୍ତୁ।")
+    st.info("""
+    🔗 **English:** No School ID is required here. Search using only your Roll Number or Name.  
+    🔗 **हिन्दी:** यहाँ किसी School ID की आवश्यकता नहीं है। कृपया केवल अपना रोल नंबर या नाम दर्ज करके खोजें।  
+    🔗 **ଓଡ଼ିଆ:** ଏଠାରେ କୌଣସି School ID ଦରକାର ନାହିଁ। କେବଳ Roll Number କିମ୍ବା Name ଦେଇ ସର୍ଚ୍ଚ କରନ୍ତୁ।
+    """)
     
     st_class = st.selectbox("Select Class (1 to 10)", classes_list, key="st_login_class") 
     st_search_query = st.text_input("Roll Number OR Student Name (ରୋଲ୍ ନମ୍ବର କିମ୍ବା ନାମ ଦିଅନ୍ତୁ)", key="st_login_search")
