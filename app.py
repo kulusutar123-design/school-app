@@ -1,268 +1,553 @@
 import streamlit as st
+import streamlit.components.v1 as components
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
 import json
 import os
-import random
 import datetime
-from fpdf import FPDF
+import random
 
-# File Locations
-DATA_FILE = "students_db.txt"
-USER_FILE = "users_db.txt"
+st.set_page_config(page_title="Advanced School Management System", layout="wide")
 
-# Utility Functions
-def load_data(file_name):
-    if os.path.exists(file_name):
-        try:
-            with open(file_name, "r") as f:
-                return json.load(f)
-        except:
-            return {}
-    return {}
+SCHOOLS_FILE = "schools.json"
+STUDENTS_FILE = "students.txt"
+MASTER_FILE = "master.json"
 
-def save_data(file_name, data):
-    with open(file_name, "w") as f:
+# --- ଡାଟା ଲୋଡ୍ ଓ ସେଭ୍ ଫଙ୍କସନ୍ ---
+def load_master_data():
+    if os.path.exists(MASTER_FILE):
+        with open(MASTER_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    else:
+        # Default High Security Master
+        return {"username": "master", "password": "master123", "email": "admin@school.com", "phone": "9999999999"}
+
+def save_master_data(data):
+    with open(MASTER_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=4)
 
-def generate_report_pdf(student_data):
-    pdf = FPDF()
-    pdf.add_page()
-    
-    # Border
-    pdf.rect(5, 5, 200, 287)
-    
-    # Header
-    pdf.set_font("Arial", 'B', 18)
-    pdf.cell(200, 15, txt=student_data['school'].upper(), ln=True, align='C')
-    pdf.set_font("Arial", 'B', 14)
-    pdf.cell(200, 10, txt="ANNUAL PROGRESS REPORT CARD", ln=True, align='C')
-    pdf.line(10, 35, 200, 35)
-    
-    # Student Info
-    pdf.ln(10)
-    pdf.set_font("Arial", '', 12)
-    pdf.cell(100, 8, txt=f"Student Name: {student_data['name']}")
-    pdf.cell(100, 8, txt=f"Roll No: {student_data['roll']}", ln=True)
-    pdf.cell(100, 8, txt=f"Class: {student_data['class']}")
-    pdf.cell(100, 8, txt=f"Date of Birth: {student_data['dob']}", ln=True)
-    pdf.cell(100, 8, txt=f"Father's Name: {student_data['father']}")
-    pdf.cell(100, 8, txt=f"Mother's Name: {student_data['mother']}", ln=True)
-    
-    # Marks Table Header
-    pdf.ln(10)
-    pdf.set_fill_color(230, 230, 230)
-    pdf.set_font("Arial", 'B', 11)
-    pdf.cell(80, 10, "Subject", border=1, fill=True)
-    pdf.cell(55, 10, "Full Mark", border=1, fill=True)
-    pdf.cell(55, 10, "Obtained Mark", border=1, fill=True, ln=True)
-    
-    # Marks Data
-    pdf.set_font("Arial", '', 11)
-    for sub in student_data['subjects']:
-        pdf.cell(80, 10, sub['name'], border=1)
-        pdf.cell(55, 10, str(sub['fm']), border=1)
-        pdf.cell(55, 10, str(sub['om']), border=1, ln=True)
+def load_data():
+    if os.path.exists(SCHOOLS_FILE):
+        with open(SCHOOLS_FILE, "r", encoding="utf-8") as f:
+            schools = json.load(f)
+    else:
+        schools = {"S001": {"name": "Govt High School Cuttack", "pass": "admin123"}}
         
-    # Result Summary
-    pdf.ln(10)
-    pdf.set_font("Arial", 'B', 12)
-    pdf.cell(200, 10, txt=f"Final Result: {student_data['total']} | Percentage: {student_data['percentage']} | Grade: {student_data['grade']}", ln=True)
+    if os.path.exists(STUDENTS_FILE):
+        try:
+            with open(STUDENTS_FILE, "r", encoding="utf-8") as f:
+                students = json.load(f)
+        except:
+            students = {}
+    else:
+        students = {}
+    return schools, students
+
+def save_data(schools, students):
+    with open(SCHOOLS_FILE, "w", encoding="utf-8") as f:
+        json.dump(schools, f, indent=4)
+    with open(STUDENTS_FILE, "w", encoding="utf-8") as f:
+        json.dump(students, f, indent=4)
+
+# --- ସୁନ୍ଦର ରାଙ୍କ୍ କାର୍ଡ (RANK CARD) ଡିଜାଇନ୍ (Without Indentation Bugs) ---
+def generate_result_card_html(school_name, st_data, roll_no):
+    res_color = "#15803d" if st_data.get('result') == "PASS" else "#dc2626"
+    bg_color = "#f0fdf4" if st_data.get('result') == "PASS" else "#fef2f2"
     
-    # Signatures
-    pdf.ln(20)
-    pdf.set_font("Arial", 'I', 10)
-    pdf.cell(100, 10, "Class Teacher Signature", align='L')
-    pdf.cell(100, 10, "Headmaster Signature", align='R', ln=True)
+    # ଟେବୁଲ୍ ରୋ' (Row) ଗୁଡ଼ିକୁ ବିନା ସ୍ପେସ୍ ରେ ଯୋଡ଼ିବା ପାଇଁ
+    rows_html = ""
+    for sub, m_info in st_data.get('subjects', {}).items():
+        rows_html += f"<tr><td style='padding: 12px; border: 1px solid #cbd5e1; text-align: left; font-weight: bold;'>{sub}</td><td style='padding: 12px; border: 1px solid #cbd5e1;'>{m_info['full']}</td><td style='padding: 12px; border: 1px solid #cbd5e1; font-weight: bold;'>{m_info['obt']}</td></tr>"
+
+    html_content = f"""
+    <div style="border: 3px solid #1E3A8A; padding: 30px; border-radius: 12px; background-color: #ffffff; color: #1e293b; font-family: Arial, sans-serif; max-width: 850px; margin: auto; box-shadow: 0px 8px 16px rgba(0,0,0,0.15);">
+        <div style="text-align: center; border-bottom: 4px double #1E3A8A; padding-bottom: 15px; margin-bottom: 25px;">
+            <h1 style="color: #1E3A8A; margin: 0; font-size: 32px; text-transform: uppercase; font-weight: 900;">🏫 {school_name}</h1>
+            <h3 style="color: #e11d48; margin: 8px 0 0 0; letter-spacing: 3px; font-weight: bold;">OFFICIAL RANK CARD</h3>
+        </div>
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 16px;">
+            <tr>
+                <td style="padding: 8px 0;"><b>Student Name:</b> {st_data.get('name', '')}</td>
+                <td style="padding: 8px 0; text-align: right;"><b>Roll No (Student ID):</b> {roll_no}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px 0;"><b>Father's Name:</b> {st_data.get('father_name', 'N/A')}</td>
+                <td style="padding: 8px 0; text-align: right;"><b>Class:</b> {st_data.get('class', 'N/A')}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px 0;"><b>Mother's Name:</b> {st_data.get('mother_name', 'N/A')}</td>
+                <td style="padding: 8px 0; text-align: right;"><b>Date of Birth:</b> {st_data.get('dob', '')}</td>
+            </tr>
+        </table>
+        <h4 style="color: #ffffff; background-color: #1E3A8A; padding: 12px; margin: 0; text-align: center; border-top-left-radius: 8px; border-top-right-radius: 8px; letter-spacing: 1px;">SUBJECT-WISE PERFORMANCE</h4>
+        <table style="width: 100%; border-collapse: collapse; text-align: center; margin-bottom: 30px; font-size: 16px; background-color: #f8fafc;">
+            <tr style="background-color: #e2e8f0; color: #1e293b;">
+                <th style="padding: 12px; border: 1px solid #cbd5e1;">Subject</th>
+                <th style="padding: 12px; border: 1px solid #cbd5e1;">Full Marks</th>
+                <th style="padding: 12px; border: 1px solid #cbd5e1;">Obtained Marks</th>
+            </tr>
+            {rows_html}
+        </table>
+        <div style="background-color: {bg_color}; padding: 20px; border: 2px solid {res_color}; border-radius: 8px;">
+            <table style="width: 100%; font-size: 18px;">
+                <tr>
+                    <td style="padding: 5px 0;"><b>Total Marks:</b> <span style="font-size: 20px;">{st_data.get('total_obt', 0)} / {st_data.get('total_full', 0)}</span></td>
+                    <td style="padding: 5px 0; text-align: center;"><b>Percentage:</b> <span style="font-size: 20px;">{st_data.get('percentage', 0)}%</span></td>
+                    <td style="padding: 5px 0; text-align: right;"><b>Grade:</b> <span style="color: #1E3A8A; font-size: 24px; font-weight: 900;">{st_data.get('grade', 'N/A')}</span></td>
+                </tr>
+            </table>
+            <div style="text-align: center; margin-top: 20px; padding-top: 15px; border-top: 2px dashed {res_color};">
+                <span style="font-size: 20px; font-weight: bold; color: #475569;">FINAL RESULT:</span> <span style="color: {res_color}; font-size: 28px; font-weight: 900; letter-spacing: 2px; margin-left: 10px;">{st_data.get('result', 'N/A')}</span>
+            </div>
+        </div>
+    </div>
+    """
+    return html_content
+
+# --- PDF ଜେନେରେଟର ---
+def create_pdf(filename, school_name, st_data, roll_no):
+    c = canvas.Canvas(filename, pagesize=letter)
+    c.setFont("Helvetica-Bold", 20)
+    c.drawCentredString(300, 750, school_name)
+    c.setFont("Helvetica-Bold", 14)
+    c.drawCentredString(300, 730, "OFFICIAL RANK CARD")
     
-    return pdf.output(dest='S').encode('latin-1')
-
-# --- Streamlit UI Setup ---
-st.set_page_config(page_title="Advanced School Management", layout="wide")
-
-# Custom CSS for styling
-st.markdown("""
-    <style>
-    .main { background-color: #f5f7f9; }
-    .stButton>button { border-radius: 5px; height: 3em; font-weight: bold; }
-    .result-card { background-color: white; padding: 25px; border-radius: 15px; border-left: 5px solid #1f77b4; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-    </style>
-    """, unsafe_allow_html=True)
-
-st.title("🏫 Advanced School Management System")
-
-# Navigation Tabs
-tab1, tab2 = st.tabs(["👨‍🎓 STUDENT PORTAL", "🏢 SCHOOL ADMIN LOGIN"])
-
-# --- TAB 1: STUDENT PORTAL ---
-with tab1:
-    st.header("Check Your Result")
-    col_s1, col_s2 = st.columns(2)
-    with col_s1:
-        s_roll = st.text_input("Enter Your Roll Number:", key="student_roll")
-    with col_s2:
-        s_dob = st.date_input("Select Your DOB:", min_value=datetime.date(2000, 1, 1), max_value=datetime.date(2065, 12, 31), key="student_dob")
+    c.setFont("Helvetica", 12)
+    c.drawString(50, 680, f"Student Name: {st_data.get('name', '')}")
+    c.drawString(400, 680, f"Roll No: {roll_no}")
+    c.drawString(50, 660, f"Father's Name: {st_data.get('father_name', 'N/A')}")
+    c.drawString(400, 660, f"Class: {st_data.get('class', '')}")
+    c.drawString(50, 640, f"Mother's Name: {st_data.get('mother_name', 'N/A')}")
+    c.drawString(400, 640, f"DOB: {st_data.get('dob', '')}")
     
-    if st.button("🔍 View & Download Result"):
-        students = load_data(DATA_FILE)
-        str_dob = s_dob.strftime("%d/%m/%Y")
+    c.line(50, 620, 550, 620)
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(50, 600, "Subject")
+    c.drawString(300, 600, "Full Marks")
+    c.drawString(450, 600, "Obtained Marks")
+    c.line(50, 590, 550, 590)
+    
+    y = 570
+    c.setFont("Helvetica", 12)
+    for sub, m_info in st_data.get('subjects', {}).items():
+        c.drawString(50, y, str(sub))
+        c.drawString(300, y, str(m_info['full']))
+        c.drawString(450, y, str(m_info['obt']))
+        y -= 20
         
-        found = False
-        for r, data in students.items():
-            if str(r) == str(s_roll) and data['dob'] == str_dob:
-                found = True
-                st.success(f"Result Found for {data['name']}!")
-                
-                # Professional Result Display
-                st.markdown(f"""
-                <div class="result-card">
-                    <h3>REPORT CARD - {data['school']}</h3>
-                    <p><b>Name:</b> {data['name']} | <b>Roll No:</b> {data['roll']} | <b>Class:</b> {data['class']}</p>
-                    <p><b>Result:</b> {data['grade']} ({data['percentage']})</p>
-                </div>
-                """, unsafe_allow_html=True)
-                
-                # Marks table display
-                st.table(data['subjects'])
-                
-                # PDF Download Button for Student
-                pdf_bytes = generate_report_pdf(data)
-                st.download_button(
-                    label="📥 Download Official Marksheet (PDF)",
-                    data=pdf_bytes,
-                    file_name=f"Result_{s_roll}.pdf",
-                    mime="application/pdf",
-                    use_container_width=True
-                )
-                break
-        
-        if not found:
-            st.error("Roll Number or Date of Birth does not match!")
+    c.line(50, y, 550, y)
+    y -= 20
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(50, y, f"Total Marks: {st_data.get('total_obt', 0)} / {st_data.get('total_full', 0)}")
+    c.drawString(400, y, f"Percentage: {st_data.get('percentage', 0)}%")
+    y -= 20
+    c.drawString(50, y, f"Grade: {st_data.get('grade', '')}")
+    c.drawString(400, y, f"Final Result: {st_data.get('result', '')}")
+    c.save()
 
-# --- TAB 2: SCHOOL ADMIN ---
-with tab2:
-    if 'admin_logged_in' not in st.session_state:
-        st.session_state.admin_logged_in = False
+# --- MAIN APP START ---
+schools_db, students_db = load_data()
+master_db = load_master_data()
 
-    if not st.session_state.admin_logged_in:
-        st.subheader("Admin Access")
-        admin_id = st.text_input("Admin ID / Mobile:")
-        admin_pwd = st.text_input("Admin Password:", type="password")
+st.markdown("<h3 style='text-align: center; color: #0284C7;'>✨ WELCOME KULU SUTAR ✨</h3>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: #1E3A8A;'>🏫 ADVANCED SCHOOL MANAGEMENT SYSTEM</h1>", unsafe_allow_html=True)
+st.markdown("<hr>", unsafe_allow_html=True)
+
+menu = st.sidebar.selectbox("🎯 Navigation Menu", ["Master Login", "School Login", "Student Login"])
+classes_list = [str(i) for i in range(1, 11)]
+
+# ----------------- MASTER LOGIN (HIGH SECURITY) -----------------
+if menu == "Master Login":
+    st.subheader("🔑 Master Administrator Portal")
+    
+    if not st.session_state.get('master_logged', False):
+        login_mode = st.radio("Choose Action", ["Login", "Forgot Password"])
         
-        c1, c2 = st.columns(2)
-        with c1:
-            if st.button("🔑 Login to Dashboard"):
-                users = load_data(USER_FILE)
-                if admin_id in users and users[admin_id] == admin_pwd:
-                    st.session_state.admin_logged_in = True
+        if login_mode == "Login":
+            m_user = st.text_input("Master Username")
+            m_pass = st.text_input("Master Password", type="password")
+            
+            if st.button("Login"):
+                if m_user == master_db["username"] and m_pass == master_db["password"]:
+                    st.session_state['master_logged'] = True
                     st.rerun()
                 else:
-                    st.error("Invalid Credentials!")
-        with c2:
-            if st.button("📩 Create Admin Account"):
-                st.info("Registration is open. Use the OTP feature below.")
-                # Simple Registration Logic
-                new_otp = str(random.randint(111111, 999999))
-                st.session_state.admin_otp = new_otp
-                st.warning(f"Registration OTP: {new_otp}")
-        
-        if 'admin_otp' in st.session_state:
-            otp_val = st.text_input("Enter OTP:")
-            new_reg_pwd = st.text_input("Create Password:", type="password")
-            if st.button("Confirm Registration"):
-                if otp_val == st.session_state.admin_otp:
-                    users = load_data(USER_FILE)
-                    users[admin_id] = new_reg_pwd
-                    save_data(USER_FILE, users)
-                    st.success("Admin Registered! Please login.")
-                    del st.session_state.admin_otp
-    
-    else:
-        st.sidebar.success(f"Admin Dashboard Active")
-        if st.sidebar.button("🚪 Logout"):
-            st.session_state.admin_logged_in = False
-            st.rerun()
+                    st.error("ଭୁଲ୍ Master ID କିମ୍ବା Password!")
+                    
+        elif login_mode == "Forgot Password":
+            st.info("Recover your Master Account using Mobile or Email OTP")
+            verify_contact = st.text_input("Enter Registered Mobile No or Email")
             
-        st.subheader("Manage Student Records")
-        
-        # Search/Delete Logic
-        search_col, action_col = st.columns([3, 1])
-        with search_col:
-            admin_search_roll = st.text_input("Search Roll Number to Edit/Delete:")
-        
-        students = load_data(DATA_FILE)
-        loaded_info = {}
-        
-        col_btn1, col_btn2 = st.columns(2)
-        with col_btn1:
-            if st.button("🔍 Load Data"):
-                if admin_search_roll in students:
-                    loaded_info = students[admin_search_roll]
-                    st.session_state.admin_subjects = loaded_info['subjects']
-                    st.success("Loaded!")
-                else: st.error("Not found")
-        with col_btn2:
-            if st.button("🗑️ Delete Student"):
-                if admin_search_roll in students:
-                    del students[admin_search_roll]
-                    save_data(DATA_FILE, students)
-                    st.success("Deleted!")
-                    st.rerun()
+            if st.button("Send OTP"):
+                if verify_contact == master_db.get("email") or verify_contact == master_db.get("phone"):
+                    otp_code = str(random.randint(1000, 9999))
+                    st.session_state['master_otp'] = otp_code
+                    st.success("OTP Sent Successfully!")
+                    st.info(f"📲 [DEMO SIMULATION] Your OTP is: **{otp_code}**")
+                else:
+                    st.error("Invalid Email or Mobile Number!")
+                    
+            if 'master_otp' in st.session_state:
+                entered_otp = st.text_input("Enter 4-digit OTP")
+                if st.button("Verify OTP"):
+                    if entered_otp == st.session_state['master_otp']:
+                        st.success("OTP Verified! You can now reset your Username and Password.")
+                        st.session_state['otp_verified'] = True
+                    else:
+                        st.error("Invalid OTP!")
+                        
+            if st.session_state.get('otp_verified', False):
+                st.markdown("### 🔄 Reset Master Credentials")
+                new_m_user = st.text_input("New Master Username")
+                new_m_pass = st.text_input("New Master Password", type="password")
+                if st.button("Save New Credentials"):
+                    if new_m_user and new_m_pass:
+                        master_db["username"] = new_m_user
+                        master_db["password"] = new_m_pass
+                        save_master_data(master_db)
+                        st.success("Master ID & Password successfully updated! Please go to 'Login'.")
+                        del st.session_state['master_otp']
+                        del st.session_state['otp_verified']
+                    else:
+                        st.warning("Please fill both fields.")
 
-        st.markdown("---")
-        # Entry Form
-        f1, f2 = st.columns(2)
-        with f1:
-            sch_name = st.text_input("School Name:", value=loaded_info.get('school', 'MY SCHOOL'))
-            stu_name = st.text_input("Student Name:", value=loaded_info.get('name', ''))
-            f_name = st.text_input("Father's Name:", value=loaded_info.get('father', ''))
-            roll_no = st.text_input("Roll Number:", value=loaded_info.get('roll', admin_search_roll))
-        with f2:
-            cls_name = st.text_input("Class:", value=loaded_info.get('class', ''))
-            # SETTING DOB RANGE 2000 to 2065
-            dob_val = st.date_input("Date of Birth:", 
-                                    min_value=datetime.date(2000, 1, 1), 
-                                    max_value=datetime.date(2065, 12, 31))
-            m_name = st.text_input("Mother's Name:", value=loaded_info.get('mother', ''))
-
-        # Subjects
-        st.write("### 📖 Subjects & Marks")
-        if 'admin_subjects' not in st.session_state:
-            st.session_state.admin_subjects = [{"name": "ODIA", "fm": 100, "om": 0}]
-
-        for i, s in enumerate(st.session_state.admin_subjects):
-            sc1, sc2, sc3, sc4 = st.columns([3, 2, 2, 1])
-            st.session_state.admin_subjects[i]['name'] = sc1.text_input(f"Subject {i+1}", value=s['name'], key=f"admin_sub_{i}")
-            st.session_state.admin_subjects[i]['fm'] = sc2.number_input(f"Full Mark", value=int(s['fm']), key=f"admin_fm_{i}")
-            st.session_state.admin_subjects[i]['om'] = sc3.number_input(f"Obtained", value=int(s['om']), key=f"admin_om_{i}")
-            if sc4.button("❌", key=f"admin_del_{i}"):
-                st.session_state.admin_subjects.pop(i)
+    # MASTER DASHBOARD
+    else:
+        col1, col2 = st.columns([8, 2])
+        with col1:
+            st.success("Welcome KULU SUTAR! ମାଷ୍ଟର୍ ସିଷ୍ଟମ୍ କୁ ସ୍ୱାଗତମ୍!")
+        with col2:
+            if st.button("🔴 Logout (Master)", key="m_logout"):
+                st.session_state['master_logged'] = False
                 st.rerun()
 
-        if st.button("➕ Add Subject"):
-            st.session_state.admin_subjects.append({"name": "", "fm": 100, "om": 0})
-            st.rerun()
-
-        # Calculation
-        t_fm = sum([x['fm'] for x in st.session_state.admin_subjects])
-        t_om = sum([x['om'] for x in st.session_state.admin_subjects])
-        per = (t_om/t_fm*100) if t_fm > 0 else 0
-        grd = "F"
-        if per >= 90: grd = "A+"
-        elif per >= 80: grd = "A"
-        elif per >= 60: grd = "B"
-        elif per >= 30: grd = "C"
-
-        st.info(f"Total: {t_om}/{t_fm} | Percentage: {per:.2f}% | Grade: {grd}")
-
-        if st.button("💾 SAVE STUDENT DATA", use_container_width=True):
-            if roll_no:
-                students[roll_no] = {
-                    "school": sch_name, "name": stu_name, "father": f_name,
-                    "mother": m_name, "roll": roll_no, "class": cls_name,
-                    "dob": dob_val.strftime("%d/%m/%Y"),
-                    "subjects": st.session_state.admin_subjects,
-                    "total": f"{t_om}/{t_fm}", "percentage": f"{per:.2f}%", "grade": grd
-                }
-                save_data(DATA_FILE, students)
-                st.success("Student Data Saved Successfully!")
+        st.markdown("---")
+        tab1, tab2, tab3, tab4, tab5 = st.tabs(["📊 All IDs & Schools", "🏫 Register School", "🎓 Edit Students Data", "🔄 Forgot School Password", "⚙️ Settings (Change ID/Pass)"])
+        
+        with tab1:
+            st.markdown("### 👁️ System Overview & Manage Schools")
+            st.info("🔒 **HIGH SECURITY ALERT:** ଏହି ମାଷ୍ଟର୍ ପ୍ୟାନେଲ୍ କେବଳ ଗୋଟିଏ ହିଁ ଆଇଡି ପାଇଁ ତିଆରି ହୋଇଛି। ଆପଣଙ୍କ ଡାଟା ୧୦୦% ସୁରକ୍ଷିତ।")
+            
+            st.markdown("#### 🏫 Registered Schools (View & Delete):")
+            if not schools_db:
+                st.write("କୌଣସି ସ୍କୁଲ୍ ରେଜିଷ୍ଟର୍ ହୋଇନାହିଁ।")
             else:
-                st.error("Roll Number Required!")
+                for s_id, s_info in list(schools_db.items()):
+                    c_1, c_2, c_3 = st.columns([2, 4, 2])
+                    c_1.write(f"**School ID:** {s_id}")
+                    c_2.write(f"**Name:** {s_info['name']}")
+                    if c_3.button(f"🗑️ Delete School", key=f"del_school_{s_id}"):
+                        del schools_db[s_id]
+                        if s_id in students_db:
+                            del students_db[s_id]
+                        save_data(schools_db, students_db)
+                        st.success(f"School '{s_id}' ସମ୍ପୂର୍ଣ୍ଣ ରୂପେ ଡିଲିଟ୍ ହୋଇଗଲା!")
+                        st.rerun()
+                
+            st.markdown("#### 🎓 Registered Student IDs:")
+            total_students = 0
+            for s_id, studs in students_db.items():
+                for r_no, st_info in studs.items():
+                    st.write(f"- **Student ID (Roll No):** {r_no} | **School ID:** {s_id} | Name: {st_info['name']}")
+                    total_students += 1
+            if total_students == 0:
+                st.write("No students registered yet.")
+
+        with tab2:
+            st.markdown("### Register New School")
+            new_s_id = st.text_input("New School ID (e.g. S002)")
+            new_s_name = st.text_input("School Name")
+            new_s_pass = st.text_input("School Password", type="password")
+            if st.button("Create School Account"):
+                if new_s_id and new_s_name and new_s_pass:
+                    schools_db[new_s_id] = {"name": new_s_name, "pass": new_s_pass}
+                    save_data(schools_db, students_db)
+                    st.success(f"ସ୍କୁଲ୍ '{new_s_name}' ସଫଳତାର ସହ ପଞ୍ଜୀକୃତ ହୋଇଗଲା!")
+                else:
+                    st.warning("ସମସ୍ତ ଫିଲ୍ଡ ପୂରଣ କରନ୍ତୁ।")
+                    
+        with tab3:
+            st.markdown("### 📋 Manage All Students (Master Access)")
+            master_school_sel = st.selectbox("Select School", ["--Select--"] + list(schools_db.keys()))
+            if master_school_sel != "--Select--":
+                school_students = students_db.get(master_school_sel, {})
+                if school_students:
+                    m_edit_roll = st.selectbox("Select Student Roll No to Edit", list(school_students.keys()))
+                    m_curr_st = school_students[m_edit_roll]
+                    
+                    st.markdown("#### Edit Student Details")
+                    c1, c2 = st.columns(2)
+                    with c1:
+                        m_up_name = st.text_input("Student Name", value=m_curr_st['name'], key="m_up_n")
+                        m_up_father = st.text_input("Father's Name", value=m_curr_st.get('father_name', ''), key="m_up_f")
+                        cls_val = m_curr_st.get('class', '1')
+                        cls_idx = classes_list.index(cls_val) if cls_val in classes_list else 0
+                        m_up_cls = st.selectbox("Class", classes_list, index=cls_idx, key="m_up_c")
+                    with c2:
+                        m_up_dob = st.text_input("DOB (YYYY-MM-DD)", value=m_curr_st['dob'], key="m_up_d")
+                        m_up_mother = st.text_input("Mother's Name", value=m_curr_st.get('mother_name', ''), key="m_up_m")
+                        m_up_obt = st.number_input("Total Obtained Marks", value=float(m_curr_st.get('total_obt', 0)), key="m_up_o")
+                        m_up_full = st.number_input("Total Full Marks", value=float(m_curr_st.get('total_full', 300)), key="m_up_full")
+                    
+                    if st.button("💾 Force Update Record"):
+                        new_per = (m_up_obt / m_up_full * 100) if m_up_full > 0 else 0.0
+                        new_res = "PASS" if new_per >= 30 else "FAIL"
+                        new_grd = "A+" if new_per >= 90 else "A" if new_per >= 80 else "B" if new_per >= 60 else "C" if new_per >= 40 else "D" if new_per >= 30 else "F"
+                        
+                        school_students[m_edit_roll].update({
+                            "name": m_up_name, "father_name": m_up_father, "mother_name": m_up_mother,
+                            "dob": m_up_dob, "class": m_up_cls, "total_obt": m_up_obt,
+                            "total_full": m_up_full, "percentage": round(new_per, 2),
+                            "result": new_res, "grade": new_grd
+                        })
+                        save_data(schools_db, students_db)
+                        st.success(f"Roll No {m_edit_roll} data updated successfully!")
+                else:
+                    st.warning("No students in this school.")
+
+        with tab4:
+            st.markdown("### 🔄 Forgot / Reset School Password")
+            selected_school = st.selectbox("Select School ID", list(schools_db.keys()))
+            new_reset_pass = st.text_input("Enter New Password for this School", type="password")
+            if st.button("Update School Password"):
+                if new_reset_pass:
+                    schools_db[selected_school]['pass'] = new_reset_pass
+                    save_data(schools_db, students_db)
+                    st.success("School password changed successfully!")
+
+        with tab5:
+            st.markdown("### ⚙️ Update Master Profile & Contact")
+            st.warning("ଏଠାରେ ଆପଣ ନିଜର ମାଷ୍ଟର୍ ଆଇଡି ଏବଂ ପାସୱାର୍ଡ ବଦଳାଇ ପାରିବେ।")
+            up_m_user = st.text_input("Master Username", value=master_db.get("username", ""))
+            up_m_pass = st.text_input("Master Password", value=master_db.get("password", ""), type="password")
+            up_m_email = st.text_input("Recovery Email (For OTP)", value=master_db.get("email", ""))
+            up_m_phone = st.text_input("Recovery Phone Number (For OTP)", value=master_db.get("phone", ""))
+            
+            if st.button("Save Profile Changes"):
+                master_db.update({"username": up_m_user, "password": up_m_pass, "email": up_m_email, "phone": up_m_phone})
+                save_master_data(master_db)
+                st.success("Master profile updated successfully!")
+
+# ----------------- SCHOOL LOGIN (WITH CAPTCHA) -----------------
+elif menu == "School Login":
+    st.subheader("🏫 School Portal")
+    
+    if 'school_logged_id' not in st.session_state:
+        s_id = st.text_input("School ID")
+        s_pass = st.text_input("School Password", type="password")
+        
+        if 'school_captcha' not in st.session_state:
+            st.session_state['school_captcha'] = str(random.randint(10000, 99999))
+            
+        st.markdown(f"<div style='margin-top:10px; margin-bottom:10px;'><b>CAPTCHA (କ୍ୟାପ୍ଚା କୋଡ୍):</b> <span style='background-color: #f1f5f9; color:#0f172a; padding: 5px 20px; font-size: 22px; font-weight: bold; letter-spacing: 6px; border: 1px solid #cbd5e1; border-radius: 5px;'>{st.session_state['school_captcha']}</span></div>", unsafe_allow_html=True)
+        
+        entered_captcha = st.text_input("Enter the CAPTCHA code shown above")
+        
+        if st.button("Login as School"):
+            if entered_captcha != st.session_state['school_captcha']:
+                st.error("❌ ଭୁଲ୍ CAPTCHA! ଦୟାକରି ସଠିକ୍ କ୍ୟାପ୍ଚା କୋଡ୍ ଦିଅନ୍ତୁ।")
+                st.session_state['school_captcha'] = str(random.randint(10000, 99999))
+                st.rerun()
+            elif s_id in schools_db and schools_db[s_id]["pass"] == s_pass:
+                st.session_state['school_logged_id'] = s_id
+                del st.session_state['school_captcha']
+                st.rerun()
+            else:
+                st.error("❌ ଭୁଲ୍ School ID କିମ୍ବା Password!")
+                st.session_state['school_captcha'] = str(random.randint(10000, 99999))
+                st.rerun()
+                
+    else: 
+        cur_school = st.session_state['school_logged_id']
+        
+        col1, col2 = st.columns([8, 2])
+        with col1:
+            st.info(f"🏫 **Your School ID:** {cur_school} | **School Name:** {schools_db[cur_school]['name']}")
+        with col2:
+            if st.button("🔴 Logout (School)", key="s_logout"):
+                del st.session_state['school_logged_id']
+                st.rerun()
+
+        st.markdown("---")
+        tab_list, tab_add, tab_edit, tab_report = st.tabs(["📋 My Students & IDs", "Add/Save Student", "Edit/Update by Roll No", "Generate & Print Report"])
+        
+        with tab_list:
+            st.markdown("### 📋 Student List, Search & IDs")
+            school_students = students_db.get(cur_school, {})
+            if school_students:
+                st.write(f"Total Students Registered in your school: **{len(school_students)}**")
+                search_query = st.text_input("🔍 Search by Name or Student ID (Roll No)")
+                for r_no, s_info in school_students.items():
+                    if search_query.lower() in r_no.lower() or search_query.lower() in s_info['name'].lower() or search_query == "":
+                        cols = st.columns([3, 3, 2, 2])
+                        cols[0].write(f"**Student ID (Roll No):** {r_no}")
+                        cols[1].write(f"**Name:** {s_info['name']}")
+                        if cols[3].button(f"🗑️ Delete {r_no}", key=f"del_{r_no}"):
+                            del school_students[r_no]
+                            save_data(schools_db, students_db)
+                            st.rerun()
+            else:
+                st.warning("No students registered in your school yet.")
+                
+        with tab_add:
+            st.markdown("### 📝 Student Registration & Subject Marks Entry")
+            roll_no = st.text_input("Roll No (Student ID)", key="add_roll")
+            st_name = st.text_input("Student Name", key="add_name")
+            father_name = st.text_input("Father's Name", key="add_father")
+            mother_name = st.text_input("Mother's Name", key="add_mother")
+            
+            min_date = datetime.date(2000, 1, 1)
+            max_date = datetime.date(2065, 12, 31)
+            dob = st.date_input("DOB (2000-2065)", min_value=min_date, max_value=max_date, key="add_dob")
+            
+            cls = st.selectbox("Class", classes_list, key="add_class")
+            
+            st.markdown("#### 📚 Subject Add / Remove & Marks")
+            if 'num_subjects' not in st.session_state:
+                st.session_state.num_subjects = 3
+                
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button("➕ Add Subject"):
+                    st.session_state.num_subjects += 1
+            with col2:
+                if st.button("➖ Remove Subject") and st.session_state.num_subjects > 1:
+                    st.session_state.num_subjects -= 1
+                    
+            subjects_data = {}
+            total_full_mark = 0
+            total_obt_mark = 0
+            
+            for i in range(st.session_state.num_subjects):
+                c1, c2, c3 = st.columns(3)
+                with c1:
+                    s_name = st.text_input(f"Subject {i+1} Name", value=f"Subject {i+1}", key=f"s_name_{i}")
+                with c2:
+                    f_mark = st.number_input("Full Mark", value=100.0, key=f"f_mark_{i}")
+                with c3:
+                    o_mark = st.number_input("Obtained Mark", value=0.0, key=f"o_mark_{i}")
+                
+                if s_name:
+                    subjects_data[s_name] = {"full": f_mark, "obt": o_mark}
+                    total_full_mark += f_mark
+                    total_obt_mark += o_mark
+
+            percentage = (total_obt_mark / total_full_mark * 100) if total_full_mark > 0 else 0.0
+            result = "PASS" if percentage >= 30 else "FAIL"
+            grade = "A+" if percentage >= 90 else "A" if percentage >= 80 else "B" if percentage >= 60 else "C" if percentage >= 40 else "D" if percentage >= 30 else "F"
+            
+            st.info(f"📊 **Auto Summary:** Total Marks: {total_obt_mark}/{total_full_mark} | Percentage: {percentage:.2f}% | Result: **{result}** | Grade: **{grade}**")
+            
+            c_save, c_clear = st.columns(2)
+            with c_save:
+                if st.button("💾 Save Student Data"):
+                    if roll_no and st_name:
+                        if cur_school not in students_db:
+                            students_db[cur_school] = {}
+                        students_db[cur_school][roll_no] = {
+                            "name": st_name, "father_name": father_name, "mother_name": mother_name,
+                            "dob": str(dob), "class": cls, "subjects": subjects_data,
+                            "total_full": total_full_mark, "total_obt": total_obt_mark,
+                            "percentage": round(percentage, 2), "result": result, "grade": grade
+                        }
+                        save_data(schools_db, students_db)
+                        st.success(f"Roll No {roll_no} ସେଭ୍ ହୋଇଗଲା!")
+                    else:
+                        st.error("Roll No ଏବଂ Student Name ଦିଅନ୍ତୁ।")
+            with c_clear:
+                if st.button("🧹 Clear Form"):
+                    st.rerun()
+
+        with tab_edit:
+            st.markdown("### ✏️ Edit / Update Student Record")
+            school_students = students_db.get(cur_school, {})
+            if school_students:
+                edit_roll = st.selectbox("Select Roll No", list(school_students.keys()), key="edit_roll_sel")
+                curr_st = school_students[edit_roll]
+                
+                up_name = st.text_input("Edit Name", value=curr_st['name'])
+                up_father = st.text_input("Edit Father's Name", value=curr_st.get('father_name', ''))
+                up_mother = st.text_input("Edit Mother's Name", value=curr_st.get('mother_name', ''))
+                up_dob = st.text_input("Edit DOB (YYYY-MM-DD)", value=curr_st['dob'])
+                
+                cls_val = curr_st.get('class', '1')
+                cls_idx = classes_list.index(cls_val) if cls_val in classes_list else 0
+                up_cls = st.selectbox("Edit Class", classes_list, index=cls_idx)
+                
+                up_total_obt = st.number_input("Update Total Obtained Marks", value=float(curr_st.get('total_obt', 0)))
+                up_total_full = st.number_input("Update Total Full Marks", value=float(curr_st.get('total_full', 300)))
+                
+                if st.button("💾 Save Updated Record"):
+                    new_per = (up_total_obt / up_total_full * 100) if up_total_full > 0 else 0.0
+                    new_res = "PASS" if new_per >= 30 else "FAIL"
+                    new_grd = "A+" if new_per >= 90 else "A" if new_per >= 80 else "B" if new_per >= 60 else "C" if new_per >= 40 else "D" if new_per >= 30 else "F"
+                    
+                    school_students[edit_roll].update({
+                        "name": up_name, "father_name": up_father, "mother_name": up_mother,
+                        "dob": up_dob, "class": up_cls, "total_obt": up_total_obt,
+                        "total_full": up_total_full, "percentage": round(new_per, 2),
+                        "result": new_res, "grade": new_grd
+                    })
+                    save_data(schools_db, students_db)
+                    st.success("ରେକର୍ଡ ଅପଡେଟ୍ ହୋଇଗଲା!")
+            else:
+                st.warning("କୌଣସି ଷ୍ଟୁଡେଣ୍ଟ୍ ନାହାଁନ୍ତି।")
+
+        with tab_report:
+            st.markdown("### 🖨️ Generate & Print Report Cards")
+            school_students = students_db.get(cur_school, {})
+            if school_students:
+                rep_roll = st.selectbox("Select Student Roll No for Report", list(school_students.keys()), key="rep_sel")
+                st_data = school_students[rep_roll]
+                school_name = schools_db[cur_school]['name']
+                
+                # ଏବେ ସୁନ୍ଦର RANK CARD ଡିଜାଇନ୍ ଦେଖାଯିବ
+                st.markdown(generate_result_card_html(school_name, st_data, rep_roll), unsafe_allow_html=True)
+                
+                col1, col2 = st.columns(2)
+                with col1:
+                    pdf_file = f"Report_{rep_roll}.pdf"
+                    create_pdf(pdf_file, school_name, st_data, rep_roll)
+                    with open(pdf_file, "rb") as f:
+                        st.download_button("📥 Download PDF Report", f, file_name=pdf_file, mime="application/pdf", key="dl_sch")
+                with col2:
+                    if st.button("🖨️ Print Result Card", key="print_sch"):
+                        components.html("<script>window.parent.print();</script>", height=0)
+            else:
+                st.warning("କୌଣସି ଷ୍ଟୁଡେଣ୍ଟ୍ ନାହାଁନ୍ତି।")
+
+# ----------------- STUDENT LOGIN -----------------
+elif menu == "Student Login":
+    st.subheader("🎓 Student Portal (Result Viewer)")
+    st_school_id = st.text_input("School ID", key="st_login_school")
+    st_class = st.selectbox("Select Class (1 to 10)", classes_list, key="st_login_class") 
+    st_roll = st.text_input("Roll Number (Student ID)", key="st_login_roll")
+    st_dob_input = st.text_input("Date of Birth (YYYY-MM-DD)", key="st_login_dob")
+    
+    if st.button("View Result"):
+        try:
+            student = students_db[st_school_id][st_roll]
+            if student["dob"] == st_dob_input and student.get("class") == st_class:
+                st.success(f"Welcome KULU SUTAR! ଆପଣଙ୍କ ରେଜଲ୍ଟ୍ ତଳେ ଦିଆଗଲା:")
+                school_name = schools_db[st_school_id]['name']
+                
+                # ସୁନ୍ଦର RANK CARD ଏଠାରେ ମଧ୍ୟ ଡିସପ୍ଲେ ହେବ
+                st.markdown(generate_result_card_html(school_name, student, st_roll), unsafe_allow_html=True)
+                
+                col1, col2 = st.columns(2)
+                with col1:
+                    pdf_file = f"Result_{st_roll}.pdf"
+                    create_pdf(pdf_file, school_name, student, st_roll)
+                    with open(pdf_file, "rb") as f:
+                        st.download_button("📥 Download PDF", f, file_name=pdf_file, mime="application/pdf", key="dl_stu")
+                
+                with col2:
+                    if st.button("🖨️ Print Result Card", key="print_stu"):
+                        components.html("<script>window.parent.print();</script>", height=0)
+            
+            elif student["dob"] != st_dob_input:
+                st.error("ଭୁଲ୍ Date of Birth!")
+            else:
+                st.error("ଭୁଲ୍ Class! ଦୟାକରି ସଠିକ୍ କ୍ଲାସ୍ ବାଛନ୍ତୁ।")
+        except KeyError:
+            st.error("ଭୁଲ୍ School ID କିମ୍ବା Roll Number!")
