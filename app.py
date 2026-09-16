@@ -65,6 +65,14 @@ def generate_result_card_html(school_name, st_data, roll_no):
     res_color = "#15803d" if st_data.get('result') == "PASS" else "#dc2626"
     bg_color = "#f0fdf4" if st_data.get('result') == "PASS" else "#fef2f2"
     
+    # DOB Convert to DD-MM-YYYY for display
+    raw_dob = st_data.get('dob', '')
+    disp_dob = raw_dob
+    if len(raw_dob.split('-')) == 3:
+        y, m, d = raw_dob.split('-')
+        if len(y) == 4:
+            disp_dob = f"{d}-{m}-{y}"
+
     rows_html = ""
     for sub, m_info in st_data.get('subjects', {}).items():
         rows_html += f"<tr><td style='padding: 12px; border: 1px solid #cbd5e1; text-align: left; font-weight: bold;'>{sub}</td><td style='padding: 12px; border: 1px solid #cbd5e1;'>{m_info['full']}</td><td style='padding: 12px; border: 1px solid #cbd5e1; font-weight: bold;'>{m_info['obt']}</td></tr>"
@@ -86,7 +94,7 @@ def generate_result_card_html(school_name, st_data, roll_no):
             </tr>
             <tr>
                 <td style="padding: 8px 0;"><b>Mother's Name:</b> {st_data.get('mother_name', 'N/A')}</td>
-                <td style="padding: 8px 0; text-align: right;"><b>Date of Birth:</b> {st_data.get('dob', '')}</td>
+                <td style="padding: 8px 0; text-align: right;"><b>Date of Birth:</b> {disp_dob}</td>
             </tr>
             <tr>
                 <td style="padding: 8px 0;"><b>Gender:</b> {st_data.get('gender', 'N/A')}</td>
@@ -124,6 +132,14 @@ def generate_result_card_html(school_name, st_data, roll_no):
 
 # --- PDF ଜେନେରେଟର ---
 def create_pdf(filename, school_name, st_data, roll_no):
+    # DOB Convert to DD-MM-YYYY for display
+    raw_dob = st_data.get('dob', '')
+    disp_dob = raw_dob
+    if len(raw_dob.split('-')) == 3:
+        y, m, d = raw_dob.split('-')
+        if len(y) == 4:
+            disp_dob = f"{d}-{m}-{y}"
+            
     c = canvas.Canvas(filename, pagesize=letter)
     c.setFont("Helvetica-Bold", 20)
     c.drawCentredString(300, 750, school_name)
@@ -136,7 +152,7 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.drawString(50, 660, f"Father's Name: {st_data.get('father_name', 'N/A')}")
     c.drawString(400, 660, f"Class: {st_data.get('class', '')}")
     c.drawString(50, 640, f"Mother's Name: {st_data.get('mother_name', 'N/A')}")
-    c.drawString(400, 640, f"DOB: {st_data.get('dob', '')}")
+    c.drawString(400, 640, f"DOB: {disp_dob}")
     c.drawString(50, 620, f"Gender: {st_data.get('gender', 'N/A')}")
     c.drawString(400, 620, f"PEN NO: {st_data.get('pen_no', 'N/A')}")
     c.drawString(50, 600, f"APAAR NO: {st_data.get('apaar_no', 'N/A')}")
@@ -579,7 +595,8 @@ elif menu == "School Login":
             
             min_date = datetime.date(2000, 1, 1)
             max_date = datetime.date(2065, 12, 31)
-            dob = st.date_input("DOB (2000-2065)", min_value=min_date, max_value=max_date, key="add_dob")
+            # School add module standard format (DB saves as YYYY-MM-DD string)
+            dob = st.date_input("DOB (YYYY-MM-DD)", min_value=min_date, max_value=max_date, key="add_dob")
             
             cls = st.selectbox("Class", classes_list, key="add_class")
             
@@ -722,7 +739,7 @@ elif menu == "Results":
     
     st_class = st.selectbox("Select Class (1 to 10)", classes_list, key="st_login_class") 
     st_search_query = st.text_input("Roll Number OR Student Name (ରୋଲ୍ ନମ୍ବର କିମ୍ବା ନାମ ଦିଅନ୍ତୁ)", key="st_login_search")
-    st_dob_input = st.text_input("Date of Birth (YYYY-MM-DD)", key="st_login_dob")
+    st_dob_input = st.text_input("Date of Birth (DD-MM-YYYY)", key="st_login_dob")
     
     if st.button("View Result"):
         found_student = None
@@ -731,12 +748,19 @@ elif menu == "Results":
         
         search_query_lower = st_search_query.strip().lower()
         
+        # ବ୍ୟବହାରକାରୀ ଦେଇଥିବା ଦିନ-ମାସ-ବର୍ଷ (DD-MM-YYYY) କୁ ଡାଟାବେସ୍ ଫର୍ମାଟ୍ (YYYY-MM-DD) କୁ ବଦଳାଇବା
+        db_dob_format = st_dob_input.strip()
+        if db_dob_format.count('-') == 2:
+            p1, p2, p3 = db_dob_format.split('-')
+            if len(p1) == 2 and len(p3) == 4:
+                db_dob_format = f"{p3}-{p2}-{p1}"
+        
         # ସବୁ ସ୍କୁଲ୍ ଭିତରେ ଖୋଜିବା
         for s_id, school_students in students_db.items():
             # ୧. Roll No ଦ୍ୱାରା ଖୋଜିବା
             if st_search_query in school_students:
                 potential_student = school_students[st_search_query]
-                if potential_student["dob"] == st_dob_input and potential_student.get("class") == st_class:
+                if potential_student["dob"] == db_dob_format and potential_student.get("class") == st_class:
                     found_student = potential_student
                     found_roll = st_search_query
                     found_school_id = s_id
@@ -746,7 +770,7 @@ elif menu == "Results":
             if not found_student:
                 for r_no, s_info in school_students.items():
                     if s_info.get("name", "").strip().lower() == search_query_lower:
-                        if s_info["dob"] == st_dob_input and s_info.get("class") == st_class:
+                        if s_info["dob"] == db_dob_format and s_info.get("class") == st_class:
                             found_student = s_info
                             found_roll = r_no
                             found_school_id = s_id
