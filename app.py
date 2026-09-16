@@ -7,39 +7,51 @@ import os
 import datetime
 import random
 
-st.set_page_config(page_title="Advanced School Management System", layout="wide")
+st.set_page_config(page_title="Advanced School Management System", layout="centered")
 
 SCHOOLS_FILE = "schools.json"
 STUDENTS_FILE = "students.txt"
 MASTER_FILE = "master.json"
 
-# --- ଡାଟା ଲୋଡ୍ ଓ ସେଭ୍ ଫଙ୍କସନ୍ ---
+# --- ଡାଟା ଲୋଡ୍ ଓ ସେଭ୍ ଫଙ୍କସନ୍ (Strong Persistence) ---
 def load_master_data():
+    default_master = {"username": "master", "password": "master123", "email": "admin@school.com", "phone": "9999999999"}
     if os.path.exists(MASTER_FILE):
-        with open(MASTER_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
-    else:
-        return {"username": "master", "password": "master123", "email": "admin@school.com", "phone": "9999999999"}
+        try:
+            with open(MASTER_FILE, "r", encoding="utf-8") as f:
+                content = f.read()
+                if content.strip():
+                    return json.loads(content)
+        except Exception:
+            pass
+    return default_master
 
 def save_master_data(data):
     with open(MASTER_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=4)
 
 def load_data():
+    schools = {"S001": {"name": "Govt High School Cuttack", "pass": "admin123"}}
+    students = {}
+    
     if os.path.exists(SCHOOLS_FILE):
-        with open(SCHOOLS_FILE, "r", encoding="utf-8") as f:
-            schools = json.load(f)
-    else:
-        schools = {"S001": {"name": "Govt High School Cuttack", "pass": "admin123"}}
-        
+        try:
+            with open(SCHOOLS_FILE, "r", encoding="utf-8") as f:
+                content = f.read()
+                if content.strip():
+                    schools = json.loads(content)
+        except Exception:
+            pass
+            
     if os.path.exists(STUDENTS_FILE):
         try:
             with open(STUDENTS_FILE, "r", encoding="utf-8") as f:
-                students = json.load(f)
-        except:
-            students = {}
-    else:
-        students = {}
+                content = f.read()
+                if content.strip():
+                    students = json.loads(content)
+        except Exception:
+            pass
+            
     return schools, students
 
 def save_data(schools, students):
@@ -66,7 +78,7 @@ def generate_result_card_html(school_name, st_data, roll_no):
         <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 16px;">
             <tr>
                 <td style="padding: 8px 0;"><b>Student Name:</b> {st_data.get('name', '')}</td>
-                <td style="padding: 8px 0; text-align: right;"><b>Roll No (Student ID):</b> {roll_no}</td>
+                <td style="padding: 8px 0; text-align: right;"><b>Roll No:</b> {roll_no}</td>
             </tr>
             <tr>
                 <td style="padding: 8px 0;"><b>Father's Name:</b> {st_data.get('father_name', 'N/A')}</td>
@@ -158,15 +170,144 @@ def create_pdf(filename, school_name, st_data, roll_no):
 schools_db, students_db = load_data()
 master_db = load_master_data()
 
-st.markdown("<h3 style='text-align: center; color: #0284C7;'>✨ WELCOME KULU SUTAR ✨</h3>", unsafe_allow_html=True)
-st.markdown("<h1 style='text-align: center; color: #1E3A8A;'>🏫 ADVANCED SCHOOL MANAGEMENT SYSTEM</h1>", unsafe_allow_html=True)
-st.markdown("<hr>", unsafe_allow_html=True)
+# ----------------- DYNAMIC LINK GENERATION -----------------
+portal_param = st.query_params.get("portal", "home")
 
-menu = st.sidebar.selectbox("🎯 Navigation Menu", ["Master Login", "School Login", "Student Login"])
+default_idx = 0
+if portal_param == "master":
+    default_idx = 1
+elif portal_param == "school":
+    default_idx = 2
+elif portal_param == "student":
+    default_idx = 3
+
+st.markdown("<h3 style='text-align: center; color: #0284C7; margin-top:-20px;'>✨ WELCOME KULU SUTAR ✨</h3>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: #1E3A8A; font-size: 30px;'>🏫 ADVANCED SCHOOL MANAGEMENT SYSTEM</h1>", unsafe_allow_html=True)
+st.markdown("<hr style='margin-bottom: 10px;'>", unsafe_allow_html=True)
+
+menu = st.sidebar.selectbox("🎯 Navigation Menu", ["Home Page", "Master Login", "School Login", "Student Login"], index=default_idx)
+
+# ସାଇଡବାର୍ ବାଛିବା ଅନୁସାରେ ଉପରେ ଲିଙ୍କ୍ ଆପେ ଆପେ ବଦଳିବ
+if menu == "Home Page":
+    st.query_params["portal"] = "home"
+elif menu == "Master Login":
+    st.query_params["portal"] = "master"
+elif menu == "School Login":
+    st.query_params["portal"] = "school"
+elif menu == "Student Login":
+    st.query_params["portal"] = "student"
+
 classes_list = [str(i) for i in range(1, 11)]
 
-# ----------------- MASTER LOGIN (HIGH SECURITY) -----------------
-if menu == "Master Login":
+# ----------------- HOME PAGE (ERP STYLE UI) -----------------
+if menu == "Home Page":
+    st.markdown("""
+    <style>
+    .notice-container {
+        background-color: #1e293b;
+        border-radius: 5px;
+        padding: 0;
+        margin-bottom: 25px;
+        border: 1px solid #475569;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .notice-header {
+        background-color: #27374D;
+        color: white;
+        text-align: center;
+        padding: 12px;
+        font-weight: bold;
+        font-size: 20px;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+        border-bottom: 2px solid #526D82;
+    }
+    .notice-body {
+        padding: 15px;
+        color: #e2e8f0;
+        height: 180px;
+        overflow-y: auto;
+    }
+    .notice-item {
+        margin-bottom: 12px;
+        font-size: 15px;
+        border-bottom: 1px dotted #475569;
+        padding-bottom: 8px;
+    }
+    .new-badge {
+        background-color: #fbbf24;
+        color: black;
+        font-size: 11px;
+        font-weight: bold;
+        padding: 2px 6px;
+        border-radius: 3px;
+        margin-left: 5px;
+    }
+    .login-card {
+        background-color: white;
+        border: 1px solid #cbd5e1;
+        border-bottom: 5px solid #fbbf24;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 15px;
+        text-align: center;
+        text-decoration: none;
+        display: block;
+        color: #1e3a8a;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        transition: 0.3s;
+    }
+    .login-card:hover {
+        background-color: #f8fafc;
+        border-bottom: 5px solid #1e3a8a;
+        transform: translateY(-2px);
+    }
+    .login-title {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+    .login-sub {
+        font-size: 14px;
+        color: #64748b;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    st.markdown("""
+    <div class="notice-container">
+        <div class="notice-header">RECENT NOTICE</div>
+        <div class="notice-body">
+            <div class="notice-item">⏩ Welcome to Advanced School Management System! <span class="new-badge">NEW!</span></div>
+            <div class="notice-item">⏩ Master & School portal passwords are encrypted and secured.</div>
+            <div class="notice-item">⏩ Online Student Rank Card generation is now active for all classes.</div>
+            <div class="notice-item">⏩ APAAR and PEN details have been integrated into the system.</div>
+            <div class="notice-item">⏩ Student ID / Roll No is mandatory for result checking.</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("""
+    <a href="?portal=master" target="_self" class="login-card" style="text-decoration: none;">
+        <div class="login-title">🏛️ Master Login</div>
+        <div class="login-sub">Click here to login as Admin / University</div>
+    </a>
+    <a href="?portal=school" target="_self" class="login-card" style="text-decoration: none;">
+        <div class="login-title">🏫 School Login</div>
+        <div class="login-sub">Click here to login as School / College</div>
+    </a>
+    <a href="?portal=student" target="_self" class="login-card" style="text-decoration: none;">
+        <div class="login-title">🎓 Student Login</div>
+        <div class="login-sub">Click here to check Student Rank Card</div>
+    </a>
+    """, unsafe_allow_html=True)
+
+# ----------------- MASTER LOGIN -----------------
+elif menu == "Master Login":
     st.subheader("🔑 Master Administrator Portal")
     
     if not st.session_state.get('master_logged', False):
@@ -225,7 +366,7 @@ if menu == "Master Login":
         with col1:
             st.success("Welcome KULU SUTAR! ମାଷ୍ଟର୍ ସିଷ୍ଟମ୍ କୁ ସ୍ୱାଗତମ୍!")
         with col2:
-            if st.button("🔴 Logout (Master)", key="m_logout"):
+            if st.button("🔴 Logout", key="m_logout"):
                 st.session_state['master_logged'] = False
                 st.rerun()
 
@@ -234,8 +375,9 @@ if menu == "Master Login":
         
         with tab1:
             st.markdown("### 👁️ System Overview & Manage Schools")
-            st.info("🔒 **HIGH SECURITY ALERT:** ଏହି ମାଷ୍ଟର୍ ପ୍ୟାନେଲ୍ କେବଳ ଗୋଟିଏ ହିଁ ଆଇଡି ପାଇଁ ତିଆରି ହୋଇଛି। ଆପଣଙ୍କ ଡାଟା ୧୦୦% ସୁରକ୍ଷିତ।")
-            
+            st.info("🔒 ଏହି ମାଷ୍ଟର୍ ପ୍ୟାନେଲ୍ କେବଳ ଆପଣ ହିଁ ଦେଖିପାରିବେ।")
+            st.success("🔗 **Share Direct School Login Link:** `?portal=school`")
+
             st.markdown("#### 🏫 Registered Schools (View & Delete):")
             if not schools_db:
                 st.write("କୌଣସି ସ୍କୁଲ୍ ରେଜିଷ୍ଟର୍ ହୋଇନାହିଁ।")
@@ -244,6 +386,7 @@ if menu == "Master Login":
                     c_1, c_2, c_3 = st.columns([2, 4, 2])
                     c_1.write(f"**School ID:** {s_id}")
                     c_2.write(f"**Name:** {s_info['name']}")
+                    # MASTER CAN DELETE SCHOOLS
                     if c_3.button(f"🗑️ Delete School", key=f"del_school_{s_id}"):
                         del schools_db[s_id]
                         if s_id in students_db:
@@ -288,13 +431,10 @@ if menu == "Master Login":
                     with c1:
                         m_up_name = st.text_input("Student Name", value=m_curr_st['name'], key="m_up_n")
                         m_up_father = st.text_input("Father's Name", value=m_curr_st.get('father_name', ''), key="m_up_f")
-                        
                         genders = ["Male", "Female", "Other"]
                         g_val = m_curr_st.get('gender', 'Male')
                         m_up_gender = st.selectbox("Gender", genders, index=genders.index(g_val) if g_val in genders else 0, key="m_up_gen")
-                        
                         m_up_pen = st.text_input("PEN NO", value=m_curr_st.get('pen_no', ''), key="m_up_pen")
-                        
                         cls_val = m_curr_st.get('class', '1')
                         m_up_cls = st.selectbox("Class", classes_list, index=classes_list.index(cls_val) if cls_val in classes_list else 0, key="m_up_c")
                         
@@ -342,13 +482,15 @@ if menu == "Master Login":
             if st.button("Save Profile Changes"):
                 master_db.update({"username": up_m_user, "password": up_m_pass, "email": up_m_email, "phone": up_m_phone})
                 save_master_data(master_db)
-                st.success("Master profile updated successfully! Please remember your new credentials.")
+                st.success("Master profile updated successfully!")
 
-# ----------------- SCHOOL LOGIN (WITH CAPTCHA) -----------------
+# ----------------- SCHOOL LOGIN -----------------
 elif menu == "School Login":
     st.subheader("🏫 School Portal")
     
     if 'school_logged_id' not in st.session_state:
+        st.info("🔗 ଉପରେ ବ୍ରାଉଜର୍‌ରେ ଥିବା ଲିଙ୍କ୍ କୁ କପି କରି ଅନ୍ୟମାନଙ୍କୁ ସ୍କୁଲ୍ ଲଗ୍ଇନ୍ ପାଇଁ ପଠାଇ ପାରିବେ।")
+        
         s_id = st.text_input("School ID")
         s_pass = st.text_input("School Password", type="password")
         
@@ -380,11 +522,13 @@ elif menu == "School Login":
         with col1:
             st.info(f"🏫 **Your School ID:** {cur_school} | **School Name:** {schools_db[cur_school]['name']}")
         with col2:
-            if st.button("🔴 Logout (School)", key="s_logout"):
+            if st.button("🔴 Logout", key="s_logout"):
                 del st.session_state['school_logged_id']
                 st.rerun()
 
         st.markdown("---")
+        st.success("🔗 **Share Direct Student Login Link:** `?portal=student`")
+
         tab_list, tab_add, tab_edit, tab_report = st.tabs(["📋 My Students & IDs", "Add/Save Student", "Edit/Update by Roll No", "Generate & Print Report"])
         
         with tab_list:
@@ -400,6 +544,7 @@ elif menu == "School Login":
                         cols[1].write(f"**Name:** {s_info['name']}")
                         cols[2].write(f"**PEN:** {s_info.get('pen_no', 'N/A')}")
                         cols[3].write(f"**Gen:** {s_info.get('gender', 'N/A')}")
+                        # SCHOOL CAN DELETE STUDENTS
                         if cols[4].button(f"🗑️ Delete", key=f"del_{r_no}"):
                             del school_students[r_no]
                             save_data(schools_db, students_db)
@@ -557,6 +702,8 @@ elif menu == "School Login":
 # ----------------- STUDENT LOGIN -----------------
 elif menu == "Student Login":
     st.subheader("🎓 Student Portal (Result Viewer)")
+    st.info("🔗 ଉପରେ ବ୍ରାଉଜର୍ ଲିଙ୍କ୍ କୁ କପି କରି ଷ୍ଟୁଡେଣ୍ଟ୍‌ମାନଙ୍କୁ ପଠାଇ ପାରିବେ, ସେମାନେ ସିଧା ଏହି ପେଜ୍‌କୁ ଆସିବେ।")
+    
     st_school_id = st.text_input("School ID", key="st_login_school")
     st_class = st.selectbox("Select Class (1 to 10)", classes_list, key="st_login_class") 
     st_roll = st.text_input("Roll Number (Student ID)", key="st_login_roll")
