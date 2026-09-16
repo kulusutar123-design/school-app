@@ -187,7 +187,6 @@ st.markdown("<hr style='margin-bottom: 10px;'>", unsafe_allow_html=True)
 
 menu = st.sidebar.selectbox("🎯 Navigation Menu", ["Home Page", "Master Login", "School Login", "Student Login"], index=default_idx)
 
-# ସାଇଡବାର୍ ବାଛିବା ଅନୁସାରେ ଉପରେ ଲିଙ୍କ୍ ଆପେ ଆପେ ବଦଳିବ
 if menu == "Home Page":
     st.query_params["portal"] = "home"
 elif menu == "Master Login":
@@ -308,7 +307,14 @@ if menu == "Home Page":
 
 # ----------------- MASTER LOGIN -----------------
 elif menu == "Master Login":
-    st.subheader("🔑 Master Administrator Portal")
+    # --- 🏠 HOME BUTTON (ମାଷ୍ଟର ପେଜ୍ ପାଇଁ) ---
+    c_home, c_title = st.columns([1, 8])
+    with c_home:
+        if st.button("🏠 Home", key="m_home_btn"):
+            st.query_params["portal"] = "home"
+            st.rerun()
+    with c_title:
+        st.subheader("🔑 Master Administrator Portal")
     
     if not st.session_state.get('master_logged', False):
         login_mode = st.radio("Choose Action", ["Login", "Forgot Password"])
@@ -386,7 +392,6 @@ elif menu == "Master Login":
                     c_1, c_2, c_3 = st.columns([2, 4, 2])
                     c_1.write(f"**School ID:** {s_id}")
                     c_2.write(f"**Name:** {s_info['name']}")
-                    # MASTER CAN DELETE SCHOOLS
                     if c_3.button(f"🗑️ Delete School", key=f"del_school_{s_id}"):
                         del schools_db[s_id]
                         if s_id in students_db:
@@ -486,7 +491,14 @@ elif menu == "Master Login":
 
 # ----------------- SCHOOL LOGIN -----------------
 elif menu == "School Login":
-    st.subheader("🏫 School Portal")
+    # --- 🏠 HOME BUTTON (ସ୍କୁଲ୍ ପେଜ୍ ପାଇଁ) ---
+    c_home, c_title = st.columns([1, 8])
+    with c_home:
+        if st.button("🏠 Home", key="s_home_btn"):
+            st.query_params["portal"] = "home"
+            st.rerun()
+    with c_title:
+        st.subheader("🏫 School Portal")
     
     if 'school_logged_id' not in st.session_state:
         st.info("🔗 ଉପରେ ବ୍ରାଉଜର୍‌ରେ ଥିବା ଲିଙ୍କ୍ କୁ କପି କରି ଅନ୍ୟମାନଙ୍କୁ ସ୍କୁଲ୍ ଲଗ୍ଇନ୍ ପାଇଁ ପଠାଇ ପାରିବେ।")
@@ -544,7 +556,6 @@ elif menu == "School Login":
                         cols[1].write(f"**Name:** {s_info['name']}")
                         cols[2].write(f"**PEN:** {s_info.get('pen_no', 'N/A')}")
                         cols[3].write(f"**Gen:** {s_info.get('gender', 'N/A')}")
-                        # SCHOOL CAN DELETE STUDENTS
                         if cols[4].button(f"🗑️ Delete", key=f"del_{r_no}"):
                             del school_students[r_no]
                             save_data(schools_db, students_db)
@@ -701,7 +712,15 @@ elif menu == "School Login":
 
 # ----------------- STUDENT LOGIN -----------------
 elif menu == "Student Login":
-    st.subheader("🎓 Student Portal (Result Viewer)")
+    # --- 🏠 HOME BUTTON (ଷ୍ଟୁଡେଣ୍ଟ୍ ପେଜ୍ ପାଇଁ) ---
+    c_home, c_title = st.columns([1, 8])
+    with c_home:
+        if st.button("🏠 Home", key="st_home_btn"):
+            st.query_params["portal"] = "home"
+            st.rerun()
+    with c_title:
+        st.subheader("🎓 Student Portal (Result Viewer)")
+        
     st.info("🔗 ଉପରେ ବ୍ରାଉଜର୍ ଲିଙ୍କ୍ କୁ କପି କରି ଷ୍ଟୁଡେଣ୍ଟ୍‌ମାନଙ୍କୁ ପଠାଇ ପାରିବେ, ସେମାନେ ସିଧା ଏହି ପେଜ୍‌କୁ ଆସିବେ।")
     
     st_school_id = st.text_input("School ID", key="st_login_school")
