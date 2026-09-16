@@ -19,7 +19,6 @@ def load_master_data():
         with open(MASTER_FILE, "r", encoding="utf-8") as f:
             return json.load(f)
     else:
-        # Default High Security Master
         return {"username": "master", "password": "master123", "email": "admin@school.com", "phone": "9999999999"}
 
 def save_master_data(data):
@@ -49,12 +48,11 @@ def save_data(schools, students):
     with open(STUDENTS_FILE, "w", encoding="utf-8") as f:
         json.dump(students, f, indent=4)
 
-# --- ସୁନ୍ଦର ରାଙ୍କ୍ କାର୍ଡ (RANK CARD) ଡିଜାଇନ୍ (Without Indentation Bugs) ---
+# --- ସୁନ୍ଦର ରାଙ୍କ୍ କାର୍ଡ (RANK CARD) ଡିଜାଇନ୍ ---
 def generate_result_card_html(school_name, st_data, roll_no):
     res_color = "#15803d" if st_data.get('result') == "PASS" else "#dc2626"
     bg_color = "#f0fdf4" if st_data.get('result') == "PASS" else "#fef2f2"
     
-    # ଟେବୁଲ୍ ରୋ' (Row) ଗୁଡ଼ିକୁ ବିନା ସ୍ପେସ୍ ରେ ଯୋଡ଼ିବା ପାଇଁ
     rows_html = ""
     for sub, m_info in st_data.get('subjects', {}).items():
         rows_html += f"<tr><td style='padding: 12px; border: 1px solid #cbd5e1; text-align: left; font-weight: bold;'>{sub}</td><td style='padding: 12px; border: 1px solid #cbd5e1;'>{m_info['full']}</td><td style='padding: 12px; border: 1px solid #cbd5e1; font-weight: bold;'>{m_info['obt']}</td></tr>"
@@ -77,6 +75,14 @@ def generate_result_card_html(school_name, st_data, roll_no):
             <tr>
                 <td style="padding: 8px 0;"><b>Mother's Name:</b> {st_data.get('mother_name', 'N/A')}</td>
                 <td style="padding: 8px 0; text-align: right;"><b>Date of Birth:</b> {st_data.get('dob', '')}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px 0;"><b>Gender:</b> {st_data.get('gender', 'N/A')}</td>
+                <td style="padding: 8px 0; text-align: right;"><b>PEN NO:</b> {st_data.get('pen_no', 'N/A')}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px 0;"><b>APAAR NO:</b> {st_data.get('apaar_no', 'N/A')}</td>
+                <td style="padding: 8px 0; text-align: right;"></td>
             </tr>
         </table>
         <h4 style="color: #ffffff; background-color: #1E3A8A; padding: 12px; margin: 0; text-align: center; border-top-left-radius: 8px; border-top-right-radius: 8px; letter-spacing: 1px;">SUBJECT-WISE PERFORMANCE</h4>
@@ -119,15 +125,18 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.drawString(400, 660, f"Class: {st_data.get('class', '')}")
     c.drawString(50, 640, f"Mother's Name: {st_data.get('mother_name', 'N/A')}")
     c.drawString(400, 640, f"DOB: {st_data.get('dob', '')}")
+    c.drawString(50, 620, f"Gender: {st_data.get('gender', 'N/A')}")
+    c.drawString(400, 620, f"PEN NO: {st_data.get('pen_no', 'N/A')}")
+    c.drawString(50, 600, f"APAAR NO: {st_data.get('apaar_no', 'N/A')}")
     
-    c.line(50, 620, 550, 620)
+    c.line(50, 580, 550, 580)
     c.setFont("Helvetica-Bold", 12)
-    c.drawString(50, 600, "Subject")
-    c.drawString(300, 600, "Full Marks")
-    c.drawString(450, 600, "Obtained Marks")
-    c.line(50, 590, 550, 590)
+    c.drawString(50, 560, "Subject")
+    c.drawString(300, 560, "Full Marks")
+    c.drawString(450, 560, "Obtained Marks")
+    c.line(50, 550, 550, 550)
     
-    y = 570
+    y = 530
     c.setFont("Helvetica", 12)
     for sub, m_info in st_data.get('subjects', {}).items():
         c.drawString(50, y, str(sub))
@@ -211,7 +220,6 @@ if menu == "Master Login":
                     else:
                         st.warning("Please fill both fields.")
 
-    # MASTER DASHBOARD
     else:
         col1, col2 = st.columns([8, 2])
         with col1:
@@ -248,7 +256,7 @@ if menu == "Master Login":
             total_students = 0
             for s_id, studs in students_db.items():
                 for r_no, st_info in studs.items():
-                    st.write(f"- **Student ID (Roll No):** {r_no} | **School ID:** {s_id} | Name: {st_info['name']}")
+                    st.write(f"- **Student ID:** {r_no} | **School ID:** {s_id} | Name: {st_info['name']}")
                     total_students += 1
             if total_students == 0:
                 st.write("No students registered yet.")
@@ -280,12 +288,20 @@ if menu == "Master Login":
                     with c1:
                         m_up_name = st.text_input("Student Name", value=m_curr_st['name'], key="m_up_n")
                         m_up_father = st.text_input("Father's Name", value=m_curr_st.get('father_name', ''), key="m_up_f")
+                        
+                        genders = ["Male", "Female", "Other"]
+                        g_val = m_curr_st.get('gender', 'Male')
+                        m_up_gender = st.selectbox("Gender", genders, index=genders.index(g_val) if g_val in genders else 0, key="m_up_gen")
+                        
+                        m_up_pen = st.text_input("PEN NO", value=m_curr_st.get('pen_no', ''), key="m_up_pen")
+                        
                         cls_val = m_curr_st.get('class', '1')
-                        cls_idx = classes_list.index(cls_val) if cls_val in classes_list else 0
-                        m_up_cls = st.selectbox("Class", classes_list, index=cls_idx, key="m_up_c")
+                        m_up_cls = st.selectbox("Class", classes_list, index=classes_list.index(cls_val) if cls_val in classes_list else 0, key="m_up_c")
+                        
                     with c2:
                         m_up_dob = st.text_input("DOB (YYYY-MM-DD)", value=m_curr_st['dob'], key="m_up_d")
                         m_up_mother = st.text_input("Mother's Name", value=m_curr_st.get('mother_name', ''), key="m_up_m")
+                        m_up_apaar = st.text_input("APAAR NO", value=m_curr_st.get('apaar_no', ''), key="m_up_apaar")
                         m_up_obt = st.number_input("Total Obtained Marks", value=float(m_curr_st.get('total_obt', 0)), key="m_up_o")
                         m_up_full = st.number_input("Total Full Marks", value=float(m_curr_st.get('total_full', 300)), key="m_up_full")
                     
@@ -295,7 +311,8 @@ if menu == "Master Login":
                         new_grd = "A+" if new_per >= 90 else "A" if new_per >= 80 else "B" if new_per >= 60 else "C" if new_per >= 40 else "D" if new_per >= 30 else "F"
                         
                         school_students[m_edit_roll].update({
-                            "name": m_up_name, "father_name": m_up_father, "mother_name": m_up_mother,
+                            "name": m_up_name, "gender": m_up_gender, "pen_no": m_up_pen, "apaar_no": m_up_apaar,
+                            "father_name": m_up_father, "mother_name": m_up_mother,
                             "dob": m_up_dob, "class": m_up_cls, "total_obt": m_up_obt,
                             "total_full": m_up_full, "percentage": round(new_per, 2),
                             "result": new_res, "grade": new_grd
@@ -317,7 +334,6 @@ if menu == "Master Login":
 
         with tab5:
             st.markdown("### ⚙️ Update Master Profile & Contact")
-            st.warning("ଏଠାରେ ଆପଣ ନିଜର ମାଷ୍ଟର୍ ଆଇଡି ଏବଂ ପାସୱାର୍ଡ ବଦଳାଇ ପାରିବେ।")
             up_m_user = st.text_input("Master Username", value=master_db.get("username", ""))
             up_m_pass = st.text_input("Master Password", value=master_db.get("password", ""), type="password")
             up_m_email = st.text_input("Recovery Email (For OTP)", value=master_db.get("email", ""))
@@ -326,7 +342,7 @@ if menu == "Master Login":
             if st.button("Save Profile Changes"):
                 master_db.update({"username": up_m_user, "password": up_m_pass, "email": up_m_email, "phone": up_m_phone})
                 save_master_data(master_db)
-                st.success("Master profile updated successfully!")
+                st.success("Master profile updated successfully! Please remember your new credentials.")
 
 # ----------------- SCHOOL LOGIN (WITH CAPTCHA) -----------------
 elif menu == "School Login":
@@ -339,7 +355,7 @@ elif menu == "School Login":
         if 'school_captcha' not in st.session_state:
             st.session_state['school_captcha'] = str(random.randint(10000, 99999))
             
-        st.markdown(f"<div style='margin-top:10px; margin-bottom:10px;'><b>CAPTCHA (କ୍ୟାପ୍ଚା କୋଡ୍):</b> <span style='background-color: #f1f5f9; color:#0f172a; padding: 5px 20px; font-size: 22px; font-weight: bold; letter-spacing: 6px; border: 1px solid #cbd5e1; border-radius: 5px;'>{st.session_state['school_captcha']}</span></div>", unsafe_allow_html=True)
+        st.markdown(f"<div style='margin-top:10px; margin-bottom:10px;'><b>CAPTCHA:</b> <span style='background-color: #f1f5f9; color:#0f172a; padding: 5px 20px; font-size: 22px; font-weight: bold; letter-spacing: 6px; border: 1px solid #cbd5e1; border-radius: 5px;'>{st.session_state['school_captcha']}</span></div>", unsafe_allow_html=True)
         
         entered_captcha = st.text_input("Enter the CAPTCHA code shown above")
         
@@ -375,14 +391,16 @@ elif menu == "School Login":
             st.markdown("### 📋 Student List, Search & IDs")
             school_students = students_db.get(cur_school, {})
             if school_students:
-                st.write(f"Total Students Registered in your school: **{len(school_students)}**")
+                st.write(f"Total Students Registered: **{len(school_students)}**")
                 search_query = st.text_input("🔍 Search by Name or Student ID (Roll No)")
                 for r_no, s_info in school_students.items():
                     if search_query.lower() in r_no.lower() or search_query.lower() in s_info['name'].lower() or search_query == "":
-                        cols = st.columns([3, 3, 2, 2])
-                        cols[0].write(f"**Student ID (Roll No):** {r_no}")
+                        cols = st.columns([2, 3, 2, 1, 2])
+                        cols[0].write(f"**Roll:** {r_no}")
                         cols[1].write(f"**Name:** {s_info['name']}")
-                        if cols[3].button(f"🗑️ Delete {r_no}", key=f"del_{r_no}"):
+                        cols[2].write(f"**PEN:** {s_info.get('pen_no', 'N/A')}")
+                        cols[3].write(f"**Gen:** {s_info.get('gender', 'N/A')}")
+                        if cols[4].button(f"🗑️ Delete", key=f"del_{r_no}"):
                             del school_students[r_no]
                             save_data(schools_db, students_db)
                             st.rerun()
@@ -393,6 +411,15 @@ elif menu == "School Login":
             st.markdown("### 📝 Student Registration & Subject Marks Entry")
             roll_no = st.text_input("Roll No (Student ID)", key="add_roll")
             st_name = st.text_input("Student Name", key="add_name")
+            
+            c_new1, c_new2, c_new3 = st.columns(3)
+            with c_new1:
+                gender = st.selectbox("Gender", ["Male", "Female", "Other"], key="add_gen")
+            with c_new2:
+                pen_no = st.text_input("PEN NO", key="add_pen")
+            with c_new3:
+                apaar_no = st.text_input("APAAR NO", key="add_apaar")
+                
             father_name = st.text_input("Father's Name", key="add_father")
             mother_name = st.text_input("Mother's Name", key="add_mother")
             
@@ -445,7 +472,8 @@ elif menu == "School Login":
                         if cur_school not in students_db:
                             students_db[cur_school] = {}
                         students_db[cur_school][roll_no] = {
-                            "name": st_name, "father_name": father_name, "mother_name": mother_name,
+                            "name": st_name, "gender": gender, "pen_no": pen_no, "apaar_no": apaar_no,
+                            "father_name": father_name, "mother_name": mother_name,
                             "dob": str(dob), "class": cls, "subjects": subjects_data,
                             "total_full": total_full_mark, "total_obt": total_obt_mark,
                             "percentage": round(percentage, 2), "result": result, "grade": grade
@@ -466,13 +494,23 @@ elif menu == "School Login":
                 curr_st = school_students[edit_roll]
                 
                 up_name = st.text_input("Edit Name", value=curr_st['name'])
+                
+                c_up1, c_up2, c_up3 = st.columns(3)
+                with c_up1:
+                    genders = ["Male", "Female", "Other"]
+                    g_val = curr_st.get('gender', 'Male')
+                    up_gender = st.selectbox("Edit Gender", genders, index=genders.index(g_val) if g_val in genders else 0)
+                with c_up2:
+                    up_pen = st.text_input("Edit PEN NO", value=curr_st.get('pen_no', ''))
+                with c_up3:
+                    up_apaar = st.text_input("Edit APAAR NO", value=curr_st.get('apaar_no', ''))
+
                 up_father = st.text_input("Edit Father's Name", value=curr_st.get('father_name', ''))
                 up_mother = st.text_input("Edit Mother's Name", value=curr_st.get('mother_name', ''))
                 up_dob = st.text_input("Edit DOB (YYYY-MM-DD)", value=curr_st['dob'])
                 
                 cls_val = curr_st.get('class', '1')
-                cls_idx = classes_list.index(cls_val) if cls_val in classes_list else 0
-                up_cls = st.selectbox("Edit Class", classes_list, index=cls_idx)
+                up_cls = st.selectbox("Edit Class", classes_list, index=classes_list.index(cls_val) if cls_val in classes_list else 0)
                 
                 up_total_obt = st.number_input("Update Total Obtained Marks", value=float(curr_st.get('total_obt', 0)))
                 up_total_full = st.number_input("Update Total Full Marks", value=float(curr_st.get('total_full', 300)))
@@ -483,7 +521,8 @@ elif menu == "School Login":
                     new_grd = "A+" if new_per >= 90 else "A" if new_per >= 80 else "B" if new_per >= 60 else "C" if new_per >= 40 else "D" if new_per >= 30 else "F"
                     
                     school_students[edit_roll].update({
-                        "name": up_name, "father_name": up_father, "mother_name": up_mother,
+                        "name": up_name, "gender": up_gender, "pen_no": up_pen, "apaar_no": up_apaar,
+                        "father_name": up_father, "mother_name": up_mother,
                         "dob": up_dob, "class": up_cls, "total_obt": up_total_obt,
                         "total_full": up_total_full, "percentage": round(new_per, 2),
                         "result": new_res, "grade": new_grd
@@ -501,7 +540,6 @@ elif menu == "School Login":
                 st_data = school_students[rep_roll]
                 school_name = schools_db[cur_school]['name']
                 
-                # ଏବେ ସୁନ୍ଦର RANK CARD ଡିଜାଇନ୍ ଦେଖାଯିବ
                 st.markdown(generate_result_card_html(school_name, st_data, rep_roll), unsafe_allow_html=True)
                 
                 col1, col2 = st.columns(2)
@@ -531,7 +569,6 @@ elif menu == "Student Login":
                 st.success(f"Welcome KULU SUTAR! ଆପଣଙ୍କ ରେଜଲ୍ଟ୍ ତଳେ ଦିଆଗଲା:")
                 school_name = schools_db[st_school_id]['name']
                 
-                # ସୁନ୍ଦର RANK CARD ଏଠାରେ ମଧ୍ୟ ଡିସପ୍ଲେ ହେବ
                 st.markdown(generate_result_card_html(school_name, student, st_roll), unsafe_allow_html=True)
                 
                 col1, col2 = st.columns(2)
