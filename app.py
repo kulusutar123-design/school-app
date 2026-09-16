@@ -284,7 +284,7 @@ if menu == "Home Page":
             <div class="notice-item">⏩ Welcome to Advanced School Management System! <span class="new-badge">NEW!</span></div>
             <div class="notice-item">⏩ Master & School portal passwords are encrypted and secured.</div>
             <div class="notice-item">⏩ Online Student Rank Card generation is now active for all classes.</div>
-            <div class="notice-item">⏩ Students can now Search Result by Roll No OR Name. <span class="new-badge">UPDATE!</span></div>
+            <div class="notice-item">⏩ Students can now Search Result by Roll No OR Name. No School ID needed! <span class="new-badge">UPDATE!</span></div>
             <div class="notice-item">⏩ APAAR and PEN details have been integrated into the system.</div>
         </div>
     </div>
@@ -718,53 +718,61 @@ elif menu == "Student Login":
     with c_title:
         st.subheader("🎓 Student Portal (Result Viewer)")
         
-    st.info("🔗 ଉପରେ ବ୍ରାଉଜର୍ ଲିଙ୍କ୍ କୁ କପି କରି ଷ୍ଟୁଡେଣ୍ଟ୍‌ମାନଙ୍କୁ ପଠାଇ ପାରିବେ, ସେମାନେ ସିଧା ଏହି ପେଜ୍‌କୁ ଆସିବେ।")
+    st.info("🔗 ଏଠାରେ କୌଣସି School ID ଦରକାର ନାହିଁ। କେବଳ Roll Number କିମ୍ବା Name ଦେଇ ସର୍ଚ୍ଚ କରନ୍ତୁ।")
     
-    st_school_id = st.text_input("School ID", key="st_login_school")
     st_class = st.selectbox("Select Class (1 to 10)", classes_list, key="st_login_class") 
     st_search_query = st.text_input("Roll Number OR Student Name (ରୋଲ୍ ନମ୍ବର କିମ୍ବା ନାମ ଦିଅନ୍ତୁ)", key="st_login_search")
     st_dob_input = st.text_input("Date of Birth (YYYY-MM-DD)", key="st_login_dob")
     
     if st.button("View Result"):
-        if st_school_id in students_db:
-            school_students = students_db[st_school_id]
-            found_student = None
-            found_roll = None
-            
-            # ରୋଲ୍ ନମ୍ବର କିମ୍ବା ନାମ (Roll No OR Name) ଦ୍ୱାରା ଖୋଜିବା
+        found_student = None
+        found_roll = None
+        found_school_id = None
+        
+        search_query_lower = st_search_query.strip().lower()
+        
+        # ସବୁ ସ୍କୁଲ୍ ଭିତରେ ଖୋଜିବା
+        for s_id, school_students in students_db.items():
+            # ୧. Roll No ଦ୍ୱାରା ଖୋଜିବା
             if st_search_query in school_students:
-                found_student = school_students[st_search_query]
-                found_roll = st_search_query
-            else:
+                potential_student = school_students[st_search_query]
+                if potential_student["dob"] == st_dob_input and potential_student.get("class") == st_class:
+                    found_student = potential_student
+                    found_roll = st_search_query
+                    found_school_id = s_id
+                    break
+            
+            # ୨. ନାମ (Name) ଦ୍ୱାରା ଖୋଜିବା
+            if not found_student:
                 for r_no, s_info in school_students.items():
-                    if s_info.get("name", "").strip().lower() == st_search_query.strip().lower():
-                        found_student = s_info
-                        found_roll = r_no
-                        break
+                    if s_info.get("name", "").strip().lower() == search_query_lower:
+                        if s_info["dob"] == st_dob_input and s_info.get("class") == st_class:
+                            found_student = s_info
+                            found_roll = r_no
+                            found_school_id = s_id
+                            break
             
             if found_student:
-                if found_student["dob"] == st_dob_input and found_student.get("class") == st_class:
-                    st.success(f"Welcome KULU SUTAR! ଆପଣଙ୍କ ରେଜଲ୍ଟ୍ ତଳେ ଦିଆଗଲା:")
-                    school_name = schools_db[st_school_id]['name']
-                    
-                    st.markdown(generate_result_card_html(school_name, found_student, found_roll), unsafe_allow_html=True)
-                    
-                    col1, col2 = st.columns(2)
-                    with col1:
-                        pdf_file = f"Result_{found_roll}.pdf"
-                        create_pdf(pdf_file, school_name, found_student, found_roll)
-                        with open(pdf_file, "rb") as f:
-                            st.download_button("📥 Download PDF", f, file_name=pdf_file, mime="application/pdf", key="dl_stu")
-                    
-                    with col2:
-                        if st.button("🖨️ Print Result Card", key="print_stu"):
-                            components.html("<script>window.parent.print();</script>", height=0)
+                break
+                
+        if found_student:
+            st.success(f"Welcome KULU SUTAR! ଆପଣଙ୍କ ରେଜଲ୍ଟ୍ ତଳେ ଦିଆଗଲା:")
+            school_name = schools_db[found_school_id]['name']
             
-                elif found_student["dob"] != st_dob_input:
-                    st.error("❌ ଭୁଲ୍ Date of Birth!")
-                else:
-                    st.error("❌ ଭୁଲ୍ Class! ଦୟାକରି ସଠିକ୍ କ୍ଲାସ୍ ବାଛନ୍ତୁ।")
-            else:
-                st.error("❌ କୌଣସି ରେକର୍ଡ ମିଳିଲା ନାହିଁ! ଭୁଲ୍ Roll Number କିମ୍ବା Name ଦେଇଛନ୍ତି।")
+            st.markdown(generate_result_card_html(school_name, found_student, found_roll), unsafe_allow_html=True)
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                pdf_file = f"Result_{found_roll}.pdf"
+                create_pdf(pdf_file, school_name, found_student, found_roll)
+                with open(pdf_file, "rb") as f:
+                    st.download_button("📥 Download PDF", f, file_name=pdf_file, mime="application/pdf", key="dl_stu")
+            
+            with col2:
+                if st.button("🖨️ Print Result Card", key="print_stu"):
+                    components.html("<script>window.parent.print();</script>", height=0)
         else:
-            st.error("❌ ଭୁଲ୍ School ID!")
+            if not st_search_query or not st_dob_input:
+                st.warning("ଦୟାକରି ସବୁ ତଥ୍ୟ ପୂରଣ କରନ୍ତୁ।")
+            else:
+                st.error("❌ କୌଣସି ରେକର୍ଡ ମିଳିଲା ନାହିଁ! ଭୁଲ୍ ତଥ୍ୟ (Roll Number/Name, DOB କିମ୍ବା Class) ଦେଇଛନ୍ତି।")
