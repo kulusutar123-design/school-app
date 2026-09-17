@@ -10,7 +10,7 @@ import random
 # ପେଜ୍ ସେଟିଂ
 st.set_page_config(page_title="Advanced School Management System", layout="centered")
 
-# --- HIDE STREAMLIT DEFAULT MENU & HEADER (ସୁରକ୍ଷା ପାଇଁ ଉପର ମେନୁ ଲୁଚାଇବା) ---
+# --- HIDE STREAMLIT DEFAULT MENU & HEADER ---
 hide_st_style = """
             <style>
             #MainMenu {visibility: hidden;}
@@ -24,7 +24,7 @@ SCHOOLS_FILE = "schools.json"
 STUDENTS_FILE = "students.txt"
 MASTER_FILE = "master.json"
 
-# --- ଡାଟା ଲୋଡ୍ ଓ ସେଭ୍ ଫଙ୍କସନ୍ (Strong Persistence) ---
+# --- ଡାଟା ଲୋଡ୍ ଓ ସେଭ୍ ଫଙ୍କସନ୍ ---
 def load_master_data():
     default_master = {"username": "master", "password": "master123", "email": "admin@school.com", "phone": "9999999999"}
     if os.path.exists(MASTER_FILE):
@@ -71,11 +71,8 @@ def save_data(schools, students):
     with open(STUDENTS_FILE, "w", encoding="utf-8") as f:
         json.dump(students, f, indent=4)
 
-# --- ସୁନ୍ଦର ରାଙ୍କ୍ କାର୍ଡ (RANK CARD) ଡିଜାଇନ୍ ---
+# --- ସୁନ୍ଦର ରାଙ୍କ୍ କାର୍ଡ (NEW CERTIFICATE DESIGN) ---
 def generate_result_card_html(school_name, st_data, roll_no):
-    res_color = "#15803d" if st_data.get('result') == "PASS" else "#dc2626"
-    bg_color = "#f0fdf4" if st_data.get('result') == "PASS" else "#fef2f2"
-    
     raw_dob = st_data.get('dob', '')
     disp_dob = raw_dob
     if len(raw_dob.split('-')) == 3:
@@ -86,72 +83,98 @@ def generate_result_card_html(school_name, st_data, roll_no):
     rows_html = ""
     for sub, m_info in st_data.get('subjects', {}).items():
         rows_html += (
-            f"<tr>"
-            f"<td style='padding: 12px; border: 1px solid #cbd5e1; text-align: left; font-weight: bold;'>{sub}</td>"
-            f"<td style='padding: 12px; border: 1px solid #cbd5e1;'>{m_info['full']}</td>"
-            f"<td style='padding: 12px; border: 1px solid #cbd5e1; font-weight: bold;'>{m_info['obt']}</td>"
+            f"<tr style='border-bottom: 1px solid #d4a3d4;'>"
+            f"<td style='padding: 8px; border-right: 1px solid #a965a9; text-align: left; font-weight: bold;'>{sub.upper()}</td>"
+            f"<td style='padding: 8px; border-right: 1px solid #a965a9;'>{m_info['full']}</td>"
+            f"<td style='padding: 8px; font-weight: bold;'>{m_info['obt']}</td>"
             f"</tr>"
         )
 
     html_content = f"""
-    <div style="border: 3px solid #1E3A8A; padding: 30px; border-radius: 12px; 
-                background-color: #ffffff; color: #1e293b; font-family: Arial, sans-serif; 
-                max-width: 850px; margin: auto; box-shadow: 0px 8px 16px rgba(0,0,0,0.15);">
-        <div style="text-align: center; border-bottom: 4px double #1E3A8A; padding-bottom: 15px; margin-bottom: 25px;">
-            <h1 style="color: #1E3A8A; margin: 0; font-size: 32px; text-transform: uppercase; font-weight: 900;">
-                🏫 {school_name}
-            </h1>
-            <h3 style="color: #e11d48; margin: 8px 0 0 0; letter-spacing: 3px; font-weight: bold;">
-                OFFICIAL RANK CARD
-            </h3>
-        </div>
-        <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 16px;">
-            <tr>
-                <td style="padding: 8px 0;"><b>Student Name:</b> {st_data.get('name', '')}</td>
-                <td style="padding: 8px 0; text-align: right;"><b>Roll No:</b> {roll_no}</td>
-            </tr>
-            <tr>
-                <td style="padding: 8px 0;"><b>Father's Name:</b> {st_data.get('father_name', 'N/A')}</td>
-                <td style="padding: 8px 0; text-align: right;"><b>Class:</b> {st_data.get('class', 'N/A')}</td>
-            </tr>
-            <tr>
-                <td style="padding: 8px 0;"><b>Mother's Name:</b> {st_data.get('mother_name', 'N/A')}</td>
-                <td style="padding: 8px 0; text-align: right;"><b>Date of Birth:</b> {disp_dob}</td>
-            </tr>
-            <tr>
-                <td style="padding: 8px 0;"><b>Gender:</b> {st_data.get('gender', 'N/A')}</td>
-                <td style="padding: 8px 0; text-align: right;"><b>PEN NO:</b> {st_data.get('pen_no', 'N/A')}</td>
-            </tr>
-            <tr>
-                <td style="padding: 8px 0;"><b>APAAR NO:</b> {st_data.get('apaar_no', 'N/A')}</td>
-                <td style="padding: 8px 0; text-align: right;"><b>Batch:</b> {st_data.get('batch', 'N/A')}</td>
-            </tr>
-        </table>
-        <h4 style="color: #ffffff; background-color: #1E3A8A; padding: 12px; margin: 0; text-align: center; border-top-left-radius: 8px; border-top-right-radius: 8px; letter-spacing: 1px;">
-            SUBJECT-WISE PERFORMANCE
-        </h4>
-        <table style="width: 100%; border-collapse: collapse; text-align: center; margin-bottom: 30px; font-size: 16px; background-color: #f8fafc;">
-            <tr style="background-color: #e2e8f0; color: #1e293b;">
-                <th style="padding: 12px; border: 1px solid #cbd5e1;">Subject</th>
-                <th style="padding: 12px; border: 1px solid #cbd5e1;">Full Marks</th>
-                <th style="padding: 12px; border: 1px solid #cbd5e1;">Obtained Marks</th>
-            </tr>
-            {rows_html}
-        </table>
-        <div style="background-color: {bg_color}; padding: 20px; border: 2px solid {res_color}; border-radius: 8px;">
-            <table style="width: 100%; font-size: 18px;">
+    <div style="font-family: 'Times New Roman', serif; border: 15px solid #dcb5e3; padding: 4px; max-width: 800px; margin: auto; background-color: #ffffff;">
+        <div style="border: 2px solid #a965a9; padding: 25px; background-color: #fffdfd; position: relative;">
+            
+            <!-- Header Section -->
+            <div style="text-align: center; color: #8e24aa; margin-bottom: 20px;">
+                <h1 style="margin: 0; font-size: 26px; text-transform: uppercase;">{school_name}</h1>
+                <h3 style="margin: 8px 0; font-size: 16px; letter-spacing: 1px;">ANNUAL EXAMINATION - {st_data.get('batch', '2025-2026')}</h3>
+                <p style="margin: 5px 0; font-weight: bold; font-size: 17px; text-decoration: underline;">CERTIFICATE-CUM-MARK SHEET</p>
+            </div>
+            
+            <!-- Top Details (Roll No, Class, etc.) -->
+            <table style="width: 100%; font-size: 13px; color: #333; margin-bottom: 20px;">
                 <tr>
-                    <td style="padding: 5px 0;"><b>Total Marks:</b> <span style="font-size: 20px;">{st_data.get('total_obt', 0)} / {st_data.get('total_full', 0)}</span></td>
-                    <td style="padding: 5px 0; text-align: center;"><b>Percentage:</b> <span style="font-size: 20px;">{st_data.get('percentage', 0)}%</span></td>
-                    <td style="padding: 5px 0; text-align: right;"><b>Grade:</b> <span style="color: #1E3A8A; font-size: 24px; font-weight: 900;">{st_data.get('grade', 'N/A')}</span></td>
+                    <td><b>ROLL NO:</b> {roll_no}</td>
+                    <td style="text-align: right;"><b>CLASS:</b> {st_data.get('class', 'N/A')}</td>
+                </tr>
+                <tr>
+                    <td><b>PEN NO:</b> {st_data.get('pen_no', 'N/A')}</td>
+                    <td style="text-align: right;"><b>APAAR NO:</b> {st_data.get('apaar_no', 'N/A')}</td>
                 </tr>
             </table>
-            <div style="text-align: center; margin-top: 20px; padding-top: 15px; border-top: 2px dashed {res_color};">
-                <span style="font-size: 20px; font-weight: bold; color: #475569;">FINAL RESULT:</span> 
-                <span style="color: {res_color}; font-size: 28px; font-weight: 900; letter-spacing: 2px; margin-left: 10px;">
-                    {st_data.get('result', 'N/A')}
-                </span>
+            
+            <!-- Student Personal Details -->
+            <table style="width: 100%; font-size: 15px; margin-bottom: 15px; text-transform: uppercase; color: #333; line-height: 1.8;">
+                <tr>
+                    <td style="width: 160px; color: #8e24aa; font-weight: bold;">Certify that</td>
+                    <td style="font-weight: bold;">{st_data.get('name', 'N/A')}</td>
+                </tr>
+                <tr>
+                    <td style="color: #8e24aa; font-weight: bold;">Mother's Name</td>
+                    <td style="font-weight: bold;">{st_data.get('mother_name', 'N/A')}</td>
+                </tr>
+                <tr>
+                    <td style="color: #8e24aa; font-weight: bold;">Father's Name</td>
+                    <td style="font-weight: bold;">{st_data.get('father_name', 'N/A')}</td>
+                </tr>
+                <tr>
+                    <td style="color: #8e24aa; font-weight: bold;">Date of Birth</td>
+                    <td style="font-weight: bold;">{disp_dob}</td>
+                </tr>
+            </table>
+            
+            <p style="color: #8e24aa; font-style: italic; font-size: 15px; text-align: center; margin-bottom: 20px;">
+                Passed the Annual Examination held in the academic batch of {st_data.get('batch', 'N/A')}.
+            </p>
+            
+            <!-- Marks Table -->
+            <div style="text-align: center; color: #8e24aa; font-weight: bold; font-size: 14px; margin-bottom: 5px;">
+                SUBJECTS AND MARKS SECURED
             </div>
+            <table style="width: 100%; border-collapse: collapse; border: 2px solid #a965a9; text-align: center; font-size: 14px;">
+                <tr style="color: #8e24aa; background-color: #fdf5fc; border-bottom: 2px solid #a965a9;">
+                    <th style="padding: 10px; border-right: 1px solid #a965a9;">SUBJECT</th>
+                    <th style="padding: 10px; border-right: 1px solid #a965a9;">FULL MARKS</th>
+                    <th style="padding: 10px;">MARKS SECURED</th>
+                </tr>
+                {rows_html}
+                <tr style="color: #8e24aa; font-weight: bold; background-color: #fdf5fc; border-top: 2px solid #a965a9;">
+                    <td style="padding: 10px; border-right: 1px solid #a965a9; text-align: right;">TOTAL MARKS</td>
+                    <td style="padding: 10px; border-right: 1px solid #a965a9;">{st_data.get('total_full', 0)}</td>
+                    <td style="padding: 10px;">{st_data.get('total_obt', 0)}</td>
+                </tr>
+            </table>
+            
+            <!-- Footer (Grade, Result, Date) -->
+            <table style="width: 100%; margin-top: 30px; text-align: center; color: #8e24aa;">
+                <tr>
+                    <td style="width: 33%;">
+                        <div style="font-size: 11px;">DATE OF PUBLICATION</div>
+                        <div style="font-weight: bold; font-size: 14px; margin-top: 5px;">{datetime.date.today().strftime('%d/%m/%Y')}</div>
+                    </td>
+                    <td style="width: 34%;">
+                        <div style="border: 2px solid #a965a9; padding: 10px; background-color: #fdf5fc; display: inline-block; min-width: 80px;">
+                            <div style="font-size: 11px; margin-bottom: 5px;">GRADE</div>
+                            <div style="font-weight: bold; font-size: 18px;">{st_data.get('grade', 'N/A')}</div>
+                        </div>
+                    </td>
+                    <td style="width: 33%;">
+                        <div style="font-size: 11px;">FINAL RESULT</div>
+                        <div style="font-weight: bold; font-size: 18px; margin-top: 5px;">{st_data.get('result', 'N/A')}</div>
+                    </td>
+                </tr>
+            </table>
+            
         </div>
     </div>
     """
@@ -167,46 +190,79 @@ def create_pdf(filename, school_name, st_data, roll_no):
             disp_dob = f"{d}-{m}-{y}"
             
     c = canvas.Canvas(filename, pagesize=letter)
-    c.setFont("Helvetica-Bold", 20)
-    c.drawCentredString(300, 750, school_name)
-    c.setFont("Helvetica-Bold", 14)
-    c.drawCentredString(300, 730, "OFFICIAL RANK CARD")
     
-    c.setFont("Helvetica", 12)
-    c.drawString(50, 680, f"Student Name: {st_data.get('name', '')}")
-    c.drawString(400, 680, f"Roll No: {roll_no}")
-    c.drawString(50, 660, f"Father's Name: {st_data.get('father_name', 'N/A')}")
-    c.drawString(400, 660, f"Class: {st_data.get('class', '')}")
-    c.drawString(50, 640, f"Mother's Name: {st_data.get('mother_name', 'N/A')}")
-    c.drawString(400, 640, f"DOB: {disp_dob}")
-    c.drawString(50, 620, f"Gender: {st_data.get('gender', 'N/A')}")
-    c.drawString(400, 620, f"PEN NO: {st_data.get('pen_no', 'N/A')}")
-    c.drawString(50, 600, f"APAAR NO: {st_data.get('apaar_no', 'N/A')}")
-    c.drawString(400, 600, f"Batch: {st_data.get('batch', 'N/A')}")
+    # Add Certificate Border to PDF
+    c.setStrokeColorRGB(0.66, 0.39, 0.66) # Purple/Pink border
+    c.setLineWidth(4)
+    c.rect(20, 20, 570, 750)
+    c.setLineWidth(1)
+    c.rect(25, 25, 560, 740)
     
-    c.line(50, 580, 550, 580)
+    c.setFillColorRGB(0.55, 0.14, 0.66) # Purple text
+    c.setFont("Helvetica-Bold", 18)
+    c.drawCentredString(300, 730, school_name.upper())
     c.setFont("Helvetica-Bold", 12)
-    c.drawString(50, 560, "Subject")
-    c.drawString(300, 560, "Full Marks")
-    c.drawString(450, 560, "Obtained Marks")
-    c.line(50, 550, 550, 550)
+    c.drawCentredString(300, 710, f"ANNUAL EXAMINATION - {st_data.get('batch', '2025-2026')}")
+    c.drawCentredString(300, 690, "CERTIFICATE-CUM-MARK SHEET")
     
-    y = 530
-    c.setFont("Helvetica", 12)
+    c.setFillColorRGB(0, 0, 0) # Black text for details
+    c.setFont("Helvetica", 11)
+    c.drawString(50, 650, f"ROLL NO: {roll_no}")
+    c.drawString(450, 650, f"CLASS: {st_data.get('class', '')}")
+    c.drawString(50, 630, f"PEN NO: {st_data.get('pen_no', 'N/A')}")
+    c.drawString(450, 630, f"APAAR NO: {st_data.get('apaar_no', 'N/A')}")
+    
+    c.setFont("Helvetica-Bold", 11)
+    c.drawString(50, 600, "Certify that:")
+    c.setFont("Helvetica", 11)
+    c.drawString(150, 600, f"{st_data.get('name', '').upper()}")
+    
+    c.setFont("Helvetica-Bold", 11)
+    c.drawString(50, 580, "Mother's Name:")
+    c.setFont("Helvetica", 11)
+    c.drawString(150, 580, f"{st_data.get('mother_name', 'N/A').upper()}")
+    
+    c.setFont("Helvetica-Bold", 11)
+    c.drawString(50, 560, "Father's Name:")
+    c.setFont("Helvetica", 11)
+    c.drawString(150, 560, f"{st_data.get('father_name', 'N/A').upper()}")
+    
+    c.setFont("Helvetica-Bold", 11)
+    c.drawString(50, 540, "Date of Birth:")
+    c.setFont("Helvetica", 11)
+    c.drawString(150, 540, f"{disp_dob}")
+    
+    c.setStrokeColorRGB(0.66, 0.39, 0.66)
+    c.line(50, 510, 550, 510)
+    c.setFillColorRGB(0.55, 0.14, 0.66)
+    c.setFont("Helvetica-Bold", 11)
+    c.drawString(50, 490, "SUBJECT")
+    c.drawString(300, 490, "FULL MARKS")
+    c.drawString(450, 490, "MARKS SECURED")
+    c.line(50, 480, 550, 480)
+    
+    c.setFillColorRGB(0, 0, 0)
+    y = 460
+    c.setFont("Helvetica", 11)
     for sub, m_info in st_data.get('subjects', {}).items():
-        c.drawString(50, y, str(sub))
+        c.drawString(50, y, str(sub).upper())
         c.drawString(300, y, str(m_info['full']))
         c.drawString(450, y, str(m_info['obt']))
         y -= 20
         
+    c.setStrokeColorRGB(0.66, 0.39, 0.66)
     c.line(50, y, 550, y)
     y -= 20
-    c.setFont("Helvetica-Bold", 12)
-    c.drawString(50, y, f"Total Marks: {st_data.get('total_obt', 0)} / {st_data.get('total_full', 0)}")
-    c.drawString(400, y, f"Percentage: {st_data.get('percentage', 0)}%")
-    y -= 20
-    c.drawString(50, y, f"Grade: {st_data.get('grade', '')}")
-    c.drawString(400, y, f"Final Result: {st_data.get('result', '')}")
+    
+    c.setFillColorRGB(0.55, 0.14, 0.66)
+    c.setFont("Helvetica-Bold", 11)
+    c.drawString(50, y, "TOTAL MARKS")
+    c.drawString(300, y, str(st_data.get('total_full', 0)))
+    c.drawString(450, y, str(st_data.get('total_obt', 0)))
+    
+    y -= 40
+    c.drawString(50, y, f"GRADE: {st_data.get('grade', '')}")
+    c.drawString(400, y, f"FINAL RESULT: {st_data.get('result', '')}")
     c.save()
 
 # --- MAIN APP START ---
@@ -240,7 +296,6 @@ elif menu == "Results":
     st.query_params["portal"] = "student"
 
 classes_list = [str(i) for i in range(1, 11)]
-# ବ୍ୟାଚ୍ ଲିଷ୍ଟ୍ (2020 ରୁ 2050 ପର୍ଯ୍ୟନ୍ତ)
 batches_list = [f"{y}-{y+1}" for y in range(2020, 2051)]
 
 # ----------------- HOME PAGE (ERP STYLE UI) -----------------
@@ -817,11 +872,7 @@ elif menu == "Results":
     with c_title:
         st.subheader("🎓 Results Portal")
         
-    st.info(
-        "🔗 **English:** No School ID is required here. Search using only your Roll Number or Name. \n\n"
-        "🔗 **हिन्दी:** यहाँ किसी School ID की आवश्यकता नहीं है। कृपया केवल अपना रोल नंबर या नाम दर्ज करके खोजें। \n\n"
-        "🔗 **ଓଡ଼ିଆ:** ଏଠାରେ କୌଣସି School ID ଦରକାର ନାହିଁ। କେବଳ Roll Number କିମ୍ବା Name ଦେଇ ସର୍ଚ୍ଚ କରନ୍ତୁ।"
-    )
+    st.info("🔗 **Information:** Please select your Class & Batch, then enter your Roll Number OR Name along with Date of Birth to view your Result.")
     
     col_c, col_b = st.columns(2)
     with col_c:
