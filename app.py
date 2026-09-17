@@ -7,7 +7,18 @@ import os
 import datetime
 import random
 
+# ପେଜ୍ ସେଟିଂ
 st.set_page_config(page_title="Advanced School Management System", layout="centered")
+
+# --- HIDE STREAMLIT DEFAULT MENU & HEADER (ସୁରକ୍ଷା ପାଇଁ ଉପର ମେନୁ ଲୁଚାଇବା) ---
+hide_st_style = """
+            <style>
+            #MainMenu {visibility: hidden;}
+            header {visibility: hidden;}
+            footer {visibility: hidden;}
+            </style>
+            """
+st.markdown(hide_st_style, unsafe_allow_html=True)
 
 SCHOOLS_FILE = "schools.json"
 STUDENTS_FILE = "students.txt"
@@ -231,22 +242,55 @@ classes_list = [str(i) for i in range(1, 11)]
 
 # ----------------- HOME PAGE (ERP STYLE UI) -----------------
 if menu == "Home Page":
-    # ନୂଆ ଏବଂ ସୁରକ୍ଷିତ Notice Board ଡିଜାଇନ୍ (ମୋବାଇଲ୍ Copy ପାଇଁ ଏକଦମ୍ ଠିକ୍)
+    st.markdown("""
+    <style>
+    .notice-container { background-color: #1e293b; border-radius: 5px; margin-bottom: 25px; border: 1px solid #475569; }
+    .notice-header { background-color: #27374D; color: white; text-align: center; padding: 12px; font-weight: bold; font-size: 20px; }
+    .notice-item { margin-bottom: 15px; font-size: 16px; border-bottom: 1px dotted #475569; padding-bottom: 10px; }
+    .new-badge { background-color: #fbbf24; color: black; font-size: 12px; font-weight: bold; padding: 2px 6px; border-radius: 3px; margin-left: 5px; animation: blinker 1.5s linear infinite; }
+    @keyframes blinker { 50% { opacity: 0; } }
+    .login-card { background-color: white; border: 1px solid #cbd5e1; border-bottom: 5px solid #fbbf24; border-radius: 8px; padding: 20px; margin-bottom: 15px; text-align: center; text-decoration: none; display: block; color: #1e3a8a; }
+    .login-title { font-size: 24px; font-weight: bold; margin-bottom: 5px; }
+    .login-sub { font-size: 14px; color: #64748b; }
+    </style>
+    """, unsafe_allow_html=True)
+
     notice_html = (
-        "<div style='background-color:#ffffff; border:1px solid #cbd5e1; border-radius:10px; box-shadow:0 4px 6px rgba(0,0,0,0.1); margin-bottom:25px; overflow:hidden;'>"
-        "<div style='background:linear-gradient(90deg, #1e3a8a 0%, #3b82f6 100%); color:white; padding:15px; text-align:center; font-size:20px; font-weight:bold; letter-spacing:1px;'>📢 RECENT UPDATES & NOTICES</div>"
-        "<div style='padding:15px; color:#1e293b; height:240px; overflow:hidden;'>"
-        "<marquee direction='up' scrollamount='2' onmouseover='this.stop();' onmouseout='this.start();' style='height:100%;'>"
-        "<div style='margin-bottom:12px; padding-bottom:8px; border-bottom:1px dashed #cbd5e1; font-size:16px;'>📌 <b>Welcome</b> to Advanced School Management System! <span style='background-color:#ef4444; color:white; font-size:11px; padding:2px 6px; border-radius:4px; font-weight:bold;'>NEW!</span></div>"
-        "<div style='margin-bottom:12px; padding-bottom:8px; border-bottom:1px dashed #cbd5e1; font-size:16px;'>📌 <b>Security:</b> Master & School portal passwords are encrypted and secured.</div>"
-        "<div style='margin-bottom:12px; padding-bottom:8px; border-bottom:1px dashed #cbd5e1; font-size:16px;'>📌 <b>Rank Cards:</b> Online Student Rank Card generation is now active for all classes.</div>"
-        "<div style='margin-bottom:12px; padding-bottom:8px; border-bottom:1px dashed #cbd5e1; font-size:16px;'>📌 <b>Search Feature:</b> Students can now Search Result by Roll No OR Name. No School ID needed! <span style='background-color:#10b981; color:white; font-size:11px; padding:2px 6px; border-radius:4px; font-weight:bold;'>UPDATE!</span></div>"
-        "<div style='margin-bottom:12px; padding-bottom:8px; border-bottom:1px dashed #cbd5e1; font-size:16px;'>📌 <b>New Fields:</b> APAAR and PEN details have been integrated into the system.</div>"
-        "<div style='margin-top:20px; text-align:center; padding:15px; background-color:#f1f5f9; border-radius:8px; border:1px solid #e2e8f0;'>"
-        "<div style='color:#1e3a8a; font-weight:bold; font-size:18px; margin-bottom:10px;'>📞 Helpdesk 24x7 Support:</div>"
-        "<span style='background-color:#25D366; color:white; padding:6px 15px; border-radius:20px; font-weight:bold; display:inline-block; margin:5px; box-shadow:0 2px 4px rgba(0,0,0,0.1);'>💬 WhatsApp: 8910223342</span>"
-        "<span style='background-color:#ea4335; color:white; padding:6px 15px; border-radius:20px; font-weight:bold; display:inline-block; margin:5px; box-shadow:0 2px 4px rgba(0,0,0,0.1);'>📧 Mail: kulusutar123@gmail.com</span>"
+        "<div class='notice-container'>"
+        "<div class='notice-header'>RECENT NOTICE</div>"
+        "<div style='padding: 0; overflow: hidden; background-color: #1e293b; color: #e2e8f0;'>"
+        "<marquee direction='up' scrollamount='2' onmouseover='this.stop();' onmouseout='this.start();' style='height: 180px; padding: 15px;'>"
+        
+        "<div class='notice-item'>"
+        "⏩ Welcome to Advanced School Management System! <span class='new-badge'>NEW!</span>"
         "</div>"
+        
+        "<div class='notice-item'>"
+        "⏩ Master & School portal passwords are encrypted and secured."
+        "</div>"
+        
+        "<div class='notice-item'>"
+        "⏩ Online Student Rank Card generation is now active for all classes."
+        "</div>"
+        
+        "<div class='notice-item'>"
+        "⏩ Students can now Search Result by Roll No OR Name. No School ID needed! <span class='new-badge'>UPDATE!</span>"
+        "</div>"
+        
+        "<div class='notice-item'>"
+        "⏩ APAAR and PEN details have been integrated into the system."
+        "</div>"
+        
+        "<div class='notice-item' style='border-bottom: none; margin-top: 15px; text-align: center; line-height: 2.5;'>"
+        "<span style='color: #fbbf24; font-weight: bold; font-size: 18px;'>📞 Helpdesk 24x7:</span><br>"
+        "<span style='background-color: #25D366; color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold; display: inline-block; margin-bottom: 5px;'>"
+        "💬 WhatsApp: 8910223342"
+        "</span><br>"
+        "<span style='background-color: #ea4335; color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold; display: inline-block;'>"
+        "📧 Mail: kulusutar123@gmail.com"
+        "</span>"
+        "</div>"
+        
         "</marquee>"
         "</div>"
         "</div>"
@@ -254,13 +298,6 @@ if menu == "Home Page":
     st.markdown(notice_html, unsafe_allow_html=True)
 
     st.markdown("""
-    <style>
-    .login-card { background-color: white; border: 1px solid #cbd5e1; border-bottom: 5px solid #fbbf24; border-radius: 8px; padding: 20px; margin-bottom: 15px; text-align: center; text-decoration: none; display: block; color: #1e3a8a; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.3s; }
-    .login-card:hover { background-color: #f8fafc; border-bottom: 5px solid #1e3a8a; transform: translateY(-2px); }
-    .login-title { font-size: 24px; font-weight: bold; margin-bottom: 5px; display: flex; align-items: center; justify-content: center; gap: 10px; }
-    .login-sub { font-size: 14px; color: #64748b; }
-    </style>
-    
     <a href="?portal=master" target="_self" class="login-card" style="text-decoration: none;">
         <div class="login-title">🏛️ Master Login</div>
         <div class="login-sub">Click here to login as Admin / University</div>
