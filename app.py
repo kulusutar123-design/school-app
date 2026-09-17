@@ -434,7 +434,7 @@ elif menu == "Master Login":
             if master_school_sel != "--Select--":
                 school_students = students_db.get(master_school_sel, {})
                 if school_students:
-                    m_edit_roll = st.selectbox("Select Student Roll No to Edit", list(school_students.keys()))
+                    m_edit_roll = st.selectbox("Select Student Roll No to Edit/Delete", list(school_students.keys()))
                     m_curr_st = school_students[m_edit_roll]
                     
                     st.markdown("#### Edit Student Details")
@@ -453,23 +453,57 @@ elif menu == "Master Login":
                         m_up_dob = st.text_input("DOB (YYYY-MM-DD)", value=m_curr_st['dob'], key="m_up_d")
                         m_up_mother = st.text_input("Mother's Name", value=m_curr_st.get('mother_name', ''), key="m_up_m")
                         m_up_apaar = st.text_input("APAAR NO", value=m_curr_st.get('apaar_no', ''), key="m_up_apaar")
-                        m_up_obt = st.number_input("Total Obtained Marks", value=float(m_curr_st.get('total_obt', 0)), key="m_up_o")
-                        m_up_full = st.number_input("Total Full Marks", value=float(m_curr_st.get('total_full', 300)), key="m_up_full")
                     
-                    if st.button("💾 Force Update Record"):
-                        new_per = (m_up_obt / m_up_full * 100) if m_up_full > 0 else 0.0
-                        new_res = "PASS" if new_per >= 30 else "FAIL"
-                        new_grd = "A+" if new_per >= 90 else "A" if new_per >= 80 else "B" if new_per >= 60 else "C" if new_per >= 40 else "D" if new_per >= 30 else "F"
-                        
-                        school_students[m_edit_roll].update({
-                            "name": m_up_name, "gender": m_up_gender, "pen_no": m_up_pen, "apaar_no": m_up_apaar,
-                            "father_name": m_up_father, "mother_name": m_up_mother,
-                            "dob": m_up_dob, "class": m_up_cls, "total_obt": m_up_obt,
-                            "total_full": m_up_full, "percentage": round(new_per, 2),
-                            "result": new_res, "grade": new_grd
-                        })
-                        save_data(schools_db, students_db)
-                        st.success(f"Roll No {m_edit_roll} data updated successfully!")
+                    st.markdown("#### 📚 Edit Subjects & Marks")
+                    m_subjects = m_curr_st.get('subjects', {})
+                    new_m_subjects = {}
+                    m_tot_full = 0
+                    m_tot_obt = 0
+                    
+                    if m_subjects:
+                        for sub_name, sub_info in m_subjects.items():
+                            sc1, sc2, sc3 = st.columns(3)
+                            with sc1:
+                                u_sub = st.text_input("Subject Name", value=sub_name, key=f"m_sub_{sub_name}")
+                            with sc2:
+                                u_f = st.number_input("Full Mark", value=float(sub_info['full']), key=f"m_f_{sub_name}")
+                            with sc3:
+                                u_o = st.number_input("Obtained Mark", value=float(sub_info['obt']), key=f"m_o_{sub_name}")
+                            if u_sub:
+                                new_m_subjects[u_sub] = {"full": u_f, "obt": u_o}
+                                m_tot_full += u_f
+                                m_tot_obt += u_o
+                    else:
+                        st.info("No detailed subjects found. Using only total marks.")
+                        m_tot_full = float(m_curr_st.get('total_full', 300))
+                        m_tot_obt = float(m_curr_st.get('total_obt', 0))
+
+                    st.info(f"📊 **Auto Summary:** Total Marks: {m_tot_obt}/{m_tot_full}")
+                    
+                    col_sv, col_dl = st.columns(2)
+                    with col_sv:
+                        if st.button("💾 Force Update Record"):
+                            new_per = (m_tot_obt / m_tot_full * 100) if m_tot_full > 0 else 0.0
+                            new_res = "PASS" if new_per >= 30 else "FAIL"
+                            new_grd = "A+" if new_per >= 90 else "A" if new_per >= 80 else "B" if new_per >= 60 else "C" if new_per >= 40 else "D" if new_per >= 30 else "F"
+                            
+                            school_students[m_edit_roll].update({
+                                "name": m_up_name, "gender": m_up_gender, "pen_no": m_up_pen, "apaar_no": m_up_apaar,
+                                "father_name": m_up_father, "mother_name": m_up_mother,
+                                "dob": m_up_dob, "class": m_up_cls, 
+                                "subjects": new_m_subjects if new_m_subjects else m_subjects,
+                                "total_obt": m_tot_obt, "total_full": m_tot_full, 
+                                "percentage": round(new_per, 2), "result": new_res, "grade": new_grd
+                            })
+                            save_data(schools_db, students_db)
+                            st.success(f"Roll No {m_edit_roll} data updated successfully!")
+                            
+                    with col_dl:
+                        if st.button("🗑️ Delete Student (Master Only)", type="primary"):
+                            del school_students[m_edit_roll]
+                            save_data(schools_db, students_db)
+                            st.success("Student deleted successfully!")
+                            st.rerun()
                 else:
                     st.warning("No students in this school.")
 
@@ -566,21 +600,19 @@ elif menu == "School Login":
         
         with tab_list:
             st.markdown("### 📋 Student List, Search & IDs")
+            st.error("🚫 **SECURITY LOCK:** ପିଲାଙ୍କ ଡାଟା ଡିଲିଟ୍ କରିବାର ଅନୁମତି ବର୍ତ୍ତମାନ କେବଳ Master ଙ୍କ ପାଖରେ ଅଛି। ଆପଣ କେବଳ ଦେଖିବେ ବା ଏଡିଟ୍ କରିପାରିବେ।")
             school_students = students_db.get(cur_school, {})
             if school_students:
                 st.write(f"Total Students Registered: **{len(school_students)}**")
                 search_query = st.text_input("🔍 Search by Name or Student ID (Roll No)")
                 for r_no, s_info in school_students.items():
                     if search_query.lower() in r_no.lower() or search_query.lower() in s_info['name'].lower() or search_query == "":
-                        cols = st.columns([2, 3, 2, 1, 2])
+                        # Removed Delete button column, kept only viewing columns
+                        cols = st.columns([2, 4, 3, 3])
                         cols[0].write(f"**Roll:** {r_no}")
                         cols[1].write(f"**Name:** {s_info['name']}")
                         cols[2].write(f"**PEN:** {s_info.get('pen_no', 'N/A')}")
                         cols[3].write(f"**Gen:** {s_info.get('gender', 'N/A')}")
-                        if cols[4].button(f"🗑️ Delete", key=f"del_{r_no}"):
-                            del school_students[r_no]
-                            save_data(schools_db, students_db)
-                            st.rerun()
             else:
                 st.warning("No students registered in your school yet.")
                 
@@ -689,20 +721,44 @@ elif menu == "School Login":
                 cls_val = curr_st.get('class', '1')
                 up_cls = st.selectbox("Edit Class", classes_list, index=classes_list.index(cls_val) if cls_val in classes_list else 0)
                 
-                up_total_obt = st.number_input("Update Total Obtained Marks", value=float(curr_st.get('total_obt', 0)))
-                up_total_full = st.number_input("Update Total Full Marks", value=float(curr_st.get('total_full', 300)))
+                st.markdown("#### 📚 Edit Subjects & Marks")
+                up_subjects = curr_st.get('subjects', {})
+                new_up_subjects = {}
+                up_tot_full = 0
+                up_tot_obt = 0
+                
+                if up_subjects:
+                    for sub_name, sub_info in up_subjects.items():
+                        sc1, sc2, sc3 = st.columns(3)
+                        with sc1:
+                            u_sub = st.text_input("Subject Name", value=sub_name, key=f"s_sub_{sub_name}")
+                        with sc2:
+                            u_f = st.number_input("Full Mark", value=float(sub_info['full']), key=f"s_f_{sub_name}")
+                        with sc3:
+                            u_o = st.number_input("Obtained Mark", value=float(sub_info['obt']), key=f"s_o_{sub_name}")
+                        if u_sub:
+                            new_up_subjects[u_sub] = {"full": u_f, "obt": u_o}
+                            up_tot_full += u_f
+                            up_tot_obt += u_o
+                else:
+                    st.info("No detailed subjects found. Using only total marks.")
+                    up_tot_full = float(curr_st.get('total_full', 300))
+                    up_tot_obt = float(curr_st.get('total_obt', 0))
+
+                st.info(f"📊 **Auto Summary:** Total Marks: {up_tot_obt}/{up_tot_full}")
                 
                 if st.button("💾 Save Updated Record"):
-                    new_per = (up_total_obt / up_total_full * 100) if up_total_full > 0 else 0.0
+                    new_per = (up_tot_obt / up_tot_full * 100) if up_tot_full > 0 else 0.0
                     new_res = "PASS" if new_per >= 30 else "FAIL"
                     new_grd = "A+" if new_per >= 90 else "A" if new_per >= 80 else "B" if new_per >= 60 else "C" if new_per >= 40 else "D" if new_per >= 30 else "F"
                     
                     school_students[edit_roll].update({
                         "name": up_name, "gender": up_gender, "pen_no": up_pen, "apaar_no": up_apaar,
                         "father_name": up_father, "mother_name": up_mother,
-                        "dob": up_dob, "class": up_cls, "total_obt": up_total_obt,
-                        "total_full": up_total_full, "percentage": round(new_per, 2),
-                        "result": new_res, "grade": new_grd
+                        "dob": up_dob, "class": up_cls,
+                        "subjects": new_up_subjects if new_up_subjects else up_subjects,
+                        "total_obt": up_tot_obt, "total_full": up_tot_full, 
+                        "percentage": round(new_per, 2), "result": new_res, "grade": new_grd
                     })
                     save_data(schools_db, students_db)
                     st.success("ରେକର୍ଡ ଅପଡେଟ୍ ହୋଇଗଲା!")
