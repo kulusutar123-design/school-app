@@ -110,13 +110,9 @@ def generate_result_card_html(school_name, st_data, roll_no):
     total_obt = st_data.get('total_obt', 0)
     words_total = number_to_words(total_obt)
 
-    # 🟢 OFFLINE QR CODE VERIFICATION
-    student_name = st_data.get('name', 'N/A').upper()
-    total_marks = f"{total_obt}/{st_data.get('total_full', 0)}"
-    grade = st_data.get('grade', 'N/A')
-    
-    qr_text = f"NAME: {student_name} | ROLL: {roll_no} | MARKS: {total_marks} | GRADE: {grade}"
-    qr_data = urllib.parse.quote(qr_text)
+    # 🟢 DYNAMIC QR LINK FOR ONLINE VERIFICATION
+    student_direct_link = f"{APP_URL}/?portal=student&roll={roll_no}&dob={disp_dob}"
+    qr_data = urllib.parse.quote(student_direct_link)
     qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={qr_data}"
     barcode_url = f"https://barcode.tec-it.com/barcode.ashx?data={roll_no}&code=Code128&dpi=96"
 
@@ -153,7 +149,7 @@ def generate_result_card_html(school_name, st_data, roll_no):
         "</table>"
         
         "<table style='width: 100%; font-size: 15px; margin-bottom: 15px; text-transform: uppercase; color: #000000; line-height: 1.8;'>"
-        f"<tr><td style='width: 160px; color: {border_color}; font-weight: bold; font-style: italic;'>Certify that</td><td style='font-weight: bold;'>{student_name}</td></tr>"
+        f"<tr><td style='width: 160px; color: {border_color}; font-weight: bold; font-style: italic;'>Certify that</td><td style='font-weight: bold;'>{st_data.get('name', 'N/A')}</td></tr>"
         f"<tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Mother's Name</td><td style='font-weight: bold;'>{st_data.get('mother_name', 'N/A')}</td></tr>"
         f"<tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Father's Name</td><td style='font-weight: bold;'>{st_data.get('father_name', 'N/A')}</td></tr>"
         f"<tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Date of Birth</td><td style='font-weight: bold;'>{disp_dob}</td></tr>"
@@ -192,12 +188,14 @@ def generate_result_card_html(school_name, st_data, roll_no):
         "<td style='width: 34%; vertical-align: top; padding-top: 5px;'>"
         "<div style='font-size: 12px; margin-bottom: 5px;'>GRADE</div>"
         f"<div style='border: 2px solid {border_color}; padding: 10px 25px; display: inline-block; min-width: 80px;'>"
-        f"<div style='font-weight: bold; font-size: 22px; color: #000;'>{grade}</div>"
+        f"<div style='font-weight: bold; font-size: 22px; color: #000;'>{st_data.get('grade', 'N/A')}</div>"
         "</div>"
         "</td>"
         
         "<td style='width: 33%; vertical-align: bottom;'>"
-        f"<img src='{qr_url}' alt='QR Code' style='height: 65px; margin-bottom: 10px; max-width: 100%;' title='Scan for Verification'/>"
+        f"<a href='{student_direct_link}' target='_blank'>"
+        f"<img src='{qr_url}' alt='QR Code' style='height: 65px; margin-bottom: 10px; max-width: 100%; cursor: pointer;' title='Scan to view result online'/>"
+        f"</a>"
         "<div style='height: 15px; margin-bottom: 30px;'></div>"
         f"<div style='border-bottom: 1px solid {border_color}; width: 80%; margin: auto;'></div>"
         "<div style='font-size: 11px; margin-top: 5px; font-weight: bold;'>CLASS TEACHER SIGNATURE</div>"
@@ -241,7 +239,6 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.setFillColorRGB(0.55, 0.14, 0.66)
     school_title = school_name.upper()
     title_size = 22
-    # ଯେତେବେଳେ ଯାଏଁ ଟେକ୍ସଟ୍ ବର୍ଡର୍ ଭିତରେ ନ ରହିଛି ସେତେବେଳ ଯାଏଁ ସାଇଜ୍ କମିବ
     while c.stringWidth(school_title, "Times-Bold", title_size) > 490 and title_size > 10:
         title_size -= 1
     
@@ -255,10 +252,15 @@ def create_pdf(filename, school_name, st_data, roll_no):
     
     c.setFillColorRGB(0, 0, 0)
     c.setFont("Helvetica-Bold", 11)
+    
+    # ==========================================
+    # 🌟 FIXED APAAR NO OVERLAP BY RIGHT ALIGNING
+    # ==========================================
     c.drawString(50, 635, f"ROLL NO: {roll_no}")
-    c.drawString(450, 635, f"CLASS: {st_data.get('class', '')}")
+    c.drawRightString(550, 635, f"CLASS: {st_data.get('class', '')}")
+    
     c.drawString(50, 615, f"PEN NO: {st_data.get('pen_no', 'N/A')}")
-    c.drawString(450, 615, f"APAAR NO: {st_data.get('apaar_no', 'N/A')}")
+    c.drawRightString(550, 615, f"APAAR NO: {st_data.get('apaar_no', 'N/A')}")
     
     c.setFillColorRGB(0.55, 0.14, 0.66)
     c.setFont("Helvetica-Oblique", 11)
@@ -294,7 +296,7 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.setFont("Helvetica-Bold", 11)
     c.drawString(50, 475, "SUBJECT")
     c.drawString(300, 475, "FULL MARKS")
-    c.drawString(450, 475, "MARKS SECURED")
+    c.drawRightString(550, 475, "MARKS SECURED")
     c.line(50, 465, 550, 465)
     
     c.setFillColorRGB(0, 0, 0)
@@ -303,7 +305,7 @@ def create_pdf(filename, school_name, st_data, roll_no):
     for sub, m_info in st_data.get('subjects', {}).items():
         c.drawString(50, y, str(sub).upper())
         c.drawString(300, y, str(m_info['full']))
-        c.drawString(450, y, str(m_info['obt']))
+        c.drawRightString(525, y, str(m_info['obt']))
         y -= 20
         
     c.setStrokeColorRGB(0.55, 0.14, 0.66)
@@ -314,7 +316,7 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.setFont("Helvetica-Bold", 11)
     c.drawString(50, y, "TOTAL MARKS")
     c.drawString(300, y, str(st_data.get('total_full', 0)))
-    c.drawString(450, y, str(st_data.get('total_obt', 0)))
+    c.drawRightString(525, y, str(st_data.get('total_obt', 0)))
     
     # --- PDF FOOTER ---
     y -= 30
@@ -354,13 +356,9 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.drawCentredString(300, y-15, f"{st_data.get('grade', 'N/A')}")
     
     # 3. QR Code & Class Teacher Signature (Right)
-    student_name = st_data.get('name', 'N/A').upper()
-    total_marks = f"{total_obt}/{st_data.get('total_full', 0)}"
-    grade = st_data.get('grade', 'N/A')
-    
-    qr_text = f"NAME: {student_name}\nROLL: {roll_no}\nMARKS: {total_marks}\nGRADE: {grade}"
+    student_direct_link = f"{APP_URL}/?portal=student&roll={roll_no}&dob={disp_dob}"
     try:
-        qr_w = qr.QrCodeWidget(qr_text)
+        qr_w = qr.QrCodeWidget(student_direct_link)
         b = qr_w.getBounds()
         w = b[2]-b[0]
         h = b[3]-b[1]
@@ -968,7 +966,7 @@ elif menu == "Results":
     st.info(
         "🔗 **English:** No School ID is required here. Search using only your Roll Number or Name. \n\n"
         "🔗 **हिन्दी:** यहाँ किसी School ID की आवश्यकता नहीं है। कृपया केवल अपना रोल नंबर या नाम दर्ज करके खोजें। \n\n"
-        "🔗 **ଓଡ଼ିଆ:** ଏଠାରେ କୌଣସି School ID ଦରକାର ନାହିଁ। କେବଳ Roll Number କିମ୍ବା Name ଦେଇ ସର୍ଚ୍ଚ କରନ୍ତୁ。"
+        "🔗 **ଓଡ଼ିଆ:** ଏଠାରେ କୌଣସି School ID ଦରକାର ନାହିଁ। କେବଳ Roll Number କିମ୍ବା Name ଦେଇ ସର୍ଚ୍ଚ କରନ୍ତୁ।"
     )
     
     col_c, col_b = st.columns(2)
