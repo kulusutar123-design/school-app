@@ -71,7 +71,7 @@ def save_data(schools, students):
     with open(STUDENTS_FILE, "w", encoding="utf-8") as f:
         json.dump(students, f, indent=4)
 
-# --- ସୁନ୍ଦର ରାଙ୍କ୍ କାର୍ଡ (NEW CERTIFICATE DESIGN - ERROR FIXED) ---
+# --- ସୁନ୍ଦର ରାଙ୍କ୍ କାର୍ଡ (NEW CERTIFICATE DESIGN WITH SAME BACKGROUND COLOR) ---
 def generate_result_card_html(school_name, st_data, roll_no):
     raw_dob = st_data.get('dob', '')
     disp_dob = raw_dob
@@ -80,58 +80,68 @@ def generate_result_card_html(school_name, st_data, roll_no):
         if len(y) == 4:
             disp_dob = f"{d}-{m}-{y}"
 
+    # Colors perfectly matched to the BSE Odisha Certificate
+    bg_color = "#fdf2f9" # Very light pinkish-purple background
+    border_color = "#9c27b0" # Deep purple/magenta for lines and texts
+    outer_border = "#e1bee7" # Lighter purple for the thick outer frame
+
     rows_html = ""
     for sub, m_info in st_data.get('subjects', {}).items():
         rows_html += (
-            "<tr style='border-bottom: 1px solid #d4a3d4;'>"
-            f"<td style='padding: 8px; border-right: 1px solid #a965a9; text-align: left; font-weight: bold;'>{sub.upper()}</td>"
-            f"<td style='padding: 8px; border-right: 1px solid #a965a9;'>{m_info['full']}</td>"
+            f"<tr style='border-bottom: 1px solid {border_color};'>"
+            f"<td style='padding: 8px; border-right: 1px solid {border_color}; text-align: left; font-weight: bold;'>{sub.upper()}</td>"
+            f"<td style='padding: 8px; border-right: 1px solid {border_color};'>{m_info['full']}</td>"
             f"<td style='padding: 8px; font-weight: bold;'>{m_info['obt']}</td>"
             "</tr>"
         )
 
-    # କୋଡ୍ ବ୍ଲକ୍ ଏରର୍ ଆସିବ ନାହିଁ କାରଣ ଆମେ ସବୁ ଲାଇନ୍‌କୁ ଯୋଡ଼ି ଦେଇଛୁ (No Indentation Issues)
     html_content = (
-        "<div style='font-family: \"Times New Roman\", serif; border: 15px solid #dcb5e3; padding: 4px; max-width: 800px; margin: auto; background-color: #ffffff;'>"
-        "<div style='border: 2px solid #a965a9; padding: 25px; background-color: #fffdfd; position: relative;'>"
-        "<div style='text-align: center; color: #8e24aa; margin-bottom: 20px;'>"
+        f"<div style='font-family: \"Times New Roman\", serif; border: 15px solid {outer_border}; padding: 4px; max-width: 800px; margin: auto; background-color: #ffffff;'>"
+        f"<div style='border: 2px solid {border_color}; padding: 25px; background-color: {bg_color}; position: relative;'>"
+        
+        f"<div style='text-align: center; color: {border_color}; margin-bottom: 20px;'>"
         f"<h1 style='margin: 0; font-size: 26px; text-transform: uppercase;'>{school_name}</h1>"
         f"<h3 style='margin: 8px 0; font-size: 16px; letter-spacing: 1px;'>ANNUAL EXAMINATION - {st_data.get('batch', '2025-2026')}</h3>"
         "<p style='margin: 5px 0; font-weight: bold; font-size: 17px; text-decoration: underline;'>CERTIFICATE-CUM-MARK SHEET</p>"
         "</div>"
-        "<table style='width: 100%; font-size: 13px; color: #333; margin-bottom: 20px;'>"
-        f"<tr><td><b>ROLL NO:</b> {roll_no}</td><td style='text-align: right;'><b>CLASS:</b> {st_data.get('class', 'N/A')}</td></tr>"
-        f"<tr><td><b>PEN NO:</b> {st_data.get('pen_no', 'N/A')}</td><td style='text-align: right;'><b>APAAR NO:</b> {st_data.get('apaar_no', 'N/A')}</td></tr>"
+        
+        "<table style='width: 100%; font-size: 13px; color: #000000; margin-bottom: 20px; font-weight: bold;'>"
+        f"<tr><td>ROLL NO: {roll_no}</td><td style='text-align: right;'>CLASS: {st_data.get('class', 'N/A')}</td></tr>"
+        f"<tr><td>PEN NO: {st_data.get('pen_no', 'N/A')}</td><td style='text-align: right;'>APAAR NO: {st_data.get('apaar_no', 'N/A')}</td></tr>"
         "</table>"
-        "<table style='width: 100%; font-size: 15px; margin-bottom: 15px; text-transform: uppercase; color: #333; line-height: 1.8;'>"
-        f"<tr><td style='width: 160px; color: #8e24aa; font-weight: bold;'>Certify that</td><td style='font-weight: bold;'>{st_data.get('name', 'N/A')}</td></tr>"
-        f"<tr><td style='color: #8e24aa; font-weight: bold;'>Mother's Name</td><td style='font-weight: bold;'>{st_data.get('mother_name', 'N/A')}</td></tr>"
-        f"<tr><td style='color: #8e24aa; font-weight: bold;'>Father's Name</td><td style='font-weight: bold;'>{st_data.get('father_name', 'N/A')}</td></tr>"
-        f"<tr><td style='color: #8e24aa; font-weight: bold;'>Date of Birth</td><td style='font-weight: bold;'>{disp_dob}</td></tr>"
+        
+        "<table style='width: 100%; font-size: 15px; margin-bottom: 15px; text-transform: uppercase; color: #000000; line-height: 1.8;'>"
+        f"<tr><td style='width: 160px; color: {border_color}; font-weight: bold; font-style: italic;'>Certify that</td><td style='font-weight: bold;'>{st_data.get('name', 'N/A')}</td></tr>"
+        f"<tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Mother's Name</td><td style='font-weight: bold;'>{st_data.get('mother_name', 'N/A')}</td></tr>"
+        f"<tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Father's Name</td><td style='font-weight: bold;'>{st_data.get('father_name', 'N/A')}</td></tr>"
+        f"<tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Date of Birth</td><td style='font-weight: bold;'>{disp_dob}</td></tr>"
         "</table>"
-        f"<p style='color: #8e24aa; font-style: italic; font-size: 15px; text-align: center; margin-bottom: 20px;'>Passed the Annual Examination held in the academic batch of {st_data.get('batch', 'N/A')}.</p>"
-        "<div style='text-align: center; color: #8e24aa; font-weight: bold; font-size: 14px; margin-bottom: 5px;'>SUBJECTS AND MARKS SECURED</div>"
-        "<table style='width: 100%; border-collapse: collapse; border: 2px solid #a965a9; text-align: center; font-size: 14px;'>"
-        "<tr style='color: #8e24aa; background-color: #fdf5fc; border-bottom: 2px solid #a965a9;'>"
-        "<th style='padding: 10px; border-right: 1px solid #a965a9;'>SUBJECT</th>"
-        "<th style='padding: 10px; border-right: 1px solid #a965a9;'>FULL MARKS</th>"
+        
+        f"<p style='color: {border_color}; font-style: italic; font-size: 15px; text-align: center; margin-bottom: 20px;'>Passed the Annual Examination held in the academic batch of {st_data.get('batch', 'N/A')}.</p>"
+        
+        f"<div style='text-align: center; color: {border_color}; font-weight: bold; font-size: 14px; margin-bottom: 5px;'>SUBJECTS AND MARKS SECURED</div>"
+        f"<table style='width: 100%; border-collapse: collapse; border: 2px solid {border_color}; text-align: center; font-size: 14px; background-color: transparent; color: #000000;'>"
+        f"<tr style='color: {border_color}; border-bottom: 2px solid {border_color};'>"
+        f"<th style='padding: 10px; border-right: 1px solid {border_color};'>SUBJECT</th>"
+        f"<th style='padding: 10px; border-right: 1px solid {border_color};'>FULL MARKS</th>"
         "<th style='padding: 10px;'>MARKS SECURED</th>"
         "</tr>"
         f"{rows_html}"
-        "<tr style='color: #8e24aa; font-weight: bold; background-color: #fdf5fc; border-top: 2px solid #a965a9;'>"
-        "<td style='padding: 10px; border-right: 1px solid #a965a9; text-align: right;'>TOTAL MARKS</td>"
-        f"<td style='padding: 10px; border-right: 1px solid #a965a9;'>{st_data.get('total_full', 0)}</td>"
+        f"<tr style='color: {border_color}; font-weight: bold; border-top: 2px solid {border_color};'>"
+        f"<td style='padding: 10px; border-right: 1px solid {border_color}; text-align: right;'>TOTAL MARKS</td>"
+        f"<td style='padding: 10px; border-right: 1px solid {border_color};'>{st_data.get('total_full', 0)}</td>"
         f"<td style='padding: 10px;'>{st_data.get('total_obt', 0)}</td>"
         "</tr>"
         "</table>"
-        "<table style='width: 100%; margin-top: 30px; text-align: center; color: #8e24aa;'>"
+        
+        f"<table style='width: 100%; margin-top: 30px; text-align: center; color: {border_color};'>"
         "<tr>"
         "<td style='width: 33%;'>"
         "<div style='font-size: 11px;'>DATE OF PUBLICATION</div>"
         f"<div style='font-weight: bold; font-size: 14px; margin-top: 5px;'>{datetime.date.today().strftime('%d/%m/%Y')}</div>"
         "</td>"
         "<td style='width: 34%;'>"
-        "<div style='border: 2px solid #a965a9; padding: 10px; background-color: #fdf5fc; display: inline-block; min-width: 80px;'>"
+        f"<div style='border: 2px solid {border_color}; padding: 10px; background-color: {bg_color}; display: inline-block; min-width: 80px;'>"
         "<div style='font-size: 11px; margin-bottom: 5px;'>GRADE</div>"
         f"<div style='font-weight: bold; font-size: 18px;'>{st_data.get('grade', 'N/A')}</div>"
         "</div>"
@@ -142,6 +152,7 @@ def generate_result_card_html(school_name, st_data, roll_no):
         "</td>"
         "</tr>"
         "</table>"
+        
         "</div></div>"
     )
     return html_content
@@ -157,70 +168,85 @@ def create_pdf(filename, school_name, st_data, roll_no):
             
     c = canvas.Canvas(filename, pagesize=letter)
     
-    # Add Certificate Border to PDF
-    c.setStrokeColorRGB(0.66, 0.39, 0.66) # Purple/Pink border
-    c.setLineWidth(4)
-    c.rect(20, 20, 570, 750)
-    c.setLineWidth(1)
-    c.rect(25, 25, 560, 740)
+    # PDF Background color (Light Pinkish-Purple similar to image)
+    c.setFillColorRGB(0.99, 0.95, 0.98) # Background #fdf2f9
+    c.rect(30, 30, 552, 732, fill=1, stroke=0)
     
-    c.setFillColorRGB(0.55, 0.14, 0.66) # Purple text
+    # Outer Border (Thick Lighter Purple)
+    c.setStrokeColorRGB(0.88, 0.74, 0.90) # Outer Border #e1bee7
+    c.setLineWidth(15)
+    c.rect(15, 15, 582, 762, fill=0, stroke=1)
+    
+    # Inner Border (Thin Dark Purple)
+    c.setStrokeColorRGB(0.61, 0.15, 0.69) # Inner Border #9c27b0
+    c.setLineWidth(2)
+    c.rect(30, 30, 552, 732, fill=0, stroke=1)
+    
+    c.setFillColorRGB(0.61, 0.15, 0.69) # Dark Purple Text
     c.setFont("Helvetica-Bold", 18)
-    c.drawCentredString(300, 730, school_name.upper())
+    c.drawCentredString(300, 720, school_name.upper())
     c.setFont("Helvetica-Bold", 12)
-    c.drawCentredString(300, 710, f"ANNUAL EXAMINATION - {st_data.get('batch', '2025-2026')}")
-    c.drawCentredString(300, 690, "CERTIFICATE-CUM-MARK SHEET")
+    c.drawCentredString(300, 700, f"ANNUAL EXAMINATION - {st_data.get('batch', '2025-2026')}")
+    c.drawCentredString(300, 680, "CERTIFICATE-CUM-MARK SHEET")
     
-    c.setFillColorRGB(0, 0, 0) # Black text for details
-    c.setFont("Helvetica", 11)
-    c.drawString(50, 650, f"ROLL NO: {roll_no}")
-    c.drawString(450, 650, f"CLASS: {st_data.get('class', '')}")
-    c.drawString(50, 630, f"PEN NO: {st_data.get('pen_no', 'N/A')}")
-    c.drawString(450, 630, f"APAAR NO: {st_data.get('apaar_no', 'N/A')}")
-    
+    c.setFillColorRGB(0, 0, 0) # Black Text
     c.setFont("Helvetica-Bold", 11)
-    c.drawString(50, 600, "Certify that:")
-    c.setFont("Helvetica", 11)
-    c.drawString(150, 600, f"{st_data.get('name', '').upper()}")
+    c.drawString(50, 640, f"ROLL NO: {roll_no}")
+    c.drawString(450, 640, f"CLASS: {st_data.get('class', '')}")
+    c.drawString(50, 620, f"PEN NO: {st_data.get('pen_no', 'N/A')}")
+    c.drawString(450, 620, f"APAAR NO: {st_data.get('apaar_no', 'N/A')}")
     
+    c.setFillColorRGB(0.61, 0.15, 0.69)
+    c.setFont("Helvetica-Oblique", 11)
+    c.drawString(50, 590, "Certify that")
+    c.setFillColorRGB(0, 0, 0)
     c.setFont("Helvetica-Bold", 11)
-    c.drawString(50, 580, "Mother's Name:")
-    c.setFont("Helvetica", 11)
-    c.drawString(150, 580, f"{st_data.get('mother_name', 'N/A').upper()}")
+    c.drawString(150, 590, f"{st_data.get('name', '').upper()}")
     
+    c.setFillColorRGB(0.61, 0.15, 0.69)
+    c.setFont("Helvetica-Oblique", 11)
+    c.drawString(50, 570, "Mother's Name")
+    c.setFillColorRGB(0, 0, 0)
     c.setFont("Helvetica-Bold", 11)
-    c.drawString(50, 560, "Father's Name:")
-    c.setFont("Helvetica", 11)
-    c.drawString(150, 560, f"{st_data.get('father_name', 'N/A').upper()}")
+    c.drawString(150, 570, f"{st_data.get('mother_name', 'N/A').upper()}")
     
+    c.setFillColorRGB(0.61, 0.15, 0.69)
+    c.setFont("Helvetica-Oblique", 11)
+    c.drawString(50, 550, "Father's Name")
+    c.setFillColorRGB(0, 0, 0)
     c.setFont("Helvetica-Bold", 11)
-    c.drawString(50, 540, "Date of Birth:")
-    c.setFont("Helvetica", 11)
-    c.drawString(150, 540, f"{disp_dob}")
+    c.drawString(150, 550, f"{st_data.get('father_name', 'N/A').upper()}")
     
-    c.setStrokeColorRGB(0.66, 0.39, 0.66)
-    c.line(50, 510, 550, 510)
-    c.setFillColorRGB(0.55, 0.14, 0.66)
+    c.setFillColorRGB(0.61, 0.15, 0.69)
+    c.setFont("Helvetica-Oblique", 11)
+    c.drawString(50, 530, "Date of Birth")
+    c.setFillColorRGB(0, 0, 0)
     c.setFont("Helvetica-Bold", 11)
-    c.drawString(50, 490, "SUBJECT")
-    c.drawString(300, 490, "FULL MARKS")
-    c.drawString(450, 490, "MARKS SECURED")
-    c.line(50, 480, 550, 480)
+    c.drawString(150, 530, f"{disp_dob}")
+    
+    c.setStrokeColorRGB(0.61, 0.15, 0.69)
+    c.line(50, 500, 550, 500)
+    c.setFillColorRGB(0.61, 0.15, 0.69)
+    c.setFont("Helvetica-Bold", 11)
+    c.drawString(50, 480, "SUBJECT")
+    c.drawString(300, 480, "FULL MARKS")
+    c.drawString(450, 480, "MARKS SECURED")
+    c.line(50, 470, 550, 470)
     
     c.setFillColorRGB(0, 0, 0)
-    y = 460
-    c.setFont("Helvetica", 11)
+    y = 450
+    c.setFont("Helvetica-Bold", 11)
     for sub, m_info in st_data.get('subjects', {}).items():
         c.drawString(50, y, str(sub).upper())
         c.drawString(300, y, str(m_info['full']))
         c.drawString(450, y, str(m_info['obt']))
         y -= 20
         
-    c.setStrokeColorRGB(0.66, 0.39, 0.66)
+    c.setStrokeColorRGB(0.61, 0.15, 0.69)
     c.line(50, y, 550, y)
     y -= 20
     
-    c.setFillColorRGB(0.55, 0.14, 0.66)
+    c.setFillColorRGB(0.61, 0.15, 0.69)
     c.setFont("Helvetica-Bold", 11)
     c.drawString(50, y, "TOTAL MARKS")
     c.drawString(300, y, str(st_data.get('total_full', 0)))
@@ -820,7 +846,7 @@ elif menu == "Results":
     st.info(
         "🔗 **English:** No School ID is required here. Search using only your Roll Number or Name. \n\n"
         "🔗 **हिन्दी:** यहाँ किसी School ID की आवश्यकता नहीं है। कृपया केवल अपना रोल नंबर या नाम दर्ज करके खोजें। \n\n"
-        "🔗 **ଓଡ଼ିଆ:** ଏଠାରେ କୌଣସି School ID ଦରକାର ନାହିଁ। କେବଳ Roll Number କିମ୍ବା Name ଦେଇ ସର୍ଚ୍ଚ କରନ୍ତୁ।"
+        "🔗 **ଓଡ଼ିଆ:** ଏଠାରେ କୌଣସି School ID ଦରକାର ନାହିଁ। କେବଳ Roll Number କିମ୍ବା Name ଦେଇ ସର୍ଚ୍ଚ କରନ୍ତୁ。"
     )
     
     col_c, col_b = st.columns(2)
