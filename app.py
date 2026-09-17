@@ -237,26 +237,24 @@ if menu == "Home Page":
         border-top-right-radius: 5px;
         border-bottom: 2px solid #526D82;
     }
-    .notice-body {
-        padding: 15px;
-        color: #e2e8f0;
-        height: 180px;
-        overflow-y: auto;
-    }
     .notice-item {
-        margin-bottom: 12px;
-        font-size: 15px;
+        margin-bottom: 15px;
+        font-size: 16px;
         border-bottom: 1px dotted #475569;
-        padding-bottom: 8px;
+        padding-bottom: 10px;
     }
     .new-badge {
         background-color: #fbbf24;
         color: black;
-        font-size: 11px;
+        font-size: 12px;
         font-weight: bold;
         padding: 2px 6px;
         border-radius: 3px;
         margin-left: 5px;
+        animation: blinker 1.5s linear infinite;
+    }
+    @keyframes blinker {
+        50% { opacity: 0; }
     }
     .login-card {
         background-color: white;
@@ -293,15 +291,19 @@ if menu == "Home Page":
     </style>
     """, unsafe_allow_html=True)
 
+    # Scrolling Notification Marquee 
     st.markdown("""
     <div class="notice-container">
         <div class="notice-header">RECENT NOTICE</div>
-        <div class="notice-body">
-            <div class="notice-item">⏩ Welcome to Advanced School Management System! <span class="new-badge">NEW!</span></div>
-            <div class="notice-item">⏩ Master & School portal passwords are encrypted and secured.</div>
-            <div class="notice-item">⏩ Online Student Rank Card generation is now active for all classes.</div>
-            <div class="notice-item">⏩ Students can now Search Result by Roll No OR Name. No School ID needed! <span class="new-badge">UPDATE!</span></div>
-            <div class="notice-item">⏩ APAAR and PEN details have been integrated into the system.</div>
+        <div style="padding: 0; overflow: hidden; background-color: #1e293b; color: #e2e8f0;">
+            <marquee direction="up" scrollamount="2" onmouseover="this.stop();" onmouseout="this.start();" style="height: 180px; padding: 15px;">
+                <div class="notice-item">⏩ Welcome to Advanced School Management System! <span class="new-badge">NEW!</span></div>
+                <div class="notice-item">⏩ Master & School portal passwords are encrypted and secured.</div>
+                <div class="notice-item">⏩ Online Student Rank Card generation is now active for all classes.</div>
+                <div class="notice-item">⏩ Students can now Search Result by Roll No OR Name. No School ID needed! <span class="new-badge">UPDATE!</span></div>
+                <div class="notice-item">⏩ APAAR and PEN details have been integrated into the system.</div>
+                <div class="notice-item" style="color: #fbbf24; font-weight: bold; font-size: 18px;">📞 Helpdesk / Contact: MY - 8910223342 <span class="new-badge" style="background-color: #ef4444; color: white;">24x7 Support</span></div>
+            </marquee>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -472,7 +474,7 @@ elif menu == "Master Login":
                         
                         school_students[m_edit_roll].update({
                             "name": m_up_name, "gender": m_up_gender, "pen_no": m_up_pen, "apaar_no": m_up_apaar,
-                            "father_name": up_father, "mother_name": up_mother,
+                            "father_name": m_up_father, "mother_name": m_up_mother,
                             "dob": m_up_dob, "class": m_up_cls, "total_obt": m_up_obt,
                             "total_full": m_up_full, "percentage": round(new_per, 2),
                             "result": new_res, "grade": new_grd
