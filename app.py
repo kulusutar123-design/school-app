@@ -124,7 +124,7 @@ def generate_result_card_html(school_name, st_data, roll_no):
             </tr>
             <tr>
                 <td style="padding: 8px 0;"><b>APAAR NO:</b> {st_data.get('apaar_no', 'N/A')}</td>
-                <td style="padding: 8px 0; text-align: right;"></td>
+                <td style="padding: 8px 0; text-align: right;"><b>Batch:</b> {st_data.get('batch', 'N/A')}</td>
             </tr>
         </table>
         <h4 style="color: #ffffff; background-color: #1E3A8A; padding: 12px; margin: 0; text-align: center; border-top-left-radius: 8px; border-top-right-radius: 8px; letter-spacing: 1px;">
@@ -182,6 +182,7 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.drawString(50, 620, f"Gender: {st_data.get('gender', 'N/A')}")
     c.drawString(400, 620, f"PEN NO: {st_data.get('pen_no', 'N/A')}")
     c.drawString(50, 600, f"APAAR NO: {st_data.get('apaar_no', 'N/A')}")
+    c.drawString(400, 600, f"Batch: {st_data.get('batch', 'N/A')}")
     
     c.line(50, 580, 550, 580)
     c.setFont("Helvetica-Bold", 12)
@@ -239,6 +240,8 @@ elif menu == "Results":
     st.query_params["portal"] = "student"
 
 classes_list = [str(i) for i in range(1, 11)]
+# ବ୍ୟାଚ୍ ଲିଷ୍ଟ୍ (2020 ରୁ 2050 ପର୍ଯ୍ୟନ୍ତ)
+batches_list = [f"{y}-{y+1}" for y in range(2020, 2051)]
 
 # ----------------- HOME PAGE (ERP STYLE UI) -----------------
 if menu == "Home Page":
@@ -249,8 +252,9 @@ if menu == "Home Page":
     .notice-item { margin-bottom: 15px; font-size: 16px; border-bottom: 1px dotted #475569; padding-bottom: 10px; }
     .new-badge { background-color: #fbbf24; color: black; font-size: 12px; font-weight: bold; padding: 2px 6px; border-radius: 3px; margin-left: 5px; animation: blinker 1.5s linear infinite; }
     @keyframes blinker { 50% { opacity: 0; } }
-    .login-card { background-color: white; border: 1px solid #cbd5e1; border-bottom: 5px solid #fbbf24; border-radius: 8px; padding: 20px; margin-bottom: 15px; text-align: center; text-decoration: none; display: block; color: #1e3a8a; }
-    .login-title { font-size: 24px; font-weight: bold; margin-bottom: 5px; }
+    .login-card { background-color: white; border: 1px solid #cbd5e1; border-bottom: 5px solid #fbbf24; border-radius: 8px; padding: 20px; margin-bottom: 15px; text-align: center; text-decoration: none; display: block; color: #1e3a8a; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.3s; }
+    .login-card:hover { background-color: #f8fafc; border-bottom: 5px solid #1e3a8a; transform: translateY(-2px); }
+    .login-title { font-size: 24px; font-weight: bold; margin-bottom: 5px; display: flex; align-items: center; justify-content: center; gap: 10px; }
     .login-sub { font-size: 14px; color: #64748b; }
     </style>
     """, unsafe_allow_html=True)
@@ -274,7 +278,7 @@ if menu == "Home Page":
         "</div>"
         
         "<div class='notice-item'>"
-        "⏩ Students can now Search Result by Roll No OR Name. No School ID needed! <span class='new-badge'>UPDATE!</span>"
+        "⏩ Students can now Search Result by Batch, Roll No OR Name. No School ID needed! <span class='new-badge'>UPDATE!</span>"
         "</div>"
         
         "<div class='notice-item'>"
@@ -410,7 +414,8 @@ elif menu == "Master Login":
             total_students = 0
             for s_id, studs in students_db.items():
                 for r_no, st_info in studs.items():
-                    st.write(f"- **Student ID:** {r_no} | **School ID:** {s_id} | Name: {st_info['name']}")
+                    b_info = st_info.get("batch", "N/A")
+                    st.write(f"- **Student ID:** {r_no} | **School ID:** {s_id} | Name: {st_info['name']} | Batch: {b_info}")
                     total_students += 1
             if total_students == 0:
                 st.write("No students registered yet.")
@@ -446,6 +451,7 @@ elif menu == "Master Login":
                         g_val = m_curr_st.get('gender', 'Male')
                         m_up_gender = st.selectbox("Gender", genders, index=genders.index(g_val) if g_val in genders else 0, key="m_up_gen")
                         m_up_pen = st.text_input("PEN NO", value=m_curr_st.get('pen_no', ''), key="m_up_pen")
+                        
                         cls_val = m_curr_st.get('class', '1')
                         m_up_cls = st.selectbox("Class", classes_list, index=classes_list.index(cls_val) if cls_val in classes_list else 0, key="m_up_c")
                         
@@ -453,6 +459,11 @@ elif menu == "Master Login":
                         m_up_dob = st.text_input("DOB (YYYY-MM-DD)", value=m_curr_st['dob'], key="m_up_d")
                         m_up_mother = st.text_input("Mother's Name", value=m_curr_st.get('mother_name', ''), key="m_up_m")
                         m_up_apaar = st.text_input("APAAR NO", value=m_curr_st.get('apaar_no', ''), key="m_up_apaar")
+                        
+                        # BATCH Selection in Edit
+                        b_val = m_curr_st.get('batch', '2025-2026')
+                        b_idx = batches_list.index(b_val) if b_val in batches_list else 5
+                        m_up_batch = st.selectbox("Batch", batches_list, index=b_idx, key="m_up_batch")
                     
                     st.markdown("#### 📚 Edit Subjects & Marks")
                     m_subjects = m_curr_st.get('subjects', {})
@@ -490,7 +501,7 @@ elif menu == "Master Login":
                             school_students[m_edit_roll].update({
                                 "name": m_up_name, "gender": m_up_gender, "pen_no": m_up_pen, "apaar_no": m_up_apaar,
                                 "father_name": m_up_father, "mother_name": m_up_mother,
-                                "dob": m_up_dob, "class": m_up_cls, 
+                                "dob": m_up_dob, "class": m_up_cls, "batch": m_up_batch,
                                 "subjects": new_m_subjects if new_m_subjects else m_subjects,
                                 "total_obt": m_tot_obt, "total_full": m_tot_full, 
                                 "percentage": round(new_per, 2), "result": new_res, "grade": new_grd
@@ -607,12 +618,12 @@ elif menu == "School Login":
                 search_query = st.text_input("🔍 Search by Name or Student ID (Roll No)")
                 for r_no, s_info in school_students.items():
                     if search_query.lower() in r_no.lower() or search_query.lower() in s_info['name'].lower() or search_query == "":
-                        # Removed Delete button column, kept only viewing columns
                         cols = st.columns([2, 4, 3, 3])
                         cols[0].write(f"**Roll:** {r_no}")
                         cols[1].write(f"**Name:** {s_info['name']}")
-                        cols[2].write(f"**PEN:** {s_info.get('pen_no', 'N/A')}")
-                        cols[3].write(f"**Gen:** {s_info.get('gender', 'N/A')}")
+                        b_val = s_info.get('batch', 'N/A')
+                        cols[2].write(f"**Batch:** {b_val}")
+                        cols[3].write(f"**Class:** {s_info.get('class', 'N/A')}")
             else:
                 st.warning("No students registered in your school yet.")
                 
@@ -636,7 +647,13 @@ elif menu == "School Login":
             max_date = datetime.date(2065, 12, 31)
             dob = st.date_input("DOB (YYYY-MM-DD)", min_value=min_date, max_value=max_date, key="add_dob")
             
-            cls = st.selectbox("Class", classes_list, key="add_class")
+            # Batch and Class in Add Student
+            c_c1, c_c2 = st.columns(2)
+            with c_c1:
+                cls = st.selectbox("Class", classes_list, key="add_class")
+            with c_c2:
+                # Default selected index to 2025-2026 (index 5)
+                add_batch = st.selectbox("Batch", batches_list, index=5, key="add_batch")
             
             st.markdown("#### 📚 Subject Add / Remove & Marks")
             if 'num_subjects' not in st.session_state:
@@ -683,7 +700,7 @@ elif menu == "School Login":
                         students_db[cur_school][roll_no] = {
                             "name": st_name, "gender": gender, "pen_no": pen_no, "apaar_no": apaar_no,
                             "father_name": father_name, "mother_name": mother_name,
-                            "dob": str(dob), "class": cls, "subjects": subjects_data,
+                            "dob": str(dob), "class": cls, "batch": add_batch, "subjects": subjects_data,
                             "total_full": total_full_mark, "total_obt": total_obt_mark,
                             "percentage": round(percentage, 2), "result": result, "grade": grade
                         }
@@ -718,8 +735,14 @@ elif menu == "School Login":
                 up_mother = st.text_input("Edit Mother's Name", value=curr_st.get('mother_name', ''))
                 up_dob = st.text_input("Edit DOB (YYYY-MM-DD)", value=curr_st['dob'])
                 
-                cls_val = curr_st.get('class', '1')
-                up_cls = st.selectbox("Edit Class", classes_list, index=classes_list.index(cls_val) if cls_val in classes_list else 0)
+                c_e1, c_e2 = st.columns(2)
+                with c_e1:
+                    cls_val = curr_st.get('class', '1')
+                    up_cls = st.selectbox("Edit Class", classes_list, index=classes_list.index(cls_val) if cls_val in classes_list else 0)
+                with c_e2:
+                    b_val = curr_st.get('batch', '2025-2026')
+                    b_idx = batches_list.index(b_val) if b_val in batches_list else 5
+                    up_batch = st.selectbox("Edit Batch", batches_list, index=b_idx)
                 
                 st.markdown("#### 📚 Edit Subjects & Marks")
                 up_subjects = curr_st.get('subjects', {})
@@ -755,7 +778,7 @@ elif menu == "School Login":
                     school_students[edit_roll].update({
                         "name": up_name, "gender": up_gender, "pen_no": up_pen, "apaar_no": up_apaar,
                         "father_name": up_father, "mother_name": up_mother,
-                        "dob": up_dob, "class": up_cls,
+                        "dob": up_dob, "class": up_cls, "batch": up_batch,
                         "subjects": new_up_subjects if new_up_subjects else up_subjects,
                         "total_obt": up_tot_obt, "total_full": up_tot_full, 
                         "percentage": round(new_per, 2), "result": new_res, "grade": new_grd
@@ -803,7 +826,12 @@ elif menu == "Results":
         "🔗 **ଓଡ଼ିଆ:** ଏଠାରେ କୌଣସି School ID ଦରକାର ନାହିଁ। କେବଳ Roll Number କିମ୍ବା Name ଦେଇ ସର୍ଚ୍ଚ କରନ୍ତୁ।"
     )
     
-    st_class = st.selectbox("Select Class (1 to 10)", classes_list, key="st_login_class") 
+    col_c, col_b = st.columns(2)
+    with col_c:
+        st_class = st.selectbox("Select Class (1 to 10)", classes_list, key="st_login_class") 
+    with col_b:
+        st_batch = st.selectbox("Select Batch", batches_list, index=5, key="st_login_batch")
+        
     st_search_query = st.text_input("Roll Number OR Student Name (ରୋଲ୍ ନମ୍ବର କିମ୍ବା ନାମ ଦିଅନ୍ତୁ)", key="st_login_search")
     st_dob_input = st.text_input("Date of Birth (DD-MM-YYYY)", key="st_login_dob")
     
@@ -825,7 +853,7 @@ elif menu == "Results":
         for s_id, school_students in students_db.items():
             if st_search_query in school_students:
                 potential_student = school_students[st_search_query]
-                if potential_student["dob"] == db_dob_format and potential_student.get("class") == st_class:
+                if potential_student["dob"] == db_dob_format and potential_student.get("class") == st_class and potential_student.get("batch", "2025-2026") == st_batch:
                     found_student = potential_student
                     found_roll = st_search_query
                     found_school_id = s_id
@@ -834,7 +862,7 @@ elif menu == "Results":
             if not found_student:
                 for r_no, s_info in school_students.items():
                     if s_info.get("name", "").strip().lower() == search_query_lower:
-                        if s_info["dob"] == db_dob_format and s_info.get("class") == st_class:
+                        if s_info["dob"] == db_dob_format and s_info.get("class") == st_class and s_info.get("batch", "2025-2026") == st_batch:
                             found_student = s_info
                             found_roll = r_no
                             found_school_id = s_id
@@ -863,4 +891,4 @@ elif menu == "Results":
             if not st_search_query or not st_dob_input:
                 st.warning("ଦୟାକରି ସବୁ ତଥ୍ୟ ପୂରଣ କରନ୍ତୁ।")
             else:
-                st.error("❌ କୌଣସି ରେକର୍ଡ ମିଳିଲା ନାହିଁ! ଭୁଲ୍ ତଥ୍ୟ (Roll Number/Name, DOB କିମ୍ବା Class) ଦେଇଛନ୍ତି।")
+                st.error("❌ କୌଣସି ରେକର୍ଡ ମିଳିଲା ନାହିଁ! ଭୁଲ୍ ତଥ୍ୟ (Roll Number/Name, DOB, Class କିମ୍ବା Batch) ଦେଇଛନ୍ତି।")
