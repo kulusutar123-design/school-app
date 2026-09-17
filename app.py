@@ -11,6 +11,11 @@ import datetime
 import random
 import urllib.parse
 
+# ==========================================
+# 🌐 APP URL SETTING (ସ୍କାନ୍ କଲେ ଏହି ଲିଙ୍କ୍ ଖୋଲିବ)
+# ==========================================
+APP_URL = "http://localhost:8501" # ଆପଣ ଯେବେ ଆପ୍ କୁ ଅନଲାଇନ୍ କରିବେ, ଏଠାରେ ନିଜର ଲିଙ୍କ୍ ଦେବେ।
+
 # ପେଜ୍ ସେଟିଂ
 st.set_page_config(page_title="Advanced School Management System", layout="centered")
 
@@ -89,7 +94,7 @@ def save_data(schools, students):
     with open(STUDENTS_FILE, "w", encoding="utf-8") as f:
         json.dump(students, f, indent=4)
 
-# --- ସୁନ୍ଦର ରାଙ୍କ୍ କାର୍ଡ (NEW CERTIFICATE DESIGN WITH WORDS & QR) ---
+# --- ସୁନ୍ଦର ରାଙ୍କ୍ କାର୍ଡ (HTML DESIGN WITH DYNAMIC QR LINK) ---
 def generate_result_card_html(school_name, st_data, roll_no):
     raw_dob = st_data.get('dob', '')
     disp_dob = raw_dob
@@ -98,15 +103,16 @@ def generate_result_card_html(school_name, st_data, roll_no):
         if len(y) == 4:
             disp_dob = f"{d}-{m}-{y}"
 
-    bg_color = "#fcf0e3" # Peach background like the image
-    border_color = "#8e24aa" # Purple text and lines
-    outer_border = "#ce93d8" # Light purple outer frame
+    bg_color = "#fcf0e3" 
+    border_color = "#8e24aa" 
+    outer_border = "#ce93d8" 
     
     total_obt = st_data.get('total_obt', 0)
     words_total = number_to_words(total_obt)
 
-    # QR Code Data
-    qr_data = urllib.parse.quote(f"Result_{roll_no}")
+    # DYNAMIC QR LINK: Scans directly to result page
+    student_direct_link = f"{APP_URL}/?portal=student&roll={roll_no}&dob={disp_dob}"
+    qr_data = urllib.parse.quote(student_direct_link)
     qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={qr_data}"
     barcode_url = f"https://barcode.tec-it.com/barcode.ashx?data={roll_no}&code=Code128&dpi=96"
 
@@ -159,19 +165,18 @@ def generate_result_card_html(school_name, st_data, roll_no):
         "</tr>"
         "</table>"
         
-        # New Footer: Marks in Words, Barcodes, Grade, and Signatures
         f"<div style='text-align: center; font-weight: bold; font-size: 14px; color: #000; margin-top: 20px;'>( {words_total} )</div>"
         
         f"<table style='width: 100%; margin-top: 20px; text-align: center; color: {border_color};'>"
         "<tr>"
         
-        # Left Side (1D Barcode & Controller)
+        # Left Side (1D Barcode & HM Signature)
         "<td style='width: 33%; vertical-align: bottom;'>"
         f"<img src='{barcode_url}' alt='Barcode' style='height: 35px; margin-bottom: 10px; max-width: 100%;'/>"
         "<div style='font-size: 11px;'>DATE OF PUBLICATION OF RESULTS</div>"
         f"<div style='font-weight: bold; font-size: 14px; margin-top: 5px; margin-bottom: 30px;'>{datetime.date.today().strftime('%d/%m/%Y')}</div>"
         f"<div style='border-bottom: 1px solid {border_color}; width: 80%; margin: auto;'></div>"
-        "<div style='font-size: 11px; margin-top: 5px;'>CONTROLLER OF EXAMINATIONS</div>"
+        "<div style='font-size: 11px; margin-top: 5px; font-weight: bold;'>HM SIGNATURE</div>"
         "</td>"
         
         # Center (Grade Box)
@@ -182,12 +187,14 @@ def generate_result_card_html(school_name, st_data, roll_no):
         "</div>"
         "</td>"
         
-        # Right Side (QR Code & Secretary)
+        # Right Side (QR Code & Class Teacher Signature)
         "<td style='width: 33%; vertical-align: bottom;'>"
-        f"<img src='{qr_url}' alt='QR Code' style='height: 65px; margin-bottom: 10px; max-width: 100%;'/>"
+        f"<a href='{student_direct_link}' target='_blank'>"
+        f"<img src='{qr_url}' alt='QR Code' style='height: 65px; margin-bottom: 10px; max-width: 100%; cursor: pointer;' title='Scan to view result online'/>"
+        f"</a>"
         "<div style='height: 15px; margin-bottom: 30px;'></div>"
         f"<div style='border-bottom: 1px solid {border_color}; width: 80%; margin: auto;'></div>"
-        "<div style='font-size: 11px; margin-top: 5px;'>SECRETARY</div>"
+        "<div style='font-size: 11px; margin-top: 5px; font-weight: bold;'>CLASS TEACHER SIGNATURE</div>"
         "</td>"
         
         "</tr>"
@@ -197,7 +204,7 @@ def generate_result_card_html(school_name, st_data, roll_no):
     )
     return html_content
 
-# --- PDF ଜେନେରେଟର ---
+# --- PDF ଜେନେରେଟର (PDF DESIGN WITH DYNAMIC QR LINK) ---
 def create_pdf(filename, school_name, st_data, roll_no):
     raw_dob = st_data.get('dob', '')
     disp_dob = raw_dob
@@ -208,7 +215,7 @@ def create_pdf(filename, school_name, st_data, roll_no):
             
     c = canvas.Canvas(filename, pagesize=letter)
     
-    # PDF Background color (Peach/Linen)
+    # PDF Background color
     c.setFillColorRGB(0.99, 0.94, 0.89)
     c.rect(30, 30, 552, 732, fill=1, stroke=0)
     
@@ -309,12 +316,14 @@ def create_pdf(filename, school_name, st_data, roll_no):
     
     c.setFillColorRGB(0.55, 0.14, 0.66)
     c.setFont("Helvetica", 10)
-    c.drawString(50, y-10, "DATE OF PUBLICATION OF RESULTS")
+    c.drawCentredString(140, y-10, "DATE OF PUBLICATION OF RESULTS")
     c.setFont("Helvetica-Bold", 11)
-    c.drawString(90, y-25, f"{datetime.date.today().strftime('%d/%m/%Y')}")
+    c.drawCentredString(140, y-25, f"{datetime.date.today().strftime('%d/%m/%Y')}")
+    
+    # HM Signature Line
     c.line(50, y-60, 230, y-60)
-    c.setFont("Helvetica", 10)
-    c.drawString(60, y-75, "CONTROLLER OF EXAMINATIONS")
+    c.setFont("Helvetica-Bold", 10)
+    c.drawCentredString(140, y-75, "HM SIGNATURE")
     
     # 2. Grade Box (Center)
     c.setStrokeColorRGB(0.55, 0.14, 0.66)
@@ -327,21 +336,23 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.setFont("Helvetica-Bold", 18)
     c.drawCentredString(300, y-15, f"{st_data.get('grade', 'N/A')}")
     
-    # 3. QR Code & Secretary (Right)
+    # 3. QR Code & Class Teacher Signature (Right)
+    # The QR Code will scan to exactly open the student's result on your app
+    student_direct_link = f"{APP_URL}/?portal=student&roll={roll_no}&dob={disp_dob}"
     try:
-        qr_w = qr.QrCodeWidget(f"Result_Roll_{roll_no}")
+        qr_w = qr.QrCodeWidget(student_direct_link)
         b = qr_w.getBounds()
         w = b[2]-b[0]
         h = b[3]-b[1]
         d = Drawing(60, 60, transform=[60/w,0,0,60/h,0,0])
         d.add(qr_w)
-        renderPDF.draw(d, c, 440, y-5)
+        renderPDF.draw(d, c, 445, y-5)
     except: pass
     
     c.setFillColorRGB(0.55, 0.14, 0.66)
     c.line(400, y-60, 550, y-60)
-    c.setFont("Helvetica", 10)
-    c.drawString(440, y-75, "SECRETARY")
+    c.setFont("Helvetica-Bold", 10)
+    c.drawCentredString(475, y-75, "CLASS TEACHER SIGNATURE")
     
     c.save()
 
@@ -923,6 +934,10 @@ elif menu == "School Login":
 
 # ----------------- RESULTS PORTAL -----------------
 elif menu == "Results":
+    # ଲିଙ୍କ୍ ରୁ ଡାଟା ଧରିବା (ଯଦି କେହି QR Code ସ୍କାନ୍ କରିକି ଆସିବ)
+    url_roll = st.query_params.get("roll", "")
+    url_dob = st.query_params.get("dob", "")
+    
     c_home, c_title = st.columns([1, 8])
     with c_home:
         if st.button("🏠 Home", key="st_home_btn"):
@@ -943,10 +958,12 @@ elif menu == "Results":
     with col_b:
         st_batch = st.selectbox("Select Batch", batches_list, index=5, key="st_login_batch")
         
-    st_search_query = st.text_input("Roll Number OR Student Name (ରୋଲ୍ ନମ୍ବର କିମ୍ବା ନାମ ଦିଅନ୍ତୁ)", key="st_login_search")
-    st_dob_input = st.text_input("Date of Birth (DD-MM-YYYY)", key="st_login_dob")
+    # QR Code ରୁ ଆସିଲେ Auto ଫିଲ୍ ହୋଇଯିବ
+    st_search_query = st.text_input("Roll Number OR Student Name (ରୋଲ୍ ନମ୍ବର କିମ୍ବା ନାମ ଦିଅନ୍ତୁ)", value=url_roll, key="st_login_search")
+    st_dob_input = st.text_input("Date of Birth (DD-MM-YYYY)", value=url_dob, key="st_login_dob")
     
-    if st.button("View Result"):
+    # ଯଦି QR ସ୍କାନ୍ ହୋଇ ଲିଙ୍କ୍ ରେ ଡାଟା ଅଛି କିମ୍ବା ବଟନ୍ କ୍ଲିକ୍ ହେଲା
+    if st.button("View Result") or (url_roll and url_dob):
         found_student = None
         found_roll = None
         found_school_id = None
@@ -962,7 +979,7 @@ elif menu == "Results":
         for s_id, school_students in students_db.items():
             if st_search_query in school_students:
                 potential_student = school_students[st_search_query]
-                if potential_student["dob"] == db_dob_format and potential_student.get("class") == st_class and potential_student.get("batch", "2025-2026") == st_batch:
+                if potential_student["dob"] == db_dob_format:
                     found_student = potential_student
                     found_roll = st_search_query
                     found_school_id = s_id
@@ -971,7 +988,7 @@ elif menu == "Results":
             if not found_student:
                 for r_no, s_info in school_students.items():
                     if s_info.get("name", "").strip().lower() == search_query_lower:
-                        if s_info["dob"] == db_dob_format and s_info.get("class") == st_class and s_info.get("batch", "2025-2026") == st_batch:
+                        if s_info["dob"] == db_dob_format:
                             found_student = s_info
                             found_roll = r_no
                             found_school_id = s_id
