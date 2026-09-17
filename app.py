@@ -11,6 +11,11 @@ import datetime
 import random
 import urllib.parse
 
+# ==========================================
+# 🌐 APP URL SETTING (ସ୍କାନ୍ କଲେ ଏହି ଲିଙ୍କ୍ ଖୋଲିବ)
+# ==========================================
+APP_URL = "http://localhost:8501" # ଆପଣ ଯେବେ ଆପ୍ କୁ ଅନଲାଇନ୍ କରିବେ, ଏଠାରେ ନିଜର ଲିଙ୍କ୍ ଦେବେ।
+
 # ପେଜ୍ ସେଟିଂ
 st.set_page_config(page_title="Advanced School Management System", layout="centered")
 
@@ -60,7 +65,7 @@ def save_master_data(data):
         json.dump(data, f, indent=4)
 
 def load_data():
-    schools = {"S001": {"name": "Govt High School Cuttack", "pass": "admin123"}}
+    schools = {"S001": {"name": "LAXMI NARAYAN GIRLS HIGH SCHOOL, BANASAR KALYANI", "pass": "admin123"}}
     students = {}
     
     if os.path.exists(SCHOOLS_FILE):
@@ -89,7 +94,7 @@ def save_data(schools, students):
     with open(STUDENTS_FILE, "w", encoding="utf-8") as f:
         json.dump(students, f, indent=4)
 
-# --- ସୁନ୍ଦର ରାଙ୍କ୍ କାର୍ଡ ---
+# --- ସୁନ୍ଦର ରାଙ୍କ୍ କାର୍ଡ (HTML DESIGN WITH BEAUTIFUL FONT & HM/CT SIGNS) ---
 def generate_result_card_html(school_name, st_data, roll_no):
     raw_dob = st_data.get('dob', '')
     disp_dob = raw_dob
@@ -105,7 +110,7 @@ def generate_result_card_html(school_name, st_data, roll_no):
     total_obt = st_data.get('total_obt', 0)
     words_total = number_to_words(total_obt)
 
-    # 🟢 OFFLINE QR CODE VERIFICATION: ସ୍କାନ୍ କଲେ ପିଲାର ଡିଟେଲ୍ସ ଦେଖାଇବ
+    # 🟢 OFFLINE QR CODE VERIFICATION
     student_name = st_data.get('name', 'N/A').upper()
     total_marks = f"{total_obt}/{st_data.get('total_full', 0)}"
     grade = st_data.get('grade', 'N/A')
@@ -130,7 +135,7 @@ def generate_result_card_html(school_name, st_data, roll_no):
         f"<div style='border: 2px solid {border_color}; padding: 25px; background-color: {bg_color}; position: relative;'>"
         
         f"<div style='text-align: center; color: {border_color}; margin-bottom: 20px;'>"
-        f"<h1 style='margin: 0; font-size: 26px; text-transform: uppercase;'>{school_name}</h1>"
+        f"<h1 style='margin: 0; font-size: 28px; text-transform: uppercase; font-family: \"Georgia\", serif; text-shadow: 1px 1px 2px #e1bee7;'>{school_name}</h1>"
         f"<h3 style='margin: 8px 0; font-size: 16px; letter-spacing: 1px;'>ANNUAL EXAMINATION - {st_data.get('batch', '2025-2026')}</h3>"
         "<p style='margin: 5px 0; font-weight: bold; font-size: 17px; text-decoration: underline;'>CERTIFICATE-CUM-MARK SHEET</p>"
         "</div>"
@@ -174,7 +179,7 @@ def generate_result_card_html(school_name, st_data, roll_no):
         "<div style='font-size: 11px;'>DATE OF PUBLICATION OF RESULTS</div>"
         f"<div style='font-weight: bold; font-size: 14px; margin-top: 5px; margin-bottom: 30px;'>{datetime.date.today().strftime('%d/%m/%Y')}</div>"
         f"<div style='border-bottom: 1px solid {border_color}; width: 80%; margin: auto;'></div>"
-        "<div style='font-size: 11px; margin-top: 5px; font-weight: bold;'>CONTROLLER OF EXAMINATIONS</div>"
+        "<div style='font-size: 11px; margin-top: 5px; font-weight: bold;'>HM SIGNATURE</div>"
         "</td>"
         
         "<td style='width: 34%; vertical-align: top; padding-top: 5px;'>"
@@ -188,7 +193,7 @@ def generate_result_card_html(school_name, st_data, roll_no):
         f"<img src='{qr_url}' alt='QR Code' style='height: 65px; margin-bottom: 10px; max-width: 100%;' title='Scan for Verification'/>"
         "<div style='height: 15px; margin-bottom: 30px;'></div>"
         f"<div style='border-bottom: 1px solid {border_color}; width: 80%; margin: auto;'></div>"
-        "<div style='font-size: 11px; margin-top: 5px;'>SECRETARY</div>"
+        "<div style='font-size: 11px; margin-top: 5px; font-weight: bold;'>CLASS TEACHER SIGNATURE</div>"
         "</td>"
         
         "</tr>"
@@ -198,7 +203,7 @@ def generate_result_card_html(school_name, st_data, roll_no):
     )
     return html_content
 
-# --- PDF ଜେନେରେଟର (PDF DESIGN WITH OFFLINE QR VERIFICATION) ---
+# --- PDF ଜେନେରେଟର (PDF DESIGN WITH HM & CLASS TEACHER SIGNATURES) ---
 def create_pdf(filename, school_name, st_data, roll_no):
     raw_dob = st_data.get('dob', '')
     disp_dob = raw_dob
@@ -223,59 +228,61 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.setLineWidth(2)
     c.rect(30, 30, 552, 732, fill=0, stroke=1)
     
+    # BEAUTIFUL FONT FOR SCHOOL NAME IN PDF
     c.setFillColorRGB(0.55, 0.14, 0.66)
-    c.setFont("Helvetica-Bold", 18)
+    c.setFont("Times-Bold", 20)
     c.drawCentredString(300, 720, school_name.upper())
     c.setFont("Helvetica-Bold", 12)
-    c.drawCentredString(300, 700, f"ANNUAL EXAMINATION - {st_data.get('batch', '2025-2026')}")
-    c.drawCentredString(300, 680, "CERTIFICATE-CUM-MARK SHEET")
+    c.drawCentredString(300, 695, f"ANNUAL EXAMINATION - {st_data.get('batch', '2025-2026')}")
+    c.setFont("Helvetica", 11)
+    c.drawCentredString(300, 675, "CERTIFICATE-CUM-MARK SHEET")
     
     c.setFillColorRGB(0, 0, 0)
     c.setFont("Helvetica-Bold", 11)
-    c.drawString(50, 640, f"ROLL NO: {roll_no}")
-    c.drawString(450, 640, f"CLASS: {st_data.get('class', '')}")
-    c.drawString(50, 620, f"PEN NO: {st_data.get('pen_no', 'N/A')}")
-    c.drawString(450, 620, f"APAAR NO: {st_data.get('apaar_no', 'N/A')}")
-    
-    c.setFillColorRGB(0.55, 0.14, 0.66)
-    c.setFont("Helvetica-Oblique", 11)
-    c.drawString(50, 590, "Certify that")
-    c.setFillColorRGB(0, 0, 0)
-    c.setFont("Helvetica-Bold", 11)
-    c.drawString(150, 590, f"{st_data.get('name', '').upper()}")
+    c.drawString(50, 635, f"ROLL NO: {roll_no}")
+    c.drawString(450, 635, f"CLASS: {st_data.get('class', '')}")
+    c.drawString(50, 615, f"PEN NO: {st_data.get('pen_no', 'N/A')}")
+    c.drawString(450, 615, f"APAAR NO: {st_data.get('apaar_no', 'N/A')}")
     
     c.setFillColorRGB(0.55, 0.14, 0.66)
     c.setFont("Helvetica-Oblique", 11)
-    c.drawString(50, 570, "Mother's Name")
+    c.drawString(50, 585, "Certify that")
     c.setFillColorRGB(0, 0, 0)
     c.setFont("Helvetica-Bold", 11)
-    c.drawString(150, 570, f"{st_data.get('mother_name', 'N/A').upper()}")
+    c.drawString(150, 585, f"{st_data.get('name', '').upper()}")
     
     c.setFillColorRGB(0.55, 0.14, 0.66)
     c.setFont("Helvetica-Oblique", 11)
-    c.drawString(50, 550, "Father's Name")
+    c.drawString(50, 565, "Mother's Name")
     c.setFillColorRGB(0, 0, 0)
     c.setFont("Helvetica-Bold", 11)
-    c.drawString(150, 550, f"{st_data.get('father_name', 'N/A').upper()}")
+    c.drawString(150, 565, f"{st_data.get('mother_name', 'N/A').upper()}")
     
     c.setFillColorRGB(0.55, 0.14, 0.66)
     c.setFont("Helvetica-Oblique", 11)
-    c.drawString(50, 530, "Date of Birth")
+    c.drawString(50, 545, "Father's Name")
     c.setFillColorRGB(0, 0, 0)
     c.setFont("Helvetica-Bold", 11)
-    c.drawString(150, 530, f"{disp_dob}")
+    c.drawString(150, 545, f"{st_data.get('father_name', 'N/A').upper()}")
+    
+    c.setFillColorRGB(0.55, 0.14, 0.66)
+    c.setFont("Helvetica-Oblique", 11)
+    c.drawString(50, 525, "Date of Birth")
+    c.setFillColorRGB(0, 0, 0)
+    c.setFont("Helvetica-Bold", 11)
+    c.drawString(150, 525, f"{disp_dob}")
     
     c.setStrokeColorRGB(0.55, 0.14, 0.66)
-    c.line(50, 500, 550, 500)
+    c.line(50, 495, 550, 495)
     c.setFillColorRGB(0.55, 0.14, 0.66)
     c.setFont("Helvetica-Bold", 11)
-    c.drawString(50, 480, "SUBJECT")
-    c.drawString(300, 480, "FULL MARKS")
-    c.drawString(450, 480, "MARKS SECURED")
-    c.line(50, 470, 550, 470)
+    c.drawString(50, 475, "SUBJECT")
+    c.drawString(300, 475, "FULL MARKS")
+    c.drawString(450, 475, "MARKS SECURED")
+    c.line(50, 465, 550, 465)
     
     c.setFillColorRGB(0, 0, 0)
-    y = 450
+    y = 445
     c.setFont("Helvetica-Bold", 11)
     for sub, m_info in st_data.get('subjects', {}).items():
         c.drawString(50, y, str(sub).upper())
@@ -314,9 +321,10 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.setFont("Helvetica-Bold", 11)
     c.drawCentredString(140, y-25, f"{datetime.date.today().strftime('%d/%m/%Y')}")
     
+    # HM Signature Line
     c.line(50, y-60, 230, y-60)
-    c.setFont("Helvetica", 10)
-    c.drawCentredString(140, y-75, "CONTROLLER OF EXAMINATIONS")
+    c.setFont("Helvetica-Bold", 10)
+    c.drawCentredString(140, y-75, "HM SIGNATURE")
     
     # 2. Grade Box (Center)
     c.setStrokeColorRGB(0.55, 0.14, 0.66)
@@ -329,7 +337,7 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.setFont("Helvetica-Bold", 18)
     c.drawCentredString(300, y-15, f"{st_data.get('grade', 'N/A')}")
     
-    # 3. QR Code (Right) - Text embedded for Offline Verification
+    # 3. QR Code & Class Teacher Signature (Right) - Text embedded for Offline Verification
     student_name = st_data.get('name', 'N/A').upper()
     total_marks = f"{total_obt}/{st_data.get('total_full', 0)}"
     grade = st_data.get('grade', 'N/A')
@@ -347,8 +355,8 @@ def create_pdf(filename, school_name, st_data, roll_no):
     
     c.setFillColorRGB(0.55, 0.14, 0.66)
     c.line(400, y-60, 550, y-60)
-    c.setFont("Helvetica", 10)
-    c.drawCentredString(475, y-75, "SECRETARY")
+    c.setFont("Helvetica-Bold", 10)
+    c.drawCentredString(475, y-75, "CLASS TEACHER SIGNATURE")
     
     c.save()
 
