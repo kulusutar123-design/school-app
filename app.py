@@ -2,7 +2,9 @@ import streamlit as st
 import streamlit.components.v1 as components
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
-from reportlab.graphics.barcode import code128
+from reportlab.graphics.barcode import code128, qr
+from reportlab.graphics.shapes import Drawing
+from reportlab.graphics import renderPDF
 import json
 import os
 import datetime
@@ -25,6 +27,20 @@ st.markdown(hide_st_style, unsafe_allow_html=True)
 SCHOOLS_FILE = "schools.json"
 STUDENTS_FILE = "students.txt"
 MASTER_FILE = "master.json"
+
+# --- Number to Words Converter ---
+def number_to_words(num):
+    if num == 0: return "ZERO"
+    ones = ["", "ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE", "TEN", "ELEVEN", "TWELVE", "THIRTEEN", "FOURTEEN", "FIFTEEN", "SIXTEEN", "SEVENTEEN", "EIGHTEEN", "NINETEEN"]
+    tens = ["", "", "TWENTY", "THIRTY", "FORTY", "FIFTY", "SIXTY", "SEVENTY", "EIGHTY", "NINETY"]
+    
+    def words(n):
+        if n < 20: return ones[int(n)]
+        elif n < 100: return tens[int(n // 10)] + ("-" + ones[int(n % 10)] if n % 10 != 0 else "")
+        elif n < 1000: return ones[int(n // 100)] + " HUNDRED" + (" AND " + words(n % 100) if n % 100 != 0 else "")
+        else: return str(n)
+        
+    return words(num)
 
 # --- ଡାଟା ଲୋଡ୍ ଓ ସେଭ୍ ଫଙ୍କସନ୍ ---
 def load_master_data():
@@ -73,7 +89,7 @@ def save_data(schools, students):
     with open(STUDENTS_FILE, "w", encoding="utf-8") as f:
         json.dump(students, f, indent=4)
 
-# --- ସୁନ୍ଦର ରାଙ୍କ୍ କାର୍ଡ (NEW CERTIFICATE DESIGN WITH BARCODE & SIGNATURES) ---
+# --- ସୁନ୍ଦର ରାଙ୍କ୍ କାର୍ଡ (NEW CERTIFICATE DESIGN WITH WORDS & QR) ---
 def generate_result_card_html(school_name, st_data, roll_no):
     raw_dob = st_data.get('dob', '')
     disp_dob = raw_dob
@@ -82,14 +98,17 @@ def generate_result_card_html(school_name, st_data, roll_no):
         if len(y) == 4:
             disp_dob = f"{d}-{m}-{y}"
 
-    bg_color = "#fdf2f9"
-    border_color = "#9c27b0" 
-    outer_border = "#e1bee7" 
+    bg_color = "#fcf0e3" # Peach background like the image
+    border_color = "#8e24aa" # Purple text and lines
+    outer_border = "#ce93d8" # Light purple outer frame
+    
+    total_obt = st_data.get('total_obt', 0)
+    words_total = number_to_words(total_obt)
 
-    # Generate Barcode URL using Student Name
-    student_name = st_data.get('name', 'STUDENT')
-    safe_name = urllib.parse.quote(student_name)
-    barcode_url = f"https://barcode.tec-it.com/barcode.ashx?data={safe_name}&code=Code128&dpi=96"
+    # QR Code Data
+    qr_data = urllib.parse.quote(f"Result_{roll_no}")
+    qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={qr_data}"
+    barcode_url = f"https://barcode.tec-it.com/barcode.ashx?data={roll_no}&code=Code128&dpi=96"
 
     rows_html = ""
     for sub, m_info in st_data.get('subjects', {}).items():
@@ -117,7 +136,7 @@ def generate_result_card_html(school_name, st_data, roll_no):
         "</table>"
         
         "<table style='width: 100%; font-size: 15px; margin-bottom: 15px; text-transform: uppercase; color: #000000; line-height: 1.8;'>"
-        f"<tr><td style='width: 160px; color: {border_color}; font-weight: bold; font-style: italic;'>Certify that</td><td style='font-weight: bold;'>{student_name}</td></tr>"
+        f"<tr><td style='width: 160px; color: {border_color}; font-weight: bold; font-style: italic;'>Certify that</td><td style='font-weight: bold;'>{st_data.get('name', 'N/A')}</td></tr>"
         f"<tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Mother's Name</td><td style='font-weight: bold;'>{st_data.get('mother_name', 'N/A')}</td></tr>"
         f"<tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Father's Name</td><td style='font-weight: bold;'>{st_data.get('father_name', 'N/A')}</td></tr>"
         f"<tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Date of Birth</td><td style='font-weight: bold;'>{disp_dob}</td></tr>"
@@ -136,36 +155,39 @@ def generate_result_card_html(school_name, st_data, roll_no):
         f"<tr style='color: {border_color}; font-weight: bold; border-top: 2px solid {border_color};'>"
         f"<td style='padding: 10px; border-right: 1px solid {border_color}; text-align: right;'>TOTAL MARKS</td>"
         f"<td style='padding: 10px; border-right: 1px solid {border_color};'>{st_data.get('total_full', 0)}</td>"
-        f"<td style='padding: 10px;'>{st_data.get('total_obt', 0)}</td>"
+        f"<td style='padding: 10px;'>{total_obt}</td>"
         "</tr>"
         "</table>"
         
-        # New Footer matching the uploaded image (Barcode, Grade Box, Signatures)
-        f"<table style='width: 100%; margin-top: 30px; text-align: center; color: {border_color};'>"
+        # New Footer: Marks in Words, Barcodes, Grade, and Signatures
+        f"<div style='text-align: center; font-weight: bold; font-size: 14px; color: #000; margin-top: 20px;'>( {words_total} )</div>"
+        
+        f"<table style='width: 100%; margin-top: 20px; text-align: center; color: {border_color};'>"
         "<tr>"
         
+        # Left Side (1D Barcode & Controller)
         "<td style='width: 33%; vertical-align: bottom;'>"
-        f"<img src='{barcode_url}' alt='Barcode' style='height: 45px; margin-bottom: 10px; max-width: 100%;'/>"
+        f"<img src='{barcode_url}' alt='Barcode' style='height: 35px; margin-bottom: 10px; max-width: 100%;'/>"
         "<div style='font-size: 11px;'>DATE OF PUBLICATION OF RESULTS</div>"
         f"<div style='font-weight: bold; font-size: 14px; margin-top: 5px; margin-bottom: 30px;'>{datetime.date.today().strftime('%d/%m/%Y')}</div>"
         f"<div style='border-bottom: 1px solid {border_color}; width: 80%; margin: auto;'></div>"
-        "<div style='font-size: 12px; margin-top: 5px; font-weight: bold;'>HM SIGNATURE</div>"
+        "<div style='font-size: 11px; margin-top: 5px;'>CONTROLLER OF EXAMINATIONS</div>"
         "</td>"
         
-        "<td style='width: 34%; vertical-align: top; padding-top: 15px;'>"
-        f"<div style='font-size: 12px; margin-bottom: 5px; font-weight: bold;'>( TOTAL: {st_data.get('total_obt', 0)} )</div>"
+        # Center (Grade Box)
+        "<td style='width: 34%; vertical-align: top; padding-top: 5px;'>"
         "<div style='font-size: 12px; margin-bottom: 5px;'>GRADE</div>"
-        f"<div style='border: 2px solid {border_color}; padding: 15px; background-color: {bg_color}; display: inline-block; min-width: 90px;'>"
-        f"<div style='font-weight: bold; font-size: 24px;'>{st_data.get('grade', 'N/A')}</div>"
+        f"<div style='border: 2px solid {border_color}; padding: 10px 25px; display: inline-block; min-width: 80px;'>"
+        f"<div style='font-weight: bold; font-size: 22px; color: #000;'>{st_data.get('grade', 'N/A')}</div>"
         "</div>"
         "</td>"
         
+        # Right Side (QR Code & Secretary)
         "<td style='width: 33%; vertical-align: bottom;'>"
-        "<div style='height: 45px; margin-bottom: 10px;'></div>"
-        "<div style='font-size: 11px; color: transparent;'>SPACE</div>"
-        "<div style='font-weight: bold; font-size: 14px; margin-top: 5px; margin-bottom: 30px; color: transparent;'>SPACE</div>"
+        f"<img src='{qr_url}' alt='QR Code' style='height: 65px; margin-bottom: 10px; max-width: 100%;'/>"
+        "<div style='height: 15px; margin-bottom: 30px;'></div>"
         f"<div style='border-bottom: 1px solid {border_color}; width: 80%; margin: auto;'></div>"
-        "<div style='font-size: 12px; margin-top: 5px; font-weight: bold;'>STUDENT SIGNATURE</div>"
+        "<div style='font-size: 11px; margin-top: 5px;'>SECRETARY</div>"
         "</td>"
         
         "</tr>"
@@ -186,21 +208,21 @@ def create_pdf(filename, school_name, st_data, roll_no):
             
     c = canvas.Canvas(filename, pagesize=letter)
     
-    # PDF Background color (Light Pinkish-Purple)
-    c.setFillColorRGB(0.99, 0.95, 0.98)
+    # PDF Background color (Peach/Linen)
+    c.setFillColorRGB(0.99, 0.94, 0.89)
     c.rect(30, 30, 552, 732, fill=1, stroke=0)
     
     # Outer Border
-    c.setStrokeColorRGB(0.88, 0.74, 0.90)
+    c.setStrokeColorRGB(0.81, 0.58, 0.85)
     c.setLineWidth(15)
     c.rect(15, 15, 582, 762, fill=0, stroke=1)
     
     # Inner Border
-    c.setStrokeColorRGB(0.61, 0.15, 0.69)
+    c.setStrokeColorRGB(0.55, 0.14, 0.66)
     c.setLineWidth(2)
     c.rect(30, 30, 552, 732, fill=0, stroke=1)
     
-    c.setFillColorRGB(0.61, 0.15, 0.69)
+    c.setFillColorRGB(0.55, 0.14, 0.66)
     c.setFont("Helvetica-Bold", 18)
     c.drawCentredString(300, 720, school_name.upper())
     c.setFont("Helvetica-Bold", 12)
@@ -214,37 +236,37 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.drawString(50, 620, f"PEN NO: {st_data.get('pen_no', 'N/A')}")
     c.drawString(450, 620, f"APAAR NO: {st_data.get('apaar_no', 'N/A')}")
     
-    c.setFillColorRGB(0.61, 0.15, 0.69)
+    c.setFillColorRGB(0.55, 0.14, 0.66)
     c.setFont("Helvetica-Oblique", 11)
     c.drawString(50, 590, "Certify that")
     c.setFillColorRGB(0, 0, 0)
     c.setFont("Helvetica-Bold", 11)
     c.drawString(150, 590, f"{st_data.get('name', '').upper()}")
     
-    c.setFillColorRGB(0.61, 0.15, 0.69)
+    c.setFillColorRGB(0.55, 0.14, 0.66)
     c.setFont("Helvetica-Oblique", 11)
     c.drawString(50, 570, "Mother's Name")
     c.setFillColorRGB(0, 0, 0)
     c.setFont("Helvetica-Bold", 11)
     c.drawString(150, 570, f"{st_data.get('mother_name', 'N/A').upper()}")
     
-    c.setFillColorRGB(0.61, 0.15, 0.69)
+    c.setFillColorRGB(0.55, 0.14, 0.66)
     c.setFont("Helvetica-Oblique", 11)
     c.drawString(50, 550, "Father's Name")
     c.setFillColorRGB(0, 0, 0)
     c.setFont("Helvetica-Bold", 11)
     c.drawString(150, 550, f"{st_data.get('father_name', 'N/A').upper()}")
     
-    c.setFillColorRGB(0.61, 0.15, 0.69)
+    c.setFillColorRGB(0.55, 0.14, 0.66)
     c.setFont("Helvetica-Oblique", 11)
     c.drawString(50, 530, "Date of Birth")
     c.setFillColorRGB(0, 0, 0)
     c.setFont("Helvetica-Bold", 11)
     c.drawString(150, 530, f"{disp_dob}")
     
-    c.setStrokeColorRGB(0.61, 0.15, 0.69)
+    c.setStrokeColorRGB(0.55, 0.14, 0.66)
     c.line(50, 500, 550, 500)
-    c.setFillColorRGB(0.61, 0.15, 0.69)
+    c.setFillColorRGB(0.55, 0.14, 0.66)
     c.setFont("Helvetica-Bold", 11)
     c.drawString(50, 480, "SUBJECT")
     c.drawString(300, 480, "FULL MARKS")
@@ -260,53 +282,66 @@ def create_pdf(filename, school_name, st_data, roll_no):
         c.drawString(450, y, str(m_info['obt']))
         y -= 20
         
-    c.setStrokeColorRGB(0.61, 0.15, 0.69)
+    c.setStrokeColorRGB(0.55, 0.14, 0.66)
     c.line(50, y, 550, y)
     y -= 20
     
-    c.setFillColorRGB(0.61, 0.15, 0.69)
+    c.setFillColorRGB(0.55, 0.14, 0.66)
     c.setFont("Helvetica-Bold", 11)
     c.drawString(50, y, "TOTAL MARKS")
     c.drawString(300, y, str(st_data.get('total_full', 0)))
     c.drawString(450, y, str(st_data.get('total_obt', 0)))
     
-    # --- PDF FOOTER (Barcode, Grade Box, Signatures) ---
-    y -= 50
+    # --- PDF FOOTER ---
+    y -= 30
+    total_obt = st_data.get('total_obt', 0)
+    c.setFillColorRGB(0, 0, 0)
+    c.setFont("Helvetica-Bold", 10)
+    c.drawCentredString(300, y, f"( {number_to_words(total_obt)} )")
     
-    # 1. Barcode of Student Name (Left)
-    safe_name = st_data.get('name', 'STUDENT').upper().replace(" ", "")[:15]
-    if not safe_name: safe_name = "STUDENT"
+    y -= 60
+    
+    # 1. 1D Barcode
     try:
-        bc = code128.Code128(safe_name, barHeight=25, barWidth=1.2)
+        bc = code128.Code128(str(roll_no), barHeight=25, barWidth=1.2)
         bc.drawOn(c, 50, y+15)
-    except:
-        pass
+    except: pass
     
-    c.setFillColorRGB(0.61, 0.15, 0.69)
-    c.setFont("Helvetica", 9)
+    c.setFillColorRGB(0.55, 0.14, 0.66)
+    c.setFont("Helvetica", 10)
     c.drawString(50, y-10, "DATE OF PUBLICATION OF RESULTS")
     c.setFont("Helvetica-Bold", 11)
-    c.drawString(70, y-25, f"{datetime.date.today().strftime('%d/%m/%Y')}")
-    
-    c.line(50, y-60, 200, y-60)
-    c.setFont("Helvetica-Bold", 10)
-    c.drawString(80, y-75, "HM SIGNATURE")
+    c.drawString(90, y-25, f"{datetime.date.today().strftime('%d/%m/%Y')}")
+    c.line(50, y-60, 230, y-60)
+    c.setFont("Helvetica", 10)
+    c.drawString(60, y-75, "CONTROLLER OF EXAMINATIONS")
     
     # 2. Grade Box (Center)
-    c.setStrokeColorRGB(0.61, 0.15, 0.69)
-    c.setFillColorRGB(0.99, 0.95, 0.98)
-    c.rect(260, y-40, 80, 50, fill=1, stroke=1)
+    c.setStrokeColorRGB(0.55, 0.14, 0.66)
+    c.setFillColorRGB(0.99, 0.94, 0.89)
+    c.rect(260, y-30, 80, 40, fill=1, stroke=1)
+    c.setFillColorRGB(0.55, 0.14, 0.66)
+    c.setFont("Helvetica", 10)
+    c.drawCentredString(300, y+20, "GRADE")
+    c.setFillColorRGB(0, 0, 0)
+    c.setFont("Helvetica-Bold", 18)
+    c.drawCentredString(300, y-15, f"{st_data.get('grade', 'N/A')}")
     
-    c.setFillColorRGB(0.61, 0.15, 0.69)
-    c.setFont("Helvetica-Bold", 10)
-    c.drawCentredString(300, y+20, f"( TOTAL: {st_data.get('total_obt', 0)} )")
-    c.drawCentredString(300, y, "GRADE")
-    c.setFont("Helvetica-Bold", 20)
-    c.drawCentredString(300, y-25, f"{st_data.get('grade', 'N/A')}")
+    # 3. QR Code & Secretary (Right)
+    try:
+        qr_w = qr.QrCodeWidget(f"Result_Roll_{roll_no}")
+        b = qr_w.getBounds()
+        w = b[2]-b[0]
+        h = b[3]-b[1]
+        d = Drawing(60, 60, transform=[60/w,0,0,60/h,0,0])
+        d.add(qr_w)
+        renderPDF.draw(d, c, 440, y-5)
+    except: pass
     
-    # 3. Student Signature (Right)
+    c.setFillColorRGB(0.55, 0.14, 0.66)
     c.line(400, y-60, 550, y-60)
-    c.drawString(420, y-75, "STUDENT SIGNATURE")
+    c.setFont("Helvetica", 10)
+    c.drawString(440, y-75, "SECRETARY")
     
     c.save()
 
@@ -510,7 +545,7 @@ elif menu == "Master Login":
                     save_data(schools_db, students_db)
                     st.success(f"ସ୍କୁଲ୍ '{new_s_name}' ସଫଳତାର ସହ ପଞ୍ଜୀକୃତ ହୋଇଗଲା!")
                 else:
-                    st.warning("ସମସ୍ତ ଫିଲ୍ଡ ପୂରଣ cur_school କରନ୍ତୁ।")
+                    st.warning("ସମସ୍ତ ଫିଲ୍ଡ ପୂରଣ କରନ୍ତୁ।")
                     
         with tab3:
             st.markdown("### 📋 Manage All Students (Master Access)")
