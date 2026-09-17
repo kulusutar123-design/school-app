@@ -291,7 +291,7 @@ if menu == "Home Page":
     </style>
     """, unsafe_allow_html=True)
 
-    # Scrolling Notification Marquee 
+    # Scrolling Notification Marquee with newly styled WhatsApp & Email
     st.markdown("""
     <div class="notice-container">
         <div class="notice-header">RECENT NOTICE</div>
@@ -302,7 +302,12 @@ if menu == "Home Page":
                 <div class="notice-item">⏩ Online Student Rank Card generation is now active for all classes.</div>
                 <div class="notice-item">⏩ Students can now Search Result by Roll No OR Name. No School ID needed! <span class="new-badge">UPDATE!</span></div>
                 <div class="notice-item">⏩ APAAR and PEN details have been integrated into the system.</div>
-                <div class="notice-item" style="color: #fbbf24; font-weight: bold; font-size: 18px;">📞 Helpdesk / Contact: MY - 8910223342 <span class="new-badge" style="background-color: #ef4444; color: white;">24x7 Support</span></div>
+                
+                <div class="notice-item" style="border-bottom: none; margin-top: 15px; text-align: center; line-height: 2.5;">
+                    <span style="color: #fbbf24; font-weight: bold; font-size: 18px; margin-right: 5px;">📞 Helpdesk 24x7:</span><br>
+                    <span style="background-color: #25D366; color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold; margin: 5px;">💬 WhatsApp: 8910223342</span>
+                    <span style="background-color: #ea4335; color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold; margin: 5px;">📧 Mail: kulusutar123@gmail.com</span>
+                </div>
             </marquee>
         </div>
     </div>
