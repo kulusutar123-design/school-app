@@ -65,7 +65,6 @@ def generate_result_card_html(school_name, st_data, roll_no):
     res_color = "#15803d" if st_data.get('result') == "PASS" else "#dc2626"
     bg_color = "#f0fdf4" if st_data.get('result') == "PASS" else "#fef2f2"
     
-    # DOB Convert to DD-MM-YYYY for display
     raw_dob = st_data.get('dob', '')
     disp_dob = raw_dob
     if len(raw_dob.split('-')) == 3:
@@ -87,18 +86,14 @@ def generate_result_card_html(school_name, st_data, roll_no):
     <div style="border: 3px solid #1E3A8A; padding: 30px; border-radius: 12px; 
                 background-color: #ffffff; color: #1e293b; font-family: Arial, sans-serif; 
                 max-width: 850px; margin: auto; box-shadow: 0px 8px 16px rgba(0,0,0,0.15);">
-        
-        <div style="text-align: center; border-bottom: 4px double #1E3A8A; 
-                    padding-bottom: 15px; margin-bottom: 25px;">
-            <h1 style="color: #1E3A8A; margin: 0; font-size: 32px; 
-                       text-transform: uppercase; font-weight: 900;">
+        <div style="text-align: center; border-bottom: 4px double #1E3A8A; padding-bottom: 15px; margin-bottom: 25px;">
+            <h1 style="color: #1E3A8A; margin: 0; font-size: 32px; text-transform: uppercase; font-weight: 900;">
                 🏫 {school_name}
             </h1>
             <h3 style="color: #e11d48; margin: 8px 0 0 0; letter-spacing: 3px; font-weight: bold;">
                 OFFICIAL RANK CARD
             </h3>
         </div>
-        
         <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 16px;">
             <tr>
                 <td style="padding: 8px 0;"><b>Student Name:</b> {st_data.get('name', '')}</td>
@@ -121,15 +116,10 @@ def generate_result_card_html(school_name, st_data, roll_no):
                 <td style="padding: 8px 0; text-align: right;"></td>
             </tr>
         </table>
-        
-        <h4 style="color: #ffffff; background-color: #1E3A8A; padding: 12px; margin: 0; 
-                   text-align: center; border-top-left-radius: 8px; border-top-right-radius: 8px; 
-                   letter-spacing: 1px;">
+        <h4 style="color: #ffffff; background-color: #1E3A8A; padding: 12px; margin: 0; text-align: center; border-top-left-radius: 8px; border-top-right-radius: 8px; letter-spacing: 1px;">
             SUBJECT-WISE PERFORMANCE
         </h4>
-        
-        <table style="width: 100%; border-collapse: collapse; text-align: center; 
-                      margin-bottom: 30px; font-size: 16px; background-color: #f8fafc;">
+        <table style="width: 100%; border-collapse: collapse; text-align: center; margin-bottom: 30px; font-size: 16px; background-color: #f8fafc;">
             <tr style="background-color: #e2e8f0; color: #1e293b;">
                 <th style="padding: 12px; border: 1px solid #cbd5e1;">Subject</th>
                 <th style="padding: 12px; border: 1px solid #cbd5e1;">Full Marks</th>
@@ -137,31 +127,17 @@ def generate_result_card_html(school_name, st_data, roll_no):
             </tr>
             {rows_html}
         </table>
-        
-        <div style="background-color: {bg_color}; padding: 20px; 
-                    border: 2px solid {res_color}; border-radius: 8px;">
+        <div style="background-color: {bg_color}; padding: 20px; border: 2px solid {res_color}; border-radius: 8px;">
             <table style="width: 100%; font-size: 18px;">
                 <tr>
-                    <td style="padding: 5px 0;">
-                        <b>Total Marks:</b> 
-                        <span style="font-size: 20px;">{st_data.get('total_obt', 0)} / {st_data.get('total_full', 0)}</span>
-                    </td>
-                    <td style="padding: 5px 0; text-align: center;">
-                        <b>Percentage:</b> 
-                        <span style="font-size: 20px;">{st_data.get('percentage', 0)}%</span>
-                    </td>
-                    <td style="padding: 5px 0; text-align: right;">
-                        <b>Grade:</b> 
-                        <span style="color: #1E3A8A; font-size: 24px; font-weight: 900;">{st_data.get('grade', 'N/A')}</span>
-                    </td>
+                    <td style="padding: 5px 0;"><b>Total Marks:</b> <span style="font-size: 20px;">{st_data.get('total_obt', 0)} / {st_data.get('total_full', 0)}</span></td>
+                    <td style="padding: 5px 0; text-align: center;"><b>Percentage:</b> <span style="font-size: 20px;">{st_data.get('percentage', 0)}%</span></td>
+                    <td style="padding: 5px 0; text-align: right;"><b>Grade:</b> <span style="color: #1E3A8A; font-size: 24px; font-weight: 900;">{st_data.get('grade', 'N/A')}</span></td>
                 </tr>
             </table>
-            
-            <div style="text-align: center; margin-top: 20px; padding-top: 15px; 
-                        border-top: 2px dashed {res_color};">
+            <div style="text-align: center; margin-top: 20px; padding-top: 15px; border-top: 2px dashed {res_color};">
                 <span style="font-size: 20px; font-weight: bold; color: #475569;">FINAL RESULT:</span> 
-                <span style="color: {res_color}; font-size: 28px; font-weight: 900; 
-                             letter-spacing: 2px; margin-left: 10px;">
+                <span style="color: {res_color}; font-size: 28px; font-weight: 900; letter-spacing: 2px; margin-left: 10px;">
                     {st_data.get('result', 'N/A')}
                 </span>
             </div>
@@ -172,7 +148,6 @@ def generate_result_card_html(school_name, st_data, roll_no):
 
 # --- PDF ଜେନେରେଟର ---
 def create_pdf(filename, school_name, st_data, roll_no):
-    # DOB Convert to DD-MM-YYYY for display
     raw_dob = st_data.get('dob', '')
     disp_dob = raw_dob
     if len(raw_dob.split('-')) == 3:
@@ -237,16 +212,8 @@ elif portal_param == "school":
 elif portal_param == "student":
     default_idx = 3
 
-st.markdown(
-    "<h3 style='text-align: center; color: #0284C7; margin-top:-20px;'>"
-    "✨ WELCOME KULU SUTAR ✨</h3>", 
-    unsafe_allow_html=True
-)
-st.markdown(
-    "<h1 style='text-align: center; color: #1E3A8A; font-size: 30px;'>"
-    "🏫 ADVANCED SCHOOL MANAGEMENT SYSTEM</h1>", 
-    unsafe_allow_html=True
-)
+st.markdown("<h3 style='text-align: center; color: #0284C7; margin-top:-20px;'>✨ WELCOME KULU SUTAR ✨</h3>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: #1E3A8A; font-size: 30px;'>🏫 ADVANCED SCHOOL MANAGEMENT SYSTEM</h1>", unsafe_allow_html=True)
 st.markdown("<hr style='margin-bottom: 10px;'>", unsafe_allow_html=True)
 
 menu = st.sidebar.selectbox("🎯 Navigation Menu", ["Home Page", "Master Login", "School Login", "Results"], index=default_idx)
@@ -264,121 +231,36 @@ classes_list = [str(i) for i in range(1, 11)]
 
 # ----------------- HOME PAGE (ERP STYLE UI) -----------------
 if menu == "Home Page":
+    # ନୂଆ ଏବଂ ସୁରକ୍ଷିତ Notice Board ଡିଜାଇନ୍ (ମୋବାଇଲ୍ Copy ପାଇଁ ଏକଦମ୍ ଠିକ୍)
+    notice_html = (
+        "<div style='background-color:#ffffff; border:1px solid #cbd5e1; border-radius:10px; box-shadow:0 4px 6px rgba(0,0,0,0.1); margin-bottom:25px; overflow:hidden;'>"
+        "<div style='background:linear-gradient(90deg, #1e3a8a 0%, #3b82f6 100%); color:white; padding:15px; text-align:center; font-size:20px; font-weight:bold; letter-spacing:1px;'>📢 RECENT UPDATES & NOTICES</div>"
+        "<div style='padding:15px; color:#1e293b; height:240px; overflow:hidden;'>"
+        "<marquee direction='up' scrollamount='2' onmouseover='this.stop();' onmouseout='this.start();' style='height:100%;'>"
+        "<div style='margin-bottom:12px; padding-bottom:8px; border-bottom:1px dashed #cbd5e1; font-size:16px;'>📌 <b>Welcome</b> to Advanced School Management System! <span style='background-color:#ef4444; color:white; font-size:11px; padding:2px 6px; border-radius:4px; font-weight:bold;'>NEW!</span></div>"
+        "<div style='margin-bottom:12px; padding-bottom:8px; border-bottom:1px dashed #cbd5e1; font-size:16px;'>📌 <b>Security:</b> Master & School portal passwords are encrypted and secured.</div>"
+        "<div style='margin-bottom:12px; padding-bottom:8px; border-bottom:1px dashed #cbd5e1; font-size:16px;'>📌 <b>Rank Cards:</b> Online Student Rank Card generation is now active for all classes.</div>"
+        "<div style='margin-bottom:12px; padding-bottom:8px; border-bottom:1px dashed #cbd5e1; font-size:16px;'>📌 <b>Search Feature:</b> Students can now Search Result by Roll No OR Name. No School ID needed! <span style='background-color:#10b981; color:white; font-size:11px; padding:2px 6px; border-radius:4px; font-weight:bold;'>UPDATE!</span></div>"
+        "<div style='margin-bottom:12px; padding-bottom:8px; border-bottom:1px dashed #cbd5e1; font-size:16px;'>📌 <b>New Fields:</b> APAAR and PEN details have been integrated into the system.</div>"
+        "<div style='margin-top:20px; text-align:center; padding:15px; background-color:#f1f5f9; border-radius:8px; border:1px solid #e2e8f0;'>"
+        "<div style='color:#1e3a8a; font-weight:bold; font-size:18px; margin-bottom:10px;'>📞 Helpdesk 24x7 Support:</div>"
+        "<span style='background-color:#25D366; color:white; padding:6px 15px; border-radius:20px; font-weight:bold; display:inline-block; margin:5px; box-shadow:0 2px 4px rgba(0,0,0,0.1);'>💬 WhatsApp: 8910223342</span>"
+        "<span style='background-color:#ea4335; color:white; padding:6px 15px; border-radius:20px; font-weight:bold; display:inline-block; margin:5px; box-shadow:0 2px 4px rgba(0,0,0,0.1);'>📧 Mail: kulusutar123@gmail.com</span>"
+        "</div>"
+        "</marquee>"
+        "</div>"
+        "</div>"
+    )
+    st.markdown(notice_html, unsafe_allow_html=True)
+
     st.markdown("""
     <style>
-    .notice-container { 
-        background-color: #1e293b; 
-        border-radius: 5px; 
-        margin-bottom: 25px; 
-        border: 1px solid #475569; 
-    }
-    .notice-header { 
-        background-color: #27374D; 
-        color: white; 
-        text-align: center; 
-        padding: 12px; 
-        font-weight: bold; 
-        font-size: 20px; 
-    }
-    .notice-item { 
-        margin-bottom: 15px; 
-        font-size: 16px; 
-        border-bottom: 1px dotted #475569; 
-        padding-bottom: 10px; 
-    }
-    .new-badge { 
-        background-color: #fbbf24; 
-        color: black; 
-        font-size: 12px; 
-        font-weight: bold; 
-        padding: 2px 6px; 
-        border-radius: 3px; 
-        margin-left: 5px; 
-        animation: blinker 1.5s linear infinite; 
-    }
-    @keyframes blinker { 
-        50% { opacity: 0; } 
-    }
-    .login-card { 
-        background-color: white; 
-        border: 1px solid #cbd5e1; 
-        border-bottom: 5px solid #fbbf24; 
-        border-radius: 8px; 
-        padding: 20px; 
-        margin-bottom: 15px; 
-        text-align: center; 
-        text-decoration: none; 
-        display: block; 
-        color: #1e3a8a; 
-    }
-    .login-title { 
-        font-size: 24px; 
-        font-weight: bold; 
-        margin-bottom: 5px; 
-    }
-    .login-sub { 
-        font-size: 14px; 
-        color: #64748b; 
-    }
+    .login-card { background-color: white; border: 1px solid #cbd5e1; border-bottom: 5px solid #fbbf24; border-radius: 8px; padding: 20px; margin-bottom: 15px; text-align: center; text-decoration: none; display: block; color: #1e3a8a; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.3s; }
+    .login-card:hover { background-color: #f8fafc; border-bottom: 5px solid #1e3a8a; transform: translateY(-2px); }
+    .login-title { font-size: 24px; font-weight: bold; margin-bottom: 5px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .login-sub { font-size: 14px; color: #64748b; }
     </style>
-    """, unsafe_allow_html=True)
-
-    # Note: Using multi-line strings broken down to prevent truncation
-    st.markdown("""
-    <div class="notice-container">
-        <div class="notice-header">RECENT NOTICE</div>
-        <div style="padding: 0; overflow: hidden; background-color: #1e293b; color: #e2e8f0;">
-            <marquee direction="up" scrollamount="2" onmouseover="this.stop();" 
-                     onmouseout="this.start();" style="height: 180px; padding: 15px;">
-                
-                <div class="notice-item">
-                    ⏩ Welcome to Advanced School Management System! <span class="new-badge">NEW!</span>
-                </div>
-                
-                <div class="notice-item">
-                    ⏩ Master & School portal passwords are encrypted and secured.
-                </div>
-                
-                <div class="notice-item">
-                    ⏩ Online Student Rank Card generation is now active for all classes.
-                </div>
-                
-                <div class="notice-item">
-                    ⏩ Students can now Search Result by Roll No OR Name. 
-                    <span class="new-badge">UPDATE!</span>
-                </div>
-                
-                <div class="notice-item">
-                    ⏩ APAAR and PEN details have been integrated into the system.
-                </div>
-                
-                <div class="notice-item" 
-                     style="border-bottom: none; margin-top: 15px; text-align: center; line-height: 2.5;">
-                    
-                    <span style="color: #fbbf24; font-weight: bold; font-size: 18px;">
-                        📞 Helpdesk 24x7:
-                    </span>
-                    <br>
-                    
-                    <span style="background-color: #25D366; color: white; padding: 5px 12px; 
-                                 border-radius: 20px; font-weight: bold; display: inline-block; 
-                                 margin-bottom: 5px;">
-                        💬 WhatsApp: 8910223342
-                    </span>
-                    <br>
-                    
-                    <span style="background-color: #ea4335; color: white; padding: 5px 12px; 
-                                 border-radius: 20px; font-weight: bold; display: inline-block;">
-                        📧 Mail: kulusutar123@gmail.com
-                    </span>
-                    
-                </div>
-            </marquee>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    st.markdown("""
+    
     <a href="?portal=master" target="_self" class="login-card" style="text-decoration: none;">
         <div class="login-title">🏛️ Master Login</div>
         <div class="login-sub">Click here to login as Admin / University</div>
