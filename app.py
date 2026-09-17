@@ -71,7 +71,7 @@ def save_data(schools, students):
     with open(STUDENTS_FILE, "w", encoding="utf-8") as f:
         json.dump(students, f, indent=4)
 
-# --- ସୁନ୍ଦର ରାଙ୍କ୍ କାର୍ଡ (NEW CERTIFICATE DESIGN) ---
+# --- ସୁନ୍ଦର ରାଙ୍କ୍ କାର୍ଡ (NEW CERTIFICATE DESIGN - ERROR FIXED) ---
 def generate_result_card_html(school_name, st_data, roll_no):
     raw_dob = st_data.get('dob', '')
     disp_dob = raw_dob
@@ -83,101 +83,67 @@ def generate_result_card_html(school_name, st_data, roll_no):
     rows_html = ""
     for sub, m_info in st_data.get('subjects', {}).items():
         rows_html += (
-            f"<tr style='border-bottom: 1px solid #d4a3d4;'>"
+            "<tr style='border-bottom: 1px solid #d4a3d4;'>"
             f"<td style='padding: 8px; border-right: 1px solid #a965a9; text-align: left; font-weight: bold;'>{sub.upper()}</td>"
             f"<td style='padding: 8px; border-right: 1px solid #a965a9;'>{m_info['full']}</td>"
             f"<td style='padding: 8px; font-weight: bold;'>{m_info['obt']}</td>"
-            f"</tr>"
+            "</tr>"
         )
 
-    html_content = f"""
-    <div style="font-family: 'Times New Roman', serif; border: 15px solid #dcb5e3; padding: 4px; max-width: 800px; margin: auto; background-color: #ffffff;">
-        <div style="border: 2px solid #a965a9; padding: 25px; background-color: #fffdfd; position: relative;">
-            
-            <!-- Header Section -->
-            <div style="text-align: center; color: #8e24aa; margin-bottom: 20px;">
-                <h1 style="margin: 0; font-size: 26px; text-transform: uppercase;">{school_name}</h1>
-                <h3 style="margin: 8px 0; font-size: 16px; letter-spacing: 1px;">ANNUAL EXAMINATION - {st_data.get('batch', '2025-2026')}</h3>
-                <p style="margin: 5px 0; font-weight: bold; font-size: 17px; text-decoration: underline;">CERTIFICATE-CUM-MARK SHEET</p>
-            </div>
-            
-            <!-- Top Details (Roll No, Class, etc.) -->
-            <table style="width: 100%; font-size: 13px; color: #333; margin-bottom: 20px;">
-                <tr>
-                    <td><b>ROLL NO:</b> {roll_no}</td>
-                    <td style="text-align: right;"><b>CLASS:</b> {st_data.get('class', 'N/A')}</td>
-                </tr>
-                <tr>
-                    <td><b>PEN NO:</b> {st_data.get('pen_no', 'N/A')}</td>
-                    <td style="text-align: right;"><b>APAAR NO:</b> {st_data.get('apaar_no', 'N/A')}</td>
-                </tr>
-            </table>
-            
-            <!-- Student Personal Details -->
-            <table style="width: 100%; font-size: 15px; margin-bottom: 15px; text-transform: uppercase; color: #333; line-height: 1.8;">
-                <tr>
-                    <td style="width: 160px; color: #8e24aa; font-weight: bold;">Certify that</td>
-                    <td style="font-weight: bold;">{st_data.get('name', 'N/A')}</td>
-                </tr>
-                <tr>
-                    <td style="color: #8e24aa; font-weight: bold;">Mother's Name</td>
-                    <td style="font-weight: bold;">{st_data.get('mother_name', 'N/A')}</td>
-                </tr>
-                <tr>
-                    <td style="color: #8e24aa; font-weight: bold;">Father's Name</td>
-                    <td style="font-weight: bold;">{st_data.get('father_name', 'N/A')}</td>
-                </tr>
-                <tr>
-                    <td style="color: #8e24aa; font-weight: bold;">Date of Birth</td>
-                    <td style="font-weight: bold;">{disp_dob}</td>
-                </tr>
-            </table>
-            
-            <p style="color: #8e24aa; font-style: italic; font-size: 15px; text-align: center; margin-bottom: 20px;">
-                Passed the Annual Examination held in the academic batch of {st_data.get('batch', 'N/A')}.
-            </p>
-            
-            <!-- Marks Table -->
-            <div style="text-align: center; color: #8e24aa; font-weight: bold; font-size: 14px; margin-bottom: 5px;">
-                SUBJECTS AND MARKS SECURED
-            </div>
-            <table style="width: 100%; border-collapse: collapse; border: 2px solid #a965a9; text-align: center; font-size: 14px;">
-                <tr style="color: #8e24aa; background-color: #fdf5fc; border-bottom: 2px solid #a965a9;">
-                    <th style="padding: 10px; border-right: 1px solid #a965a9;">SUBJECT</th>
-                    <th style="padding: 10px; border-right: 1px solid #a965a9;">FULL MARKS</th>
-                    <th style="padding: 10px;">MARKS SECURED</th>
-                </tr>
-                {rows_html}
-                <tr style="color: #8e24aa; font-weight: bold; background-color: #fdf5fc; border-top: 2px solid #a965a9;">
-                    <td style="padding: 10px; border-right: 1px solid #a965a9; text-align: right;">TOTAL MARKS</td>
-                    <td style="padding: 10px; border-right: 1px solid #a965a9;">{st_data.get('total_full', 0)}</td>
-                    <td style="padding: 10px;">{st_data.get('total_obt', 0)}</td>
-                </tr>
-            </table>
-            
-            <!-- Footer (Grade, Result, Date) -->
-            <table style="width: 100%; margin-top: 30px; text-align: center; color: #8e24aa;">
-                <tr>
-                    <td style="width: 33%;">
-                        <div style="font-size: 11px;">DATE OF PUBLICATION</div>
-                        <div style="font-weight: bold; font-size: 14px; margin-top: 5px;">{datetime.date.today().strftime('%d/%m/%Y')}</div>
-                    </td>
-                    <td style="width: 34%;">
-                        <div style="border: 2px solid #a965a9; padding: 10px; background-color: #fdf5fc; display: inline-block; min-width: 80px;">
-                            <div style="font-size: 11px; margin-bottom: 5px;">GRADE</div>
-                            <div style="font-weight: bold; font-size: 18px;">{st_data.get('grade', 'N/A')}</div>
-                        </div>
-                    </td>
-                    <td style="width: 33%;">
-                        <div style="font-size: 11px;">FINAL RESULT</div>
-                        <div style="font-weight: bold; font-size: 18px; margin-top: 5px;">{st_data.get('result', 'N/A')}</div>
-                    </td>
-                </tr>
-            </table>
-            
-        </div>
-    </div>
-    """
+    # କୋଡ୍ ବ୍ଲକ୍ ଏରର୍ ଆସିବ ନାହିଁ କାରଣ ଆମେ ସବୁ ଲାଇନ୍‌କୁ ଯୋଡ଼ି ଦେଇଛୁ (No Indentation Issues)
+    html_content = (
+        "<div style='font-family: \"Times New Roman\", serif; border: 15px solid #dcb5e3; padding: 4px; max-width: 800px; margin: auto; background-color: #ffffff;'>"
+        "<div style='border: 2px solid #a965a9; padding: 25px; background-color: #fffdfd; position: relative;'>"
+        "<div style='text-align: center; color: #8e24aa; margin-bottom: 20px;'>"
+        f"<h1 style='margin: 0; font-size: 26px; text-transform: uppercase;'>{school_name}</h1>"
+        f"<h3 style='margin: 8px 0; font-size: 16px; letter-spacing: 1px;'>ANNUAL EXAMINATION - {st_data.get('batch', '2025-2026')}</h3>"
+        "<p style='margin: 5px 0; font-weight: bold; font-size: 17px; text-decoration: underline;'>CERTIFICATE-CUM-MARK SHEET</p>"
+        "</div>"
+        "<table style='width: 100%; font-size: 13px; color: #333; margin-bottom: 20px;'>"
+        f"<tr><td><b>ROLL NO:</b> {roll_no}</td><td style='text-align: right;'><b>CLASS:</b> {st_data.get('class', 'N/A')}</td></tr>"
+        f"<tr><td><b>PEN NO:</b> {st_data.get('pen_no', 'N/A')}</td><td style='text-align: right;'><b>APAAR NO:</b> {st_data.get('apaar_no', 'N/A')}</td></tr>"
+        "</table>"
+        "<table style='width: 100%; font-size: 15px; margin-bottom: 15px; text-transform: uppercase; color: #333; line-height: 1.8;'>"
+        f"<tr><td style='width: 160px; color: #8e24aa; font-weight: bold;'>Certify that</td><td style='font-weight: bold;'>{st_data.get('name', 'N/A')}</td></tr>"
+        f"<tr><td style='color: #8e24aa; font-weight: bold;'>Mother's Name</td><td style='font-weight: bold;'>{st_data.get('mother_name', 'N/A')}</td></tr>"
+        f"<tr><td style='color: #8e24aa; font-weight: bold;'>Father's Name</td><td style='font-weight: bold;'>{st_data.get('father_name', 'N/A')}</td></tr>"
+        f"<tr><td style='color: #8e24aa; font-weight: bold;'>Date of Birth</td><td style='font-weight: bold;'>{disp_dob}</td></tr>"
+        "</table>"
+        f"<p style='color: #8e24aa; font-style: italic; font-size: 15px; text-align: center; margin-bottom: 20px;'>Passed the Annual Examination held in the academic batch of {st_data.get('batch', 'N/A')}.</p>"
+        "<div style='text-align: center; color: #8e24aa; font-weight: bold; font-size: 14px; margin-bottom: 5px;'>SUBJECTS AND MARKS SECURED</div>"
+        "<table style='width: 100%; border-collapse: collapse; border: 2px solid #a965a9; text-align: center; font-size: 14px;'>"
+        "<tr style='color: #8e24aa; background-color: #fdf5fc; border-bottom: 2px solid #a965a9;'>"
+        "<th style='padding: 10px; border-right: 1px solid #a965a9;'>SUBJECT</th>"
+        "<th style='padding: 10px; border-right: 1px solid #a965a9;'>FULL MARKS</th>"
+        "<th style='padding: 10px;'>MARKS SECURED</th>"
+        "</tr>"
+        f"{rows_html}"
+        "<tr style='color: #8e24aa; font-weight: bold; background-color: #fdf5fc; border-top: 2px solid #a965a9;'>"
+        "<td style='padding: 10px; border-right: 1px solid #a965a9; text-align: right;'>TOTAL MARKS</td>"
+        f"<td style='padding: 10px; border-right: 1px solid #a965a9;'>{st_data.get('total_full', 0)}</td>"
+        f"<td style='padding: 10px;'>{st_data.get('total_obt', 0)}</td>"
+        "</tr>"
+        "</table>"
+        "<table style='width: 100%; margin-top: 30px; text-align: center; color: #8e24aa;'>"
+        "<tr>"
+        "<td style='width: 33%;'>"
+        "<div style='font-size: 11px;'>DATE OF PUBLICATION</div>"
+        f"<div style='font-weight: bold; font-size: 14px; margin-top: 5px;'>{datetime.date.today().strftime('%d/%m/%Y')}</div>"
+        "</td>"
+        "<td style='width: 34%;'>"
+        "<div style='border: 2px solid #a965a9; padding: 10px; background-color: #fdf5fc; display: inline-block; min-width: 80px;'>"
+        "<div style='font-size: 11px; margin-bottom: 5px;'>GRADE</div>"
+        f"<div style='font-weight: bold; font-size: 18px;'>{st_data.get('grade', 'N/A')}</div>"
+        "</div>"
+        "</td>"
+        "<td style='width: 33%;'>"
+        "<div style='font-size: 11px;'>FINAL RESULT</div>"
+        f"<div style='font-weight: bold; font-size: 18px; margin-top: 5px;'>{st_data.get('result', 'N/A')}</div>"
+        "</td>"
+        "</tr>"
+        "</table>"
+        "</div></div>"
+    )
     return html_content
 
 # --- PDF ଜେନେରେଟର ---
@@ -319,37 +285,16 @@ if menu == "Home Page":
         "<div class='notice-header'>RECENT NOTICE</div>"
         "<div style='padding: 0; overflow: hidden; background-color: #1e293b; color: #e2e8f0;'>"
         "<marquee direction='up' scrollamount='2' onmouseover='this.stop();' onmouseout='this.start();' style='height: 180px; padding: 15px;'>"
-        
-        "<div class='notice-item'>"
-        "⏩ Welcome to Advanced School Management System! <span class='new-badge'>NEW!</span>"
-        "</div>"
-        
-        "<div class='notice-item'>"
-        "⏩ Master & School portal passwords are encrypted and secured."
-        "</div>"
-        
-        "<div class='notice-item'>"
-        "⏩ Online Student Rank Card generation is now active for all classes."
-        "</div>"
-        
-        "<div class='notice-item'>"
-        "⏩ Students can now Search Result by Batch, Roll No OR Name. No School ID needed! <span class='new-badge'>UPDATE!</span>"
-        "</div>"
-        
-        "<div class='notice-item'>"
-        "⏩ APAAR and PEN details have been integrated into the system."
-        "</div>"
-        
+        "<div class='notice-item'>⏩ Welcome to Advanced School Management System! <span class='new-badge'>NEW!</span></div>"
+        "<div class='notice-item'>⏩ Master & School portal passwords are encrypted and secured.</div>"
+        "<div class='notice-item'>⏩ Online Student Rank Card generation is now active for all classes.</div>"
+        "<div class='notice-item'>⏩ Students can now Search Result by Batch, Roll No OR Name. No School ID needed! <span class='new-badge'>UPDATE!</span></div>"
+        "<div class='notice-item'>⏩ APAAR and PEN details have been integrated into the system.</div>"
         "<div class='notice-item' style='border-bottom: none; margin-top: 15px; text-align: center; line-height: 2.5;'>"
         "<span style='color: #fbbf24; font-weight: bold; font-size: 18px;'>📞 Helpdesk 24x7:</span><br>"
-        "<span style='background-color: #25D366; color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold; display: inline-block; margin-bottom: 5px;'>"
-        "💬 WhatsApp: 8910223342"
-        "</span><br>"
-        "<span style='background-color: #ea4335; color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold; display: inline-block;'>"
-        "📧 Mail: kulusutar123@gmail.com"
-        "</span>"
+        "<span style='background-color: #25D366; color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold; display: inline-block; margin-bottom: 5px;'>💬 WhatsApp: 8910223342</span><br>"
+        "<span style='background-color: #ea4335; color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold; display: inline-block;'>📧 Mail: kulusutar123@gmail.com</span>"
         "</div>"
-        
         "</marquee>"
         "</div>"
         "</div>"
@@ -872,7 +817,11 @@ elif menu == "Results":
     with c_title:
         st.subheader("🎓 Results Portal")
         
-    st.info("🔗 **Information:** Please select your Class & Batch, then enter your Roll Number OR Name along with Date of Birth to view your Result.")
+    st.info(
+        "🔗 **English:** No School ID is required here. Search using only your Roll Number or Name. \n\n"
+        "🔗 **हिन्दी:** यहाँ किसी School ID की आवश्यकता नहीं है। कृपया केवल अपना रोल नंबर या नाम दर्ज करके खोजें। \n\n"
+        "🔗 **ଓଡ଼ିଆ:** ଏଠାରେ କୌଣସି School ID ଦରକାର ନାହିଁ। କେବଳ Roll Number କିମ୍ବା Name ଦେଇ ସର୍ଚ୍ଚ କରନ୍ତୁ।"
+    )
     
     col_c, col_b = st.columns(2)
     with col_c:
