@@ -460,7 +460,6 @@ elif menu == "Master Login":
                         m_up_mother = st.text_input("Mother's Name", value=m_curr_st.get('mother_name', ''), key="m_up_m")
                         m_up_apaar = st.text_input("APAAR NO", value=m_curr_st.get('apaar_no', ''), key="m_up_apaar")
                         
-                        # BATCH Selection in Edit
                         b_val = m_curr_st.get('batch', '2025-2026')
                         b_idx = batches_list.index(b_val) if b_val in batches_list else 5
                         m_up_batch = st.selectbox("Batch", batches_list, index=b_idx, key="m_up_batch")
@@ -647,12 +646,10 @@ elif menu == "School Login":
             max_date = datetime.date(2065, 12, 31)
             dob = st.date_input("DOB (YYYY-MM-DD)", min_value=min_date, max_value=max_date, key="add_dob")
             
-            # Batch and Class in Add Student
             c_c1, c_c2 = st.columns(2)
             with c_c1:
                 cls = st.selectbox("Class", classes_list, key="add_class")
             with c_c2:
-                # Default selected index to 2025-2026 (index 5)
                 add_batch = st.selectbox("Batch", batches_list, index=5, key="add_batch")
             
             st.markdown("#### 📚 Subject Add / Remove & Marks")
@@ -842,14 +839,12 @@ elif menu == "Results":
         
         search_query_lower = st_search_query.strip().lower()
         
-        # ବ୍ୟବହାରକାରୀ ଦେଇଥିବା ଦିନ-ମାସ-ବର୍ଷ (DD-MM-YYYY) କୁ ଡାଟାବେସ୍ ଫର୍ମାଟ୍ (YYYY-MM-DD) କୁ ବଦଳାଇବା
         db_dob_format = st_dob_input.strip()
         if db_dob_format.count('-') == 2:
             p1, p2, p3 = db_dob_format.split('-')
             if len(p1) == 2 and len(p3) == 4:
                 db_dob_format = f"{p3}-{p2}-{p1}"
         
-        # ସବୁ ସ୍କୁଲ୍ ଭିତରେ ଖୋଜିବା
         for s_id, school_students in students_db.items():
             if st_search_query in school_students:
                 potential_student = school_students[st_search_query]
@@ -872,7 +867,12 @@ elif menu == "Results":
                 break
                 
         if found_student:
-            st.success(f"Welcome KULU SUTAR! ଆପଣଙ୍କ ରେଜଲ୍ଟ୍ ତଳେ ଦିଆଗଲା:")
+            student_name = found_student.get('name', '').upper()
+            st.success(
+                f"🎉 **Welcome {student_name}!** Your result is given below:  \n"
+                f"🎉 **स्वागत है {student_name}!** आपका परिणाम नीचे दिया गया है:  \n"
+                f"🎉 **ସ୍ୱାଗତମ୍ {student_name}!** ଆପଣଙ୍କ ରେଜଲ୍ଟ ତଳେ ଦିଆଗଲା:"
+            )
             school_name = schools_db[found_school_id]['name']
             
             st.markdown(generate_result_card_html(school_name, found_student, found_roll), unsafe_allow_html=True)
