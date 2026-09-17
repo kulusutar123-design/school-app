@@ -218,80 +218,18 @@ classes_list = [str(i) for i in range(1, 11)]
 if menu == "Home Page":
     st.markdown("""
     <style>
-    .notice-container {
-        background-color: #1e293b;
-        border-radius: 5px;
-        padding: 0;
-        margin-bottom: 25px;
-        border: 1px solid #475569;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-    .notice-header {
-        background-color: #27374D;
-        color: white;
-        text-align: center;
-        padding: 12px;
-        font-weight: bold;
-        font-size: 20px;
-        border-top-left-radius: 5px;
-        border-top-right-radius: 5px;
-        border-bottom: 2px solid #526D82;
-    }
-    .notice-item {
-        margin-bottom: 15px;
-        font-size: 16px;
-        border-bottom: 1px dotted #475569;
-        padding-bottom: 10px;
-    }
-    .new-badge {
-        background-color: #fbbf24;
-        color: black;
-        font-size: 12px;
-        font-weight: bold;
-        padding: 2px 6px;
-        border-radius: 3px;
-        margin-left: 5px;
-        animation: blinker 1.5s linear infinite;
-    }
-    @keyframes blinker {
-        50% { opacity: 0; }
-    }
-    .login-card {
-        background-color: white;
-        border: 1px solid #cbd5e1;
-        border-bottom: 5px solid #fbbf24;
-        border-radius: 8px;
-        padding: 20px;
-        margin-bottom: 15px;
-        text-align: center;
-        text-decoration: none;
-        display: block;
-        color: #1e3a8a;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        transition: 0.3s;
-    }
-    .login-card:hover {
-        background-color: #f8fafc;
-        border-bottom: 5px solid #1e3a8a;
-        transform: translateY(-2px);
-    }
-    .login-title {
-        font-size: 24px;
-        font-weight: bold;
-        margin-bottom: 5px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-    }
-    .login-sub {
-        font-size: 14px;
-        color: #64748b;
-    }
+    .notice-container { background-color: #1e293b; border-radius: 5px; margin-bottom: 25px; border: 1px solid #475569; }
+    .notice-header { background-color: #27374D; color: white; text-align: center; padding: 12px; font-weight: bold; font-size: 20px; }
+    .notice-item { margin-bottom: 15px; font-size: 16px; border-bottom: 1px dotted #475569; padding-bottom: 10px; }
+    .new-badge { background-color: #fbbf24; color: black; font-size: 12px; font-weight: bold; padding: 2px 6px; border-radius: 3px; margin-left: 5px; animation: blinker 1.5s linear infinite; }
+    @keyframes blinker { 50% { opacity: 0; } }
+    .login-card { background-color: white; border: 1px solid #cbd5e1; border-bottom: 5px solid #fbbf24; border-radius: 8px; padding: 20px; margin-bottom: 15px; text-align: center; text-decoration: none; display: block; color: #1e3a8a; }
+    .login-title { font-size: 24px; font-weight: bold; margin-bottom: 5px; }
+    .login-sub { font-size: 14px; color: #64748b; }
     </style>
     """, unsafe_allow_html=True)
 
-    # Scrolling Notification Marquee with newly styled WhatsApp & Email
+    # Note: Code format is adjusted below to prevent text truncation during copy/paste
     st.markdown("""
     <div class="notice-container">
         <div class="notice-header">RECENT NOTICE</div>
@@ -304,9 +242,13 @@ if menu == "Home Page":
                 <div class="notice-item">⏩ APAAR and PEN details have been integrated into the system.</div>
                 
                 <div class="notice-item" style="border-bottom: none; margin-top: 15px; text-align: center; line-height: 2.5;">
-                    <span style="color: #fbbf24; font-weight: bold; font-size: 18px; margin-right: 5px;">📞 Helpdesk 24x7:</span><br>
-                    <span style="background-color: #25D366; color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold; margin: 5px;">💬 WhatsApp: 8910223342</span>
-                    <span style="background-color: #ea4335; color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold; margin: 5px;">📧 Mail: kulusutar123@gmail.com</span>
+                    <span style="color: #fbbf24; font-weight: bold; font-size: 18px;">📞 Helpdesk 24x7:</span><br>
+                    <span style="background-color: #25D366; color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold; display: inline-block; margin-bottom: 5px;">
+                        💬 WhatsApp: 8910223342
+                    </span><br>
+                    <span style="background-color: #ea4335; color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold; display: inline-block;">
+                        📧 Mail: kulusutar123@gmail.com
+                    </span>
                 </div>
             </marquee>
         </div>
