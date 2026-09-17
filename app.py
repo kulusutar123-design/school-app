@@ -94,7 +94,7 @@ def save_data(schools, students):
     with open(STUDENTS_FILE, "w", encoding="utf-8") as f:
         json.dump(students, f, indent=4)
 
-# --- ସୁନ୍ଦର ରାଙ୍କ୍ କାର୍ଡ (HTML DESIGN WITH BEAUTIFUL FONT & HM/CT SIGNS) ---
+# --- ସୁନ୍ଦର ରାଙ୍କ୍ କାର୍ଡ HTML ଡିଜାଇନ୍ ---
 def generate_result_card_html(school_name, st_data, roll_no):
     raw_dob = st_data.get('dob', '')
     disp_dob = raw_dob
@@ -130,12 +130,19 @@ def generate_result_card_html(school_name, st_data, roll_no):
             "</tr>"
         )
 
+    # Calculate dynamic font size for HTML header to prevent wrapping
+    header_font_size = "28px"
+    if len(school_name) > 40:
+        header_font_size = "22px"
+    if len(school_name) > 55:
+        header_font_size = "18px"
+
     html_content = (
         f"<div style='font-family: \"Times New Roman\", serif; border: 15px solid {outer_border}; padding: 4px; max-width: 800px; margin: auto; background-color: #ffffff;'>"
         f"<div style='border: 2px solid {border_color}; padding: 25px; background-color: {bg_color}; position: relative;'>"
         
         f"<div style='text-align: center; color: {border_color}; margin-bottom: 20px;'>"
-        f"<h1 style='margin: 0; font-size: 28px; text-transform: uppercase; font-family: \"Georgia\", serif; text-shadow: 1px 1px 2px #e1bee7;'>{school_name}</h1>"
+        f"<h1 style='margin: 0; font-size: {header_font_size}; text-transform: uppercase; font-family: \"Georgia\", serif; text-shadow: 1px 1px 2px #e1bee7;'>{school_name}</h1>"
         f"<h3 style='margin: 8px 0; font-size: 16px; letter-spacing: 1px;'>ANNUAL EXAMINATION - {st_data.get('batch', '2025-2026')}</h3>"
         "<p style='margin: 5px 0; font-weight: bold; font-size: 17px; text-decoration: underline;'>CERTIFICATE-CUM-MARK SHEET</p>"
         "</div>"
@@ -203,7 +210,7 @@ def generate_result_card_html(school_name, st_data, roll_no):
     )
     return html_content
 
-# --- PDF ଜେନେରେଟର (PDF DESIGN WITH HM & CLASS TEACHER SIGNATURES) ---
+# --- PDF ଜେନେରେଟର ---
 def create_pdf(filename, school_name, st_data, roll_no):
     raw_dob = st_data.get('dob', '')
     disp_dob = raw_dob
@@ -228,10 +235,19 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.setLineWidth(2)
     c.rect(30, 30, 552, 732, fill=0, stroke=1)
     
-    # BEAUTIFUL FONT FOR SCHOOL NAME IN PDF
+    # ==========================================
+    # 🌟 AUTO FONT SIZE ADJUSTMENT FOR PDF HEADER
+    # ==========================================
     c.setFillColorRGB(0.55, 0.14, 0.66)
-    c.setFont("Times-Bold", 20)
-    c.drawCentredString(300, 720, school_name.upper())
+    school_title = school_name.upper()
+    title_size = 22
+    # ଯେତେବେଳେ ଯାଏଁ ଟେକ୍ସଟ୍ ବର୍ଡର୍ ଭିତରେ ନ ରହିଛି ସେତେବେଳ ଯାଏଁ ସାଇଜ୍ କମିବ
+    while c.stringWidth(school_title, "Times-Bold", title_size) > 490 and title_size > 10:
+        title_size -= 1
+    
+    c.setFont("Times-Bold", title_size)
+    c.drawCentredString(300, 720, school_title)
+    
     c.setFont("Helvetica-Bold", 12)
     c.drawCentredString(300, 695, f"ANNUAL EXAMINATION - {st_data.get('batch', '2025-2026')}")
     c.setFont("Helvetica", 11)
@@ -337,7 +353,7 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.setFont("Helvetica-Bold", 18)
     c.drawCentredString(300, y-15, f"{st_data.get('grade', 'N/A')}")
     
-    # 3. QR Code & Class Teacher Signature (Right) - Text embedded for Offline Verification
+    # 3. QR Code & Class Teacher Signature (Right)
     student_name = st_data.get('name', 'N/A').upper()
     total_marks = f"{total_obt}/{st_data.get('total_full', 0)}"
     grade = st_data.get('grade', 'N/A')
@@ -952,7 +968,7 @@ elif menu == "Results":
     st.info(
         "🔗 **English:** No School ID is required here. Search using only your Roll Number or Name. \n\n"
         "🔗 **हिन्दी:** यहाँ किसी School ID की आवश्यकता नहीं है। कृपया केवल अपना रोल नंबर या नाम दर्ज करके खोजें। \n\n"
-        "🔗 **ଓଡ଼ିଆ:** ଏଠାରେ କୌଣସି School ID ଦରକାର ନାହିଁ। କେବଳ Roll Number କିମ୍ବା Name ଦେଇ ସର୍ଚ୍ଚ କରନ୍ତୁ।"
+        "🔗 **ଓଡ଼ିଆ:** ଏଠାରେ କୌଣସି School ID ଦରକାର ନାହିଁ। କେବଳ Roll Number କିମ୍ବା Name ଦେଇ ସର୍ଚ୍ଚ କରନ୍ତୁ。"
     )
     
     col_c, col_b = st.columns(2)
