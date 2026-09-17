@@ -14,7 +14,9 @@ import urllib.parse
 # ==========================================
 # 🌐 APP URL SETTING (ସ୍କାନ୍ କଲେ ଏହି ଲିଙ୍କ୍ ଖୋଲିବ)
 # ==========================================
-APP_URL = "http://localhost:8501" # ଆପଣ ଯେବେ ଆପ୍ କୁ ଅନଲାଇନ୍ କରିବେ, ଏଠାରେ ନିଜର ଲିଙ୍କ୍ ଦେବେ।
+# ଯଦି ଆପଣ ଗୋଟିଏ WiFi ରେ କମ୍ପ୍ୟୁଟର ଓ ମୋବାଇଲ୍ ଚଲାଉଛନ୍ତି, ତେବେ ଲୋକାଲ୍ IP (ଯେପରି: http://192.168.1.5:8501) ଦିଅନ୍ତୁ।
+# ଯଦି ଅନଲାଇନ୍ ଛାଡିଛନ୍ତି, ତେବେ ସେହି ୱେବସାଇଟ୍ ର ଲିଙ୍କ୍ ଦିଅନ୍ତୁ।
+APP_URL = "http://192.168.1.100:8501" # <--- ଏଠାରେ ନିଜର WiFi IP କିମ୍ବା Website ଲିଙ୍କ୍ ଦିଅନ୍ତୁ।
 
 # ପେଜ୍ ସେଟିଂ
 st.set_page_config(page_title="Advanced School Management System", layout="centered")
@@ -94,7 +96,7 @@ def save_data(schools, students):
     with open(STUDENTS_FILE, "w", encoding="utf-8") as f:
         json.dump(students, f, indent=4)
 
-# --- ସୁନ୍ଦର ରାଙ୍କ୍ କାର୍ଡ HTML ଡିଜାଇନ୍ ---
+# --- ସୁନ୍ଦର ରାଙ୍କ୍ କାର୍ଡ HTML ଡିଜାଇନ୍ (ବାରକୋଡ୍ ସ୍କାନ୍ କଲେ ଡାଇରେକ୍ଟ୍ ଲିଙ୍କ୍ ଖୋଲିବ) ---
 def generate_result_card_html(school_name, st_data, roll_no):
     raw_dob = st_data.get('dob', '')
     disp_dob = raw_dob
@@ -110,11 +112,13 @@ def generate_result_card_html(school_name, st_data, roll_no):
     total_obt = st_data.get('total_obt', 0)
     words_total = number_to_words(total_obt)
 
-    # 🟢 DYNAMIC QR LINK FOR ONLINE VERIFICATION
+    # 🟢 ଉଭୟ QR ଏବଂ Barcode ଭିତରେ ଲିଙ୍କ୍ ପୂରାଇବା
     student_direct_link = f"{APP_URL}/?portal=student&roll={roll_no}&dob={disp_dob}"
-    qr_data = urllib.parse.quote(student_direct_link)
-    qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={qr_data}"
-    barcode_url = f"https://barcode.tec-it.com/barcode.ashx?data={roll_no}&code=Code128&dpi=96"
+    safe_link = urllib.parse.quote(student_direct_link)
+    
+    qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={safe_link}"
+    # ବାରକୋଡ୍ ରେ ମଧ୍ୟ ଡାଇରେକ୍ଟ ଲିଙ୍କ୍ ଦିଆଗଲା
+    barcode_url = f"https://barcode.tec-it.com/barcode.ashx?data={safe_link}&code=Code128&dpi=96"
 
     rows_html = ""
     for sub, m_info in st_data.get('subjects', {}).items():
@@ -149,9 +153,9 @@ def generate_result_card_html(school_name, st_data, roll_no):
         "</table>"
         
         "<table style='width: 100%; font-size: 15px; margin-bottom: 15px; text-transform: uppercase; color: #000000; line-height: 1.8;'>"
-        f"<tr><td style='width: 160px; color: {border_color}; font-weight: bold; font-style: italic;'>Certify that</td><td style='font-weight: bold;'>{st_data.get('name', 'N/A')}</td></tr>"
-        f"<tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Mother's Name</td><td style='font-weight: bold;'>{st_data.get('mother_name', 'N/A')}</td></tr>"
-        f"<tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Father's Name</td><td style='font-weight: bold;'>{st_data.get('father_name', 'N/A')}</td></tr>"
+        f"<tr><td style='width: 160px; color: {border_color}; font-weight: bold; font-style: italic;'>Certify that</td><td style='font-weight: bold;'>{st_data.get('name', 'N/A').upper()}</td></tr>"
+        f"<tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Mother's Name</td><td style='font-weight: bold;'>{st_data.get('mother_name', 'N/A').upper()}</td></tr>"
+        f"<tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Father's Name</td><td style='font-weight: bold;'>{st_data.get('father_name', 'N/A').upper()}</td></tr>"
         f"<tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Date of Birth</td><td style='font-weight: bold;'>{disp_dob}</td></tr>"
         "</table>"
         
@@ -178,7 +182,9 @@ def generate_result_card_html(school_name, st_data, roll_no):
         "<tr>"
         
         "<td style='width: 33%; vertical-align: bottom;'>"
-        f"<img src='{barcode_url}' alt='Barcode' style='height: 35px; margin-bottom: 10px; max-width: 100%;'/>"
+        f"<a href='{student_direct_link}' target='_blank'>"
+        f"<img src='{barcode_url}' alt='Barcode' style='height: 35px; margin-bottom: 10px; max-width: 100%; cursor: pointer;' title='Scan Barcode'/>"
+        f"</a>"
         "<div style='font-size: 11px;'>DATE OF PUBLICATION OF RESULTS</div>"
         f"<div style='font-weight: bold; font-size: 14px; margin-top: 5px; margin-bottom: 30px;'>{datetime.date.today().strftime('%d/%m/%Y')}</div>"
         f"<div style='border-bottom: 1px solid {border_color}; width: 80%; margin: auto;'></div>"
@@ -194,7 +200,7 @@ def generate_result_card_html(school_name, st_data, roll_no):
         
         "<td style='width: 33%; vertical-align: bottom;'>"
         f"<a href='{student_direct_link}' target='_blank'>"
-        f"<img src='{qr_url}' alt='QR Code' style='height: 65px; margin-bottom: 10px; max-width: 100%; cursor: pointer;' title='Scan to view result online'/>"
+        f"<img src='{qr_url}' alt='QR Code' style='height: 65px; margin-bottom: 10px; max-width: 100%; cursor: pointer;' title='Scan QR Code'/>"
         f"</a>"
         "<div style='height: 15px; margin-bottom: 30px;'></div>"
         f"<div style='border-bottom: 1px solid {border_color}; width: 80%; margin: auto;'></div>"
@@ -208,7 +214,7 @@ def generate_result_card_html(school_name, st_data, roll_no):
     )
     return html_content
 
-# --- PDF ଜେନେରେଟର ---
+# --- PDF ଜେନେରେଟର (PDF Barcode & QR Code ସ୍କାନ୍ କଲେ ମାର୍କସିଟ୍ ଖୋଲିବ) ---
 def create_pdf(filename, school_name, st_data, roll_no):
     raw_dob = st_data.get('dob', '')
     disp_dob = raw_dob
@@ -233,9 +239,6 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.setLineWidth(2)
     c.rect(30, 30, 552, 732, fill=0, stroke=1)
     
-    # ==========================================
-    # 🌟 AUTO FONT SIZE ADJUSTMENT FOR PDF HEADER
-    # ==========================================
     c.setFillColorRGB(0.55, 0.14, 0.66)
     school_title = school_name.upper()
     title_size = 22
@@ -253,9 +256,6 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.setFillColorRGB(0, 0, 0)
     c.setFont("Helvetica-Bold", 11)
     
-    # ==========================================
-    # 🌟 FIXED APAAR NO OVERLAP BY RIGHT ALIGNING
-    # ==========================================
     c.drawString(50, 635, f"ROLL NO: {roll_no}")
     c.drawRightString(550, 635, f"CLASS: {st_data.get('class', '')}")
     
@@ -296,7 +296,7 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.setFont("Helvetica-Bold", 11)
     c.drawString(50, 475, "SUBJECT")
     c.drawString(300, 475, "FULL MARKS")
-    c.drawRightString(550, 475, "MARKS SECURED")
+    c.drawRightString(525, 475, "MARKS SECURED")
     c.line(50, 465, 550, 465)
     
     c.setFillColorRGB(0, 0, 0)
@@ -327,10 +327,13 @@ def create_pdf(filename, school_name, st_data, roll_no):
     
     y -= 60
     
-    # 1. 1D Barcode
+    # ଉଭୟ Barcode ଓ QR Code ରେ ସିଧାସଳଖ ଆପ୍ ଲିଙ୍କ୍ ରହିବ
+    student_direct_link = f"{APP_URL}/?portal=student&roll={roll_no}&dob={disp_dob}"
+    
+    # 1. 1D Barcode (With Direct Link, barWidth reduced to fit URL)
     try:
-        bc = code128.Code128(str(roll_no), barHeight=25, barWidth=1.2)
-        bc.drawOn(c, 50, y+15)
+        bc = code128.Code128(student_direct_link, barHeight=25, barWidth=0.5)
+        bc.drawOn(c, 40, y+15)
     except: pass
     
     c.setFillColorRGB(0.55, 0.14, 0.66)
@@ -355,8 +358,7 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.setFont("Helvetica-Bold", 18)
     c.drawCentredString(300, y-15, f"{st_data.get('grade', 'N/A')}")
     
-    # 3. QR Code & Class Teacher Signature (Right)
-    student_direct_link = f"{APP_URL}/?portal=student&roll={roll_no}&dob={disp_dob}"
+    # 3. QR Code (Right) With Direct Link
     try:
         qr_w = qr.QrCodeWidget(student_direct_link)
         b = qr_w.getBounds()
