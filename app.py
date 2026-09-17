@@ -11,6 +11,11 @@ import datetime
 import random
 import urllib.parse
 
+# ==========================================
+# 🌐 APP URL SETTING (ସ୍କାନ୍ କଲେ ଏହି ଲିଙ୍କ୍ ଖୋଲିବ)
+# ==========================================
+APP_URL = "http://localhost:8501"
+
 # ପେଜ୍ ସେଟିଂ
 st.set_page_config(page_title="Advanced School Management System", layout="centered")
 
@@ -89,7 +94,7 @@ def save_data(schools, students):
     with open(STUDENTS_FILE, "w", encoding="utf-8") as f:
         json.dump(students, f, indent=4)
 
-# --- ସୁନ୍ଦର ରାଙ୍କ୍ କାର୍ଡ HTML ଡିଜାଇନ୍ (OFFLINE QR & BARCODE) ---
+# --- ସୁନ୍ଦର ରାଙ୍କ୍ କାର୍ଡ HTML ଡିଜାଇନ୍ (100% ORIGINAL COLORS) ---
 def generate_result_card_html(school_name, st_data, roll_no):
     raw_dob = st_data.get('dob', '')
     disp_dob = raw_dob
@@ -98,22 +103,26 @@ def generate_result_card_html(school_name, st_data, roll_no):
         if len(y) == 4:
             disp_dob = f"{d}-{m}-{y}"
 
-    bg_color = "#fcf0e3" 
-    border_color = "#8e24aa" 
-    outer_border = "#ce93d8" 
+    # EXACT ORIGINAL COLORS
+    bg_color = "#fef9f7"      # Very light off-white/beige background
+    border_color = "#963f98"  # Original board Purple/Magenta color
+    outer_border = "#ce9bd0"  # Lighter purple for outer border
+    table_bg = "#fcf4fc"      # Very faint purple for table headers
     
     total_obt = st_data.get('total_obt', 0)
     words_total = number_to_words(total_obt)
+
+    # OFFLINE VERIFICATION DATA (QR Code)
     student_name = st_data.get('name', 'N/A').upper()
+    total_marks = f"{total_obt}/{st_data.get('total_full', 0)}"
     grade = st_data.get('grade', 'N/A')
     result_stat = st_data.get('result', 'N/A')
-
-    # 🟢 OFFLINE VERIFICATION DATA (ଏହା ସ୍କାନ୍ କଲେ ମୋବାଇଲ୍‌ରେ ଦେଖାଇବ)
-    qr_text = f"SCHOOL: {school_name} | NAME: {student_name} | ROLL: {roll_no} | DOB: {disp_dob} | MARKS: {total_obt}/{st_data.get('total_full', 0)} | GRADE: {grade} | RESULT: {result_stat}"
+    
+    qr_text = f"SCHOOL: {school_name} | NAME: {student_name} | ROLL: {roll_no} | DOB: {disp_dob} | MARKS: {total_marks} | GRADE: {grade} | RESULT: {result_stat}"
     qr_data = urllib.parse.quote(qr_text)
     qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={qr_data}"
     
-    # Barcode ରେ କେବଳ ଛାତ୍ରର ରୋଲ୍ ନମ୍ବର ରହିବ
+    # Barcode
     barcode_url = f"https://barcode.tec-it.com/barcode.ashx?data={roll_no}&code=Code128&dpi=96"
 
     rows_html = ""
@@ -126,6 +135,7 @@ def generate_result_card_html(school_name, st_data, roll_no):
             "</tr>"
         )
 
+    # Dynamic Header Font Size
     header_font_size = "28px"
     if len(school_name) > 40: header_font_size = "22px"
     if len(school_name) > 55: header_font_size = "18px"
@@ -135,20 +145,20 @@ def generate_result_card_html(school_name, st_data, roll_no):
         f"<div style='border: 2px solid {border_color}; padding: 25px; background-color: {bg_color}; position: relative;'>"
         
         f"<div style='text-align: center; color: {border_color}; margin-bottom: 20px;'>"
-        f"<h1 style='margin: 0; font-size: {header_font_size}; text-transform: uppercase; font-family: \"Georgia\", serif; text-shadow: 1px 1px 2px #e1bee7;'>{school_name}</h1>"
+        f"<h1 style='margin: 0; font-size: {header_font_size}; text-transform: uppercase; font-family: \"Georgia\", serif; text-shadow: 1px 1px 1px #e1bee7;'>{school_name}</h1>"
         f"<h3 style='margin: 8px 0; font-size: 16px; letter-spacing: 1px;'>ANNUAL EXAMINATION - {st_data.get('batch', '2025-2026')}</h3>"
         "<p style='margin: 5px 0; font-weight: bold; font-size: 17px; text-decoration: underline;'>CERTIFICATE-CUM-MARK SHEET</p>"
         "</div>"
         
         "<table style='width: 100%; font-size: 13px; color: #000000; margin-bottom: 20px; font-weight: bold;'>"
-        f"<tr><td>ROLL NO: {roll_no}</td><td style='text-align: right;'>CLASS: {st_data.get('class', 'N/A')}</td></tr>"
-        f"<tr><td>PEN NO: {st_data.get('pen_no', 'N/A')}</td><td style='text-align: right;'>APAAR NO: {st_data.get('apaar_no', 'N/A')}</td></tr>"
+        f"<tr><td><span style='color:{border_color}; font-weight:normal;'>ROLL NO:</span> {roll_no}</td><td style='text-align: right;'><span style='color:{border_color}; font-weight:normal;'>CLASS:</span> {st_data.get('class', 'N/A')}</td></tr>"
+        f"<tr><td><span style='color:{border_color}; font-weight:normal;'>PEN NO:</span> {st_data.get('pen_no', 'N/A')}</td><td style='text-align: right;'><span style='color:{border_color}; font-weight:normal;'>APAAR NO:</span> {st_data.get('apaar_no', 'N/A')}</td></tr>"
         "</table>"
         
         "<table style='width: 100%; font-size: 15px; margin-bottom: 15px; text-transform: uppercase; color: #000000; line-height: 1.8;'>"
         f"<tr><td style='width: 160px; color: {border_color}; font-weight: bold; font-style: italic;'>Certify that</td><td style='font-weight: bold;'>{student_name}</td></tr>"
-        f"<tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Mother's Name</td><td style='font-weight: bold;'>{st_data.get('mother_name', 'N/A')}</td></tr>"
-        f"<tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Father's Name</td><td style='font-weight: bold;'>{st_data.get('father_name', 'N/A')}</td></tr>"
+        f"<tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Mother's Name</td><td style='font-weight: bold;'>{st_data.get('mother_name', 'N/A').upper()}</td></tr>"
+        f"<tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Father's Name</td><td style='font-weight: bold;'>{st_data.get('father_name', 'N/A').upper()}</td></tr>"
         f"<tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Date of Birth</td><td style='font-weight: bold;'>{disp_dob}</td></tr>"
         "</table>"
         
@@ -156,16 +166,16 @@ def generate_result_card_html(school_name, st_data, roll_no):
         
         f"<div style='text-align: center; color: {border_color}; font-weight: bold; font-size: 14px; margin-bottom: 5px;'>SUBJECTS AND MARKS SECURED</div>"
         f"<table style='width: 100%; border-collapse: collapse; border: 2px solid {border_color}; text-align: center; font-size: 14px; background-color: transparent; color: #000000;'>"
-        f"<tr style='color: {border_color}; border-bottom: 2px solid {border_color};'>"
+        f"<tr style='color: {border_color}; background-color: {table_bg}; border-bottom: 2px solid {border_color};'>"
         f"<th style='padding: 10px; border-right: 1px solid {border_color};'>SUBJECT</th>"
         f"<th style='padding: 10px; border-right: 1px solid {border_color};'>FULL MARKS</th>"
         "<th style='padding: 10px;'>MARKS SECURED</th>"
         "</tr>"
         f"{rows_html}"
-        f"<tr style='color: {border_color}; font-weight: bold; border-top: 2px solid {border_color};'>"
+        f"<tr style='color: {border_color}; font-weight: bold; background-color: {table_bg}; border-top: 2px solid {border_color};'>"
         f"<td style='padding: 10px; border-right: 1px solid {border_color}; text-align: right;'>TOTAL MARKS</td>"
         f"<td style='padding: 10px; border-right: 1px solid {border_color};'>{st_data.get('total_full', 0)}</td>"
-        f"<td style='padding: 10px;'>{total_obt}</td>"
+        f"<td style='padding: 10px; color: #000;'>{total_obt}</td>"
         "</tr>"
         "</table>"
         
@@ -184,13 +194,13 @@ def generate_result_card_html(school_name, st_data, roll_no):
         
         "<td style='width: 34%; vertical-align: top; padding-top: 5px;'>"
         "<div style='font-size: 12px; margin-bottom: 5px;'>GRADE</div>"
-        f"<div style='border: 2px solid {border_color}; padding: 10px 25px; display: inline-block; min-width: 80px;'>"
+        f"<div style='border: 2px solid {border_color}; padding: 10px 25px; display: inline-block; min-width: 80px; background-color: {table_bg};'>"
         f"<div style='font-weight: bold; font-size: 22px; color: #000;'>{grade}</div>"
         "</div>"
         "</td>"
         
         "<td style='width: 33%; vertical-align: bottom;'>"
-        f"<img src='{qr_url}' alt='QR Code' style='height: 65px; margin-bottom: 10px; max-width: 100%;' title='Scan to view details'/>"
+        f"<img src='{qr_url}' alt='QR Code' style='height: 65px; margin-bottom: 10px; max-width: 100%;'/>"
         "<div style='height: 15px; margin-bottom: 30px;'></div>"
         f"<div style='border-bottom: 1px solid {border_color}; width: 80%; margin: auto;'></div>"
         "<div style='font-size: 11px; margin-top: 5px; font-weight: bold;'>CLASS TEACHER SIGNATURE</div>"
@@ -203,7 +213,7 @@ def generate_result_card_html(school_name, st_data, roll_no):
     )
     return html_content
 
-# --- PDF ଜେନେରେଟର (OFFLINE QR VERIFICATION) ---
+# --- PDF ଜେନେରେଟର (100% ORIGINAL COLORS & LAYOUT) ---
 def create_pdf(filename, school_name, st_data, roll_no):
     raw_dob = st_data.get('dob', '')
     disp_dob = raw_dob
@@ -214,21 +224,22 @@ def create_pdf(filename, school_name, st_data, roll_no):
             
     c = canvas.Canvas(filename, pagesize=letter)
     
-    # PDF Background color
-    c.setFillColorRGB(0.99, 0.94, 0.89)
+    # PDF Background color (Very faint warm white/beige)
+    c.setFillColorRGB(0.99, 0.98, 0.97)
     c.rect(30, 30, 552, 732, fill=1, stroke=0)
     
-    # Outer Border
-    c.setStrokeColorRGB(0.81, 0.58, 0.85)
+    # Outer Border (Lighter Purple)
+    c.setStrokeColorRGB(0.82, 0.60, 0.83)
     c.setLineWidth(15)
     c.rect(15, 15, 582, 762, fill=0, stroke=1)
     
-    # Inner Border
-    c.setStrokeColorRGB(0.55, 0.14, 0.66)
+    # Inner Border (Original Purple)
+    c.setStrokeColorRGB(0.59, 0.25, 0.60) # Exact #963f98
     c.setLineWidth(2)
     c.rect(30, 30, 552, 732, fill=0, stroke=1)
     
-    c.setFillColorRGB(0.55, 0.14, 0.66)
+    # PDF HEADER
+    c.setFillColorRGB(0.59, 0.25, 0.60)
     school_title = school_name.upper()
     title_size = 22
     while c.stringWidth(school_title, "Times-Bold", title_size) > 490 and title_size > 10:
@@ -242,73 +253,127 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.setFont("Helvetica", 11)
     c.drawCentredString(300, 675, "CERTIFICATE-CUM-MARK SHEET")
     
+    # STUDENT DETAILS
+    c.setFont("Helvetica", 11)
+    c.drawString(50, 635, "ROLL NO:")
     c.setFillColorRGB(0, 0, 0)
     c.setFont("Helvetica-Bold", 11)
+    c.drawString(110, 635, f"{roll_no}")
     
-    c.drawString(50, 635, f"ROLL NO: {roll_no}")
-    c.drawRightString(550, 635, f"CLASS: {st_data.get('class', '')}")
+    c.setFillColorRGB(0.59, 0.25, 0.60)
+    c.setFont("Helvetica", 11)
+    c.drawString(450, 635, "CLASS:")
+    c.setFillColorRGB(0, 0, 0)
+    c.setFont("Helvetica-Bold", 11)
+    c.drawString(500, 635, f"{st_data.get('class', '')}")
     
-    c.drawString(50, 615, f"PEN NO: {st_data.get('pen_no', 'N/A')}")
-    c.drawRightString(550, 615, f"APAAR NO: {st_data.get('apaar_no', 'N/A')}")
+    c.setFillColorRGB(0.59, 0.25, 0.60)
+    c.setFont("Helvetica", 11)
+    c.drawString(50, 615, "PEN NO:")
+    c.setFillColorRGB(0, 0, 0)
+    c.setFont("Helvetica-Bold", 11)
+    c.drawString(100, 615, f"{st_data.get('pen_no', 'N/A')}")
     
-    c.setFillColorRGB(0.55, 0.14, 0.66)
+    c.setFillColorRGB(0.59, 0.25, 0.60)
+    c.setFont("Helvetica", 11)
+    c.drawString(420, 615, "APAAR NO:")
+    c.setFillColorRGB(0, 0, 0)
+    c.setFont("Helvetica-Bold", 11)
+    c.drawString(490, 615, f"{st_data.get('apaar_no', 'N/A')}")
+    
+    c.setFillColorRGB(0.59, 0.25, 0.60)
     c.setFont("Helvetica-Oblique", 11)
     c.drawString(50, 585, "Certify that")
     c.setFillColorRGB(0, 0, 0)
     c.setFont("Helvetica-Bold", 11)
     c.drawString(150, 585, f"{st_data.get('name', '').upper()}")
     
-    c.setFillColorRGB(0.55, 0.14, 0.66)
+    c.setFillColorRGB(0.59, 0.25, 0.60)
     c.setFont("Helvetica-Oblique", 11)
     c.drawString(50, 565, "Mother's Name")
     c.setFillColorRGB(0, 0, 0)
     c.setFont("Helvetica-Bold", 11)
     c.drawString(150, 565, f"{st_data.get('mother_name', 'N/A').upper()}")
     
-    c.setFillColorRGB(0.55, 0.14, 0.66)
+    c.setFillColorRGB(0.59, 0.25, 0.60)
     c.setFont("Helvetica-Oblique", 11)
     c.drawString(50, 545, "Father's Name")
     c.setFillColorRGB(0, 0, 0)
     c.setFont("Helvetica-Bold", 11)
     c.drawString(150, 545, f"{st_data.get('father_name', 'N/A').upper()}")
     
-    c.setFillColorRGB(0.55, 0.14, 0.66)
+    c.setFillColorRGB(0.59, 0.25, 0.60)
     c.setFont("Helvetica-Oblique", 11)
     c.drawString(50, 525, "Date of Birth")
     c.setFillColorRGB(0, 0, 0)
     c.setFont("Helvetica-Bold", 11)
     c.drawString(150, 525, f"{disp_dob}")
     
-    c.setStrokeColorRGB(0.55, 0.14, 0.66)
+    # MARKS TABLE
+    c.setStrokeColorRGB(0.59, 0.25, 0.60)
     c.line(50, 495, 550, 495)
-    c.setFillColorRGB(0.55, 0.14, 0.66)
+    
+    # Table Header Background
+    c.setFillColorRGB(0.98, 0.95, 0.98) # Faint purple for header
+    c.rect(50, 465, 500, 30, fill=1, stroke=0)
+    
+    c.setFillColorRGB(0.59, 0.25, 0.60)
     c.setFont("Helvetica-Bold", 11)
-    c.drawString(50, 475, "SUBJECT")
-    c.drawString(300, 475, "FULL MARKS")
-    c.drawRightString(525, 475, "MARKS SECURED")
+    c.drawString(60, 475, "SUBJECT")
+    c.drawCentredString(350, 475, "FULL MARKS")
+    c.drawRightString(540, 475, "MARKS SECURED")
     c.line(50, 465, 550, 465)
+    
+    # Vertical lines for table
+    c.line(50, 495, 50, 465)
+    c.line(280, 495, 280, 465)
+    c.line(420, 495, 420, 465)
+    c.line(550, 495, 550, 465)
     
     c.setFillColorRGB(0, 0, 0)
     y = 445
     c.setFont("Helvetica-Bold", 11)
-    for sub, m_info in st_data.get('subjects', {}).items():
-        c.drawString(50, y, str(sub).upper())
-        c.drawString(300, y, str(m_info['full']))
-        c.drawRightString(525, y, str(m_info['obt']))
-        y -= 20
-        
-    c.setStrokeColorRGB(0.55, 0.14, 0.66)
-    c.line(50, y, 550, y)
-    y -= 20
     
-    c.setFillColorRGB(0.55, 0.14, 0.66)
+    table_bottom_y = y + 10
+    
+    for sub, m_info in st_data.get('subjects', {}).items():
+        c.drawString(60, y, str(sub).upper())
+        c.drawCentredString(350, y, str(m_info['full']))
+        c.drawRightString(540, y, str(m_info['obt']))
+        
+        c.setStrokeColorRGB(0.59, 0.25, 0.60)
+        c.line(50, y-10, 550, y-10)
+        y -= 20
+        table_bottom_y = y + 10
+
+    # Draw vertical lines for data rows
+    c.line(50, 465, 50, table_bottom_y)
+    c.line(280, 465, 280, table_bottom_y)
+    c.line(420, 465, 420, table_bottom_y)
+    c.line(550, 465, 550, table_bottom_y)
+    
+    # TOTAL ROW
+    c.setFillColorRGB(0.98, 0.95, 0.98)
+    c.rect(50, table_bottom_y-25, 500, 25, fill=1, stroke=0)
+    
+    c.setFillColorRGB(0.59, 0.25, 0.60)
     c.setFont("Helvetica-Bold", 11)
-    c.drawString(50, y, "TOTAL MARKS")
-    c.drawString(300, y, str(st_data.get('total_full', 0)))
-    c.drawRightString(525, y, str(st_data.get('total_obt', 0)))
+    c.drawRightString(270, table_bottom_y-17, "TOTAL MARKS")
+    c.drawCentredString(350, table_bottom_y-17, str(st_data.get('total_full', 0)))
+    c.setFillColorRGB(0, 0, 0)
+    c.drawRightString(540, table_bottom_y-17, str(st_data.get('total_obt', 0)))
+    
+    c.setStrokeColorRGB(0.59, 0.25, 0.60)
+    c.line(50, table_bottom_y-25, 550, table_bottom_y-25)
+    
+    # Vertical lines for total row
+    c.line(50, table_bottom_y, 50, table_bottom_y-25)
+    c.line(280, table_bottom_y, 280, table_bottom_y-25)
+    c.line(420, table_bottom_y, 420, table_bottom_y-25)
+    c.line(550, table_bottom_y, 550, table_bottom_y-25)
     
     # --- PDF FOOTER ---
-    y -= 30
+    y = table_bottom_y - 45
     total_obt = st_data.get('total_obt', 0)
     c.setFillColorRGB(0, 0, 0)
     c.setFont("Helvetica-Bold", 10)
@@ -322,30 +387,28 @@ def create_pdf(filename, school_name, st_data, roll_no):
         bc.drawOn(c, 50, y+15)
     except: pass
     
-    c.setFillColorRGB(0.55, 0.14, 0.66)
+    c.setFillColorRGB(0.59, 0.25, 0.60)
     c.setFont("Helvetica", 10)
     c.drawCentredString(140, y-10, "DATE OF PUBLICATION OF RESULTS")
     c.setFont("Helvetica-Bold", 11)
     c.drawCentredString(140, y-25, f"{datetime.date.today().strftime('%d/%m/%Y')}")
     
-    # HM Signature Line
     c.line(50, y-60, 230, y-60)
     c.setFont("Helvetica-Bold", 10)
     c.drawCentredString(140, y-75, "HM SIGNATURE")
     
     # 2. Grade Box (Center)
-    c.setStrokeColorRGB(0.55, 0.14, 0.66)
-    c.setFillColorRGB(0.99, 0.94, 0.89)
+    c.setStrokeColorRGB(0.59, 0.25, 0.60)
+    c.setFillColorRGB(0.98, 0.95, 0.98)
     c.rect(260, y-30, 80, 40, fill=1, stroke=1)
-    c.setFillColorRGB(0.55, 0.14, 0.66)
+    c.setFillColorRGB(0.59, 0.25, 0.60)
     c.setFont("Helvetica", 10)
     c.drawCentredString(300, y+20, "GRADE")
     c.setFillColorRGB(0, 0, 0)
     c.setFont("Helvetica-Bold", 18)
     c.drawCentredString(300, y-15, f"{st_data.get('grade', 'N/A')}")
     
-    # 3. QR Code & Class Teacher Signature (Right)
-    # 🟢 OFFLINE VERIFICATION TEXT
+    # 3. QR Code & Class Teacher Signature (Right) - OFFLINE VERIFICATION
     student_name = st_data.get('name', 'N/A').upper()
     grade = st_data.get('grade', 'N/A')
     result_stat = st_data.get('result', 'N/A')
@@ -362,7 +425,7 @@ def create_pdf(filename, school_name, st_data, roll_no):
         renderPDF.draw(d, c, 445, y-5)
     except: pass
     
-    c.setFillColorRGB(0.55, 0.14, 0.66)
+    c.setFillColorRGB(0.59, 0.25, 0.60)
     c.line(400, y-60, 550, y-60)
     c.setFont("Helvetica-Bold", 10)
     c.drawCentredString(475, y-75, "CLASS TEACHER SIGNATURE")
