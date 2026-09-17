@@ -71,7 +71,7 @@ def save_data(schools, students):
     with open(STUDENTS_FILE, "w", encoding="utf-8") as f:
         json.dump(students, f, indent=4)
 
-# --- ସୁନ୍ଦର ରାଙ୍କ୍ କାର୍ଡ (NEW CERTIFICATE DESIGN) ---
+# --- ସୁନ୍ଦର ରାଙ୍କ୍ କାର୍ଡ ---
 def generate_result_card_html(school_name, st_data, roll_no):
     raw_dob = st_data.get('dob', '')
     disp_dob = raw_dob
@@ -157,20 +157,20 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c = canvas.Canvas(filename, pagesize=letter)
     
     # Add Certificate Border to PDF
-    c.setStrokeColorRGB(0.66, 0.39, 0.66) # Purple/Pink border
+    c.setStrokeColorRGB(0.66, 0.39, 0.66)
     c.setLineWidth(4)
     c.rect(20, 20, 570, 750)
     c.setLineWidth(1)
     c.rect(25, 25, 560, 740)
     
-    c.setFillColorRGB(0.55, 0.14, 0.66) # Purple text
+    c.setFillColorRGB(0.55, 0.14, 0.66)
     c.setFont("Helvetica-Bold", 18)
     c.drawCentredString(300, 730, school_name.upper())
     c.setFont("Helvetica-Bold", 12)
     c.drawCentredString(300, 710, f"ANNUAL EXAMINATION - {st_data.get('batch', '2025-2026')}")
     c.drawCentredString(300, 690, "CERTIFICATE-CUM-MARK SHEET")
     
-    c.setFillColorRGB(0, 0, 0) # Black text for details
+    c.setFillColorRGB(0, 0, 0)
     c.setFont("Helvetica", 11)
     c.drawString(50, 650, f"ROLL NO: {roll_no}")
     c.drawString(450, 650, f"CLASS: {st_data.get('class', '')}")
@@ -287,7 +287,7 @@ if menu == "Home Page":
         "<div class='notice-item'>⏩ Welcome to Advanced School Management System! <span class='new-badge'>NEW!</span></div>"
         "<div class='notice-item'>⏩ Master & School portal passwords are encrypted and secured.</div>"
         "<div class='notice-item'>⏩ Online Student Rank Card generation is now active for all classes.</div>"
-        "<div class='notice-item'>⏩ Auto Grading system active (A1, A2, B1, B2... based on %). <span class='new-badge'>UPDATE!</span></div>"
+        "<div class='notice-item'>⏩ Students can now Search Result by Batch, Roll No OR Name. No School ID needed! <span class='new-badge'>UPDATE!</span></div>"
         "<div class='notice-item'>⏩ APAAR and PEN details have been integrated into the system.</div>"
         "<div class='notice-item' style='border-bottom: none; margin-top: 15px; text-align: center; line-height: 2.5;'>"
         "<span style='color: #fbbf24; font-weight: bold; font-size: 18px;'>📞 Helpdesk 24x7:</span><br>"
@@ -819,7 +819,7 @@ elif menu == "Results":
     st.info(
         "🔗 **English:** No School ID is required here. Search using only your Roll Number or Name. \n\n"
         "🔗 **हिन्दी:** यहाँ किसी School ID की आवश्यकता नहीं है। कृपया केवल अपना रोल नंबर या नाम दर्ज करके खोजें। \n\n"
-        "🔗 **ଓଡ଼ିଆ:** ଏଠାରେ କୌଣସି School ID ଦରକାର ନାହିଁ। କେବଳ Roll Number କିମ୍ବା Name ଦେଇ ସର୍ଚ୍ଚ କରନ୍ତୁ。"
+        "🔗 **ଓଡ଼ିଆ:** ଏଠାରେ କୌଣସି School ID ଦରକାର ନାହିଁ। କେବଳ Roll Number କିମ୍ବା Name ଦେଇ ସର୍ଚ୍ଚ କରନ୍ତୁ।"
     )
     
     col_c, col_b = st.columns(2)
