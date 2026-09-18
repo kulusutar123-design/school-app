@@ -27,7 +27,7 @@ def sanitize(text):
     return text
 
 # ==========================================
-# 🌐 APP URL SETTING
+# 🌐 APP URL SETTING & CONFIG
 # ==========================================
 APP_URL = "http://localhost:8501"
 
@@ -65,6 +65,7 @@ STATE_LANG_MAP = {
 }
 
 COUNTRIES = ["Yes - Indian National", "No - Other Country"]
+SOCIAL_CATEGORIES = ["General", "SC (Scheduled Caste)", "ST (Scheduled Tribe)", "OBC (Other Backward Class)", "SEBC", "Minority", "Others"]
 
 # ==========================================
 # 🤖 AUTO TRANSLATION ENGINE
@@ -109,7 +110,7 @@ def t(eng_text, lang):
         "Edit Student": {"Odia": "ଛାତ୍ର ତଥ୍ୟ ବଦଳାନ୍ତୁ", "Hindi": "छात्र विवरण बदलें", "Bengali": "তথ্য আপডেট করুন"},
         "Report Card": {"Odia": "ରିପୋର୍ଟ କାର୍ଡ ପ୍ରିଣ୍ଟ୍", "Hindi": "रिपोर्ट कार्ड", "Bengali": "ରିପୋର୍ଟ କାର୍ଡ"},
         "Search": {"Odia": "ନାମ କିମ୍ବା ରୋଲ୍ ନମ୍ବର ଦେଇ ଖୋଜନ୍ତୁ", "Hindi": "नाम या रोल नंबर से खोजें", "Bengali": "নাম বা রোল নম্বর দিয়ে খুঁজুন"},
-        "ANNUAL EXAMINATION": {"Odia": "ବାର୍ଷିକ ପରୀକ୍ଷା", "Hindi": "वार्षिक परीक्षा", "Bengali": "বার্ষিক পরীক্ষা"},
+        "ANNUAL EXAMINATION": {"Odia": "ବାର୍ଷିକ ପରୀକ୍ଷା", "Hindi": "वार्षिक परीक्षा", "Bengali": "বার্ষিক परीक्षा"},
         "CERTIFICATE-CUM-MARK SHEET": {"Odia": "ପ୍ରମାଣପତ୍ର ଏବଂ ମାର୍କସିଟ୍", "Hindi": "प्रमाणपत्र सह अंकतालिका", "Bengali": "শংসାପତ୍ର ଏବଂ ମାର୍କସିଟ୍"},
         "SUBJECTS AND MARKS SECURED": {"Odia": "ବିଷୟ ଏବଂ ପ୍ରାପ୍ତ ନମ୍ବର", "Hindi": "विषय और प्राप्त अंक", "Bengali": "বিষয় এবং প্রাপ্ত নম্বর"},
         "Certify that": {"Odia": "ପ୍ରମାଣ କରାଯାଏ ଯେ", "Hindi": "प्रमाणित किया जाता है कि", "Bengali": "প্রত্যয়ন করা যাচ্ছে যে"},
@@ -405,6 +406,12 @@ menu_items = ["Home Page", "New Student Registration", "New School Registration"
 portal_map = {"home": 0, "reg_student": 1, "reg_school": 2, "master": 3, "school": 4, "student": 5}
 portal_param = st.query_params.get("portal", "home")
 default_idx = portal_map.get(portal_param, 0)
+
+# Sidebar Background Color Customization
+st.sidebar.markdown("---")
+user_bg_color = st.sidebar.color_picker("🎨 Custom Background Color", "#ffffff")
+st.markdown(f"<style>.stApp {{ background-color: {user_bg_color} !important; }}</style>", unsafe_allow_html=True)
+
 menu = st.sidebar.selectbox("🎯 Navigation Menu", menu_items, index=default_idx)
 
 if menu == "Home Page": st.query_params["portal"] = "home"
@@ -416,58 +423,54 @@ elif menu == "Results": st.query_params["portal"] = "student"
 
 classes_list = [str(i) for i in range(1, 11)]
 batches_list = [f"{y}-{y+1}" for y in range(2020, 2051)]
-SOCIAL_CATEGORIES = ["General", "SC (Scheduled Caste)", "ST (Scheduled Tribe)", "OBC (Other Backward Class)", "SEBC", "Minority", "Others"]
 
 # ----------------- HOME PAGE (BEAUTIFUL DYNAMIC UI) -----------------
 if menu == "Home Page":
     st.markdown("""
     <style>
-    @keyframes colorChange {
-        0% { background-color: #e0e7ff; }
-        25% { background-color: #fce7f3; }
-        50% { background-color: #ffedd5; }
-        75% { background-color: #dcfce7; }
-        100% { background-color: #e0e7ff; }
-    }
-    .dynamic-bg-box {
-        animation: colorChange 15s infinite alternate;
-        padding: 25px;
-        border-radius: 15px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        margin-bottom: 25px;
-        border: 2px solid #cbd5e1;
-    }
-    .carousel { width: 100%; height: 380px; overflow: hidden; border-radius: 10px; position: relative; border: 4px solid #1e3a8a; box-shadow: 0 4px 10px rgba(0,0,0,0.3); background-color: #000; }
-    .carousel-inner { display: flex; width: 400%; height: 100%; animation: slide 16s infinite; }
-    .carousel-img { width: 25%; height: 100%; object-fit: cover; }
-    @keyframes slide { 0%, 20% { transform: translateX(0); } 25%, 45% { transform: translateX(-25%); } 50%, 70% { transform: translateX(-50%); } 75%, 95% { transform: translateX(-75%); } 100% { transform: translateX(0); } }
-    .carousel-overlay { position: absolute; bottom: 0; background: rgba(30,58,138,0.85); width: 100%; color: white; text-align: center; padding: 12px; font-weight: bold; font-size: 20px; letter-spacing: 1px; }
+    .notice-container { background-color: #1e293b; border-radius: 5px; margin-bottom: 25px; border: 1px solid #475569; }
+    .notice-item { margin-bottom: 15px; font-size: 18px; color: #fbbf24; font-weight: bold; }
+    
+    .carousel { width: 100%; height: 350px; overflow: hidden; border-radius: 10px; position: relative; border: 4px solid #1e3a8a; box-shadow: 0 4px 10px rgba(0,0,0,0.3); background-color: #000; margin-bottom: 20px;}
+    .marquee-images { white-space: nowrap; height: 100%; display: flex; align-items: center; }
+    .marquee-img { height: 300px; border-radius: 10px; margin-right: 20px; object-fit: cover; }
     
     .login-card { background: white; border: 1px solid #cbd5e1; border-bottom: 5px solid #fbbf24; border-radius: 8px; padding: 25px; margin-bottom: 20px; text-align: center; text-decoration: none; display: block; color: #1e3a8a; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.3s; }
     .login-card:hover { background: #f8fafc; border-bottom: 5px solid #1e3a8a; transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
     .login-title { font-size: 24px; font-weight: bold; margin-bottom: 8px; }
     .login-sub { font-size: 15px; color: #64748b; }
-    
-    .dev-footer { text-align: center; margin-top: 40px; padding: 15px; background: linear-gradient(90deg, #1e3a8a, #9333ea); color: white; border-radius: 8px; font-weight: bold; font-size: 18px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
-    .dev-highlight { color: #fbbf24; font-size: 20px; text-shadow: 1px 1px 2px #000; }
     </style>
     """, unsafe_allow_html=True)
 
     # Dynamic Background Container with Sliding Photos
     st.markdown("""
-    <div class="dynamic-bg-box">
+    <div>
         <h2 style='text-align: center; color: #1e3a8a; margin-top: 0;'>🏫 Welcome to Advanced School Management System</h2>
         <div class="carousel">
-            <div class="carousel-inner">
-                <img class="carousel-img" src="https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&q=80&w=1200" alt="School 1">
-                <img class="carousel-img" src="https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?auto=format&fit=crop&q=80&w=1200" alt="School 2">
-                <img class="carousel-img" src="https://images.unsplash.com/photo-1546410531-bb4caa6b424d?auto=format&fit=crop&q=80&w=1200" alt="School 3">
-                <img class="carousel-img" src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80&w=1200" alt="School 4">
-            </div>
-            <div class="carousel-overlay">Connecting Students, Teachers & Administration Seamlessly</div>
+            <marquee behavior="scroll" direction="left" scrollamount="15" class="marquee-images">
+                <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/e/e0/Raja_Ravi_Varma_-_Saraswati.jpg" alt="Saraswati Maa">
+                <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/1/19/Ganesha_Basohli_miniature_circa_1730_Dubost_p73.jpg" alt="Lord Ganesha">
+                <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/b/b3/Jagannath.jpg" alt="Lord Jagannath">
+                <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/e/e2/Droupadi_Murmu_Official_Portrait.jpg" alt="President of India">
+                <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/c/c0/Official_Photograph_of_Prime_Minister_Narendra_Modi_Portrait.png" alt="PM of India">
+                <img class="marquee-img" src="https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&q=80&w=600" alt="School Honorable CM">
+                <img class="marquee-img" src="https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?auto=format&fit=crop&q=80&w=600" alt="School Facility">
+            </marquee>
         </div>
     </div>
     """, unsafe_allow_html=True)
+
+    # Running Notification
+    notice_html = (
+        "<div class='notice-container'>"
+        "<div style='padding: 15px; overflow: hidden; background-color: #1e293b; color: #e2e8f0; border-radius: 5px;'>"
+        "<marquee direction='left' scrollamount='8'>"
+        "<span class='notice-item'>📢 Welcome to Advanced School Management System! &nbsp;&nbsp;|&nbsp;&nbsp; 👨‍💻 Software Developed by: KULU SUTAR &nbsp;&nbsp;|&nbsp;&nbsp; 📞 Helpdesk No: 8910223342 &nbsp;&nbsp;|&nbsp;&nbsp; ✉️ Mail ID: kulusutar123@gmail.com &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 📢 ସ୍କୁଲ ମ୍ୟାନେଜମେଣ୍ଟ ସିଷ୍ଟମକୁ ସ୍ୱାଗତ! &nbsp;&nbsp;|&nbsp;&nbsp; 👨‍💻 ଡେଭଲପର୍: କୁଲୁ ସୂତାର &nbsp;&nbsp;|&nbsp;&nbsp; 📞 ହେଲ୍ପଡେସ୍କ: ୮୯୧୦୨୨୩୩୪୨ &nbsp;&nbsp;|&nbsp;&nbsp; ✉️ ଇମେଲ: kulusutar123@gmail.com &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 📢 उन्नत स्कूल प्रबंधन प्रणाली में आपका स्वागत है! &nbsp;&nbsp;|&nbsp;&nbsp; 👨‍💻 डेवलपर: कुलु सुतार &nbsp;&nbsp;|&nbsp;&nbsp; 📞 हेल्पडेस्क: 8910223342 &nbsp;&nbsp;|&nbsp;&nbsp; ✉️ ईमेल: kulusutar123@gmail.com </span>"
+        "</marquee>"
+        "</div>"
+        "</div>"
+    )
+    st.markdown(notice_html, unsafe_allow_html=True)
 
     # Prominent Action Buttons
     c1, c2, c3 = st.columns(3)
@@ -479,14 +482,6 @@ if menu == "Home Page":
         st.markdown("<a href='?portal=school' target='_self' class='login-card'><div class='login-title'>🏫 School Login</div><div class='login-sub'>School / College Portal</div></a>", unsafe_allow_html=True)
     with c3:
         st.markdown("<a href='?portal=student' target='_self' class='login-card' style='height: 94%; display: flex; flex-direction: column; justify-content: center;'><div class='login-title' style='font-size: 32px;'>🎓 Check Results</div><div class='login-sub'>Download Student Rank Card</div></a>", unsafe_allow_html=True)
-
-    # Developer Footer
-    st.markdown("""
-    <div class="dev-footer">
-        👨‍💻 Software Developed by: <span class="dev-highlight">KULU SUTAR</span> &nbsp;&nbsp;|&nbsp;&nbsp; 📞 Mob: <span class="dev-highlight">8910223342</span>
-    </div>
-    """, unsafe_allow_html=True)
-
 
 # ----------------- NEW STUDENT REGISTRATION WITH DYNAMIC FEES & GST -----------------
 elif menu == "New Student Registration":
@@ -1831,3 +1826,11 @@ elif menu == "Results":
                     st.error("❌ କୌଣସି ରେକର୍ଡ ମିଳିଲା ନାହିଁ! ଭୁଲ୍ ତଥ୍ୟ (Roll Number/Name କିମ୍ବା DOB) ଦେଇଛନ୍ତି।")
         else:
             st.warning("ଦୟାକରି ସବୁ ତଥ୍ୟ ପୂରଣ କରନ୍ତୁ।")
+
+# --- GLOBAL FOOTER ---
+st.markdown("---")
+st.markdown("""
+<div style='text-align: center; margin-top: 20px; padding: 15px; background: linear-gradient(90deg, #1e3a8a, #9333ea); color: white; border-radius: 8px; font-weight: bold; font-size: 18px; box-shadow: 0 4px 6px rgba(0,0,0,0.2);'>
+    👨‍💻 Software Developed by: <span style='color: #fbbf24; font-size: 20px; text-shadow: 1px 1px 2px #000;'>KULU SUTAR</span> &nbsp;&nbsp;|&nbsp;&nbsp; 📞 Mob: <span style='color: #fbbf24;'>8910223342</span> &nbsp;&nbsp;|&nbsp;&nbsp; ✉️ Mail: <span style='color: #fbbf24;'>kulusutar123@gmail.com</span>
+</div>
+""", unsafe_allow_html=True)
