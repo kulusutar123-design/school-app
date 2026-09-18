@@ -12,146 +12,128 @@ import random
 import urllib.parse
 import urllib.request
 import ssl
-import hashlib
 import html
 import threading
-import sqlite3
 
 # ==========================================
 # 🔒 CRASH PROTECTION & ANTI-HACK LOCKS
 # ==========================================
 file_lock = threading.Lock()
 
-def hash_password(password):
-    return hashlib.sha256(password.encode()).hexdigest()
-
 def sanitize(text):
+    """XSS Protection: Prevents hackers from injecting malicious scripts in forms"""
     if isinstance(text, str):
         return html.escape(text.strip())
     return text
 
-@st.cache_resource
-def get_db_connection():
-    conn = sqlite3.connect('school_ultimate_secure.db', check_same_thread=False, timeout=60)
-    conn.execute('PRAGMA journal_mode=WAL;') 
-    conn.execute('PRAGMA synchronous=NORMAL;')
-    conn.execute('PRAGMA cache_size=-64000;') 
-    
-    c = conn.cursor()
-    c.execute('''CREATE TABLE IF NOT EXISTS master (id TEXT PRIMARY KEY, data TEXT)''')
-    c.execute('''CREATE TABLE IF NOT EXISTS schools (id TEXT PRIMARY KEY, data TEXT)''')
-    c.execute('''CREATE TABLE IF NOT EXISTS students 
-                 (roll_no TEXT, dob TEXT, school_id TEXT, name TEXT, data TEXT, status TEXT, PRIMARY KEY (school_id, roll_no))''')
-    c.execute('''CREATE INDEX IF NOT EXISTS idx_student_search ON students(roll_no, dob, name)''')
-    
-    c.execute("SELECT data FROM master WHERE id='master'")
-    if not c.fetchone():
-        def_m = {"username": "master", "password": hash_password("master123"), "email": "admin@school.com", "phone": "9999999999", "upi_id": "school@sbi", "reg_fee": 150.0, "gst_percent": 18.0, "school_reg_fee": 1000.0, "school_gst_percent": 18.0}
-        c.execute("INSERT INTO master VALUES ('master', ?)", (json.dumps(def_m),))
-    conn.commit()
-    return conn
-
-conn = get_db_connection()
-
-def get_master():
-    row = conn.cursor().execute("SELECT data FROM master WHERE id='master'").fetchone()
-    return json.loads(row[0]) if row else {}
-
-def save_master(data):
-    with file_lock:
-        conn.cursor().execute("UPDATE master SET data=? WHERE id='master'", (json.dumps(data),))
-        conn.commit()
-
-def get_school(s_id):
-    row = conn.cursor().execute("SELECT data FROM schools WHERE id=?", (s_id,)).fetchone()
-    return json.loads(row[0]) if row else None
-
-def get_all_schools():
-    return {row[0]: json.loads(row[1]) for row in conn.cursor().execute("SELECT id, data FROM schools").fetchall()}
-
-def save_school(s_id, data):
-    with file_lock:
-        conn.cursor().execute("REPLACE INTO schools (id, data) VALUES (?, ?)", (sanitize(s_id), json.dumps(data)))
-        conn.commit()
-
-def delete_school(s_id):
-    with file_lock:
-        conn.cursor().execute("DELETE FROM schools WHERE id=?", (s_id,))
-        conn.cursor().execute("DELETE FROM students WHERE school_id=?", (s_id,))
-        conn.commit()
-
-def get_students_by_school(s_id, status=None):
-    if status:
-        return {row[0]: json.loads(row[1]) for row in conn.cursor().execute("SELECT roll_no, data FROM students WHERE school_id=? AND status=?", (s_id, status)).fetchall()}
-    return {row[0]: json.loads(row[1]) for row in conn.cursor().execute("SELECT roll_no, data FROM students WHERE school_id=?", (s_id,)).fetchall()}
-
-def get_all_students_by_status(status):
-    return [(row[0], row[1], json.loads(row[2])) for row in conn.cursor().execute("SELECT school_id, roll_no, data FROM students WHERE status=?", (status,)).fetchall()]
-
-def save_student(s_id, roll_no, data, status="Approved"):
-    n_dob = normalize_dob(data.get('dob',''))
-    n_name = data.get('name','').lower()
-    with file_lock:
-        conn.cursor().execute("REPLACE INTO students (roll_no, dob, school_id, name, data, status) VALUES (?, ?, ?, ?, ?, ?)",
-                              (sanitize(roll_no), n_dob, s_id, n_name, json.dumps(data), status))
-        conn.commit()
-
-def delete_student(s_id, roll_no):
-    with file_lock:
-        conn.cursor().execute("DELETE FROM students WHERE school_id=? AND roll_no=?", (s_id, roll_no))
-        conn.commit()
-
 # ==========================================
-# 🌐 APP URL SETTING & CONFIG
+# 🌐 APP URL SETTING
 # ==========================================
 APP_URL = "http://localhost:8501"
 
 st.set_page_config(page_title="Advanced School Management System", layout="wide")
-st.markdown("<style>#MainMenu {visibility: hidden;} header {visibility: hidden;} footer {visibility: hidden;}</style>", unsafe_allow_html=True)
 
+hide_st_style = """
+            <style>
+            #MainMenu {visibility: hidden;}
+            header {visibility: hidden;}
+            footer {visibility: hidden;}
+            </style>
+            """
+st.markdown(hide_st_style, unsafe_allow_html=True)
+
+SCHOOLS_FILE = "schools.json"
+STUDENTS_FILE = "students.txt"
+MASTER_FILE = "master.json"
+
+# ==========================================
+# 🗺️ ALL INDIAN STATES & LOCAL LANGUAGE MAPPING
+# ==========================================
 STATE_LANG_MAP = {
-    "Andhra Pradesh": "Telugu", "Arunachal Pradesh": "English", "Assam": "Assamese", "Bihar": "Hindi", "Chhattisgarh": "Hindi",
-    "Goa": "Konkani", "Gujarat": "Gujarati", "Haryana": "Hindi", "Himachal Pradesh": "Hindi", "Jharkhand": "Hindi",
-    "Karnataka": "Kannada", "Kerala": "Malayalam", "Madhya Pradesh": "Hindi", "Maharashtra": "Marathi", "Manipur": "English",
-    "Meghalaya": "English", "Mizoram": "English", "Nagaland": "English", "Odisha": "Odia", "Punjab": "Punjabi",
-    "Rajasthan": "Hindi", "Sikkim": "English", "Tamil Nadu": "Tamil", "Telangana": "Telugu", "Tripura": "Bengali",
-    "Uttar Pradesh": "Hindi", "Uttarakhand": "Hindi", "West Bengal": "Bengali", "Delhi": "Hindi"
+    "Andhra Pradesh": "Telugu", "Arunachal Pradesh": "English", "Assam": "Assamese",
+    "Bihar": "Hindi", "Chhattisgarh": "Hindi", "Goa": "Konkani",
+    "Gujarat": "Gujarati", "Haryana": "Hindi", "Himachal Pradesh": "Hindi",
+    "Jharkhand": "Hindi", "Karnataka": "Kannada", "Kerala": "Malayalam",
+    "Madhya Pradesh": "Hindi", "Maharashtra": "Marathi", "Manipur": "English",
+    "Meghalaya": "English", "Mizoram": "English", "Nagaland": "English",
+    "Odisha": "Odia", "Punjab": "Punjabi", "Rajasthan": "Hindi",
+    "Sikkim": "English", "Tamil Nadu": "Tamil", "Telangana": "Telugu",
+    "Tripura": "Bengali", "Uttar Pradesh": "Hindi", "Uttarakhand": "Hindi",
+    "West Bengal": "Bengali", "Delhi": "Hindi", "Jammu and Kashmir": "Urdu",
+    "Ladakh": "English", "Puducherry": "Tamil", "Chandigarh": "Punjabi",
+    "Andaman and Nicobar": "English", "Lakshadweep": "Malayalam", "Dadra & Nagar Haveli": "Gujarati"
 }
 
 COUNTRIES = ["Yes - Indian National", "No - Other Country"]
-# New Social Category Options
-SOCIAL_CATEGORIES = ["General", "SC (Scheduled Caste)", "ST (Scheduled Tribe)", "OBC (Other Backward Class)", "SEBC", "Minority", "Others"]
 
+# ==========================================
+# 🤖 AUTO TRANSLATION ENGINE
+# ==========================================
 @st.cache_data(show_spinner=False)
 def auto_translate(text, lang_name):
-    if lang_name == "English" or not text: return text
-    LC = {"Odia":"or", "Hindi":"hi", "Bengali":"bn", "Telugu":"te", "Tamil":"ta", "Marathi":"mr", "Gujarati":"gu", "Assamese":"as"}
-    tc = LC.get(lang_name, "en")
-    if tc == "en": return text
-    try:
-        ctx = ssl.create_default_context(); ctx.check_hostname = False; ctx.verify_mode = ssl.CERT_NONE
-        url = f"https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl={tc}&dt=t&q={urllib.parse.quote(text)}"
-        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-        res = urllib.request.urlopen(req, timeout=3, context=ctx)
-        return "".join([s[0] for s in json.loads(res.read().decode('utf-8'))[0]])
-    except: return text 
-
-def t(eng_text, lang):
-    tr = {
-        "School Portal": {"Odia": "ସ୍କୁଲ୍ ପୋର୍ଟାଲ୍", "Hindi": "स्कूल पोर्टल"},
-        "Logout": {"Odia": "ଲଗ୍ ଆଉଟ୍", "Hindi": "लॉग आउट"},
-        "ANNUAL EXAMINATION": {"Odia": "ବାର୍ଷିକ ପରୀକ୍ଷା", "Hindi": "वार्षिक परीक्षा"},
-        "CERTIFICATE-CUM-MARK SHEET": {"Odia": "ପ୍ରମାଣପତ୍ର ଏବଂ ମାର୍କସିଟ୍", "Hindi": "प्रमाणपत्र सह अंकतालिका"},
-        "ROLL NO": {"Odia": "ରୋଲ୍ ନମ୍ବର", "Hindi": "रोल नंबर"},
-        "CLASS": {"Odia": "ଶ୍ରେଣୀ", "Hindi": "कक्षा"},
-        "NAME": {"Odia": "ନାମ", "Hindi": "नाम"},
-        "DOB": {"Odia": "ଜନ୍ମ ତାରିଖ", "Hindi": "जन्म तिथि"},
-        "SUBJECT": {"Odia": "ବିଷୟ", "Hindi": "विषय"},
-        "TOTAL MARKS": {"Odia": "ସମୁଦାୟ ନମ୍ବର", "Hindi": "कुल प्राप्तांक"},
-        "GRADE": {"Odia": "ଗ୍ରେଡ୍", "Hindi": "ग्रेड"},
+    LANG_CODES = {
+        "Odia": "or", "Hindi": "hi", "Bengali": "bn", "Telugu": "te",
+        "Tamil": "ta", "Marathi": "mr", "Gujarati": "gu", "Assamese": "as",
+        "Kannada": "kn", "Malayalam": "ml", "Punjabi": "pa", "Urdu": "ur", "English": "en"
     }
-    return tr.get(eng_text, {}).get(lang, eng_text)
+    if lang_name == "English" or not text: 
+        return text
+    
+    target_code = LANG_CODES.get(lang_name, "en")
+    if target_code == "en": 
+        return text
+        
+    try:
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        
+        url = f"https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl={target_code}&dt=t&q={urllib.parse.quote(text)}"
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        response = urllib.request.urlopen(req, timeout=5, context=ctx)
+        data = json.loads(response.read().decode('utf-8'))
+        translated_text = "".join([sentence[0] for sentence in data[0]])
+        return translated_text
+    except Exception:
+        return text 
 
+# ==========================================
+# 🗣️ STATIC TRANSLATION DICTIONARY
+# ==========================================
+def t(eng_text, lang):
+    translations = {
+        "School Portal": {"Odia": "ସ୍କୁଲ୍ ପୋର୍ଟାଲ୍", "Hindi": "स्कूल पोर्टल", "Bengali": "স্কুল পোর্টাল"},
+        "Logout": {"Odia": "ଲଗ୍ ଆଉଟ୍", "Hindi": "लॉग आउट", "Bengali": "লଗ୍ ଆଉଟ୍"},
+        "My Students": {"Odia": "ମୋର ଛାତ୍ରଛାତ୍ରୀ", "Hindi": "मेरे छात्र", "Bengali": "আমার ছাত্র"},
+        "Add Student": {"Odia": "ନୂଆ ଛାତ୍ର ଯୋଡନ୍ତୁ", "Hindi": "नया छात्र जोड़ें", "Bengali": "নতুন ছাত্র যোগ করুন"},
+        "Edit Student": {"Odia": "ଛାତ୍ର ତଥ୍ୟ ବଦଳାନ୍ତୁ", "Hindi": "छात्र विवरण बदलें", "Bengali": "তথ্য আপডেট করুন"},
+        "Report Card": {"Odia": "ରିପୋର୍ଟ କାର୍ଡ ପ୍ରିଣ୍ଟ୍", "Hindi": "रिपोर्ट कार्ड", "Bengali": "ରିପୋର୍ଟ କାର୍ଡ"},
+        "Search": {"Odia": "ନାମ କିମ୍ବା ରୋଲ୍ ନମ୍ବର ଦେଇ ଖୋଜନ୍ତୁ", "Hindi": "नाम या रोल नंबर से खोजें", "Bengali": "নাম বা রোল নম্বর দিয়ে খুঁজুন"},
+        "ANNUAL EXAMINATION": {"Odia": "ବାର୍ଷିକ ପରୀକ୍ଷା", "Hindi": "वार्षिक परीक्षा", "Bengali": "বার্ষিক পরীক্ষা"},
+        "CERTIFICATE-CUM-MARK SHEET": {"Odia": "ପ୍ରମାଣପତ୍ର ଏବଂ ମାର୍କସିଟ୍", "Hindi": "प्रमाणपत्र सह अंकतालिका", "Bengali": "শংসାପତ୍ର ଏବଂ ମାର୍କସିଟ୍"},
+        "SUBJECTS AND MARKS SECURED": {"Odia": "ବିଷୟ ଏବଂ ପ୍ରାପ୍ତ ନମ୍ବର", "Hindi": "विषय और प्राप्त अंक", "Bengali": "বিষয় এবং প্রাপ্ত নম্বর"},
+        "Certify that": {"Odia": "ପ୍ରମାଣ କରାଯାଏ ଯେ", "Hindi": "प्रमाणित किया जाता है कि", "Bengali": "প্রত্যয়ন করা যাচ্ছে যে"},
+        "ROLL NO": {"Odia": "ରୋଲ୍ ନମ୍ବର", "Hindi": "रोल नंबर", "Bengali": "ରୋଲ নম্বর"},
+        "CLASS": {"Odia": "ଶ୍ରେଣୀ", "Hindi": "कक्षा", "Bengali": "শ্রেণী"},
+        "PEN NO": {"Odia": "ପେନ୍ ନମ୍ବର", "Hindi": "पेन नं.", "Bengali": "ପେନ୍ ନମ୍ବର"},
+        "APAAR NO": {"Odia": "ଅପାର୍ ନମ୍ବର", "Hindi": "अपार नं.", "Bengali": "ଅପାର୍ ନମ୍ବର"},
+        "NAME": {"Odia": "ଛାତ୍ର/ଛାତ୍ରୀଙ୍କ ନାମ", "Hindi": "छात्र का नाम", "Bengali": "ছাত্রের নাম"},
+        "MOTHER'S NAME": {"Odia": "ମାତାଙ୍କ ନାମ", "Hindi": "माता का नाम", "Bengali": "ମାତାଙ୍କ ନାମ"},
+        "FATHER'S NAME": {"Odia": "ପିତାଙ୍କ ନାମ", "Hindi": "पिता का नाम", "Bengali": "ପିତାଙ୍କ ନାମ"},
+        "DOB": {"Odia": "ଜନ୍ମ ତାରିଖ", "Hindi": "जन्म तिथि", "Bengali": "ଜନ୍ମ ତାରିଖ"},
+        "PASSED_TEXT": {"Odia": "ଉପରୋକ୍ତ ବ୍ୟାଚରେ ଅନୁଷ୍ଠିତ ବାର୍ଷିକ ପରୀକ୍ଷାରେ ଉତ୍ତୀର୍ଣ୍ଣ ହୋଇଛନ୍ତି।", "Hindi": "उपरोक्त शैक्षणिक सत्र में आयोजित वार्षिक परीक्षा सफलतापूर्वक उत्तीर्ण की है।", "Bengali": "উপরে উল্লেখিত ব্যাচে অনুষ্ঠিত বার্ষিক পরীক্ষায় সফলভাবে উত্তীর্ণ হয়েছে।"},
+        "SUBJECT": {"Odia": "ବିଷୟ", "Hindi": "विषय", "Bengali": "বিষয়"},
+        "FULL MARKS": {"Odia": "ମୋଟ ନମ୍ବର", "Hindi": "पूर्णांक", "Bengali": "পূর্ণমান"},
+        "MARKS SECURED": {"Odia": "ପ୍ରାପ୍ତ ନମ୍ବର", "Hindi": "प्राप्तांक", "Bengali": "প্রাপ্ত নম্বর"},
+        "TOTAL MARKS": {"Odia": "ସମୁଦାୟ ନମ୍ବର", "Hindi": "कुल प्राप्तांक", "Bengali": "মোট প্রাপ্ত নম্বর"},
+        "GRADE": {"Odia": "ଗ୍ରେଡ୍", "Hindi": "ग्रेड", "Bengali": "ଗ୍ରେଡ୍"},
+        "DATE OF PUBLICATION": {"Odia": "ଫଳାଫଳ ପ୍ରକାଶନ ତାରିଖ", "Hindi": "परिणाम प्रकाशन तिथि", "Bengali": "ଫଳାଫଳ ପ୍ରକାଶନ ତାରିଖ"},
+        "HM SIGNATURE": {"Odia": "ପ୍ରଧାନ ଶିକ୍ଷକଙ୍କ ଦସ୍ତଖତ", "Hindi": "प्रधानाचार्य के हस्ताक्षर", "Bengali": "প্রধান शिक्षকের স্বাক্ষর"},
+        "CLASS TEACHER SIGNATURE": {"Odia": "ଶ୍ରେଣୀ ଶିକ୍ଷକଙ୍କ ଦସ୍ତଖତ", "Hindi": "कक्षा अध्यापक के हस्ताक्षर", "Bengali": "শ্রেণী शिक्षকের স্বাক্ষর"}
+    }
+    return translations.get(eng_text, {}).get(lang, eng_text)
+
+# --- Utilities ---
 def number_to_words(num):
     if num == 0: return "ZERO"
     ones = ["", "ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE", "TEN", "ELEVEN", "TWELVE", "THIRTEEN", "FOURTEEN", "FIFTEEN", "SIXTEEN", "SEVENTEEN", "EIGHTEEN", "NINETEEN"]
@@ -178,12 +160,8 @@ def normalize_dob(d_str):
         elif len(p3) == 4: return f"{p3}-{p2}-{p1}" 
     return d_str
 
-# --- OLD JSON DATA LOAD/SAVE FUNCTIONS (PRESERVES EXISTING DATA) ---
-SCHOOLS_FILE = "schools.json"
-STUDENTS_FILE = "students.txt"
-MASTER_FILE = "master.json"
-
-def load_master_data_json():
+# --- ଡାଟା ଲୋଡ୍ ଓ ସେଭ୍ ଫଙ୍କସନ୍ (PRESERVES EXISTING JSON DATA 100% WITH CRASH PROTECTION) ---
+def load_master_data():
     default_master = {
         "username": "master", 
         "password": "master123", 
@@ -211,13 +189,13 @@ def load_master_data_json():
             pass
     return default_master
 
-def save_master_data_json(data):
+def save_master_data(data):
     with file_lock:
         with open(MASTER_FILE, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=4)
 
-def load_data_json():
-    schools = {"S001": {"name": "LAXMI NARAYAN GIRLS HIGH SCHOOL", "name_local": "", "address": "", "address_local": "", "hm_name": "", "hm_phone": "", "pass": "admin123", "state": "Odisha", "lang": "Odia", "status": "Active"}}
+def load_data():
+    schools = {}
     students = {}
     if os.path.exists(SCHOOLS_FILE):
         try:
@@ -233,7 +211,7 @@ def load_data_json():
         except: pass
     return schools, students
 
-def save_data_json(schools, students):
+def save_data(schools, students):
     with file_lock:
         with open(SCHOOLS_FILE, "w", encoding="utf-8") as f:
             json.dump(schools, f, indent=4)
@@ -245,20 +223,10 @@ def save_data_json(schools, students):
 # ==========================================
 def create_student_receipt_pdf(filename, reg_id, s_data):
     c = canvas.Canvas(filename, pagesize=letter)
-    c.setStrokeColorRGB(0.1, 0.2, 0.5)
-    c.setLineWidth(4)
-    c.rect(30, 30, 552, 732, stroke=1, fill=0)
-    
-    c.setFillColorRGB(0.1, 0.2, 0.5)
-    c.setFont("Times-Bold", 22)
-    c.drawCentredString(300, 720, "STUDENT REGISTRATION RECEIPT")
-    
-    c.setFillColorRGB(0, 0, 0)
-    c.setFont("Helvetica-Bold", 12)
-    c.drawString(50, 670, f"REGISTRATION ID: {reg_id}")
-    
-    c.setFont("Helvetica", 12)
-    y = 640
+    c.setStrokeColorRGB(0.1, 0.2, 0.5); c.setLineWidth(4); c.rect(30, 30, 552, 732, stroke=1, fill=0)
+    c.setFillColorRGB(0.1, 0.2, 0.5); c.setFont("Times-Bold", 22); c.drawCentredString(300, 720, "STUDENT REGISTRATION RECEIPT")
+    c.setFillColorRGB(0, 0, 0); c.setFont("Helvetica-Bold", 12); c.drawString(50, 670, f"REGISTRATION ID: {reg_id}")
+    c.setFont("Helvetica", 12); y = 640
     c.drawString(50, y, f"Student Name: {s_data.get('name', '').upper()}"); y -= 25
     c.drawString(50, y, f"Father's Name: {s_data.get('father_name', '').upper()}"); y -= 25
     c.drawString(50, y, f"Date of Birth: {s_data.get('dob', '')}"); y -= 25
@@ -269,33 +237,18 @@ def create_student_receipt_pdf(filename, reg_id, s_data):
     c.drawString(50, y, f"Payment Details: {s_data.get('payment_mode', 'N/A')}"); y -= 25
     c.drawString(50, y, f"Status: {s_data.get('status', 'Pending')}"); y -= 25
     c.drawString(50, y, f"Application Date: {s_data.get('pub_date', datetime.date.today().strftime('%Y-%m-%d'))}"); y -= 40
-    
     c.line(50, y, 550, y); y -= 20
-    c.setFont("Helvetica-Oblique", 10)
-    c.drawCentredString(300, y, "This is a computer-generated receipt. Please keep it safe for future reference.")
-    
-    try:
-        bc = code128.Code128(str(reg_id), barHeight=30, barWidth=1.5)
-        bc.drawOn(c, 50, 70)
+    c.setFont("Helvetica-Oblique", 10); c.drawCentredString(300, y, "This is a computer-generated receipt. Please keep it safe.")
+    try: bc = code128.Code128(str(reg_id), barHeight=30, barWidth=1.5); bc.drawOn(c, 50, 70)
     except: pass
     c.save()
 
 def create_school_receipt_pdf(filename, sch_id, sch_data):
     c = canvas.Canvas(filename, pagesize=letter)
-    c.setStrokeColorRGB(0.1, 0.5, 0.2)
-    c.setLineWidth(4)
-    c.rect(30, 30, 552, 732, stroke=1, fill=0)
-    
-    c.setFillColorRGB(0.1, 0.5, 0.2)
-    c.setFont("Times-Bold", 22)
-    c.drawCentredString(300, 720, "SCHOOL REGISTRATION RECEIPT")
-    
-    c.setFillColorRGB(0, 0, 0)
-    c.setFont("Helvetica-Bold", 12)
-    c.drawString(50, 670, f"SCHOOL ID: {sch_id}")
-    
-    c.setFont("Helvetica", 12)
-    y = 640
+    c.setStrokeColorRGB(0.1, 0.5, 0.2); c.setLineWidth(4); c.rect(30, 30, 552, 732, stroke=1, fill=0)
+    c.setFillColorRGB(0.1, 0.5, 0.2); c.setFont("Times-Bold", 22); c.drawCentredString(300, 720, "SCHOOL REGISTRATION RECEIPT")
+    c.setFillColorRGB(0, 0, 0); c.setFont("Helvetica-Bold", 12); c.drawString(50, 670, f"SCHOOL ID: {sch_id}")
+    c.setFont("Helvetica", 12); y = 640
     c.drawString(50, y, f"School Name: {sch_data.get('name', '').upper()}"); y -= 25
     c.drawString(50, y, f"Head Master Name: {sch_data.get('hm_name', '').upper()}"); y -= 25
     c.drawString(50, y, f"Contact No: {sch_data.get('hm_phone', '')}"); y -= 25
@@ -303,14 +256,9 @@ def create_school_receipt_pdf(filename, sch_id, sch_data):
     c.drawString(50, y, f"Payment Mode: {sch_data.get('payment_mode', 'N/A')}"); y -= 25
     c.drawString(50, y, f"Status: {sch_data.get('status', 'Pending')}"); y -= 25
     c.drawString(50, y, f"Date: {datetime.date.today().strftime('%d-%m-%Y')}"); y -= 40
-    
     c.line(50, y, 550, y); y -= 20
-    c.setFont("Helvetica-Oblique", 10)
-    c.drawCentredString(300, y, "This is a computer-generated receipt. Please keep it safe for future reference.")
-    
-    try:
-        bc = code128.Code128(str(sch_id), barHeight=30, barWidth=1.5)
-        bc.drawOn(c, 50, 70)
+    c.setFont("Helvetica-Oblique", 10); c.drawCentredString(300, y, "This is a computer-generated receipt. Please keep it safe.")
+    try: bc = code128.Code128(str(sch_id), barHeight=30, barWidth=1.5); bc.drawOn(c, 50, 70)
     except: pass
     c.save()
 
@@ -449,10 +397,10 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.save()
 
 # --- MAIN APP START ---
-schools_db, students_db = load_data_json()
-master_db = load_master_data_json()
+schools_db, students_db = load_data()
+master_db = load_master_data()
 
-# ----------------- STABLE ROUTING (PREVENTS AUTO-CLOSING) -----------------
+# ----------------- STABLE ROUTING -----------------
 menu_items = ["Home Page", "New Student Registration", "New School Registration", "Master Login", "School Login", "Results"]
 portal_map = {"home": 0, "reg_student": 1, "reg_school": 2, "master": 3, "school": 4, "student": 5}
 portal_param = st.query_params.get("portal", "home")
@@ -468,69 +416,77 @@ elif menu == "Results": st.query_params["portal"] = "student"
 
 classes_list = [str(i) for i in range(1, 11)]
 batches_list = [f"{y}-{y+1}" for y in range(2020, 2051)]
+SOCIAL_CATEGORIES = ["General", "SC (Scheduled Caste)", "ST (Scheduled Tribe)", "OBC (Other Backward Class)", "SEBC", "Minority", "Others"]
 
-# ----------------- HOME PAGE (ERP STYLE UI) -----------------
+# ----------------- HOME PAGE (BEAUTIFUL DYNAMIC UI) -----------------
 if menu == "Home Page":
     st.markdown("""
     <style>
-    .notice-container { background-color: #1e293b; border-radius: 5px; margin-bottom: 25px; border: 1px solid #475569; }
-    .notice-header { background-color: #27374D; color: white; text-align: center; padding: 12px; font-weight: bold; font-size: 20px; }
-    .notice-item { margin-bottom: 15px; font-size: 16px; border-bottom: 1px dotted #475569; padding-bottom: 10px; }
-    .new-badge { background-color: #fbbf24; color: black; font-size: 12px; font-weight: bold; padding: 2px 6px; border-radius: 3px; margin-left: 5px; animation: blinker 1.5s linear infinite; }
-    @keyframes blinker { 50% { opacity: 0; } }
-    .login-card { background: white; border: 1px solid #cbd5e1; border-bottom: 5px solid #fbbf24; border-radius: 8px; padding: 20px; margin-bottom: 15px; text-align: center; text-decoration: none; display: block; color: #1e3a8a; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.3s; }
-    .login-card:hover { background: #f8fafc; border-bottom: 5px solid #1e3a8a; transform: translateY(-2px); }
-    .login-title { font-size: 24px; font-weight: bold; margin-bottom: 5px; display: flex; align-items: center; justify-content: center; gap: 10px; }
-    .login-sub { font-size: 14px; color: #64748b; }
-    /* Carousel CSS */
-    .carousel { width: 100%; height: 350px; overflow: hidden; border-radius: 10px; margin-bottom: 25px; position: relative; border: 3px solid #1e3a8a; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+    @keyframes colorChange {
+        0% { background-color: #e0e7ff; }
+        25% { background-color: #fce7f3; }
+        50% { background-color: #ffedd5; }
+        75% { background-color: #dcfce7; }
+        100% { background-color: #e0e7ff; }
+    }
+    .dynamic-bg-box {
+        animation: colorChange 15s infinite alternate;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        margin-bottom: 25px;
+        border: 2px solid #cbd5e1;
+    }
+    .carousel { width: 100%; height: 380px; overflow: hidden; border-radius: 10px; position: relative; border: 4px solid #1e3a8a; box-shadow: 0 4px 10px rgba(0,0,0,0.3); background-color: #000; }
     .carousel-inner { display: flex; width: 400%; height: 100%; animation: slide 16s infinite; }
     .carousel-img { width: 25%; height: 100%; object-fit: cover; }
     @keyframes slide { 0%, 20% { transform: translateX(0); } 25%, 45% { transform: translateX(-25%); } 50%, 70% { transform: translateX(-50%); } 75%, 95% { transform: translateX(-75%); } 100% { transform: translateX(0); } }
-    .carousel-overlay { position: absolute; bottom: 0; background: rgba(30,58,138,0.7); width: 100%; color: white; text-align: center; padding: 10px; font-weight: bold; font-size: 18px; }
+    .carousel-overlay { position: absolute; bottom: 0; background: rgba(30,58,138,0.85); width: 100%; color: white; text-align: center; padding: 12px; font-weight: bold; font-size: 20px; letter-spacing: 1px; }
+    
+    .login-card { background: white; border: 1px solid #cbd5e1; border-bottom: 5px solid #fbbf24; border-radius: 8px; padding: 25px; margin-bottom: 20px; text-align: center; text-decoration: none; display: block; color: #1e3a8a; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.3s; }
+    .login-card:hover { background: #f8fafc; border-bottom: 5px solid #1e3a8a; transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
+    .login-title { font-size: 24px; font-weight: bold; margin-bottom: 8px; }
+    .login-sub { font-size: 15px; color: #64748b; }
+    
+    .dev-footer { text-align: center; margin-top: 40px; padding: 15px; background: linear-gradient(90deg, #1e3a8a, #9333ea); color: white; border-radius: 8px; font-weight: bold; font-size: 18px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
+    .dev-highlight { color: #fbbf24; font-size: 20px; text-shadow: 1px 1px 2px #000; }
     </style>
     """, unsafe_allow_html=True)
 
-    # Auto Sliding Image Carousel
+    # Dynamic Background Container with Sliding Photos
     st.markdown("""
-    <div class="carousel">
-        <div class="carousel-inner">
-            <img class="carousel-img" src="https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&q=80&w=1200" alt="School 1">
-            <img class="carousel-img" src="https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?auto=format&fit=crop&q=80&w=1200" alt="School 2">
-            <img class="carousel-img" src="https://images.unsplash.com/photo-1546410531-bb4caa6b424d?auto=format&fit=crop&q=80&w=1200" alt="School 3">
-            <img class="carousel-img" src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80&w=1200" alt="School 4">
+    <div class="dynamic-bg-box">
+        <h2 style='text-align: center; color: #1e3a8a; margin-top: 0;'>🏫 Welcome to Advanced School Management System</h2>
+        <div class="carousel">
+            <div class="carousel-inner">
+                <img class="carousel-img" src="https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&q=80&w=1200" alt="School 1">
+                <img class="carousel-img" src="https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?auto=format&fit=crop&q=80&w=1200" alt="School 2">
+                <img class="carousel-img" src="https://images.unsplash.com/photo-1546410531-bb4caa6b424d?auto=format&fit=crop&q=80&w=1200" alt="School 3">
+                <img class="carousel-img" src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80&w=1200" alt="School 4">
+            </div>
+            <div class="carousel-overlay">Connecting Students, Teachers & Administration Seamlessly</div>
         </div>
-        <div class="carousel-overlay">Welcome to the Advanced School Management System</div>
     </div>
     """, unsafe_allow_html=True)
 
-    notice_html = (
-        "<div class='notice-container'>"
-        "<div class='notice-header'>RECENT NOTICE</div>"
-        "<div style='padding: 0; overflow: hidden; background-color: #1e293b; color: #e2e8f0;'>"
-        "<marquee direction='up' scrollamount='2' onmouseover='this.stop();' onmouseout='this.start();' style='height: 180px; padding: 15px;'>"
-        "<div class='notice-item'>⏩ Social Category Option added in Registration Form! <span class='new-badge'>NEW!</span></div>"
-        "<div class='notice-item'>⏩ Download PDF Receipt & Print Option is LIVE! </div>"
-        "<div class='notice-item'>⏩ Online Student Registration Portal with Payment & GST is LIVE!</div>"
-        "<div class='notice-item'>⏩ Master & School portal passwords are encrypted and 100% secured.</div>"
-        "<div class='notice-item' style='border-bottom: none; margin-top: 15px; text-align: center; line-height: 2.5;'>"
-        "<span style='color: #fbbf24; font-weight: bold; font-size: 18px;'>📞 Helpdesk 24x7:</span><br>"
-        "<span style='background-color: #25D366; color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold; display: inline-block; margin-bottom: 5px;'>💬 WhatsApp: 8910223342</span><br>"
-        "<span style='background-color: #ea4335; color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold; display: inline-block;'>📧 Mail: kulusutar123@gmail.com</span>"
-        "</div>"
-        "</marquee>"
-        "</div>"
-        "</div>"
-    )
-    st.markdown(notice_html, unsafe_allow_html=True)
-
-    c1, c2 = st.columns(2)
+    # Prominent Action Buttons
+    c1, c2, c3 = st.columns(3)
     with c1:
-        st.markdown("<a href='?portal=reg_student' target='_self' class='login-card'><div class='login-title'>👨‍🎓 New Student Registration</div><div class='login-sub'>Apply for admission/exams online</div></a>", unsafe_allow_html=True)
-        st.markdown("<a href='?portal=master' target='_self' class='login-card'><div class='login-title'>🏛️ Master Login</div><div class='login-sub'>Login as Admin / University</div></a>", unsafe_allow_html=True)
+        st.markdown("<a href='?portal=reg_school' target='_self' class='login-card'><div class='login-title'>🏫 New School Registration</div><div class='login-sub'>Register your institution</div></a>", unsafe_allow_html=True)
+        st.markdown("<a href='?portal=master' target='_self' class='login-card'><div class='login-title'>🏛️ Master Login</div><div class='login-sub'>University / Admin Portal</div></a>", unsafe_allow_html=True)
     with c2:
-        st.markdown("<a href='?portal=school' target='_self' class='login-card'><div class='login-title'>🏫 School Login</div><div class='login-sub'>Login as School / College</div></a>", unsafe_allow_html=True)
-        st.markdown("<a href='?portal=student' target='_self' class='login-card'><div class='login-title'>🎓 Results</div><div class='login-sub'>Check Student Rank Card</div></a>", unsafe_allow_html=True)
+        st.markdown("<a href='?portal=reg_student' target='_self' class='login-card'><div class='login-title'>👨‍🎓 New Student Registration</div><div class='login-sub'>Apply for admission/exams</div></a>", unsafe_allow_html=True)
+        st.markdown("<a href='?portal=school' target='_self' class='login-card'><div class='login-title'>🏫 School Login</div><div class='login-sub'>School / College Portal</div></a>", unsafe_allow_html=True)
+    with c3:
+        st.markdown("<a href='?portal=student' target='_self' class='login-card' style='height: 94%; display: flex; flex-direction: column; justify-content: center;'><div class='login-title' style='font-size: 32px;'>🎓 Check Results</div><div class='login-sub'>Download Student Rank Card</div></a>", unsafe_allow_html=True)
+
+    # Developer Footer
+    st.markdown("""
+    <div class="dev-footer">
+        👨‍💻 Software Developed by: <span class="dev-highlight">KULU SUTAR</span> &nbsp;&nbsp;|&nbsp;&nbsp; 📞 Mob: <span class="dev-highlight">8910223342</span>
+    </div>
+    """, unsafe_allow_html=True)
+
 
 # ----------------- NEW STUDENT REGISTRATION WITH DYNAMIC FEES & GST -----------------
 elif menu == "New Student Registration":
@@ -728,7 +684,7 @@ elif menu == "New Student Registration":
                             if sch_id not in students_db:
                                 students_db[sch_id] = {}
                             students_db[sch_id][reg_data['reg_id']] = reg_data['data']
-                            save_data_json(schools_db, students_db)
+                            save_data(schools_db, students_db)
                             
                             st.session_state['stu_reg_success'] = True
                             st.session_state['stu_reg_id'] = reg_data['reg_id']
@@ -748,7 +704,7 @@ elif menu == "New Student Registration":
                     if sch_id not in students_db:
                         students_db[sch_id] = {}
                     students_db[sch_id][reg_data['reg_id']] = reg_data['data']
-                    save_data_json(schools_db, students_db)
+                    save_data(schools_db, students_db)
                     
                     st.session_state['stu_reg_success'] = True
                     st.session_state['stu_reg_id'] = reg_data['reg_id']
@@ -900,7 +856,7 @@ elif menu == "New School Registration":
                             reg_data = st.session_state['temp_school_data']
                             reg_data['data']['payment_mode'] = f"Online (₹{s_total_fee:.2f} - Txn: {sanitize(txn_id)})"
                             schools_db[reg_data["school_id"]] = reg_data["data"]
-                            save_data_json(schools_db, students_db)
+                            save_data(schools_db, students_db)
                             
                             st.session_state['sch_reg_success'] = True
                             st.session_state['sch_reg_id'] = reg_data['school_id']
@@ -915,7 +871,7 @@ elif menu == "New School Registration":
                     reg_data = st.session_state['temp_school_data']
                     reg_data['data']['payment_mode'] = f"Offline (₹{s_total_fee:.2f} - Pending)"
                     schools_db[reg_data["school_id"]] = reg_data["data"]
-                    save_data_json(schools_db, students_db)
+                    save_data(schools_db, students_db)
                     
                     st.session_state['sch_reg_success'] = True
                     st.session_state['sch_reg_id'] = reg_data['school_id']
@@ -1032,13 +988,13 @@ elif menu == "Master Login":
                     if status == "Inactive":
                         if c_btn1.button("✅ Make Active", key=f"act_{s_id}"):
                             s_info["status"] = "Active"
-                            save_data_json(schools_db, students_db)
+                            save_data(schools_db, students_db)
                             st.success(f"School {s_id} is now Active!")
                             st.rerun()
                     if status == "Active":
                         if c_btn2.button("🚫 Make Inactive", key=f"deact_{s_id}"):
                             s_info["status"] = "Inactive"
-                            save_data_json(schools_db, students_db)
+                            save_data(schools_db, students_db)
                             st.warning(f"School {s_id} is now Inactive!")
                             st.rerun()
                             
@@ -1046,7 +1002,7 @@ elif menu == "Master Login":
                         del schools_db[s_id]
                         if s_id in students_db:
                             del students_db[s_id]
-                        save_data_json(schools_db, students_db)
+                        save_data(schools_db, students_db)
                         st.error(f"School '{s_id}' deleted!")
                         st.rerun()
 
@@ -1065,13 +1021,13 @@ elif menu == "Master Login":
                     with cp1:
                         if st.button(f"✅ Approve Payment & Activate", key=f"vps_{s_id}"):
                             s_info["status"] = "Active"
-                            save_data_json(schools_db, students_db)
+                            save_data(schools_db, students_db)
                             st.success(f"School {s_id} Activated!")
                             st.rerun()
                     with cp2:
                         if st.button(f"🚫 Reject (Auto Refund)", key=f"rps_{s_id}"):
                             del schools_db[s_id]
-                            save_data_json(schools_db, students_db)
+                            save_data(schools_db, students_db)
                             st.error(f"School {s_id} Rejected & Refund Initiated.")
                             st.rerun()
             else:
@@ -1100,14 +1056,14 @@ elif menu == "Master Login":
                     with c_pay1:
                         if st.button(f"✅ Verify Payment & Send to School", key=f"vp_{r_no}"):
                             p_st["status"] = "Pending_School"
-                            save_data_json(schools_db, students_db)
+                            save_data(schools_db, students_db)
                             st.success(f"Payment for {r_no} verified! Application sent to School.")
                             st.rerun()
                     with c_pay2:
                         if st.button(f"🚫 Reject (Auto Refund)", key=f"rp_{r_no}"):
                             p_st['payment_mode'] = p_st.get('payment_mode', '') + " - [REFUND INITIATED]"
                             p_st['status'] = "Rejected_Refund"
-                            save_data_json(schools_db, students_db)
+                            save_data(schools_db, students_db)
                             st.error(f"Payment rejected and Refund initiated for {r_no}.")
                             st.rerun()
             else:
@@ -1220,13 +1176,13 @@ elif menu == "Master Login":
                                 "total_obt": m_tot_obt, "total_full": m_tot_full, 
                                 "percentage": round(new_per, 2), "result": new_res, "grade": new_grd
                             })
-                            save_data_json(schools_db, students_db)
+                            save_data(schools_db, students_db)
                             st.success(f"Roll No {m_edit_roll} data updated successfully!")
                             
                     with col_dl:
                         if st.button("🗑️ Delete Student (Master Only)", type="primary"):
                             del students_db[master_school_sel][m_edit_roll]
-                            save_data_json(schools_db, students_db)
+                            save_data(schools_db, students_db)
                             st.success("Student deleted successfully!")
                             st.rerun()
                 else:
@@ -1274,7 +1230,7 @@ elif menu == "Master Login":
                         if edit_s_pass:
                             curr_s_data["pass"] = edit_s_pass
                             
-                        save_data_json(schools_db, students_db)
+                        save_data(schools_db, students_db)
                         st.success(f"School Profile Updated! The portal language is now set to {STATE_LANG_MAP[edit_s_state]}.")
                     else:
                         st.warning("Please fill all the mandatory details.")
@@ -1526,7 +1482,7 @@ elif menu == "School Login":
                             del students_db[cur_school][app_roll]
                             
                         students_db[cur_school][roll_to_save] = updated_p_data
-                        save_data_json(schools_db, students_db)
+                        save_data(schools_db, students_db)
                         st.success(f"Student {roll_to_save} Approved successfully!")
                         st.rerun()
                 with c_act2:
@@ -1534,7 +1490,7 @@ elif menu == "School Login":
                         p_st['payment_mode'] = p_st.get('payment_mode', '') + " - [REFUND INITIATED]"
                         p_st['status'] = "Rejected_Refund"
                         students_db[cur_school][app_roll] = p_st
-                        save_data_json(schools_db, students_db)
+                        save_data(schools_db, students_db)
                         st.error(f"Application for {app_roll} Rejected. Payment Refund Process Automatically Initiated.")
                         st.rerun()
             else:
@@ -1635,7 +1591,7 @@ elif menu == "School Login":
                         if cur_school not in students_db:
                             students_db[cur_school] = {}
                         students_db[cur_school][roll_no_clean] = new_data
-                        save_data_json(schools_db, students_db)
+                        save_data(schools_db, students_db)
                         st.success(f"Roll No {roll_no_clean} Data Saved & Approved!")
                     else:
                         st.error("Roll No and Student Name required.")
@@ -1749,7 +1705,7 @@ elif menu == "School Login":
                         "total_obt": up_tot_obt, "total_full": up_tot_full, 
                         "percentage": round(new_per, 2), "result": new_res, "grade": new_grd
                     })
-                    save_data_json(schools_db, students_db)
+                    save_data(schools_db, students_db)
                     st.success("Record Updated!")
             else:
                 st.warning("No approved students available to edit.")
