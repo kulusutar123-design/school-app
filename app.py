@@ -189,6 +189,25 @@ def number_to_words(num):
         
     return words(num)
 
+# --- Date Formatter ---
+def format_display_date(d_str):
+    if not d_str:
+        return datetime.date.today().strftime('%d/%m/%Y')
+    d_str = str(d_str).strip()
+    if '-' in d_str:
+        parts = d_str.split('-')
+        if len(parts) == 3:
+            if len(parts[0]) == 4:
+                return f"{parts[2]}/{parts[1]}/{parts[0]}"
+            elif len(parts[2]) == 4:
+                return f"{parts[0]}/{parts[1]}/{parts[2]}"
+    elif '/' in d_str:
+        parts = d_str.split('/')
+        if len(parts) == 3 and len(parts[0]) == 4:
+            return f"{parts[2]}/{parts[1]}/{parts[0]}"
+        return d_str
+    return d_str
+
 # --- ଡାଟା ଲୋଡ୍ ଓ ସେଭ୍ ଫଙ୍କସନ୍ ---
 def load_master_data():
     default_master = {"username": "master", "password": "master123", "email": "admin@school.com", "phone": "9999999999"}
@@ -238,12 +257,11 @@ def save_data(schools, students):
 
 # --- ସୁନ୍ଦର ରାଙ୍କ୍ କାର୍ଡ HTML ଡିଜାଇନ୍ (BILINGUAL AUTO-CONVERT) ---
 def generate_result_card_html(school_name, st_data, roll_no, s_lang):
-    raw_dob = st_data.get('dob', '')
-    disp_dob = raw_dob
-    if len(raw_dob.split('-')) == 3:
-        y, m, d = raw_dob.split('-')
-        if len(y) == 4:
-            disp_dob = f"{d}-{m}-{y}"
+    disp_dob = format_display_date(st_data.get('dob', ''))
+    
+    # Optional Publication Date from school login, fallback to today
+    raw_pub_date = st_data.get('pub_date', '')
+    disp_pub_date = format_display_date(raw_pub_date) if raw_pub_date else datetime.date.today().strftime('%d/%m/%Y')
 
     bg_color = "#fef9f7"
     border_color = "#963f98"
@@ -263,7 +281,7 @@ def generate_result_card_html(school_name, st_data, roll_no, s_lang):
     qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={qr_data}"
     barcode_url = f"https://barcode.tec-it.com/barcode.ashx?data={roll_no}&code=Code128&dpi=96"
 
-    # Pre-calculated translations to avoid syntax issues
+    # Pre-calculated translations
     lbl_annual = t('ANNUAL EXAMINATION', s_lang)
     lbl_cert = t('CERTIFICATE-CUM-MARK SHEET', s_lang)
     lbl_roll = t('ROLL NO', s_lang)
@@ -345,7 +363,7 @@ def generate_result_card_html(school_name, st_data, roll_no, s_lang):
         "<td style='width: 33%; vertical-align: bottom;'>"
         f"<img src='{barcode_url}' alt='Barcode' style='height: 35px; margin-bottom: 10px; max-width: 100%;'/>"
         f"<div style='font-size: 11px;'>DATE OF PUBLICATION <br><span style='font-size:10px;'>({lbl_pub_date})</span></div>"
-        f"<div style='font-weight: bold; font-size: 14px; margin-top: 5px; margin-bottom: 30px;'>{datetime.date.today().strftime('%d/%m/%Y')}</div>"
+        f"<div style='font-weight: bold; font-size: 14px; margin-top: 5px; margin-bottom: 30px;'>{disp_pub_date}</div>"
         f"<div style='border-bottom: 1px solid {border_color}; width: 80%; margin: auto;'></div>"
         f"<div style='font-size: 11px; margin-top: 5px; font-weight: bold;'>HM SIGNATURE <br><span style='font-size:10px;'>({lbl_hm_sign})</span></div>"
         "</td>"
@@ -371,15 +389,12 @@ def generate_result_card_html(school_name, st_data, roll_no, s_lang):
     )
     return html_content
 
-# --- PDF ଜେନେରେଟର (CLEAN ENGLISH PRINTING TO AVOID GLYPH ERRORS) ---
+# --- PDF ଜେନେରେଟର ---
 def create_pdf(filename, school_name, st_data, roll_no):
-    raw_dob = st_data.get('dob', '')
-    disp_dob = raw_dob
-    if len(raw_dob.split('-')) == 3:
-        y, m, d = raw_dob.split('-')
-        if len(y) == 4:
-            disp_dob = f"{d}-{m}-{y}"
-            
+    disp_dob = format_display_date(st_data.get('dob', ''))
+    raw_pub_date = st_data.get('pub_date', '')
+    disp_pub_date = format_display_date(raw_pub_date) if raw_pub_date else datetime.date.today().strftime('%d/%m/%Y')
+
     c = canvas.Canvas(filename, pagesize=letter)
     
     c.setFillColorRGB(0.99, 0.98, 0.97)
@@ -536,7 +551,7 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.setFont("Helvetica", 10)
     c.drawCentredString(140, y-10, "DATE OF PUBLICATION OF RESULTS")
     c.setFont("Helvetica-Bold", 11)
-    c.drawCentredString(140, y-25, f"{datetime.date.today().strftime('%d/%m/%Y')}")
+    c.drawCentredString(140, y-25, f"{disp_pub_date}")
     
     c.line(50, y-60, 230, y-60)
     c.setFont("Helvetica-Bold", 10)
@@ -820,6 +835,8 @@ elif menu == "Master Login":
                         b_val = m_curr_st.get('batch', '2025-2026')
                         b_idx = batches_list.index(b_val) if b_val in batches_list else 5
                         m_up_batch = st.selectbox("Batch", batches_list, index=b_idx, key="m_up_batch")
+                        
+                        m_up_pub_date = st.text_input("Publication Date (YYYY-MM-DD)", value=m_curr_st.get('pub_date', ''), key="m_up_pub_date")
                     
                     st.markdown("#### 📚 Edit Subjects & Marks")
                     m_subjects = m_curr_st.get('subjects', {})
@@ -857,7 +874,7 @@ elif menu == "Master Login":
                             school_students[m_edit_roll].update({
                                 "name": m_up_name, "gender": m_up_gender, "pen_no": m_up_pen, "apaar_no": m_up_apaar,
                                 "father_name": m_up_father, "mother_name": m_up_mother,
-                                "dob": m_up_dob, "class": m_up_cls, "batch": m_up_batch,
+                                "dob": m_up_dob, "class": m_up_cls, "batch": m_up_batch, "pub_date": m_up_pub_date,
                                 "subjects": new_m_subjects if new_m_subjects else m_subjects,
                                 "total_obt": m_tot_obt, "total_full": m_tot_full, 
                                 "percentage": round(new_per, 2), "result": new_res, "grade": new_grd
@@ -1034,6 +1051,13 @@ elif menu == "School Login":
             with c_c2:
                 add_batch = st.selectbox("Batch", batches_list, index=5, key="add_batch")
             
+            # Optional Results Publication Date
+            opt_pub_date = st.date_input(
+                f"Results Publication Date (Optional / {t('DATE OF PUBLICATION', s_lang)})", 
+                value=datetime.date.today(),
+                key="add_pub_date"
+            )
+            
             st.markdown("#### 📚 Subject Add / Remove & Marks")
             if 'num_subjects' not in st.session_state:
                 st.session_state.num_subjects = 3
@@ -1079,7 +1103,9 @@ elif menu == "School Login":
                         students_db[cur_school][roll_no] = {
                             "name": st_name, "gender": gender, "pen_no": pen_no, "apaar_no": apaar_no,
                             "father_name": father_name, "mother_name": mother_name,
-                            "dob": str(dob), "class": cls, "batch": add_batch, "subjects": subjects_data,
+                            "dob": str(dob), "class": cls, "batch": add_batch, 
+                            "pub_date": str(opt_pub_date), # Saved publication date
+                            "subjects": subjects_data,
                             "total_full": total_full_mark, "total_obt": total_obt_mark,
                             "percentage": round(percentage, 2), "result": result, "grade": grade
                         }
@@ -1123,6 +1149,20 @@ elif menu == "School Login":
                     b_idx = batches_list.index(b_val) if b_val in batches_list else 5
                     up_batch = st.selectbox("Edit Batch", batches_list, index=b_idx)
                 
+                # Optional Publication date editing
+                prev_pub_str = curr_st.get('pub_date', str(datetime.date.today()))
+                try:
+                    p_y, p_m, p_d = prev_pub_str.split('-')
+                    d_val = datetime.date(int(p_y), int(p_m), int(p_d))
+                except:
+                    d_val = datetime.date.today()
+                    
+                up_pub_date = st.date_input(
+                    f"Edit Results Publication Date (Optional / {t('DATE OF PUBLICATION', s_lang)})", 
+                    value=d_val, 
+                    key="edit_pub_date"
+                )
+                
                 st.markdown("#### 📚 Edit Subjects & Marks")
                 up_subjects = curr_st.get('subjects', {})
                 new_up_subjects = {}
@@ -1157,7 +1197,8 @@ elif menu == "School Login":
                     school_students[edit_roll].update({
                         "name": up_name, "gender": up_gender, "pen_no": up_pen, "apaar_no": up_apaar,
                         "father_name": up_father, "mother_name": up_mother,
-                        "dob": up_dob, "class": up_cls, "batch": up_batch,
+                        "dob": up_dob, "class": up_cls, "batch": up_batch, 
+                        "pub_date": str(up_pub_date),
                         "subjects": new_up_subjects if new_up_subjects else up_subjects,
                         "total_obt": up_tot_obt, "total_full": up_tot_full, 
                         "percentage": round(new_per, 2), "result": new_res, "grade": new_grd
@@ -1175,6 +1216,7 @@ elif menu == "School Login":
                 st_data = school_students[rep_roll]
                 school_name = schools_db[cur_school]['name']
                 
+                # BILINGUAL AUTO-CONVERT
                 st.markdown(generate_result_card_html(school_name, st_data, rep_roll, s_lang), unsafe_allow_html=True)
                 
                 col1, col2 = st.columns(2)
@@ -1261,6 +1303,7 @@ elif menu == "Results":
             school_name = schools_db[found_school_id]['name']
             s_lang = schools_db[found_school_id].get("lang", "English")
             
+            # BILINGUAL AUTO-CONVERT ON STUDENT RESULT PORTAL
             st.markdown(generate_result_card_html(school_name, found_student, found_roll, s_lang), unsafe_allow_html=True)
             
             col1, col2 = st.columns(2)
