@@ -52,33 +52,126 @@ STATE_LANG_MAP = {
 }
 
 # ==========================================
-# 🗣️ TRANSLATION DICTIONARY FOR AUTO LANGUAGE CHANGE
+# 🗣️ MULTI-LANGUAGE TRANSLATION ENGINE
 # ==========================================
 def t(eng_text, lang):
     translations = {
-        "School Portal": {"Odia": "ସ୍କୁଲ୍ ପୋର୍ଟାଲ୍", "Hindi": "स्कूल पोर्टल", "Bengali": "স্কুল পোর্টাল", "Telugu": "పాఠశాల పోర్టల్", "Marathi": "शाळा पोर्टल"},
-        "Logout": {"Odia": "ଲଗ୍ ଆଉଟ୍", "Hindi": "लॉग आउट", "Bengali": "লগ আউট", "Marathi": "लॉग आउट"},
-        "My Students": {"Odia": "ମୋର ଛାତ୍ରଛାତ୍ରୀ", "Hindi": "मेरे छात्र", "Bengali": "আমার ছাত্র", "Marathi": "माझे विद्यार्थी"},
-        "Add Student": {"Odia": "ନୂଆ ଛାତ୍ର ଯୋଡନ୍ତୁ", "Hindi": "नया छात्र जोड़ें", "Bengali": "নতুন ছাত্র যোগ করুন", "Marathi": "नवीन विद्यार्थी जोडा"},
-        "Edit Student": {"Odia": "ଛାତ୍ର ତଥ୍ୟ ବଦଳାନ୍ତୁ", "Hindi": "छात्र विवरण बदलें", "Bengali": "তথ্য আপডেট করুন", "Marathi": "अपडेट करा"},
-        "Report Card": {"Odia": "ରିପୋର୍ଟ କାର୍ଡ ପ୍ରିଣ୍ଟ୍", "Hindi": "रिपोर्ट कार्ड", "Bengali": "রিপোর্ট কার্ড", "Marathi": "रिपोर्ट कार्ड"},
-        "Search": {"Odia": "ନାମ କିମ୍ବା ରୋଲ୍ ନମ୍ବର ଦେଇ ଖୋଜନ୍ତୁ", "Hindi": "नाम या रोल नंबर से खोजें", "Bengali": "নাম বা রোল নম্বর দিয়ে খুঁজুন"},
+        # School Portal UI
+        "School Portal": {
+            "Odia": "ସ୍କୁଲ୍ ପୋର୍ଟାଲ୍", "Hindi": "स्कूल पोर्टल", "Bengali": "স্কুল পোর্টাল", 
+            "Telugu": "పాఠశాల పోర్టల్", "Tamil": "பள்ளி போர்டல்", "Marathi": "शाळा पोर्टल", "Gujarati": "શાળા પોર્ટલ"
+        },
+        "Logout": {
+            "Odia": "ଲଗ୍ ଆଉଟ୍", "Hindi": "लॉग आउट", "Bengali": "লগ আউট", 
+            "Telugu": "లాగ్ అవుట్", "Tamil": "வெளியேறு", "Marathi": "लॉग आउट", "Gujarati": "લૉગ આઉટ"
+        },
+        "My Students": {
+            "Odia": "ମୋର ଛାତ୍ରଛାତ୍ରୀ", "Hindi": "मेरे छात्र", "Bengali": "আমার ছাত্র",
+            "Telugu": "నా విద్యార్థులు", "Tamil": "என் மாணவர்கள்", "Marathi": "माझे विद्यार्थी", "Gujarati": "મારા વિદ્યાર્થીઓ"
+        },
+        "Add Student": {
+            "Odia": "ନୂଆ ଛାତ୍ର ଯୋଡନ୍ତୁ", "Hindi": "नया छात्र जोड़ें", "Bengali": "নতুন ছাত্র যোগ করুন",
+            "Telugu": "కొత్త విద్యార్థిని జోడించండి", "Tamil": "புதிய மாணவரைச் சேர்க்கவும்", "Marathi": "नवीन विद्यार्थी जोडा", "Gujarati": "નવો વિદ્યાર્થી ઉમેરો"
+        },
+        "Edit Student": {
+            "Odia": "ଛାତ୍ର ତଥ୍ୟ ବଦଳାନ୍ତୁ", "Hindi": "छात्र विवरण बदलें", "Bengali": "তথ্য আপডেট করুন",
+            "Telugu": "విద్యార్థి సమాచారం నవీకరించండి", "Tamil": "மாணவர் விவரங்களை புதுப்பிக்கவும்", "Marathi": "विद्यार्थी माहिती अपडेट करा", "Gujarati": "વિદ્યાર્થી માહિતી અપડેટ કરો"
+        },
+        "Report Card": {
+            "Odia": "ରିପୋର୍ଟ କାର୍ଡ ପ୍ରିଣ୍ଟ୍", "Hindi": "रिपोर्ट कार्ड", "Bengali": "রিপোর্ট কার্ড",
+            "Telugu": "రిపోర్ట్ కార్డ్", "Tamil": "மதிப்பெண் அட்டை", "Marathi": "रिपोर्ट कार्ड", "Gujarati": "રિપોર્ટ કાર્ડ"
+        },
+        "Search": {
+            "Odia": "ନାମ କିମ୍ବା ରୋଲ୍ ନମ୍ବର ଦେଇ ଖୋଜନ୍ତୁ", "Hindi": "नाम या रोल नंबर से खोजें", "Bengali": "নাম বা রোল নম্বর দিয়ে খুঁজুন",
+            "Telugu": "పేరు లేదా రోల్ నంబర్ ద్వారా శోధించండి", "Tamil": "பெயர் அல்லது பதிவு எண் மூலம் தேடவும்", "Marathi": "नाव किंवा रोल नंबरने शोधा", "Gujarati": "નામ અથવા રોલ નંબર દ્વારા શોધો"
+        },
+        "Total Registered": {
+            "Odia": "ମୋଟ ପଞ୍ଜିକୃତ:", "Hindi": "कुल पंजीकृत:", "Bengali": "মোট নিবন্ধিত:",
+            "Telugu": "మొత్తం నమోదైనవి:", "Tamil": "மொத்தம் பதிவு செய்யப்பட்டவை:", "Marathi": "एकूण नोंदणीकृत:", "Gujarati": "કુલ નોંધાયેલ:"
+        },
         
-        # Certificate Translations
-        "NAME": {"Odia": "ଛାତ୍ର/ଛାତ୍ରୀଙ୍କ ନାମ", "Hindi": "नाम", "Bengali": "নাম", "Marathi": "नाव"},
-        "ROLL NO": {"Odia": "ରୋଲ୍ ନମ୍ବର", "Hindi": "रोल नंबर", "Bengali": "রোল নম্বর", "Marathi": "रोल नंबर"},
-        "CLASS": {"Odia": "ଶ୍ରେଣୀ", "Hindi": "कक्षा", "Bengali": "শ্রেণী", "Marathi": "वर्ग"},
-        "MOTHER'S NAME": {"Odia": "ମାତାଙ୍କ ନାମ", "Hindi": "माता का नाम", "Bengali": "মাতার নাম", "Marathi": "आईचे नाव"},
-        "FATHER'S NAME": {"Odia": "ପିତାଙ୍କ ନାମ", "Hindi": "पिता का नाम", "Bengali": "পিতার নাম", "Marathi": "वडिलांचे नाव"},
-        "DOB": {"Odia": "ଜନ୍ମ ତାରିଖ", "Hindi": "जन्म तिथि", "Bengali": "जन्म তারিখ", "Marathi": "जन्म तारीख"},
-        "SUBJECT": {"Odia": "ବିଷୟ", "Hindi": "विषय", "Bengali": "বিষয়", "Marathi": "विषय"},
-        "FULL MARKS": {"Odia": "ମୋଟ ନମ୍ବର", "Hindi": "पूर्णांक", "Bengali": "পূর্ণমান", "Marathi": "एकूण गुण"},
-        "MARKS SECURED": {"Odia": "ପ୍ରାପ୍ତ ନମ୍ବର", "Hindi": "प्राप्तांक", "Bengali": "প্রাপ্ত নম্বর", "Marathi": "मिळवलेले गुण"},
-        "TOTAL MARKS": {"Odia": "ସମୁଦାୟ ପ୍ରାପ୍ତ ନମ୍ବର", "Hindi": "कुल प्राप्तांक", "Bengali": "মোট প্রাপ্ত নম্বর", "Marathi": "एकूण प्राप्त गुण"},
-        "GRADE": {"Odia": "ଗ୍ରେଡ୍", "Hindi": "ग्रेड", "Bengali": "গ্রেড", "Marathi": "श्रेणी"},
-        "ANNUAL EXAMINATION": {"Odia": "ବାର୍ଷିକ ପରୀକ୍ଷା", "Hindi": "वार्षिक परीक्षा", "Bengali": "বার্ষিক পরীক্ষা", "Marathi": "वार्षिक परीक्षा"},
-        "CERTIFICATE-CUM-MARK SHEET": {"Odia": "ପ୍ରମାଣପତ୍ର ଏବଂ ମାର୍କସିଟ୍", "Hindi": "प्रमाणपत्र सह अंकतालिका", "Bengali": "শংসাপত্র এবং মার্কশিট", "Marathi": "प्रमाणपत्र आणि गुणपत्रिका"},
-        "PASSED_TEXT": {"Odia": "ଉପରୋକ୍ତ ବ୍ୟାଚରେ ଅନୁଷ୍ଠିତ ବାର୍ଷିକ ପରୀକ୍ଷାରେ ଉତ୍ତୀର୍ଣ୍ଣ ହୋଇଛନ୍ତି।", "Hindi": "उपरोक्त शैक्षणिक बैच में आयोजित वार्षिक परीक्षा उत्तीर्ण की है।", "Bengali": "উপরে উল্লেখিত ব্যাচে অনুষ্ঠিত বার্ষিক পরীক্ষায় উত্তীর্ণ হয়েছে।", "Marathi": "शैक्षणिक बॅचमध्ये घेण्यात आलेली वार्षिक परीक्षा उत्तीर्ण केली आहे."}
+        # Certificate Labels
+        "ANNUAL EXAMINATION": {
+            "Odia": "ବାର୍ଷିକ ପରୀକ୍ଷା", "Hindi": "वार्षिक परीक्षा", "Bengali": "বার্ষিক পরীক্ষা",
+            "Telugu": "వార్షిక పరీక్ష", "Tamil": "ஆண்டுத் தேர்வு", "Marathi": "वार्षिक परीक्षा", "Gujarati": "વાર્ષિક પરીક્ષા"
+        },
+        "CERTIFICATE-CUM-MARK SHEET": {
+            "Odia": "ପ୍ରମାଣପତ୍ର ଏବଂ ମାର୍କସିଟ୍", "Hindi": "प्रमाणपत्र सह अंकतालिका", "Bengali": "শংসাপত্র এবং মার্কশিট",
+            "Telugu": "ధృవీకరణ పత్రం మరియు మార్కుల జాబితా", "Tamil": "சான்றிதழ் மற்றும் மதிப்பெண் பட்டியல்", "Marathi": "प्रमाणपत्र आणि गुणपत्रिका", "Gujarati": "પ્રમાણપત્ર અને ગુણપત્રક"
+        },
+        "ROLL NO": {
+            "Odia": "ରୋଲ୍ ନମ୍ବର", "Hindi": "रोल नंबर", "Bengali": "রোল নম্বর",
+            "Telugu": "రోల్ నంబర్", "Tamil": "பதிவு எண்", "Marathi": "रोल नंबर", "Gujarati": "રોલ નંબર"
+        },
+        "CLASS": {
+            "Odia": "ଶ୍ରେଣୀ", "Hindi": "कक्षा", "Bengali": "শ্রেণী",
+            "Telugu": "తరగతి", "Tamil": "வகுப்பு", "Marathi": "वर्ग", "Gujarati": "ધોરણ"
+        },
+        "PEN NO": {
+            "Odia": "ପେନ୍ ନମ୍ବର", "Hindi": "पेन नं.", "Bengali": "পেন নং",
+            "Telugu": "పెన్ నం.", "Tamil": "பென் எண்", "Marathi": "पेन क्र.", "Gujarati": "પેન નં."
+        },
+        "APAAR NO": {
+            "Odia": "ଅପାର୍ ନମ୍ବର", "Hindi": "अपार नं.", "Bengali": "অপার নং",
+            "Telugu": "అపార్ నం.", "Tamil": "அபார் எண்", "Marathi": "अपार क्र.", "Gujarati": "અપાર નં."
+        },
+        "NAME": {
+            "Odia": "ଛାତ୍ର/ଛାତ୍ରୀଙ୍କ ନାମ", "Hindi": "छात्र का नाम", "Bengali": "ছাত্রের নাম",
+            "Telugu": "విద్యార్థి పేరు", "Tamil": "மாணவர் பெயர்", "Marathi": "विद्यार्थ्याचे नाव", "Gujarati": "વિદ્યાર્થીનું નામ"
+        },
+        "MOTHER'S NAME": {
+            "Odia": "ମାତାଙ୍କ ନାମ", "Hindi": "माता का नाम", "Bengali": "মাতার নাম",
+            "Telugu": "తల్లి పేరు", "Tamil": "தாயின் பெயர்", "Marathi": "आईचे नाव", "Gujarati": "માતાનું નામ"
+        },
+        "FATHER'S NAME": {
+            "Odia": "ପିତାଙ୍କ ନାମ", "Hindi": "पिता का नाम", "Bengali": "পিতার নাম",
+            "Telugu": "తండ్రి పేరు", "Tamil": "தந்தையின் பெயர்", "Marathi": "वडिलांचे नाव", "Gujarati": "પિતાનું નામ"
+        },
+        "DOB": {
+            "Odia": "ଜନ୍ମ ତାରିଖ", "Hindi": "जन्म तिथि", "Bengali": "জন্ম তারিখ",
+            "Telugu": "పుట్టిన తేదీ", "Tamil": "பிறந்த தேதி", "Marathi": "जन्म तारीख", "Gujarati": "જન્મ તારીખ"
+        },
+        "PASSED_TEXT": {
+            "Odia": "ଉପରୋକ୍ତ ବ୍ୟାଚରେ ଅନୁଷ୍ଠିତ ବାର୍ଷିକ ପରୀକ୍ଷାରେ ଉତ୍ତୀର୍ଣ୍ଣ ହୋଇଛନ୍ତି।",
+            "Hindi": "उपरोक्त शैक्षणिक सत्र में आयोजित वार्षिक परीक्षा सफलतापूर्वक उत्तीर्ण की है।",
+            "Bengali": "উপরে উল্লেখিত ব্যাচে অনুষ্ঠিত বার্ষিক পরীক্ষায় সফলভাবে উত্তীর্ণ হয়েছে।",
+            "Telugu": "పైన పేర్కొన్న విద్యా సంవత్సరంలో నిర్వహించిన వార్షిక పరీక్షలో ఉత్తీర్ణులయ్యారు.",
+            "Tamil": "மேற்கண்ட கல்வி ஆண்டில் நடைபெற்ற ஆண்டுத் தேர்வில் தேர்ச்சி பெற்றுள்ளார்.",
+            "Marathi": "शैक्षणिक सत्रात घेण्यात आलेली वार्षिक परीक्षा यशस्वीरित्या उत्तीर्ण केली आहे.",
+            "Gujarati": "ઉપરોક્ત શૈક્ષણિક સત્રમાં લેવાયેલ વાર્ષિક પરીક્ષા સફળતાપૂર્વક પાસ કરેલ છે."
+        },
+        "SUBJECT": {
+            "Odia": "ବିଷୟ", "Hindi": "विषय", "Bengali": "বিষয়",
+            "Telugu": "విషయం", "Tamil": "பாடம்", "Marathi": "विषय", "Gujarati": "વિષય"
+        },
+        "FULL MARKS": {
+            "Odia": "ମୋଟ ନମ୍ବର", "Hindi": "पूर्णांक", "Bengali": "পূর্ণমান",
+            "Telugu": "గరిష్ట మార్కులు", "Tamil": "மொத்த மதிப்பெண்கள்", "Marathi": "एकूण गुण", "Gujarati": "કુલ ગુણ"
+        },
+        "MARKS SECURED": {
+            "Odia": "ପ୍ରାପ୍ତ ନମ୍ବର", "Hindi": "प्राप्तांक", "Bengali": "প্রাপ্ত নম্বর",
+            "Telugu": "పొందిన మార్కులు", "Tamil": "பெற்ற மதிப்பெண்கள்", "Marathi": "मिळालेले गुण", "Gujarati": "મેળવેલ ગુણ"
+        },
+        "TOTAL MARKS": {
+            "Odia": "ସମୁଦାୟ ନମ୍ବର", "Hindi": "कुल प्राप्तांक", "Bengali": "মোট প্রাপ্ত নম্বর",
+            "Telugu": "మొత్తం మార్కులు", "Tamil": "மொத்த மதிப்பெண்", "Marathi": "एकूण प्राप्त गुण", "Gujarati": "કુલ મેળવેલ ગુણ"
+        },
+        "GRADE": {
+            "Odia": "ଗ୍ରେଡ୍", "Hindi": "ग्रेड", "Bengali": "গ্রেড",
+            "Telugu": "గ్రేడ్", "Tamil": "தரம்", "Marathi": "श्रेणी", "Gujarati": "ગ્રેડ"
+        },
+        "DATE OF PUBLICATION": {
+            "Odia": "ଫଳାଫଳ ପ୍ରକାଶନ ତାରିଖ", "Hindi": "परिणाम प्रकाशन तिथि", "Bengali": "ফলাফল প্রকাশের তারিখ",
+            "Telugu": "ఫలితాల ప్రకటన తేదీ", "Tamil": "முடிவுகள் வெளியான தேதி", "Marathi": "निकाल जाहीर झाल्याची तारीख", "Gujarati": "પરિણામ જાહેર થયાની તારીખ"
+        },
+        "HM SIGNATURE": {
+            "Odia": "ପ୍ରଧାନ ଶିକ୍ଷକଙ୍କ ଦସ୍ତଖତ", "Hindi": "प्रधानाचार्य के हस्ताक्षर", "Bengali": "প্রধান শিক্ষকের স্বাক্ষর",
+            "Telugu": "ప్రధానోపాధ్యాయుని సంతకం", "Tamil": "தலைமை ஆசிரியர் கையொப்பம்", "Marathi": "मुख्याध्यापकांची स्वाक्षरी", "Gujarati": "આચાર્યની સહી"
+        },
+        "CLASS TEACHER SIGNATURE": {
+            "Odia": "ଶ୍ରେଣୀ ଶିକ୍ଷକଙ୍କ ଦସ୍ତଖତ", "Hindi": "कक्षा अध्यापक के हस्ताक्षर", "Bengali": "শ্রেণী শিক্ষকের স্বাক্ষর",
+            "Telugu": "తరగతి ఉపాధ్యాయుని సంతకం", "Tamil": "வகுப்பு ஆசிரியர் கையொப்பம்", "Marathi": "वर्ग शिक्षकांची स्वाक्षरी", "Gujarati": "વર્ગ શિક્ષકની સહી"
+        }
     }
     return translations.get(eng_text, {}).get(lang, eng_text)
 
@@ -114,7 +207,7 @@ def save_master_data(data):
         json.dump(data, f, indent=4)
 
 def load_data():
-    schools = {"S001": {"name": "LAXMI NARAYAN GIRLS HIGH SCHOOL", "pass": "admin123", "state": "Odisha", "lang": "Odia"}}
+    schools = {"S001": {"name": "LAXMI NARAYAN GIRLS HIGH SCHOOL, BANASAR KALYANI", "pass": "admin123", "state": "Odisha", "lang": "Odia"}}
     students = {}
     
     if os.path.exists(SCHOOLS_FILE):
@@ -143,7 +236,7 @@ def save_data(schools, students):
     with open(STUDENTS_FILE, "w", encoding="utf-8") as f:
         json.dump(students, f, indent=4)
 
-# --- ସୁନ୍ଦର ରାଙ୍କ୍ କାର୍ଡ HTML ଡିଜାଇନ୍ ---
+# --- ସୁନ୍ଦର ରାଙ୍କ୍ କାର୍ଡ HTML ଡିଜାଇନ୍ (BILINGUAL AUTO-CONVERT) ---
 def generate_result_card_html(school_name, st_data, roll_no, s_lang):
     raw_dob = st_data.get('dob', '')
     disp_dob = raw_dob
@@ -170,11 +263,13 @@ def generate_result_card_html(school_name, st_data, roll_no, s_lang):
     qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={qr_data}"
     barcode_url = f"https://barcode.tec-it.com/barcode.ashx?data={roll_no}&code=Code128&dpi=96"
 
-    # Pre-calculate translated variables to avoid f-string syntax errors
+    # Pre-calculated translations to avoid syntax issues
     lbl_annual = t('ANNUAL EXAMINATION', s_lang)
     lbl_cert = t('CERTIFICATE-CUM-MARK SHEET', s_lang)
     lbl_roll = t('ROLL NO', s_lang)
     lbl_cls = t('CLASS', s_lang)
+    lbl_pen = t('PEN NO', s_lang)
+    lbl_apaar = t('APAAR NO', s_lang)
     lbl_name = t('NAME', s_lang)
     lbl_mother = t("MOTHER'S NAME", s_lang)
     lbl_father = t("FATHER'S NAME", s_lang)
@@ -185,6 +280,9 @@ def generate_result_card_html(school_name, st_data, roll_no, s_lang):
     lbl_sec = t('MARKS SECURED', s_lang)
     lbl_tot = t('TOTAL MARKS', s_lang)
     lbl_grd = t('GRADE', s_lang)
+    lbl_pub_date = t('DATE OF PUBLICATION', s_lang)
+    lbl_hm_sign = t('HM SIGNATURE', s_lang)
+    lbl_ct_sign = t('CLASS TEACHER SIGNATURE', s_lang)
 
     rows_html = ""
     for sub, m_info in st_data.get('subjects', {}).items():
@@ -212,11 +310,11 @@ def generate_result_card_html(school_name, st_data, roll_no, s_lang):
         
         "<table style='width: 100%; font-size: 13px; color: #000000; margin-bottom: 20px; font-weight: bold;'>"
         f"<tr><td><span style='color:{border_color}; font-weight:normal;'>ROLL NO / {lbl_roll}:</span> {roll_no}</td><td style='text-align: right;'><span style='color:{border_color}; font-weight:normal;'>CLASS / {lbl_cls}:</span> {st_data.get('class', 'N/A')}</td></tr>"
-        f"<tr><td><span style='color:{border_color}; font-weight:normal;'>PEN NO:</span> {st_data.get('pen_no', 'N/A')}</td><td style='text-align: right;'><span style='color:{border_color}; font-weight:normal;'>APAAR NO:</span> {st_data.get('apaar_no', 'N/A')}</td></tr>"
+        f"<tr><td><span style='color:{border_color}; font-weight:normal;'>PEN NO / {lbl_pen}:</span> {st_data.get('pen_no', 'N/A')}</td><td style='text-align: right;'><span style='color:{border_color}; font-weight:normal;'>APAAR NO / {lbl_apaar}:</span> {st_data.get('apaar_no', 'N/A')}</td></tr>"
         "</table>"
         
-        "<table style='width: 100%; font-size: 15px; margin-bottom: 15px; text-transform: uppercase; color: #000000; line-height: 1.8;'>"
-        f"<tr><td style='width: 220px; color: {border_color}; font-weight: bold; font-style: italic;'>Certify that / <span style='font-size:12px;'>{lbl_name}</span></td><td style='font-weight: bold; font-size: 16px;'>{student_name}</td></tr>"
+        "<table style='width: 100%; font-size: 14px; margin-bottom: 15px; text-transform: uppercase; color: #000000; line-height: 1.8;'>"
+        f"<tr><td style='width: 240px; color: {border_color}; font-weight: bold; font-style: italic;'>Certify that / <span style='font-size:12px;'>{lbl_name}</span></td><td style='font-weight: bold; font-size: 16px;'>{student_name}</td></tr>"
         f"<tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Mother's Name / <span style='font-size:12px;'>{lbl_mother}</span></td><td style='font-weight: bold;'>{st_data.get('mother_name', 'N/A').upper()}</td></tr>"
         f"<tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Father's Name / <span style='font-size:12px;'>{lbl_father}</span></td><td style='font-weight: bold;'>{st_data.get('father_name', 'N/A').upper()}</td></tr>"
         f"<tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Date of Birth / <span style='font-size:12px;'>{lbl_dob}</span></td><td style='font-weight: bold;'>{disp_dob}</td></tr>"
@@ -246,10 +344,10 @@ def generate_result_card_html(school_name, st_data, roll_no, s_lang):
         
         "<td style='width: 33%; vertical-align: bottom;'>"
         f"<img src='{barcode_url}' alt='Barcode' style='height: 35px; margin-bottom: 10px; max-width: 100%;'/>"
-        "<div style='font-size: 11px;'>DATE OF PUBLICATION</div>"
+        f"<div style='font-size: 11px;'>DATE OF PUBLICATION <br><span style='font-size:10px;'>({lbl_pub_date})</span></div>"
         f"<div style='font-weight: bold; font-size: 14px; margin-top: 5px; margin-bottom: 30px;'>{datetime.date.today().strftime('%d/%m/%Y')}</div>"
         f"<div style='border-bottom: 1px solid {border_color}; width: 80%; margin: auto;'></div>"
-        "<div style='font-size: 11px; margin-top: 5px; font-weight: bold;'>HM SIGNATURE</div>"
+        f"<div style='font-size: 11px; margin-top: 5px; font-weight: bold;'>HM SIGNATURE <br><span style='font-size:10px;'>({lbl_hm_sign})</span></div>"
         "</td>"
         
         "<td style='width: 34%; vertical-align: top; padding-top: 5px;'>"
@@ -263,7 +361,7 @@ def generate_result_card_html(school_name, st_data, roll_no, s_lang):
         f"<img src='{qr_url}' alt='QR Code' style='height: 65px; margin-bottom: 10px; max-width: 100%;'/>"
         "<div style='height: 15px; margin-bottom: 30px;'></div>"
         f"<div style='border-bottom: 1px solid {border_color}; width: 80%; margin: auto;'></div>"
-        "<div style='font-size: 11px; margin-top: 5px; font-weight: bold;'>CLASS TEACHER SIGNATURE</div>"
+        f"<div style='font-size: 11px; margin-top: 5px; font-weight: bold;'>CLASS TEACHER SIGNATURE <br><span style='font-size:10px;'>({lbl_ct_sign})</span></div>"
         "</td>"
         
         "</tr>"
@@ -273,7 +371,7 @@ def generate_result_card_html(school_name, st_data, roll_no, s_lang):
     )
     return html_content
 
-# --- PDF ଜେନେରେଟର (ENGLISH ONLY FOR FONT SUPPORT) ---
+# --- PDF ଜେନେରେଟର (CLEAN ENGLISH PRINTING TO AVOID GLYPH ERRORS) ---
 def create_pdf(filename, school_name, st_data, roll_no):
     raw_dob = st_data.get('dob', '')
     disp_dob = raw_dob
@@ -911,7 +1009,7 @@ elif menu == "School Login":
                 st.warning("No students registered in your school yet.")
                 
         with tab_add:
-            st.markdown(f"### 📝 {t('Add Student', s_lang)}")
+            st.markdown(f"### 📝 {t('Add Student', s_lang)} | Add Student")
             roll_no = st.text_input("Roll No (Student ID)", key="add_roll")
             st_name = st.text_input("Student Name", key="add_name")
             
@@ -994,7 +1092,7 @@ elif menu == "School Login":
                     st.rerun()
 
         with tab_edit:
-            st.markdown(f"### ✏️ {t('Edit Student', s_lang)}")
+            st.markdown(f"### ✏️ {t('Edit Student', s_lang)} | Edit Student")
             school_students = students_db.get(cur_school, {})
             if school_students:
                 edit_roll = st.selectbox("Select Roll No", list(school_students.keys()), key="edit_roll_sel")
@@ -1070,7 +1168,7 @@ elif menu == "School Login":
                 st.warning("No students available.")
 
         with tab_report:
-            st.markdown(f"### 🖨️ {t('Report Card', s_lang)}")
+            st.markdown(f"### 🖨️ {t('Report Card', s_lang)} | Report Card")
             school_students = students_db.get(cur_school, {})
             if school_students:
                 rep_roll = st.selectbox("Select Student Roll No for Report", list(school_students.keys()), key="rep_sel")
