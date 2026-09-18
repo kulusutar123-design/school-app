@@ -16,7 +16,7 @@ import html
 import threading
 
 # ==========================================
-# 🔒 CRASH PROTECTION & ANTI-HACK LOCKS (WITH OLD JSON SYSTEM)
+# 🔒 CRASH PROTECTION & ANTI-HACK LOCKS
 # ==========================================
 file_lock = threading.Lock()
 
@@ -130,7 +130,7 @@ def t(eng_text, lang):
         "TOTAL MARKS": {"Odia": "ସମୁଦାୟ ନମ୍ବର", "Hindi": "कुल प्राप्तांक", "Bengali": "মোট প্রাপ্ত নম্বর"},
         "GRADE": {"Odia": "ଗ୍ରେଡ୍", "Hindi": "ग्रेड", "Bengali": "গ্রেড"},
         "DATE OF PUBLICATION": {"Odia": "ଫଳାଫଳ ପ୍ରକାଶନ ତାରିଖ", "Hindi": "परिणाम प्रकाशन तिथि", "Bengali": "ফলাফল প্রকাশের তারিখ"},
-        "HM SIGNATURE": {"Odia": "ପ୍ରଧାନ ଶିକ୍ଷକଙ୍କ ଦସ୍ତଖତ", "Hindi": "प्रधानाचार्य के हस्ताक्षर", "Bengali": "প্রধান শিক্ষকের স্বাক্ষর"},
+        "HM SIGNATURE": {"Odia": "ପ୍ରଧାନ ଶିକ୍ଷକଙ୍କ ଦସ୍ତଖତ", "Hindi": "प्रधानाचार्य के हस्ताक्षर", "Bengali": "প্রধান शिक्षকের স্বাক্ষর"},
         "CLASS TEACHER SIGNATURE": {"Odia": "ଶ୍ରେଣୀ ଶିକ୍ଷକଙ୍କ ଦସ୍ତଖତ", "Hindi": "कक्षा अध्यापक के हस्ताक्षर", "Bengali": "শ্রেণী শিক্ষকের স্বাক্ষর"}
     }
     return translations.get(eng_text, {}).get(lang, eng_text)
@@ -178,7 +178,9 @@ def load_master_data():
         "phone": "9999999999", 
         "upi_id": "school@sbi",
         "reg_fee": 150.0,
-        "gst_percent": 18.0
+        "gst_percent": 18.0,
+        "school_reg_fee": 1000.0,
+        "school_gst_percent": 18.0
     }
     if os.path.exists(MASTER_FILE):
         try:
@@ -189,6 +191,8 @@ def load_master_data():
                     if "upi_id" not in m: m["upi_id"] = "school@sbi"
                     if "reg_fee" not in m: m["reg_fee"] = 150.0
                     if "gst_percent" not in m: m["gst_percent"] = 18.0
+                    if "school_reg_fee" not in m: m["school_reg_fee"] = 1000.0
+                    if "school_gst_percent" not in m: m["school_gst_percent"] = 18.0
                     return m
         except Exception:
             pass
@@ -644,6 +648,7 @@ if menu == "Home Page":
         st.markdown("<a href='?portal=reg_student' target='_self' class='login-card'><div class='login-title'>👨‍🎓 New Student Registration</div><div class='login-sub'>Apply for admission/exams online</div></a>", unsafe_allow_html=True)
         st.markdown("<a href='?portal=master' target='_self' class='login-card'><div class='login-title'>🏛️ Master Login</div><div class='login-sub'>Login as Admin / University</div></a>", unsafe_allow_html=True)
     with c2:
+        st.markdown("<a href='?portal=reg_school' target='_self' class='login-card'><div class='login-title'>📝 New School Registration</div><div class='login-sub'>Register a new school in the system</div></a>", unsafe_allow_html=True)
         st.markdown("<a href='?portal=school' target='_self' class='login-card'><div class='login-title'>🏫 School Login</div><div class='login-sub'>Login as School / College</div></a>", unsafe_allow_html=True)
         st.markdown("<a href='?portal=student' target='_self' class='login-card'><div class='login-title'>🎓 Results</div><div class='login-sub'>Check Student Rank Card</div></a>", unsafe_allow_html=True)
 
@@ -811,6 +816,7 @@ elif menu == "New Student Registration":
                         else:
                             reg_data = st.session_state['temp_student_data']
                             reg_data['data']['payment_mode'] = f"Online (₹{total_fee:.2f} - Txn: {sanitize(txn_id)})"
+                            reg_data['data']['status'] = "Pending_Master"
                             
                             sch_id = reg_data['school_sel']
                             if sch_id not in students_db:
@@ -827,6 +833,7 @@ elif menu == "New Student Registration":
                 if st.button("Submit Final Application", type="primary"):
                     reg_data = st.session_state['temp_student_data']
                     reg_data['data']['payment_mode'] = f"Offline (₹{total_fee:.2f} - Pending at Counter)"
+                    reg_data['data']['status'] = "Pending_Master"
                     
                     sch_id = reg_data['school_sel']
                     if sch_id not in students_db:
@@ -834,7 +841,7 @@ elif menu == "New Student Registration":
                     students_db[sch_id][reg_data['reg_id']] = reg_data['data']
                     save_data(schools_db, students_db)
                     
-                    st.success(f"✅ Application Submitted Successfully! Your Registration ID is **{reg_data['reg_id']}**. Please visit the school counter to complete payment.")
+                    st.success(f"✅ Application Submitted Successfully! Your Registration ID is **{reg_data['reg_id']}**. It is now pending payment verification from the Master Admin.")
                     st.session_state['payment_step'] = False
                     st.session_state['temp_student_data'] = None
                     
@@ -842,67 +849,143 @@ elif menu == "New Student Registration":
                 st.session_state['payment_step'] = False
                 st.rerun()
 
-# ----------------- NEW SCHOOL REGISTRATION -----------------
+# ----------------- NEW SCHOOL REGISTRATION WITH DYNAMIC FEES -----------------
 elif menu == "New School Registration":
-    st.query_params["portal"] = "register"
+    st.query_params["portal"] = "reg_school"
     c_home, c_title = st.columns([1, 8])
     with c_home:
         if st.button("🏠 Home", key="reg_sch_home"):
             st.query_params["portal"] = "home"
             st.rerun()
     with c_title:
-        st.subheader("📝 New School Registration Portal")
+        st.subheader("📝 New School Registration & Payment")
 
-    st.info("Submit your school details. Wait for the Master Admin to approve and ACTIVATE your account before logging in.")
-    
-    with st.form("school_reg_form"):
-        r_id = st.text_input("School ID (Create a Unique ID) *")
+    s_base_fee = float(master_db.get("school_reg_fee", 1000.0))
+    s_gst_pct = float(master_db.get("school_gst_percent", 18.0))
+    s_gst_amt = round(s_base_fee * (s_gst_pct / 100.0), 2)
+    s_total_fee = round(s_base_fee + s_gst_amt, 2)
+
+    if 'school_payment_step' not in st.session_state:
+        st.session_state['school_payment_step'] = False
+        st.session_state['temp_school_data'] = None
+
+    if not st.session_state['school_payment_step']:
+        st.info("Submit your school details. Wait for the Master Admin to approve and ACTIVATE your account after payment.")
         
-        c_n1, c_n2 = st.columns(2)
-        r_name_en = c_n1.text_input("School Name (English) *")
-        r_name_loc = c_n2.text_input("School Name (Local Language) [Optional]")
-        
-        indian_states = list(STATE_LANG_MAP.keys())
-        r_state = st.selectbox("Select State", indian_states, index=18)
-        
-        c_a1, c_a2 = st.columns(2)
-        r_address_en = c_a1.text_area("School Address (English)")
-        r_address_loc = c_a2.text_area("School Address (Local Language) [Optional]")
-        
-        c_h1, c_h2 = st.columns(2)
-        r_hm_name = c_h1.text_input("Head Master Name")
-        r_hm_phone = c_h2.text_input("Head Master Mobile No.")
-        
-        c_p1, c_p2 = st.columns(2)
-        r_pass = c_p1.text_input("New Password *", type="password")
-        r_cpass = c_p2.text_input("Confirm Password *", type="password")
-        
-        submitted = st.form_submit_button("Submit Registration")
-        if submitted:
-            s_id_clean = sanitize(r_id)
-            if not s_id_clean or not sanitize(r_name_en) or not r_pass:
-                st.error("Please fill all the mandatory fields (*) including School ID, Name, and Password.")
-            elif r_pass != r_cpass:
-                st.error("Passwords do not match!")
-            elif s_id_clean in schools_db:
-                st.error("This School ID already exists. Please choose a different ID.")
-            else:
-                schools_db[s_id_clean] = {
-                    "name": sanitize(r_name_en), 
-                    "name_local": sanitize(r_name_loc),
-                    "address": sanitize(r_address_en),
-                    "address_local": sanitize(r_address_loc),
-                    "hm_name": sanitize(r_hm_name),
-                    "hm_name_local": "",
-                    "hm_phone": sanitize(r_hm_phone),
-                    "hm_email": "",
-                    "pass": r_pass, 
-                    "state": r_state, 
-                    "lang": STATE_LANG_MAP[r_state],
-                    "status": "Pending"
-                }
-                save_data(schools_db, students_db)
-                st.success("✅ Registration Successful! Your account is PENDING approval from the Master Admin. You will be able to login once it is activated.")
+        with st.form("school_reg_form"):
+            r_id = st.text_input("School ID (Create a Unique ID) *")
+            
+            c_n1, c_n2 = st.columns(2)
+            r_name_en = c_n1.text_input("School Name (English) *")
+            r_name_loc = c_n2.text_input("School Name (Local Language) [Optional]")
+            
+            indian_states = list(STATE_LANG_MAP.keys())
+            r_state = st.selectbox("Select State", indian_states, index=18)
+            
+            c_a1, c_a2 = st.columns(2)
+            r_address_en = c_a1.text_area("School Address (English)")
+            r_address_loc = c_a2.text_area("School Address (Local Language) [Optional]")
+            
+            c_h1, c_h2 = st.columns(2)
+            r_hm_name = c_h1.text_input("Head Master Name")
+            r_hm_phone = c_h2.text_input("Head Master Mobile No.")
+            
+            c_p1, c_p2 = st.columns(2)
+            r_pass = c_p1.text_input("New Password *", type="password")
+            r_cpass = c_p2.text_input("Confirm Password *", type="password")
+            
+            st.markdown("#### 5. Declaration")
+            s_declaration = st.checkbox("✅ I hereby declare that all the information provided above is true and correct.")
+            
+            submitted = st.form_submit_button("Proceed to Payment & Submit")
+            if submitted:
+                s_id_clean = sanitize(r_id)
+                if not s_declaration:
+                    st.error("⚠️ Please check the declaration box.")
+                elif not s_id_clean or not sanitize(r_name_en) or not r_pass:
+                    st.error("Please fill all the mandatory fields (*) including School ID, Name, and Password.")
+                elif r_pass != r_cpass:
+                    st.error("Passwords do not match!")
+                elif s_id_clean in schools_db:
+                    st.error("This School ID already exists. Please choose a different ID.")
+                else:
+                    st.session_state['temp_school_data'] = {
+                        "school_id": s_id_clean,
+                        "data": {
+                            "name": sanitize(r_name_en), 
+                            "name_local": sanitize(r_name_loc),
+                            "address": sanitize(r_address_en),
+                            "address_local": sanitize(r_address_loc),
+                            "hm_name": sanitize(r_hm_name),
+                            "hm_name_local": "",
+                            "hm_phone": sanitize(r_hm_phone),
+                            "hm_email": "",
+                            "pass": r_pass, 
+                            "state": r_state, 
+                            "lang": STATE_LANG_MAP[r_state],
+                            "status": "Pending_Master_Approval"
+                        }
+                    }
+                    st.session_state['school_payment_step'] = True
+                    st.rerun()
+
+    if st.session_state.get('school_payment_step', False):
+        st.markdown("### 💳 Secure Payment Gateway for School")
+        s_temp_obj = st.session_state.get('temp_school_data')
+        if s_temp_obj:
+            st.markdown(f"""
+            <div style='background-color:#eff6ff; border:1px solid #bfdbfe; padding:15px; border-radius:8px; margin-bottom:15px;'>
+                <b>School Name:</b> {s_temp_obj['data']['name'].upper()}<br>
+                <b>School Registration Base Fee:</b> ₹{s_base_fee:.2f}<br>
+                <b>GST ({s_gst_pct}%):</b> ₹{s_gst_amt:.2f}<br>
+                <hr style='margin:8px 0;'>
+                <b style='color:#1e3a8a; font-size:18px;'>Total Payable Amount: ₹{s_total_fee:.2f}</b>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            s_pay_mode = st.radio("Select Payment Mode", ["Online Payment (UPI/QR)", "Offline Payment (Direct)"])
+            
+            if s_pay_mode == "Online Payment (UPI/QR)":
+                master_upi = master_db.get("upi_id", "school@sbi")
+                upi_url = f"upi://pay?pa={master_upi}&pn=SchoolReg&am={s_total_fee:.2f}&cu=INR"
+                qr_api = f"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={urllib.parse.quote(upi_url)}"
+                
+                col_qr, col_form = st.columns([1, 2])
+                with col_qr:
+                    st.markdown(f"<img src='{qr_api}' style='border:5px solid #1E3A8A; border-radius:10px;'>", unsafe_allow_html=True)
+                    st.markdown(f"**UPI ID:** `{master_upi}`")
+                    
+                with col_form:
+                    st.warning(f"Scan the QR code to pay ₹{s_total_fee:.2f}.")
+                    txn_id = st.text_input("Enter 12-digit Transaction ID / UTR No. *")
+                    if st.button("Verify & Submit School Registration", type="primary"):
+                        if not txn_id or len(txn_id) < 8:
+                            st.error("Please enter a valid Transaction ID.")
+                        else:
+                            reg_data = st.session_state['temp_school_data']
+                            reg_data['data']['payment_mode'] = f"Online (₹{s_total_fee:.2f} - Txn: {sanitize(txn_id)})"
+                            schools_db[reg_data["school_id"]] = reg_data["data"]
+                            save_data(schools_db, students_db)
+                            
+                            st.success("✅ Payment Verified! Registration is now pending approval from the Master Admin.")
+                            st.session_state['school_payment_step'] = False
+                            st.session_state['temp_school_data'] = None
+
+            elif s_pay_mode == "Offline Payment (Direct)":
+                st.info(f"Offline Payment: Please pay ₹{s_total_fee:.2f} to the authorities.")
+                if st.button("Submit School Registration", type="primary"):
+                    reg_data = st.session_state['temp_school_data']
+                    reg_data['data']['payment_mode'] = f"Offline (₹{s_total_fee:.2f} - Pending)"
+                    schools_db[reg_data["school_id"]] = reg_data["data"]
+                    save_data(schools_db, students_db)
+                    
+                    st.success("✅ Registration is now pending approval from the Master Admin.")
+                    st.session_state['school_payment_step'] = False
+                    st.session_state['temp_school_data'] = None
+                    
+            if st.button("⬅️ Back to Form"):
+                st.session_state['school_payment_step'] = False
+                st.rerun()
 
 # ----------------- MASTER LOGIN -----------------
 elif menu == "Master Login":
@@ -978,26 +1061,23 @@ elif menu == "Master Login":
         st.markdown("---")
         tab1, tab_pay, tab2, tab3, tab4 = st.tabs([
             "👁️ Manage Schools", 
-            "💳 Payment Approvals",
+            "💳 Payment Approvals (School & Student)",
             "🎓 Edit Students Data", 
             "✏️ Edit Registered Schools", 
-            "⚙️ Settings (ID/Pass & UPI)"
+            "⚙️ Settings (ID/Pass & Fees)"
         ])
         
         with tab1:
-            st.markdown("### 🔔 Pending Approvals & Manage Schools")
-            st.info("Here you can Activate, Deactivate, or Delete registered schools.")
-
+            st.markdown("### 🏫 Active/Inactive Schools")
             if not schools_db:
                 st.write("କୌଣସି ସ୍କୁଲ୍ ରେଜିଷ୍ଟର୍ ହୋଇନାହିଁ।")
             else:
                 for s_id, s_info in list(schools_db.items()):
                     status = s_info.get("status", "Active") 
-                    
-                    bg = "#ffffff"
-                    if status == "Pending": bg = "#fffbeb"
-                    elif status == "Inactive": bg = "#fef2f2"
-                    elif status == "Active": bg = "#f0fdf4"
+                    if status == "Pending_Master_Approval":
+                        continue # Show in Payment Approvals tab
+                        
+                    bg = "#f0fdf4" if status == "Active" else "#fef2f2"
 
                     st.markdown(f"""
                     <div style="border:1px solid #cbd5e1; border-radius:5px; padding:10px; margin-bottom:10px; background-color:{bg};">
@@ -1008,14 +1088,13 @@ elif menu == "Master Login":
                     """, unsafe_allow_html=True)
                     
                     c_btn1, c_btn2, c_btn3 = st.columns(3)
-                    
-                    if status == "Pending" or status == "Inactive":
+                    if status == "Inactive":
                         if c_btn1.button("✅ Make Active", key=f"act_{s_id}"):
                             s_info["status"] = "Active"
                             save_data(schools_db, students_db)
                             st.success(f"School {s_id} is now Active!")
                             st.rerun()
-                    if status == "Active" or status == "Pending":
+                    if status == "Active":
                         if c_btn2.button("🚫 Make Inactive", key=f"deact_{s_id}"):
                             s_info["status"] = "Inactive"
                             save_data(schools_db, students_db)
@@ -1031,6 +1110,33 @@ elif menu == "Master Login":
                         st.rerun()
 
         with tab_pay:
+            st.markdown("### 💳 Verify New School Registrations")
+            pending_schools = {k: v for k, v in schools_db.items() if v.get("status") == "Pending_Master_Approval"}
+            if pending_schools:
+                for s_id, s_info in pending_schools.items():
+                    st.markdown(f"""
+                    <div style="border:1px solid #cbd5e1; border-radius:5px; padding:10px; margin-bottom:10px; background-color:#fffbeb;">
+                        <b>School ID:</b> {s_id} | <b>Name:</b> {s_info['name']}<br>
+                        <b style="color:green;">Payment Mode/UTR:</b> {s_info.get('payment_mode', 'N/A')}
+                    </div>
+                    """, unsafe_allow_html=True)
+                    cp1, cp2 = st.columns(2)
+                    with cp1:
+                        if st.button(f"✅ Approve Payment & Activate", key=f"vps_{s_id}"):
+                            s_info["status"] = "Active"
+                            save_data(schools_db, students_db)
+                            st.success(f"School {s_id} Activated!")
+                            st.rerun()
+                    with cp2:
+                        if st.button(f"🚫 Reject (Auto Refund)", key=f"rps_{s_id}"):
+                            del schools_db[s_id]
+                            save_data(schools_db, students_db)
+                            st.error(f"School {s_id} Rejected & Refund Initiated.")
+                            st.rerun()
+            else:
+                st.success("No pending School Registrations.")
+                
+            st.markdown("---")
             st.markdown("### 💳 Verify Student Payments (Master Access)")
             st.info("Approve payments here. Once verified, the application will be sent to the respective school for final admission approval.")
             
@@ -1057,13 +1163,14 @@ elif menu == "Master Login":
                             st.success(f"Payment for {r_no} verified! Application sent to School.")
                             st.rerun()
                     with c_pay2:
-                        if st.button(f"🚫 Reject Application", key=f"rp_{r_no}"):
-                            del students_db[s_id][r_no]
+                        if st.button(f"🚫 Reject (Auto Refund)", key=f"rp_{r_no}"):
+                            p_st['payment_mode'] = p_st.get('payment_mode', '') + " - [REFUND INITIATED]"
+                            p_st['status'] = "Rejected_Refund"
                             save_data(schools_db, students_db)
-                            st.error(f"Payment rejected and application {r_no} deleted.")
+                            st.error(f"Payment rejected and Refund initiated for {r_no}.")
                             st.rerun()
             else:
-                st.success("No pending payments to verify.")
+                st.success("No pending student payments to verify.")
 
         with tab2:
             st.markdown("### 📋 Manage All Students (Master Access)")
@@ -1213,7 +1320,7 @@ elif menu == "Master Login":
                 
                 if st.button("Update School Profile"):
                     if edit_s_name:
-                        curr_s_data.update({
+                        schools_db[selected_edit_school].update({
                             "name": sanitize(edit_s_name),
                             "name_local": sanitize(edit_s_name_loc),
                             "hm_name": sanitize(edit_hm_name),
@@ -1224,7 +1331,7 @@ elif menu == "Master Login":
                             "lang": STATE_LANG_MAP[edit_s_state]
                         })
                         if edit_s_pass:
-                            curr_s_data["pass"] = edit_s_pass
+                            schools_db[selected_edit_school]["pass"] = edit_s_pass
                             
                         save_data(schools_db, students_db)
                         st.success(f"School Profile Updated! The portal language is now set to {STATE_LANG_MAP[edit_s_state]}.")
@@ -1244,12 +1351,12 @@ elif menu == "Master Login":
             up_m_upi = st.text_input("Online Payment UPI ID (e.g. school@sbi)", value=master_db.get("upi_id", "school@sbi"))
             
             c_f1, c_f2 = st.columns(2)
-            up_base_fee = c_f1.number_input("Base Registration Fee (₹)", value=float(master_db.get("reg_fee", 150.0)), min_value=0.0, step=10.0)
-            up_gst_pct = c_f2.number_input("GST Percentage (%)", value=float(master_db.get("gst_percent", 18.0)), min_value=0.0, max_value=100.0, step=1.0)
+            up_base_fee = c_f1.number_input("Student Registration Base Fee (₹)", value=float(master_db.get("reg_fee", 150.0)), min_value=0.0, step=10.0)
+            up_gst_pct = c_f2.number_input("Student GST Percentage (%)", value=float(master_db.get("gst_percent", 18.0)), min_value=0.0, max_value=100.0, step=1.0)
             
-            calc_gst = round(up_base_fee * (up_gst_pct / 100.0), 2)
-            calc_total = round(up_base_fee + calc_gst, 2)
-            st.info(f"📊 **Calculated Fee Summary:** Base Fee: ₹{up_base_fee:.2f} + GST ({up_gst_pct}%): ₹{calc_gst:.2f} = **Total Fee: ₹{calc_total:.2f}**")
+            c_s1, c_s2 = st.columns(2)
+            up_sch_fee = c_s1.number_input("School Registration Base Fee (₹)", value=float(master_db.get("school_reg_fee", 1000.0)), min_value=0.0, step=100.0)
+            up_sch_gst = c_s2.number_input("School GST Percentage (%)", value=float(master_db.get("school_gst_percent", 18.0)), min_value=0.0, max_value=100.0, step=1.0)
             
             if st.button("Save Profile & Fee Settings"):
                 master_db["username"] = sanitize(up_m_user)
@@ -1258,6 +1365,8 @@ elif menu == "Master Login":
                 master_db["upi_id"] = sanitize(up_m_upi)
                 master_db["reg_fee"] = float(up_base_fee)
                 master_db["gst_percent"] = float(up_gst_pct)
+                master_db["school_reg_fee"] = float(up_sch_fee)
+                master_db["school_gst_percent"] = float(up_sch_gst)
                 if up_m_pass:
                     master_db["password"] = up_m_pass
                 save_master_data(master_db)
@@ -1316,8 +1425,8 @@ elif menu == "School Login":
                         st.session_state['school_logged_id'] = s_id_clean
                         del st.session_state['school_captcha']
                         st.rerun()
-                    elif sch_status == "Pending":
-                        st.error("⏳ ଆପଣଙ୍କ ସ୍କୁଲ୍ ଆକାଉଣ୍ଟ୍ ବର୍ତ୍ତମାନ ପେଣ୍ଡିଂ (Pending) ଅଛି। ମାଷ୍ଟର୍ ଙ୍କ ଅନୁମୋଦନ ପରେ ଆପଣ ଲଗ୍ଇନ୍ କରିପାରିବେ।")
+                    elif sch_status == "Pending_Master_Approval":
+                        st.error("⏳ ଆପଣଙ୍କ ସ୍କୁଲ୍ ପେମେଣ୍ଟ୍ ବର୍ତ୍ତମାନ ପେଣ୍ଡିଂ (Pending) ଅଛି। ମାଷ୍ଟର୍ ଙ୍କ ଅନୁମୋଦନ ପରେ ଆପଣ ଲଗ୍ଇନ୍ କରିପାରିବେ।")
                     elif sch_status == "Inactive":
                         st.error("🚫 ଆପଣଙ୍କ ସ୍କୁଲ୍ ଆକାଉଣ୍ଟ୍ କୁ ବର୍ତ୍ତମାନ ବନ୍ଦ (Inactive) କରାଯାଇଛି। ଦୟାକରି ମାଷ୍ଟର୍ ଙ୍କ ସହ ଯୋଗାଯୋଗ କରନ୍ତୁ।")
                 else:
@@ -1755,6 +1864,7 @@ elif menu == "Results":
             found_roll = None
             found_school_id = None
             
+            # FAST SEARCH THROUGH ALL SCHOOLS
             for s_id, school_students in students_db.items():
                 if st_search_query in school_students:
                     potential_student = school_students[st_search_query]
