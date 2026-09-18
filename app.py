@@ -5,17 +5,7 @@ from reportlab.pdfgen import canvas
 from reportlab.graphics.barcode import code128, qr
 from reportlab.graphics.shapes import Drawing
 from reportlab.graphics import renderPDF
-import json
-import os
-import datetime
-import random
-import urllib.parse
-import urllib.request
-import ssl
-import hashlib
-import html
-import threading
-import sqlite3
+import json, os, datetime, random, urllib.parse, urllib.request, ssl, hashlib, html, threading, sqlite3
 
 # ==========================================
 # 🔒 HIGH-SPEED DATABASE & MILITARY-GRADE SECURITY
@@ -23,16 +13,13 @@ import sqlite3
 file_lock = threading.Lock()
 
 def hash_password(password):
-    """SHA-256 Encryption for passwords to prevent cracking"""
     return hashlib.sha256(password.encode()).hexdigest()
 
 def sanitize(text):
-    """Prevents XSS & SQL Injection Hacks"""
     if isinstance(text, str):
         return html.escape(text.strip())
     return text
 
-# Crash-Proof Database Connection
 @st.cache_resource
 def get_db_connection():
     conn = sqlite3.connect('school_ultimate_secure.db', check_same_thread=False, timeout=60)
@@ -47,7 +34,6 @@ def get_db_connection():
                  (roll_no TEXT, dob TEXT, school_id TEXT, name TEXT, data TEXT, status TEXT, PRIMARY KEY (school_id, roll_no))''')
     c.execute('''CREATE INDEX IF NOT EXISTS idx_student_search ON students(roll_no, dob, name)''')
     
-    # Secure Master Initialization
     c.execute("SELECT data FROM master WHERE id='master'")
     if not c.fetchone():
         def_m = {"username": "master", "password": hash_password("master123"), "email": "admin@school.com", "phone": "9999999999"}
@@ -85,7 +71,6 @@ def delete_school(s_id):
         conn.cursor().execute("DELETE FROM students WHERE school_id=?", (s_id,))
         conn.commit()
 
-# Modifed to get all students or just approved/pending
 def get_students_by_school(s_id, status=None):
     if status:
         return {row[0]: json.loads(row[1]) for row in conn.cursor().execute("SELECT roll_no, data FROM students WHERE school_id=? AND status=?", (s_id, status)).fetchall()}
@@ -115,515 +100,228 @@ def delete_student(s_id, roll_no):
 APP_URL = "http://localhost:8501"
 
 st.set_page_config(page_title="Advanced School Management System", layout="wide")
+st.markdown("<style>#MainMenu {visibility: hidden;} header {visibility: hidden;} footer {visibility: hidden;}</style>", unsafe_allow_html=True)
 
-hide_st_style = """
-            <style>
-            #MainMenu {visibility: hidden;}
-            header {visibility: hidden;}
-            footer {visibility: hidden;}
-            </style>
-            """
-st.markdown(hide_st_style, unsafe_allow_html=True)
-
-# ==========================================
-# 🗺️ ALL INDIAN STATES & LOCAL LANGUAGE MAPPING
-# ==========================================
 STATE_LANG_MAP = {
-    "Andhra Pradesh": "Telugu", "Arunachal Pradesh": "English", "Assam": "Assamese",
-    "Bihar": "Hindi", "Chhattisgarh": "Hindi", "Goa": "Konkani",
-    "Gujarat": "Gujarati", "Haryana": "Hindi", "Himachal Pradesh": "Hindi",
-    "Jharkhand": "Hindi", "Karnataka": "Kannada", "Kerala": "Malayalam",
-    "Madhya Pradesh": "Hindi", "Maharashtra": "Marathi", "Manipur": "English",
-    "Meghalaya": "English", "Mizoram": "English", "Nagaland": "English",
-    "Odisha": "Odia", "Punjab": "Punjabi", "Rajasthan": "Hindi",
-    "Sikkim": "English", "Tamil Nadu": "Tamil", "Telangana": "Telugu",
-    "Tripura": "Bengali", "Uttar Pradesh": "Hindi", "Uttarakhand": "Hindi",
-    "West Bengal": "Bengali", "Delhi": "Hindi", "Jammu and Kashmir": "Urdu",
-    "Ladakh": "English", "Puducherry": "Tamil", "Chandigarh": "Punjabi",
-    "Andaman and Nicobar": "English", "Lakshadweep": "Malayalam", "Dadra & Nagar Haveli": "Gujarati"
+    "Andhra Pradesh": "Telugu", "Arunachal Pradesh": "English", "Assam": "Assamese", "Bihar": "Hindi", "Chhattisgarh": "Hindi",
+    "Goa": "Konkani", "Gujarat": "Gujarati", "Haryana": "Hindi", "Himachal Pradesh": "Hindi", "Jharkhand": "Hindi",
+    "Karnataka": "Kannada", "Kerala": "Malayalam", "Madhya Pradesh": "Hindi", "Maharashtra": "Marathi", "Manipur": "English",
+    "Meghalaya": "English", "Mizoram": "English", "Nagaland": "English", "Odisha": "Odia", "Punjab": "Punjabi",
+    "Rajasthan": "Hindi", "Sikkim": "English", "Tamil Nadu": "Tamil", "Telangana": "Telugu", "Tripura": "Bengali",
+    "Uttar Pradesh": "Hindi", "Uttarakhand": "Hindi", "West Bengal": "Bengali", "Delhi": "Hindi"
 }
 
-# List of Countries
-COUNTRIES = ["India", "USA", "UK", "Canada", "Australia", "UAE", "Singapore", "Other"]
+COUNTRIES = ["Yes - Indian National", "No - Other Country"]
 
-# ==========================================
-# 🤖 AUTO TRANSLATION ENGINE
-# ==========================================
 @st.cache_data(show_spinner=False)
 def auto_translate(text, lang_name):
-    LANG_CODES = {
-        "Odia": "or", "Hindi": "hi", "Bengali": "bn", "Telugu": "te",
-        "Tamil": "ta", "Marathi": "mr", "Gujarati": "gu", "Assamese": "as",
-        "Kannada": "kn", "Malayalam": "ml", "Punjabi": "pa", "Urdu": "ur", "English": "en"
-    }
-    if lang_name == "English" or not text: 
-        return text
-    
-    target_code = LANG_CODES.get(lang_name, "en")
-    if target_code == "en": 
-        return text
-        
+    if lang_name == "English" or not text: return text
+    LC = {"Odia":"or", "Hindi":"hi", "Bengali":"bn", "Telugu":"te", "Tamil":"ta", "Marathi":"mr", "Gujarati":"gu", "Assamese":"as"}
+    tc = LC.get(lang_name, "en")
+    if tc == "en": return text
     try:
-        ctx = ssl.create_default_context()
-        ctx.check_hostname = False
-        ctx.verify_mode = ssl.CERT_NONE
-        
-        url = f"https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl={target_code}&dt=t&q={urllib.parse.quote(text)}"
+        ctx = ssl.create_default_context(); ctx.check_hostname = False; ctx.verify_mode = ssl.CERT_NONE
+        url = f"https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl={tc}&dt=t&q={urllib.parse.quote(text)}"
         req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-        response = urllib.request.urlopen(req, timeout=5, context=ctx)
-        data = json.loads(response.read().decode('utf-8'))
-        translated_text = "".join([sentence[0] for sentence in data[0]])
-        return translated_text
-    except Exception:
-        return text 
+        res = urllib.request.urlopen(req, timeout=3, context=ctx)
+        return "".join([s[0] for s in json.loads(res.read().decode('utf-8'))[0]])
+    except: return text 
 
-# ==========================================
-# 🗣️ STATIC TRANSLATION DICTIONARY
-# ==========================================
 def t(eng_text, lang):
-    translations = {
-        "School Portal": {"Odia": "ସ୍କୁଲ୍ ପୋର୍ଟାଲ୍", "Hindi": "स्कूल पोर्टल", "Bengali": "স্কুল পোর্টাল", "Telugu": "పాఠశాల పోర్టల్", "Marathi": "शाळा पोर्टल"},
-        "Logout": {"Odia": "ଲଗ୍ ଆଉଟ୍", "Hindi": "लॉग आउट", "Bengali": "লগ আউট", "Marathi": "लॉग आउट"},
-        "My Students": {"Odia": "ମୋର ଛାତ୍ରଛାତ୍ରୀ", "Hindi": "मेरे छात्र", "Bengali": "আমার ছাত্র", "Marathi": "माझे विद्यार्थी"},
-        "Add Student": {"Odia": "ନୂଆ ଛାତ୍ର ଯୋଡନ୍ତୁ", "Hindi": "नया छात्र जोड़ें", "Bengali": "নতুন ছাত্র যোগ করুন", "Marathi": "नवीन विद्यार्थी जोडा"},
-        "Edit Student": {"Odia": "ଛାତ୍ର ତଥ୍ୟ ବଦଳାନ୍ତୁ", "Hindi": "छात्र विवरण बदलें", "Bengali": "তথ্য আপডেট করুন", "Marathi": "अपडेट करा"},
-        "Report Card": {"Odia": "ରିପୋର୍ଟ କାର୍ଡ ପ୍ରିଣ୍ଟ୍", "Hindi": "रिपोर्ट कार्ड", "Bengali": "রিপোর্ট কার্ড", "Marathi": "रिपोर्ट कार्ड"},
-        "Search": {"Odia": "ନାମ କିମ୍ବା ରୋଲ୍ ନମ୍ବର ଦେଇ ଖୋଜନ୍ତୁ", "Hindi": "नाम या रोल नंबर से खोजें", "Bengali": "নাম বা রোল নম্বর দিয়ে খুঁজুন"},
-        
-        "ANNUAL EXAMINATION": {"Odia": "ବାର୍ଷିକ ପରୀକ୍ଷା", "Hindi": "वार्षिक परीक्षा", "Bengali": "বার্ষিক পরীক্ষা", "Marathi": "वार्षिक परीक्षा"},
-        "CERTIFICATE-CUM-MARK SHEET": {"Odia": "ପ୍ରମାଣପତ୍ର ଏବଂ ମାର୍କସିଟ୍", "Hindi": "प्रमाणपत्र सह अंकतालिका", "Bengali": "শংসাপত্র এবং মার্কশিট", "Marathi": "प्रमाणपत्र आणि गुणपत्रिका"},
-        "SUBJECTS AND MARKS SECURED": {"Odia": "ବିଷୟ ଏବଂ ପ୍ରାପ୍ତ ନମ୍ବର", "Hindi": "विषय और प्राप्त अंक", "Bengali": "বিষয় এবং প্রাপ্ত নম্বর", "Marathi": "विषय आणि मिळवलेले गुण"},
-        "Certify that": {"Odia": "ପ୍ରମାଣ କରାଯାଏ ଯେ", "Hindi": "प्रमाणित किया जाता है कि", "Bengali": "প্রত্যয়ন করা যাচ্ছে যে", "Marathi": "प्रमाणित केले जाते की"},
-        
-        "ROLL NO": {"Odia": "ରୋଲ୍ ନମ୍ବର", "Hindi": "रोल नंबर", "Bengali": "রোল নম্বর", "Marathi": "रोल नंबर"},
-        "CLASS": {"Odia": "ଶ୍ରେଣୀ", "Hindi": "कक्षा", "Bengali": "শ্রেণী", "Marathi": "वर्ग"},
-        "PEN NO": {"Odia": "ପେନ୍ ନମ୍ବର", "Hindi": "पेन नं.", "Bengali": "পেন নং", "Marathi": "पेन क्र."},
-        "APAAR NO": {"Odia": "ଅପାର୍ ନମ୍ବର", "Hindi": "अपार नं.", "Bengali": "অপার নং", "Marathi": "अपार क्र."},
-        "NAME": {"Odia": "ଛାତ୍ର/ଛାତ୍ରୀଙ୍କ ନାମ", "Hindi": "छात्र का नाम", "Bengali": "ছাত্রের নাম", "Marathi": "विद्यार्थ्याचे नाव"},
-        "MOTHER'S NAME": {"Odia": "ମାତାଙ୍କ ନାମ", "Hindi": "माता का नाम", "Bengali": "মাতার নাম", "Marathi": "आईचे नाव"},
-        "FATHER'S NAME": {"Odia": "ପିତାଙ୍କ ନାମ", "Hindi": "पिता का नाम", "Bengali": "পিতার নাম", "Marathi": "वडिलांचे नाव"},
-        "DOB": {"Odia": "ଜନ୍ମ ତାରିଖ", "Hindi": "जन्म तिथि", "Bengali": "জন্ম তারিখ", "Marathi": "जन्म तारीख"},
-        "PASSED_TEXT": {"Odia": "ଉପରୋକ୍ତ ବ୍ୟାଚରେ ଅନୁଷ୍ଠିତ ବାର୍ଷିକ ପରୀକ୍ଷାରେ ଉତ୍ତୀର୍ଣ୍ଣ ହୋଇଛନ୍ତି।", "Hindi": "उपरोक्त शैक्षणिक सत्र में आयोजित वार्षिक परीक्षा सफलतापूर्वक उत्तीर्ण की है।", "Bengali": "উপরে উল্লেখিত ব্যাচে অনুষ্ঠিত বার্ষিক পরীক্ষায় সফলভাবে উত্তীর্ণ হয়েছে।"},
-        "SUBJECT": {"Odia": "ବିଷୟ", "Hindi": "विषय", "Bengali": "বিষয়", "Marathi": "विषय"},
-        "FULL MARKS": {"Odia": "ମୋଟ ନମ୍ବର", "Hindi": "पूर्णांक", "Bengali": "পূর্ণমান", "Marathi": "एकूण गुण"},
-        "MARKS SECURED": {"Odia": "ପ୍ରାପ୍ତ ନମ୍ବର", "Hindi": "प्राप्तांक", "Bengali": "প্রাপ্ত নম্বর", "Marathi": "मिळालेले गुण"},
-        "TOTAL MARKS": {"Odia": "ସମୁଦାୟ ନମ୍ବର", "Hindi": "कुल प्राप्तांक", "Bengali": "মোট প্রাপ্ত নম্বর", "Marathi": "एकूण प्राप्त गुण"},
-        "GRADE": {"Odia": "ଗ୍ରେଡ୍", "Hindi": "ग्रेड", "Bengali": "গ্রেড", "Marathi": "श्रेणी"},
-        "DATE OF PUBLICATION": {"Odia": "ଫଳାଫଳ ପ୍ରକାଶନ ତାରିଖ", "Hindi": "परिणाम प्रकाशन तिथि", "Bengali": "ফলাফল প্রকাশের তারিখ"},
-        "HM SIGNATURE": {"Odia": "ପ୍ରଧାନ ଶିକ୍ଷକଙ୍କ ଦସ୍ତଖତ", "Hindi": "प्रधानाचार्य के हस्ताक्षर", "Bengali": "প্রধান শিক্ষকের স্বাক্ষর"},
-        "CLASS TEACHER SIGNATURE": {"Odia": "ଶ୍ରେଣୀ ଶିକ୍ଷକଙ୍କ ଦସ୍ତଖତ", "Hindi": "कक्षा अध्यापक के हस्ताक्षर", "Bengali": "শ্রেণী শিক্ষকের স্বাক্ষর"}
+    tr = {
+        "School Portal": {"Odia": "ସ୍କୁଲ୍ ପୋର୍ଟାଲ୍", "Hindi": "स्कूल पोर्टल"},
+        "Logout": {"Odia": "ଲଗ୍ ଆଉଟ୍", "Hindi": "लॉग आउट"},
+        "ANNUAL EXAMINATION": {"Odia": "ବାର୍ଷିକ ପରୀକ୍ଷା", "Hindi": "वार्षिक परीक्षा"},
+        "CERTIFICATE-CUM-MARK SHEET": {"Odia": "ପ୍ରମାଣପତ୍ର ଏବଂ ମାର୍କସିଟ୍", "Hindi": "प्रमाणपत्र सह अंकतालिका"},
+        "ROLL NO": {"Odia": "ରୋଲ୍ ନମ୍ବର", "Hindi": "रोल नंबर"},
+        "CLASS": {"Odia": "ଶ୍ରେଣୀ", "Hindi": "कक्षा"},
+        "NAME": {"Odia": "ନାମ", "Hindi": "नाम"},
+        "DOB": {"Odia": "ଜନ୍ମ ତାରିଖ", "Hindi": "जन्म तिथि"},
+        "SUBJECT": {"Odia": "ବିଷୟ", "Hindi": "विषय"},
+        "TOTAL MARKS": {"Odia": "ସମୁଦାୟ ନମ୍ବର", "Hindi": "कुल प्राप्तांक"},
+        "GRADE": {"Odia": "ଗ୍ରେଡ୍", "Hindi": "ग्रेड"},
     }
-    return translations.get(eng_text, {}).get(lang, eng_text)
+    return tr.get(eng_text, {}).get(lang, eng_text)
 
-# --- Utilities ---
 def number_to_words(num):
     if num == 0: return "ZERO"
     ones = ["", "ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE", "TEN", "ELEVEN", "TWELVE", "THIRTEEN", "FOURTEEN", "FIFTEEN", "SIXTEEN", "SEVENTEEN", "EIGHTEEN", "NINETEEN"]
     tens = ["", "", "TWENTY", "THIRTY", "FORTY", "FIFTY", "SIXTY", "SEVENTY", "EIGHTY", "NINETY"]
-    
     def words(n):
         if n < 20: return ones[int(n)]
         elif n < 100: return tens[int(n // 10)] + ("-" + ones[int(n % 10)] if n % 10 != 0 else "")
         elif n < 1000: return ones[int(n // 100)] + " HUNDRED" + (" AND " + words(n % 100) if n % 100 != 0 else "")
         else: return str(n)
-        
     return words(num)
 
 def format_display_date(d_str):
-    if not d_str:
-        return datetime.date.today().strftime('%d-%m-%Y')
+    if not d_str: return datetime.date.today().strftime('%d-%m-%Y')
     d_str = str(d_str).strip().replace('/', '-')
     parts = d_str.split('-')
-    if len(parts) == 3:
-        if len(parts[0]) == 4:
-            return f"{parts[2]}-{parts[1]}-{parts[0]}"
+    if len(parts) == 3 and len(parts[0]) == 4: return f"{parts[2]}-{parts[1]}-{parts[0]}"
     return d_str
 
 def normalize_dob(d_str):
     d_str = d_str.strip().replace('/', '-')
     if d_str.count('-') == 2:
         p1, p2, p3 = d_str.split('-')
-        if len(p1) == 4: 
-            return f"{p1}-{p2}-{p3}" 
-        elif len(p3) == 4: 
-            return f"{p3}-{p2}-{p1}" 
+        if len(p1) == 4: return f"{p1}-{p2}-{p3}" 
+        elif len(p3) == 4: return f"{p3}-{p2}-{p1}" 
     return d_str
 
-# --- ସୁନ୍ଦର ରାଙ୍କ୍ କାର୍ଡ HTML ଡିଜାଇନ୍ (BILINGUAL) ---
+# ==========================================
+# 🎨 RESULT CARD HTML & PDF
+# ==========================================
 def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no, s_lang):
     disp_dob = format_display_date(st_data.get('dob', ''))
-    raw_pub_date = st_data.get('pub_date', '')
-    disp_pub_date = format_display_date(raw_pub_date) if raw_pub_date else datetime.date.today().strftime('%d-%m-%Y')
+    raw_pub = st_data.get('pub_date', '')
+    disp_pub_date = format_display_date(raw_pub) if raw_pub else datetime.date.today().strftime('%d-%m-%Y')
 
-    bg_color = "#fef9f7"
-    border_color = "#963f98"
-    outer_border = "#ce9bd0"
-    table_bg = "#fcf4fc"
+    bc, b_col, ob, t_bg = "#fef9f7", "#963f98", "#ce9bd0", "#fcf4fc"
+    tot_obt = st_data.get('total_obt', 0)
+    w_tot_en = number_to_words(tot_obt)
+    s_name_en = st_data.get('name', 'N/A').upper()
+    m_name_en = st_data.get('mother_name', 'N/A').upper()
+    f_name_en = st_data.get('father_name', 'N/A').upper()
     
-    total_obt = st_data.get('total_obt', 0)
-    words_total_en = number_to_words(total_obt)
+    t_sch = school_name_loc if school_name_loc.strip() else auto_translate(school_name_en, s_lang)
+    t_stu = st_data.get('name_local', '').strip() or auto_translate(s_name_en, s_lang)
+    t_mot = st_data.get('mother_name_local', '').strip() or auto_translate(m_name_en, s_lang)
+    t_fat = st_data.get('father_name_local', '').strip() or auto_translate(f_name_en, s_lang)
+    t_w_tot = auto_translate(w_tot_en, s_lang)
 
-    student_name_en = st_data.get('name', 'N/A').upper()
-    mother_name_en = st_data.get('mother_name', 'N/A').upper()
-    father_name_en = st_data.get('father_name', 'N/A').upper()
-    total_marks = f"{total_obt}/{st_data.get('total_full', 0)}"
-    grade = st_data.get('grade', 'N/A')
-    result_stat = st_data.get('result', 'N/A')
-    
-    t_school = school_name_loc if school_name_loc.strip() else auto_translate(school_name_en, s_lang)
-    t_student = st_data.get('name_local', '').strip()
-    if not t_student: t_student = auto_translate(student_name_en, s_lang)
-    t_mother = st_data.get('mother_name_local', '').strip()
-    if not t_mother: t_mother = auto_translate(mother_name_en, s_lang)
-    t_father = st_data.get('father_name_local', '').strip()
-    if not t_father: t_father = auto_translate(father_name_en, s_lang)
-    t_words_total = auto_translate(words_total_en, s_lang)
+    qr_text = f"SCHOOL: {school_name_en} | NAME: {s_name_en} | ROLL: {roll_no} | DOB: {disp_dob} | MARKS: {tot_obt}/{st_data.get('total_full', 0)} | GRADE: {st_data.get('grade', '')}"
+    qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={urllib.parse.quote(qr_text)}"
+    bc_url = f"https://barcode.tec-it.com/barcode.ashx?data={roll_no}&code=Code128&dpi=96"
 
-    qr_text = f"SCHOOL: {school_name_en} | NAME: {student_name_en} | ROLL: {roll_no} | DOB: {disp_dob} | MARKS: {total_marks} | GRADE: {grade} | RESULT: {result_stat}"
-    qr_data = urllib.parse.quote(qr_text)
-    qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={qr_data}"
-    barcode_url = f"https://barcode.tec-it.com/barcode.ashx?data={roll_no}&code=Code128&dpi=96"
+    rows_html = "".join([f"<tr style='border-bottom: 1px solid {b_col};'><td style='padding: 8px; border-right: 1px solid {b_col}; text-align: left; font-weight: bold;'>{sub.upper()}</td><td style='padding: 8px; border-right: 1px solid {b_col};'>{m['full']}</td><td style='padding: 8px; font-weight: bold;'>{m['obt']}</td></tr>" for sub, m in st_data.get('subjects', {}).items()])
 
-    lbl_annual = t('ANNUAL EXAMINATION', s_lang)
-    lbl_cert = t('CERTIFICATE-CUM-MARK SHEET', s_lang)
-    lbl_subj_marks = t('SUBJECTS AND MARKS SECURED', s_lang)
-    lbl_certify = t('Certify that', s_lang)
-    lbl_roll = t('ROLL NO', s_lang)
-    lbl_cls = t('CLASS', s_lang)
-    lbl_pen = t('PEN NO', s_lang)
-    lbl_apaar = t('APAAR NO', s_lang)
-    lbl_mother = t("MOTHER'S NAME", s_lang)
-    lbl_father = t("FATHER'S NAME", s_lang)
-    lbl_dob = t('DOB', s_lang)
-    lbl_pass_text = t('PASSED_TEXT', s_lang)
-    lbl_subject = t('SUBJECT', s_lang)
-    lbl_full = t('FULL MARKS', s_lang)
-    lbl_sec = t('MARKS SECURED', s_lang)
-    lbl_tot = t('TOTAL MARKS', s_lang)
-    lbl_grd = t('GRADE', s_lang)
-    lbl_pub_date = t('DATE OF PUBLICATION', s_lang)
-    lbl_hm_sign = t('HM SIGNATURE', s_lang)
-    lbl_ct_sign = t('CLASS TEACHER SIGNATURE', s_lang)
+    return f"""
+    <div style='font-family: "Times New Roman", serif; border: 15px solid {ob}; padding: 4px; max-width: 800px; margin: auto; background-color: #fff;'>
+        <div style='border: 2px solid {b_col}; padding: 25px; background-color: {bc}; position: relative;'>
+            <div style='text-align: center; color: {b_col}; margin-bottom: 20px;'>
+                <h1 style='margin: 0; font-size: 24px; text-transform: uppercase;'>{school_name_en}</h1>
+                <h2 style='margin: 5px 0 10px 0; font-size: 18px;'>{t_sch}</h2>
+                <h3 style='margin: 5px 0; font-size: 16px;'>ANNUAL EXAMINATION / {t('ANNUAL EXAMINATION', s_lang)} - {st_data.get('batch', '2025-2026')}</h3>
+                <p style='margin: 5px 0; font-weight: bold; font-size: 17px; text-decoration: underline;'>CERTIFICATE-CUM-MARK SHEET <br><span style='font-size:14px;text-decoration:none;'>({t('CERTIFICATE-CUM-MARK SHEET', s_lang)})</span></p>
+            </div>
+            <table style='width: 100%; font-size: 13px; margin-bottom: 20px; font-weight: bold;'>
+                <tr><td><span style='color:{b_col};'>ROLL NO:</span> {roll_no}</td><td style='text-align: right;'><span style='color:{b_col};'>CLASS:</span> {st_data.get('class', '')}</td></tr>
+                <tr><td><span style='color:{b_col};'>PEN NO:</span> {st_data.get('pen_no', '')}</td><td style='text-align: right;'><span style='color:{b_col};'>APAAR NO:</span> {st_data.get('apaar_no', '')}</td></tr>
+            </table>
+            <table style='width: 100%; font-size: 14px; margin-bottom: 15px; text-transform: uppercase; line-height: 1.8;'>
+                <tr><td style='width: 250px; color: {b_col}; font-weight: bold;'>Certify that / {t('NAME', s_lang)}</td><td><b>{s_name_en}</b><br><span style='font-size:14px; text-transform:none;'>{t_stu}</span></td></tr>
+                <tr><td style='color: {b_col}; font-weight: bold;'>Mother's Name</td><td><b>{m_name_en}</b><br><span style='font-size:14px; text-transform:none;'>{t_mot}</span></td></tr>
+                <tr><td style='color: {b_col}; font-weight: bold;'>Father's Name</td><td><b>{f_name_en}</b><br><span style='font-size:14px; text-transform:none;'>{t_fat}</span></td></tr>
+                <tr><td style='color: {b_col}; font-weight: bold;'>Date of Birth</td><td><b>{disp_dob}</b></td></tr>
+            </table>
+            <p style='color: {b_col}; text-align: center; margin-bottom: 20px; font-style:italic;'>Passed the Annual Examination held in {st_data.get('batch', '')}.</p>
+            <table style='width: 100%; border-collapse: collapse; border: 2px solid {b_col}; text-align: center; font-size: 13px;'>
+                <tr style='color: {b_col}; background-color: {t_bg}; border-bottom: 2px solid {b_col};'>
+                    <th style='padding: 8px; border-right: 1px solid {b_col};'>SUBJECT</th><th style='padding: 8px; border-right: 1px solid {b_col};'>FULL MARKS</th><th style='padding: 8px;'>MARKS SECURED</th>
+                </tr>
+                {rows_html}
+                <tr style='color: {b_col}; font-weight: bold; background-color: {t_bg}; border-top: 2px solid {b_col};'>
+                    <td style='padding: 10px; border-right: 1px solid {b_col}; text-align: right;'>TOTAL MARKS</td><td style='padding: 10px; border-right: 1px solid {b_col};'>{st_data.get('total_full', 0)}</td><td style='padding: 10px; color:#000;'>{tot_obt}</td>
+                </tr>
+            </table>
+            <div style='text-align: center; font-weight: bold; font-size: 14px; margin-top: 20px;'>( {w_tot_en} ) <br><span style='font-size:13px; font-weight:normal;'>({t_w_tot})</span></div>
+            <table style='width: 100%; margin-top: 20px; text-align: center; color: {b_col};'>
+                <tr>
+                    <td style='width: 33%; vertical-align: bottom;'><img src='{bc_url}' style='height: 35px; margin-bottom: 10px;'/><br><div style='font-size: 11px;'>DATE OF PUBLICATION</div><div style='font-weight: bold; font-size: 14px; margin-bottom: 30px;'>{disp_pub_date}</div><div style='border-bottom: 1px solid {b_col}; width: 80%; margin: auto;'></div><div style='font-size: 11px; font-weight: bold; margin-top:5px;'>HM SIGNATURE</div></td>
+                    <td style='width: 34%; vertical-align: top;'><div style='font-size: 12px; margin-bottom: 5px;'>GRADE</div><div style='border: 2px solid {b_col}; padding: 10px 25px; display: inline-block; background-color: {t_bg};'><div style='font-weight: bold; font-size: 22px; color: #000;'>{st_data.get('grade', '')}</div></div></td>
+                    <td style='width: 33%; vertical-align: bottom;'><img src='{qr_url}' style='height: 65px; margin-bottom: 10px;'/><div style='height: 15px; margin-bottom: 30px;'></div><div style='border-bottom: 1px solid {b_col}; width: 80%; margin: auto;'></div><div style='font-size: 11px; font-weight: bold; margin-top:5px;'>CLASS TEACHER SIGNATURE</div></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    """
 
-    rows_html = ""
-    for sub, m_info in st_data.get('subjects', {}).items():
-        rows_html += (
-            f"<tr style='border-bottom: 1px solid {border_color};'>"
-            f"<td style='padding: 8px; border-right: 1px solid {border_color}; text-align: left; font-weight: bold;'>{sub.upper()}</td>"
-            f"<td style='padding: 8px; border-right: 1px solid {border_color};'>{m_info['full']}</td>"
-            f"<td style='padding: 8px; font-weight: bold;'>{m_info['obt']}</td>"
-            "</tr>"
-        )
-
-    header_font_size = "28px"
-    if len(school_name_en) > 40: header_font_size = "22px"
-    if len(school_name_en) > 55: header_font_size = "18px"
-
-    html_content = (
-        f"<div style='font-family: \"Times New Roman\", serif; border: 15px solid {outer_border}; padding: 4px; max-width: 800px; margin: auto; background-color: #ffffff;'>"
-        f"<div style='border: 2px solid {border_color}; padding: 25px; background-color: {bg_color}; position: relative;'>"
-        
-        f"<div style='text-align: center; color: {border_color}; margin-bottom: 20px;'>"
-        f"<h1 style='margin: 0; font-size: {header_font_size}; text-transform: uppercase; font-family: \"Georgia\", serif; text-shadow: 1px 1px 1px #e1bee7;'>{school_name_en}</h1>"
-        f"<h2 style='margin: 5px 0 10px 0; font-size: 20px; font-weight:normal;'>{t_school}</h2>"
-        f"<h3 style='margin: 5px 0; font-size: 16px; letter-spacing: 1px;'>ANNUAL EXAMINATION / <span style='font-size: 14px;'>{lbl_annual}</span> - {st_data.get('batch', '2025-2026')}</h3>"
-        f"<p style='margin: 5px 0; font-weight: bold; font-size: 17px; text-decoration: underline;'>CERTIFICATE-CUM-MARK SHEET <br> <span style='font-size: 14px; text-decoration: none;'>({lbl_cert})</span></p>"
-        "</div>"
-        
-        "<table style='width: 100%; font-size: 13px; color: #000000; margin-bottom: 20px; font-weight: bold;'>"
-        f"<tr><td><span style='color:{border_color}; font-weight:normal;'>ROLL NO / {lbl_roll}:</span> {roll_no}</td><td style='text-align: right;'><span style='color:{border_color}; font-weight:normal;'>CLASS / {lbl_cls}:</span> {st_data.get('class', 'N/A')}</td></tr>"
-        f"<tr><td><span style='color:{border_color}; font-weight:normal;'>PEN NO / {lbl_pen}:</span> {st_data.get('pen_no', 'N/A')}</td><td style='text-align: right;'><span style='color:{border_color}; font-weight:normal;'>APAAR NO / {lbl_apaar}:</span> {st_data.get('apaar_no', 'N/A')}</td></tr>"
-        "</table>"
-        
-        "<table style='width: 100%; font-size: 14px; margin-bottom: 15px; text-transform: uppercase; color: #000000; line-height: 1.8;'>"
-        f"<tr><td style='width: 250px; color: {border_color}; font-weight: bold; font-style: italic;'>Certify that / <span style='font-size:12px;'>{lbl_certify}</span></td><td style='font-weight: bold; font-size: 15px;'>{student_name_en} <br><span style='font-size:14px; font-weight:normal; text-transform:none;'>{t_student}</span></td></tr>"
-        f"<tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Mother's Name / <span style='font-size:12px;'>{lbl_mother}</span></td><td style='font-weight: bold;'>{mother_name_en} <br><span style='font-size:14px; font-weight:normal; text-transform:none;'>{t_mother}</span></td></tr>"
-        f"<tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Father's Name / <span style='font-size:12px;'>{lbl_father}</span></td><td style='font-weight: bold;'>{father_name_en} <br><span style='font-size:14px; font-weight:normal; text-transform:none;'>{t_father}</span></td></tr>"
-        f"<tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Date of Birth / <span style='font-size:12px;'>{lbl_dob}</span></td><td style='font-weight: bold;'>{disp_dob}</td></tr>"
-        "</table>"
-        
-        f"<p style='color: {border_color}; font-style: italic; font-size: 14px; text-align: center; margin-bottom: 20px;'>Passed the Annual Examination held in the academic batch of {st_data.get('batch', 'N/A')}. <br><span style='font-size: 13px;'>{lbl_pass_text}</span></p>"
-        
-        f"<div style='text-align: center; color: {border_color}; font-weight: bold; font-size: 14px; margin-bottom: 5px;'>SUBJECTS AND MARKS SECURED <br> <span style='font-size:12px;'>{lbl_subj_marks}</span></div>"
-        f"<table style='width: 100%; border-collapse: collapse; border: 2px solid {border_color}; text-align: center; font-size: 13px; background-color: transparent; color: #000000;'>"
-        f"<tr style='color: {border_color}; background-color: {table_bg}; border-bottom: 2px solid {border_color};'>"
-        f"<th style='padding: 8px; border-right: 1px solid {border_color};'>SUBJECT / <span style='font-size:11px;'>{lbl_subject}</span></th>"
-        f"<th style='padding: 8px; border-right: 1px solid {border_color};'>FULL MARKS / <span style='font-size:11px;'>{lbl_full}</span></th>"
-        f"<th style='padding: 8px;'>MARKS SECURED / <span style='font-size:11px;'>{lbl_sec}</span></th>"
-        "</tr>"
-        f"{rows_html}"
-        f"<tr style='color: {border_color}; font-weight: bold; background-color: {table_bg}; border-top: 2px solid {border_color};'>"
-        f"<td style='padding: 10px; border-right: 1px solid {border_color}; text-align: right;'>TOTAL MARKS / <span style='font-size:11px;'>{lbl_tot}</span></td>"
-        f"<td style='padding: 10px; border-right: 1px solid {border_color};'>{st_data.get('total_full', 0)}</td>"
-        f"<td style='padding: 10px; color: #000;'>{total_obt}</td>"
-        "</tr>"
-        "</table>"
-        
-        f"<div style='text-align: center; font-weight: bold; font-size: 14px; color: #000; margin-top: 20px;'>( {words_total_en} ) <br> <span style='font-size:13px; font-weight:normal;'>({t_words_total})</span></div>"
-        
-        f"<table style='width: 100%; margin-top: 20px; text-align: center; color: {border_color};'>"
-        "<tr>"
-        
-        "<td style='width: 33%; vertical-align: bottom;'>"
-        f"<img src='{barcode_url}' alt='Barcode' style='height: 35px; margin-bottom: 10px; max-width: 100%;'/>"
-        f"<div style='font-size: 11px;'>DATE OF PUBLICATION <br><span style='font-size:10px;'>({lbl_pub_date})</span></div>"
-        f"<div style='font-weight: bold; font-size: 14px; margin-top: 5px; margin-bottom: 30px;'>{disp_pub_date}</div>"
-        f"<div style='border-bottom: 1px solid {border_color}; width: 80%; margin: auto;'></div>"
-        f"<div style='font-size: 11px; margin-top: 5px; font-weight: bold;'>HM SIGNATURE <br><span style='font-size:10px;'>({lbl_hm_sign})</span></div>"
-        "</td>"
-        
-        "<td style='width: 34%; vertical-align: top; padding-top: 5px;'>"
-        f"<div style='font-size: 12px; margin-bottom: 5px;'>GRADE / {lbl_grd}</div>"
-        f"<div style='border: 2px solid {border_color}; padding: 10px 25px; display: inline-block; min-width: 80px; background-color: {table_bg};'>"
-        f"<div style='font-weight: bold; font-size: 22px; color: #000;'>{grade}</div>"
-        "</div>"
-        "</td>"
-        
-        "<td style='width: 33%; vertical-align: bottom;'>"
-        f"<img src='{qr_url}' alt='QR Code' style='height: 65px; margin-bottom: 10px; max-width: 100%;'/>"
-        "<div style='height: 15px; margin-bottom: 30px;'></div>"
-        f"<div style='border-bottom: 1px solid {border_color}; width: 80%; margin: auto;'></div>"
-        f"<div style='font-size: 11px; margin-top: 5px; font-weight: bold;'>CLASS TEACHER SIGNATURE <br><span style='font-size:10px;'>({lbl_ct_sign})</span></div>"
-        "</td>"
-        
-        "</tr>"
-        "</table>"
-        
-        "</div></div>"
-    )
-    return html_content
-
-# --- PDF ଜେନେରେଟର (ENGLISH ONLY) ---
 def create_pdf(filename, school_name, st_data, roll_no):
     disp_dob = format_display_date(st_data.get('dob', ''))
-    raw_pub_date = st_data.get('pub_date', '')
-    disp_pub_date = format_display_date(raw_pub_date) if raw_pub_date else datetime.date.today().strftime('%d-%m-%Y')
-
+    raw_pub = st_data.get('pub_date', '')
+    disp_pub_date = format_display_date(raw_pub) if raw_pub else datetime.date.today().strftime('%d-%m-%Y')
     c = canvas.Canvas(filename, pagesize=letter)
+    c.setFillColorRGB(0.99, 0.98, 0.97); c.rect(30, 30, 552, 732, fill=1, stroke=0)
+    c.setStrokeColorRGB(0.82, 0.60, 0.83); c.setLineWidth(15); c.rect(15, 15, 582, 762, fill=0, stroke=1)
+    c.setStrokeColorRGB(0.59, 0.25, 0.60); c.setLineWidth(2); c.rect(30, 30, 552, 732, fill=0, stroke=1)
     
-    c.setFillColorRGB(0.99, 0.98, 0.97)
-    c.rect(30, 30, 552, 732, fill=1, stroke=0)
+    c.setFillColorRGB(0.59, 0.25, 0.60); c.setFont("Times-Bold", 20); c.drawCentredString(300, 720, school_name.upper())
+    c.setFont("Helvetica-Bold", 12); c.drawCentredString(300, 695, f"ANNUAL EXAMINATION - {st_data.get('batch', '2025-2026')}")
+    c.setFont("Helvetica", 11); c.drawCentredString(300, 675, "CERTIFICATE-CUM-MARK SHEET")
     
-    c.setStrokeColorRGB(0.82, 0.60, 0.83)
-    c.setLineWidth(15)
-    c.rect(15, 15, 582, 762, fill=0, stroke=1)
+    c.drawString(50, 635, "ROLL NO:"); c.setFillColorRGB(0,0,0); c.setFont("Helvetica-Bold", 11); c.drawString(110, 635, f"{roll_no}")
+    c.setFillColorRGB(0.59, 0.25, 0.60); c.drawString(450, 635, "CLASS:"); c.setFillColorRGB(0,0,0); c.drawString(500, 635, f"{st_data.get('class', '')}")
+    c.setFillColorRGB(0.59, 0.25, 0.60); c.drawString(50, 615, "PEN NO:"); c.setFillColorRGB(0,0,0); c.drawString(100, 615, f"{st_data.get('pen_no', '')}")
+    c.setFillColorRGB(0.59, 0.25, 0.60); c.drawString(420, 615, "APAAR NO:"); c.setFillColorRGB(0,0,0); c.drawString(490, 615, f"{st_data.get('apaar_no', '')}")
     
-    c.setStrokeColorRGB(0.59, 0.25, 0.60) 
-    c.setLineWidth(2)
-    c.rect(30, 30, 552, 732, fill=0, stroke=1)
+    c.setFillColorRGB(0.59, 0.25, 0.60); c.setFont("Helvetica-Oblique", 11); c.drawString(50, 585, "Certify that")
+    c.setFillColorRGB(0,0,0); c.setFont("Helvetica-Bold", 11); c.drawString(150, 585, f"{st_data.get('name', '').upper()}")
+    c.setFillColorRGB(0.59, 0.25, 0.60); c.setFont("Helvetica-Oblique", 11); c.drawString(50, 565, "Mother's Name")
+    c.setFillColorRGB(0,0,0); c.setFont("Helvetica-Bold", 11); c.drawString(150, 565, f"{st_data.get('mother_name', '').upper()}")
+    c.setFillColorRGB(0.59, 0.25, 0.60); c.setFont("Helvetica-Oblique", 11); c.drawString(50, 545, "Father's Name")
+    c.setFillColorRGB(0,0,0); c.setFont("Helvetica-Bold", 11); c.drawString(150, 545, f"{st_data.get('father_name', '').upper()}")
+    c.setFillColorRGB(0.59, 0.25, 0.60); c.setFont("Helvetica-Oblique", 11); c.drawString(50, 525, "Date of Birth")
+    c.setFillColorRGB(0,0,0); c.setFont("Helvetica-Bold", 11); c.drawString(150, 525, f"{disp_dob}")
     
-    c.setFillColorRGB(0.59, 0.25, 0.60)
-    school_title = school_name.upper()
-    title_size = 22
-    while c.stringWidth(school_title, "Times-Bold", title_size) > 490 and title_size > 10:
-        title_size -= 1
+    c.setStrokeColorRGB(0.59, 0.25, 0.60); c.line(50, 495, 550, 495)
+    c.setFillColorRGB(0.98, 0.95, 0.98); c.rect(50, 465, 500, 30, fill=1, stroke=0)
+    c.setFillColorRGB(0.59, 0.25, 0.60); c.setFont("Helvetica-Bold", 11)
+    c.drawString(60, 475, "SUBJECT"); c.drawCentredString(350, 475, "FULL MARKS"); c.drawRightString(540, 475, "MARKS SECURED")
+    c.line(50, 465, 550, 465); c.line(50, 495, 50, 465); c.line(280, 495, 280, 465); c.line(420, 495, 420, 465); c.line(550, 495, 550, 465)
     
-    c.setFont("Times-Bold", title_size)
-    c.drawCentredString(300, 720, school_title)
-    
-    c.setFont("Helvetica-Bold", 12)
-    c.drawCentredString(300, 695, f"ANNUAL EXAMINATION - {st_data.get('batch', '2025-2026')}")
-    c.setFont("Helvetica", 11)
-    c.drawCentredString(300, 675, "CERTIFICATE-CUM-MARK SHEET")
-    
-    c.setFont("Helvetica", 11)
-    c.drawString(50, 635, "ROLL NO:")
-    c.setFillColorRGB(0, 0, 0)
-    c.setFont("Helvetica-Bold", 11)
-    c.drawString(110, 635, f"{roll_no}")
-    
-    c.setFillColorRGB(0.59, 0.25, 0.60)
-    c.setFont("Helvetica", 11)
-    c.drawString(450, 635, "CLASS:")
-    c.setFillColorRGB(0, 0, 0)
-    c.setFont("Helvetica-Bold", 11)
-    c.drawString(500, 635, f"{st_data.get('class', '')}")
-    
-    c.setFillColorRGB(0.59, 0.25, 0.60)
-    c.setFont("Helvetica", 11)
-    c.drawString(50, 615, "PEN NO:")
-    c.setFillColorRGB(0, 0, 0)
-    c.setFont("Helvetica-Bold", 11)
-    c.drawString(100, 615, f"{st_data.get('pen_no', 'N/A')}")
-    
-    c.setFillColorRGB(0.59, 0.25, 0.60)
-    c.setFont("Helvetica", 11)
-    c.drawString(420, 615, "APAAR NO:")
-    c.setFillColorRGB(0, 0, 0)
-    c.setFont("Helvetica-Bold", 11)
-    c.drawString(490, 615, f"{st_data.get('apaar_no', 'N/A')}")
-    
-    c.setFillColorRGB(0.59, 0.25, 0.60)
-    c.setFont("Helvetica-Oblique", 11)
-    c.drawString(50, 585, "Certify that")
-    c.setFillColorRGB(0, 0, 0)
-    c.setFont("Helvetica-Bold", 11)
-    c.drawString(150, 585, f"{st_data.get('name', '').upper()}")
-    
-    c.setFillColorRGB(0.59, 0.25, 0.60)
-    c.setFont("Helvetica-Oblique", 11)
-    c.drawString(50, 565, "Mother's Name")
-    c.setFillColorRGB(0, 0, 0)
-    c.setFont("Helvetica-Bold", 11)
-    c.drawString(150, 565, f"{st_data.get('mother_name', 'N/A').upper()}")
-    
-    c.setFillColorRGB(0.59, 0.25, 0.60)
-    c.setFont("Helvetica-Oblique", 11)
-    c.drawString(50, 545, "Father's Name")
-    c.setFillColorRGB(0, 0, 0)
-    c.setFont("Helvetica-Bold", 11)
-    c.drawString(150, 545, f"{st_data.get('father_name', 'N/A').upper()}")
-    
-    c.setFillColorRGB(0.59, 0.25, 0.60)
-    c.setFont("Helvetica-Oblique", 11)
-    c.drawString(50, 525, "Date of Birth")
-    c.setFillColorRGB(0, 0, 0)
-    c.setFont("Helvetica-Bold", 11)
-    c.drawString(150, 525, f"{disp_dob}")
-    
-    c.setStrokeColorRGB(0.59, 0.25, 0.60)
-    c.line(50, 495, 550, 495)
-    
-    c.setFillColorRGB(0.98, 0.95, 0.98) 
-    c.rect(50, 465, 500, 30, fill=1, stroke=0)
-    
-    c.setFillColorRGB(0.59, 0.25, 0.60)
-    c.setFont("Helvetica-Bold", 11)
-    c.drawString(60, 475, "SUBJECT")
-    c.drawCentredString(350, 475, "FULL MARKS")
-    c.drawRightString(540, 475, "MARKS SECURED")
-    c.line(50, 465, 550, 465)
-    
-    c.line(50, 495, 50, 465)
-    c.line(280, 495, 280, 465)
-    c.line(420, 495, 420, 465)
-    c.line(550, 495, 550, 465)
-    
-    c.setFillColorRGB(0, 0, 0)
-    y = 445
-    c.setFont("Helvetica-Bold", 11)
-    
-    table_bottom_y = y + 10
-    
+    c.setFillColorRGB(0,0,0); y = 445; t_b_y = y + 10
     for sub, m_info in st_data.get('subjects', {}).items():
-        c.drawString(60, y, str(sub).upper())
-        c.drawCentredString(350, y, str(m_info['full']))
-        c.drawRightString(540, y, str(m_info['obt']))
-        
-        c.setStrokeColorRGB(0.59, 0.25, 0.60)
-        c.line(50, y-10, 550, y-10)
-        y -= 20
-        table_bottom_y = y + 10
-
-    c.line(50, 465, 50, table_bottom_y)
-    c.line(280, 465, 280, table_bottom_y)
-    c.line(420, 465, 420, table_bottom_y)
-    c.line(550, 465, 550, table_bottom_y)
+        c.drawString(60, y, str(sub).upper()); c.drawCentredString(350, y, str(m_info['full'])); c.drawRightString(540, y, str(m_info['obt']))
+        c.setStrokeColorRGB(0.59, 0.25, 0.60); c.line(50, y-10, 550, y-10)
+        y -= 20; t_b_y = y + 10
+    c.line(50, 465, 50, t_b_y); c.line(280, 465, 280, t_b_y); c.line(420, 465, 420, t_b_y); c.line(550, 465, 550, t_b_y)
     
-    c.setFillColorRGB(0.98, 0.95, 0.98)
-    c.rect(50, table_bottom_y-25, 500, 25, fill=1, stroke=0)
+    c.setFillColorRGB(0.98, 0.95, 0.98); c.rect(50, t_b_y-25, 500, 25, fill=1, stroke=0)
+    c.setFillColorRGB(0.59, 0.25, 0.60); c.setFont("Helvetica-Bold", 11)
+    c.drawRightString(270, t_b_y-17, "TOTAL MARKS"); c.drawCentredString(350, t_b_y-17, str(st_data.get('total_full', 0)))
+    c.setFillColorRGB(0,0,0); c.drawRightString(540, t_b_y-17, str(st_data.get('total_obt', 0)))
+    c.setStrokeColorRGB(0.59, 0.25, 0.60); c.line(50, t_b_y-25, 550, t_b_y-25)
+    c.line(50, t_b_y, 50, t_b_y-25); c.line(280, t_b_y, 280, t_b_y-25); c.line(420, t_b_y, 420, t_b_y-25); c.line(550, t_b_y, 550, t_b_y-25)
     
-    c.setFillColorRGB(0.59, 0.25, 0.60)
-    c.setFont("Helvetica-Bold", 11)
-    c.drawRightString(270, table_bottom_y-17, "TOTAL MARKS")
-    c.drawCentredString(350, table_bottom_y-17, str(st_data.get('total_full', 0)))
-    c.setFillColorRGB(0, 0, 0)
-    c.drawRightString(540, table_bottom_y-17, str(st_data.get('total_obt', 0)))
-    
-    c.setStrokeColorRGB(0.59, 0.25, 0.60)
-    c.line(50, table_bottom_y-25, 550, table_bottom_y-25)
-    
-    c.line(50, table_bottom_y, 50, table_bottom_y-25)
-    c.line(280, table_bottom_y, 280, table_bottom_y-25)
-    c.line(420, table_bottom_y, 420, table_bottom_y-25)
-    c.line(550, table_bottom_y, 550, table_bottom_y-25)
-    
-    y = table_bottom_y - 45
-    total_obt = st_data.get('total_obt', 0)
-    c.setFillColorRGB(0, 0, 0)
-    c.setFont("Helvetica-Bold", 10)
-    c.drawCentredString(300, y, f"( {number_to_words(total_obt)} )")
-    
+    y = t_b_y - 45; c.setFillColorRGB(0,0,0); c.setFont("Helvetica-Bold", 10); c.drawCentredString(300, y, f"( {number_to_words(st_data.get('total_obt', 0))} )")
     y -= 60
+    try: bc = code128.Code128(str(roll_no), barHeight=25, barWidth=1.2); bc.drawOn(c, 50, y+15)
+    except: pass
+    c.setFillColorRGB(0.59, 0.25, 0.60); c.setFont("Helvetica", 10); c.drawCentredString(140, y-10, "DATE OF PUBLICATION")
+    c.setFont("Helvetica-Bold", 11); c.drawCentredString(140, y-25, f"{disp_pub_date}")
+    c.line(50, y-60, 230, y-60); c.setFont("Helvetica-Bold", 10); c.drawCentredString(140, y-75, "HM SIGNATURE")
+    c.setStrokeColorRGB(0.59, 0.25, 0.60); c.setFillColorRGB(0.98, 0.95, 0.98); c.rect(260, y-30, 80, 40, fill=1, stroke=1)
+    c.setFillColorRGB(0.59, 0.25, 0.60); c.setFont("Helvetica", 10); c.drawCentredString(300, y+20, "GRADE")
+    c.setFillColorRGB(0,0,0); c.setFont("Helvetica-Bold", 18); c.drawCentredString(300, y-15, f"{st_data.get('grade', '')}")
     
     try:
-        bc = code128.Code128(str(roll_no), barHeight=25, barWidth=1.2)
-        bc.drawOn(c, 50, y+15)
+        qr_text = f"SCHOOL: {school_name}\nROLL: {roll_no}\nMARKS: {st_data.get('total_obt')}/{st_data.get('total_full')}\nGRADE: {st_data.get('grade')}"
+        qr_w = qr.QrCodeWidget(qr_text); b = qr_w.getBounds(); w = b[2]-b[0]; h = b[3]-b[1]
+        d = Drawing(60, 60, transform=[60/w,0,0,60/h,0,0]); d.add(qr_w); renderPDF.draw(d, c, 445, y-5)
     except: pass
-    
-    c.setFillColorRGB(0.59, 0.25, 0.60)
-    c.setFont("Helvetica", 10)
-    c.drawCentredString(140, y-10, "DATE OF PUBLICATION OF RESULTS")
-    c.setFont("Helvetica-Bold", 11)
-    c.drawCentredString(140, y-25, f"{disp_pub_date}")
-    
-    c.line(50, y-60, 230, y-60)
-    c.setFont("Helvetica-Bold", 10)
-    c.drawCentredString(140, y-75, "HM SIGNATURE")
-    
-    c.setStrokeColorRGB(0.59, 0.25, 0.60)
-    c.setFillColorRGB(0.98, 0.95, 0.98)
-    c.rect(260, y-30, 80, 40, fill=1, stroke=1)
-    c.setFillColorRGB(0.59, 0.25, 0.60)
-    c.setFont("Helvetica", 10)
-    c.drawCentredString(300, y+20, "GRADE")
-    c.setFillColorRGB(0, 0, 0)
-    c.setFont("Helvetica-Bold", 18)
-    c.drawCentredString(300, y-15, f"{st_data.get('grade', 'N/A')}")
-    
-    student_name = st_data.get('name', 'N/A').upper()
-    grade = st_data.get('grade', 'N/A')
-    result_stat = st_data.get('result', 'N/A')
-    qr_text = f"SCHOOL: {school_name}\nNAME: {student_name}\nROLL: {roll_no}\nDOB: {disp_dob}\nMARKS: {total_obt}/{st_data.get('total_full', 0)}\nGRADE: {grade}\nRESULT: {result_stat}"
-    
-    try:
-        qr_w = qr.QrCodeWidget(qr_text)
-        b = qr_w.getBounds()
-        w = b[2]-b[0]
-        h = b[3]-b[1]
-        d = Drawing(60, 60, transform=[60/w,0,0,60/h,0,0])
-        d.add(qr_w)
-        renderPDF.draw(d, c, 445, y-5)
-    except: pass
-    
-    c.setFillColorRGB(0.59, 0.25, 0.60)
-    c.line(400, y-60, 550, y-60)
-    c.setFont("Helvetica-Bold", 10)
-    c.drawCentredString(475, y-75, "CLASS TEACHER SIGNATURE")
-    
+    c.setFillColorRGB(0.59, 0.25, 0.60); c.line(400, y-60, 550, y-60); c.setFont("Helvetica-Bold", 10); c.drawCentredString(475, y-75, "CLASS TEACHER SIGNATURE")
     c.save()
 
-# --- MAIN APP START ---
-master_db = get_master()
-
-# ----------------- DYNAMIC LINK GENERATION -----------------
-portal_param = st.query_params.get("portal", "home")
-
-default_idx = 0
-if portal_param == "reg_school":
-    default_idx = 1
-elif portal_param == "reg_student":
-    default_idx = 2
-elif portal_param == "master":
-    default_idx = 3
-elif portal_param == "school":
-    default_idx = 4
-elif portal_param == "student":
-    default_idx = 5
-
+# ==========================================
+# 🚀 MAIN APP LOGIC
+# ==========================================
 st.markdown("<h3 style='text-align: center; color: #0284C7; margin-top:-20px;'>✨ WELCOME KULU SUTAR ✨</h3>", unsafe_allow_html=True)
 st.markdown("<h1 style='text-align: center; color: #1E3A8A; font-size: 30px;'>🏫 ADVANCED SCHOOL MANAGEMENT SYSTEM</h1>", unsafe_allow_html=True)
-st.markdown("<hr style='margin-bottom: 10px;'>", unsafe_allow_html=True)
 
-menu = st.sidebar.selectbox("🎯 Navigation Menu", ["Home Page", "New School Registration", "New Student Registration", "Master Login", "School Login", "Results"], index=default_idx)
+portal_param = st.query_params.get("portal", "home")
+d_idx = {"home":0, "register":1, "master":2, "school":3, "student":4}.get(portal_param, 0)
+menu = st.sidebar.selectbox("🎯 Navigation Menu", ["Home Page", "New School Registration", "Master Login", "School Login", "Results"], index=d_idx)
 
-if menu not in ["Home Page", "New School Registration", "New Student Registration", "Master Login", "School Login", "Results"]:
+if menu not in ["Home Page", "New School Registration", "Master Login", "School Login", "Results"]:
     st.query_params["portal"] = "home"
 
 classes_list = [str(i) for i in range(1, 11)]
 batches_list = [f"{y}-{y+1}" for y in range(2020, 2051)]
 
-# ----------------- HOME PAGE (ERP STYLE UI) -----------------
+master_db = get_master()
+
+# --- HOME PAGE ---
 if menu == "Home Page":
     st.query_params["portal"] = "home"
     st.markdown("""
@@ -645,8 +343,8 @@ if menu == "Home Page":
         "<div class='notice-header'>RECENT NOTICE</div>"
         "<div style='padding: 0; overflow: hidden; background-color: #1e293b; color: #e2e8f0;'>"
         "<marquee direction='up' scrollamount='2' onmouseover='this.stop();' onmouseout='this.start();' style='height: 180px; padding: 15px;'>"
-        "<div class='notice-item'>⏩ Online Student Registration Portal is now LIVE! <span class='new-badge'>NEW!</span></div>"
-        "<div class='notice-item'>⏩ Enterprise Update: Anti-Crash Database & Anti-Hacking Locks added!</div>"
+        "<div class='notice-item'>⏩ Enterprise Update: Anti-Crash Database & Anti-Hacking Locks added! <span class='new-badge'>NEW!</span></div>"
+        "<div class='notice-item'>⏩ Welcome to Advanced School Management System!</div>"
         "<div class='notice-item'>⏩ Master & School portal passwords are encrypted and 100% secured.</div>"
         "<div class='notice-item'>⏩ Students can now Search Result safely. No School ID needed!</div>"
         "<div class='notice-item' style='border-bottom: none; margin-top: 15px; text-align: center; line-height: 2.5;'>"
@@ -660,22 +358,119 @@ if menu == "Home Page":
     )
     st.markdown(notice_html, unsafe_allow_html=True)
 
-    c1, c2, c3 = st.columns(3)
+    c1, c2 = st.columns(2)
     with c1:
-        st.markdown("<a href='?portal=reg_student' target='_self' class='login-card'><div class='login-title'>👨‍🎓 New Student Registration</div><div class='login-sub'>Apply for admission/exams</div></a>", unsafe_allow_html=True)
-        st.markdown("<a href='?portal=reg_school' target='_self' class='login-card'><div class='login-title'>📝 New School Registration</div><div class='login-sub'>Register a new school</div></a>", unsafe_allow_html=True)
+        st.markdown("<a href='?portal=register' target='_self' class='login-card'><div class='login-title'>📝 New School Registration</div><div class='login-sub'>Register a new school in the system</div></a>", unsafe_allow_html=True)
+        st.markdown("<a href='?portal=master' target='_self' class='login-card'><div class='login-title'>🏛️ Master Login</div><div class='login-sub'>Login as Admin / University</div></a>", unsafe_allow_html=True)
     with c2:
         st.markdown("<a href='?portal=school' target='_self' class='login-card'><div class='login-title'>🏫 School Login</div><div class='login-sub'>Login as School / College</div></a>", unsafe_allow_html=True)
-        st.markdown("<a href='?portal=master' target='_self' class='login-card'><div class='login-title'>🏛️ Master Login</div><div class='login-sub'>Login as Admin / University</div></a>", unsafe_allow_html=True)
-    with c3:
         st.markdown("<a href='?portal=student' target='_self' class='login-card'><div class='login-title'>🎓 Results</div><div class='login-sub'>Check Student Rank Card</div></a>", unsafe_allow_html=True)
+
+    # ---------------------------------------------------------
+    # NEW STUDENT REGISTRATION DIRECTLY ON HOME PAGE
+    # ---------------------------------------------------------
+    st.markdown("---")
+    st.markdown("<h2 style='text-align: center; color: #1E3A8A;'>👨‍🎓 New Student Online Registration</h2>", unsafe_allow_html=True)
+    st.info("Submit your details below. The school will review your application. Once APPROVED, your details will be added to the portal.")
+    
+    with st.form("student_reg_form_home"):
+        st.markdown("#### 1. School Information")
+        c_sc1, c_sc2 = st.columns(2)
+        stu_school_code = c_sc1.text_input("14. SCHOOL CODE *")
+        stu_school_name = c_sc2.text_input("15. SCHOOL NAME *")
+        
+        st.markdown("#### 2. Personal Details")
+        c_n1, c_n2 = st.columns(2)
+        stu_name_en = c_n1.text_input("1. Student's Name (English) *")
+        stu_name_loc = c_n2.text_input("1. Student's Name (Local Language)")
+        
+        c_g1, c_g2 = st.columns(2)
+        stu_gender_en = c_g1.selectbox("2. Gender (English) *", ["Male", "Female", "Other"])
+        stu_gender_loc = c_g2.text_input("2. Gender (Local Language)")
+        
+        c_d1, c_d2 = st.columns(2)
+        stu_dob = c_d1.date_input("3. Date of Birth *", min_value=datetime.date(2000, 1, 1), max_value=datetime.date.today())
+        stu_state = c_d2.selectbox("4. State (All India)", list(STATE_LANG_MAP.keys()), index=18)
+        
+        c_m1, c_m2 = st.columns(2)
+        m_name_en = c_m1.text_input("5. Mother's Name (English) *")
+        m_name_loc = c_m2.text_input("5. Mother's Name (Local Language)")
+        
+        c_f1, c_f2 = st.columns(2)
+        f_name_en = c_f1.text_input("6. Father's Name (English) *")
+        f_name_loc = c_f2.text_input("6. Father's Name (Local Language)")
+        
+        st.markdown("#### 3. Contact & Identification")
+        c_id1, c_id2 = st.columns(2)
+        stu_aadhar = c_id1.text_input("7. AADHAAR Number of Student *", max_chars=12)
+        stu_phone = c_id2.text_input("10. Mobile No *", max_chars=10)
+        
+        c_ad1, c_ad2 = st.columns(2)
+        stu_address_en = c_ad1.text_area("8. Address (English) *")
+        stu_address_loc = c_ad2.text_area("8. Address (Local Language)")
+        
+        c_loc1, c_loc2 = st.columns(2)
+        stu_pin = c_loc1.text_input("9. PIN Code *", max_chars=6)
+        stu_minority = c_loc2.selectbox("11. Minority Group", ["No", "Yes - Muslim", "Yes - Christian", "Yes - Sikh", "Yes - Buddhist", "Yes - Parsi", "Yes - Jain"])
+        
+        c_nat1, c_nat2 = st.columns(2)
+        stu_country = c_nat1.selectbox("12. Whether the Student is Indian National?", COUNTRIES)
+        stu_bg = c_nat2.selectbox("13. Blood Group", ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-", "Unknown"])
+        
+        st.markdown("#### 4. Photograph Upload")
+        stu_photo = st.file_uploader("16. STUDENT PHOTO UPLOAD (JPG/PNG)", type=['png', 'jpg', 'jpeg'])
+        
+        submitted_stu = st.form_submit_button("Submit Student Application")
+        
+        if submitted_stu:
+            # Generate a temporary roll number for pending status since it's an online registration
+            temp_roll = "REG" + str(random.randint(10000, 99999))
+            
+            if not sanitize(stu_school_code) or not sanitize(stu_school_name) or not sanitize(stu_name_en) or not sanitize(f_name_en) or not sanitize(m_name_en) or not sanitize(stu_aadhar) or not sanitize(stu_phone) or not sanitize(stu_address_en) or not sanitize(stu_pin):
+                st.error("Please fill all the mandatory fields (*).")
+            else:
+                sch_id_clean = sanitize(stu_school_code)
+                has_photo = True if stu_photo else False
+                
+                new_student_data = {
+                    "name": sanitize(stu_name_en), 
+                    "name_local": sanitize(stu_name_loc),
+                    "gender": stu_gender_en, 
+                    "gender_local": sanitize(stu_gender_loc),
+                    "father_name": sanitize(f_name_en), 
+                    "father_name_local": sanitize(f_name_loc),
+                    "mother_name": sanitize(m_name_en), 
+                    "mother_name_local": sanitize(m_name_loc),
+                    "dob": str(stu_dob), 
+                    "blood_group": stu_bg,
+                    "aadhaar": sanitize(stu_aadhar), # Masked placeholder internally handled if printed
+                    "phone": sanitize(stu_phone),
+                    "address": sanitize(stu_address_en),
+                    "address_local": sanitize(stu_address_loc),
+                    "state": stu_state,
+                    "pin_code": sanitize(stu_pin),
+                    "nationality": stu_country,
+                    "minority": stu_minority,
+                    "has_photo": has_photo,
+                    "school_code": sch_id_clean,
+                    "school_name_req": sanitize(stu_school_name),
+                    "class": "1", # Default
+                    "batch": "2025-2026",
+                    "subjects": {},
+                    "total_full": 0, "total_obt": 0, "percentage": 0.0,
+                    "result": "N/A", "grade": "N/A", "pub_date": str(datetime.date.today()),
+                    "pen_no": "", "apaar_no": ""
+                }
+                
+                save_student(sch_id_clean, temp_roll, new_student_data, status="Pending")
+                st.success(f"✅ Application Submitted Successfully! Your Registration ID is **{temp_roll}**. It is now pending approval from School Code: {sch_id_clean}.")
 
 # ----------------- NEW SCHOOL REGISTRATION -----------------
 elif menu == "New School Registration":
-    st.query_params["portal"] = "reg_school"
+    st.query_params["portal"] = "register"
     c_home, c_title = st.columns([1, 8])
     with c_home:
-        if st.button("🏠 Home", key="reg_sch_home"):
+        if st.button("🏠 Home", key="reg_home_btn"):
             st.query_params["portal"] = "home"
             st.rerun()
     with c_title:
@@ -730,122 +525,6 @@ elif menu == "New School Registration":
                     "status": "Pending"
                 })
                 st.success("✅ Registration Successful! Your account is PENDING approval from the Master Admin. You will be able to login once it is activated.")
-
-# ----------------- NEW STUDENT REGISTRATION -----------------
-elif menu == "New Student Registration":
-    st.query_params["portal"] = "reg_student"
-    c_home, c_title = st.columns([1, 8])
-    with c_home:
-        if st.button("🏠 Home", key="reg_stu_home"):
-            st.query_params["portal"] = "home"
-            st.rerun()
-    with c_title:
-        st.subheader("👨‍🎓 New Student Registration Portal")
-
-    st.info("Submit your details. The school will review your application. Once APPROVED, your details will be added to the portal.")
-    
-    with st.form("student_reg_form"):
-        st.markdown("#### 1. Academic Details")
-        c_sc1, c_sc2 = st.columns(2)
-        
-        sch_dict = get_all_schools()
-        active_schools = {k: v for k, v in sch_dict.items() if v.get("status") == "Active"}
-        
-        if not active_schools:
-            st.error("No active schools available for registration.")
-            school_sel = None
-        else:
-            school_options = [f"{k} - {v['name']}" for k, v in active_schools.items()]
-            school_sel_str = c_sc1.selectbox("Select School *", ["--Select--"] + school_options)
-            school_sel = school_sel_str.split(" - ")[0] if school_sel_str != "--Select--" else None
-            
-        stu_roll = c_sc2.text_input("Roll No / Admission No *")
-        
-        st.markdown("#### 2. Personal Details")
-        c_n1, c_n2 = st.columns(2)
-        stu_name_en = c_n1.text_input("Student's Name (English) *")
-        stu_name_loc = c_n2.text_input("Student's Name (Local Language) [Optional]")
-        
-        c_f1, c_f2 = st.columns(2)
-        f_name_en = c_f1.text_input("Father's Name (English) *")
-        f_name_loc = c_f2.text_input("Father's Name (Local Language) [Optional]")
-        
-        c_m1, c_m2 = st.columns(2)
-        m_name_en = c_m1.text_input("Mother's Name (English) *")
-        m_name_loc = c_m2.text_input("Mother's Name (Local Language) [Optional]")
-        
-        c_p1, c_p2, c_p3 = st.columns(3)
-        stu_dob = c_p1.date_input("Date of Birth *", min_value=datetime.date(2000, 1, 1), max_value=datetime.date.today())
-        stu_gender = c_p2.selectbox("Gender *", ["Male", "Female", "Other"])
-        stu_bg = c_p3.selectbox("Blood Group", ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-", "Unknown"])
-        
-        st.markdown("#### 3. Contact & Identification")
-        c_id1, c_id2 = st.columns(2)
-        stu_aadhar = c_id1.text_input("Aadhaar Number (12 digits) *", max_chars=12)
-        stu_phone = c_id2.text_input("Mobile No *", max_chars=10)
-        
-        c_ad1, c_ad2 = st.columns(2)
-        stu_address_en = c_ad1.text_area("Address (English) *")
-        stu_address_loc = c_ad2.text_area("Address (Local Language) [Optional]")
-        
-        c_loc1, c_loc2, c_loc3 = st.columns(3)
-        stu_state = c_loc1.selectbox("State", list(STATE_LANG_MAP.keys()), index=18)
-        stu_pin = c_loc2.text_input("PIN Code *", max_chars=6)
-        stu_country = c_loc3.selectbox("Whether the Student is Indian National?", COUNTRIES)
-        
-        stu_minority = st.selectbox("Minority Group", ["No", "Yes - Muslim", "Yes - Christian", "Yes - Sikh", "Yes - Buddhist", "Yes - Parsi", "Yes - Jain"])
-        
-        st.markdown("#### 4. Photograph Upload")
-        stu_photo = st.file_uploader("Upload Student Photo (JPG/PNG)", type=['png', 'jpg', 'jpeg'])
-        
-        submitted = st.form_submit_button("Submit Application")
-        
-        if submitted:
-            if not school_sel or not sanitize(stu_roll) or not sanitize(stu_name_en) or not sanitize(f_name_en) or not sanitize(m_name_en) or not sanitize(stu_aadhar) or not sanitize(stu_phone) or not sanitize(stu_address_en) or not sanitize(stu_pin):
-                st.error("Please fill all the mandatory fields (*).")
-            else:
-                roll_clean = sanitize(stu_roll)
-                # Store photo data safely if needed (Here we just note it was uploaded or not for DB simplicity)
-                has_photo = True if stu_photo else False
-                
-                new_student_data = {
-                    "name": sanitize(stu_name_en), 
-                    "name_local": sanitize(stu_name_loc),
-                    "gender": stu_gender, 
-                    "father_name": sanitize(f_name_en), 
-                    "father_name_local": sanitize(f_name_loc),
-                    "mother_name": sanitize(m_name_en), 
-                    "mother_name_local": sanitize(m_name_loc),
-                    "dob": str(stu_dob), 
-                    "blood_group": stu_bg,
-                    "aadhaar": sanitize(stu_aadhar),
-                    "phone": sanitize(stu_phone),
-                    "address": sanitize(stu_address_en),
-                    "address_local": sanitize(stu_address_loc),
-                    "state": stu_state,
-                    "pin_code": sanitize(stu_pin),
-                    "nationality": stu_country,
-                    "minority": stu_minority,
-                    "has_photo": has_photo,
-                    "class": "1", # Default, can be edited by school
-                    "batch": "2025-2026",
-                    "subjects": {},
-                    "total_full": 0,
-                    "total_obt": 0,
-                    "percentage": 0.0,
-                    "result": "N/A",
-                    "grade": "N/A",
-                    "pub_date": str(datetime.date.today())
-                }
-                
-                # Check if roll no exists
-                existing = get_students_by_school(school_sel)
-                if roll_clean in existing:
-                    st.error("This Roll Number already exists in the selected school.")
-                else:
-                    # Save with "Pending" status
-                    save_student(school_sel, roll_clean, new_student_data, status="Pending")
-                    st.success("✅ Application Submitted Successfully! It is now pending approval from the school.")
 
 # ----------------- MASTER LOGIN -----------------
 elif menu == "Master Login":
@@ -975,7 +654,6 @@ elif menu == "Master Login":
             schools_db = get_all_schools()
             master_school_sel = st.selectbox("Select School", ["--Select--"] + list(schools_db.keys()))
             if master_school_sel != "--Select--":
-                # Get only approved students for master edit
                 school_students = get_students_by_school(master_school_sel, status="Approved")
                 s_lang = schools_db[master_school_sel].get("lang", "English")
                 
@@ -1242,9 +920,7 @@ elif menu == "School Login":
             f"🖨️ {t('Report Card', s_lang)} | Report Card"
         ])
         
-        # Get only Approved students for list, edit, report
         approved_students = get_students_by_school(cur_school, status="Approved")
-        # Get Pending students for approvals
         pending_students = get_students_by_school(cur_school, status="Pending")
         
         with tab_list:
@@ -1265,7 +941,7 @@ elif menu == "School Login":
                 
         with tab_approve:
             st.markdown("### ✅ Review Online Student Registrations")
-            st.info("Students who applied online will appear here. You can edit their marks/details and then Approve them. Once approved, they will appear in Results.")
+            st.info("Students who applied online will appear here. You can edit their details, add marks, and Approve them.")
             
             if pending_students:
                 app_roll = st.selectbox("Select Pending Student Application", list(pending_students.keys()))
@@ -1273,16 +949,26 @@ elif menu == "School Login":
                 
                 st.markdown("#### Review & Complete Details")
                 
+                # Check if roll number needs assigning (if they applied online)
+                new_roll_assign = st.text_input("Assign Actual Roll No (If different from Temp ID)", value=app_roll, key="p_new_roll")
+                
                 c_up_n1, c_up_n2 = st.columns(2)
                 p_name = c_up_n1.text_input("Name (English)", value=p_st.get('name', ''), key="p_name")
                 p_name_loc = c_up_n2.text_input(f"Name ({s_lang})", value=p_st.get('name_local', ''), key="p_name_loc")
                 
-                p_father = c_up_n1.text_input("Father's Name", value=p_st.get('father_name', ''), key="p_f_n")
-                p_mother = c_up_n1.text_input("Mother's Name", value=p_st.get('mother_name', ''), key="p_m_n")
+                c_f1, c_f2 = st.columns(2)
+                p_father = c_f1.text_input("Father's Name (English)", value=p_st.get('father_name', ''), key="p_f_n")
+                p_father_loc = c_f2.text_input(f"Father's Name ({s_lang})", value=p_st.get('father_name_local', ''), key="p_f_n_l")
+                
+                c_m1, c_m2 = st.columns(2)
+                p_mother = c_m1.text_input("Mother's Name (English)", value=p_st.get('mother_name', ''), key="p_m_n")
+                p_mother_loc = c_m2.text_input(f"Mother's Name ({s_lang})", value=p_st.get('mother_name_local', ''), key="p_m_n_l")
                 
                 c_up1, c_up2, c_up3 = st.columns(3)
                 with c_up1:
-                    p_gender = st.selectbox("Gender", ["Male", "Female", "Other"], index=["Male", "Female", "Other"].index(p_st.get('gender', 'Male')))
+                    gen_list = ["Male", "Female", "Other"]
+                    p_gen_val = p_st.get('gender', 'Male')
+                    p_gender = st.selectbox("Gender", gen_list, index=gen_list.index(p_gen_val) if p_gen_val in gen_list else 0)
                 with c_up2:
                     p_pen = st.text_input("PEN NO", value=p_st.get('pen_no', ''))
                 with c_up3:
@@ -1295,7 +981,7 @@ elif menu == "School Login":
                     if len(parts[0]) == 4:
                         disp_edit_dob = f"{parts[2]}-{parts[1]}-{parts[0]}"
                         
-                p_dob_input = st.text_input("DOB (DD-MM-YYYY)", value=disp_edit_dob)
+                p_dob_input = st.text_input("DOB (DD-MM-YYYY)", value=disp_edit_dob, key="p_dob")
                 
                 c_e1, c_e2 = st.columns(2)
                 with c_e1:
@@ -1330,7 +1016,7 @@ elif menu == "School Login":
 
                 p_per = (p_to / p_tf * 100) if p_tf > 0 else 0.0
                 p_res = "PASS" if p_per >= 33 else "FAIL"
-                p_grd = "A1" if p_per >= 90 else "B1" if p_per >= 70 else "C1"
+                p_grd = "A1" if p_per >= 90 else "A2" if p_per >= 80 else "B1" if p_per >= 70 else "B2" if p_per >= 60 else "C1" if p_per >= 50 else "C2" if p_per >= 40 else "D" if p_per >= 33 else "F"
                 
                 st.info(f"📊 **Marks Entered:** {p_to}/{p_tf} | Percentage: {p_per:.2f}% | Grade: {p_grd}")
                 
@@ -1346,13 +1032,21 @@ elif menu == "School Login":
                         updated_p_data.update({
                             "name": sanitize(p_name), "name_local": sanitize(p_name_loc), 
                             "gender": p_gender, "pen_no": sanitize(p_pen), "apaar_no": sanitize(p_apaar),
-                            "father_name": sanitize(p_father), "mother_name": sanitize(p_mother),
+                            "father_name": sanitize(p_father), "father_name_local": sanitize(p_father_loc),
+                            "mother_name": sanitize(p_mother), "mother_name_local": sanitize(p_mother_loc),
                             "dob": p_dob_save, "class": p_cls, "batch": p_batch,
                             "subjects": p_subjects_data, "total_full": p_tf, "total_obt": p_to,
-                            "percentage": round(p_per, 2), "result": p_res, "grade": p_grd
+                            "percentage": round(p_per, 2), "result": p_res, "grade": p_grd,
+                            "pub_date": str(datetime.date.today())
                         })
-                        save_student(cur_school, app_roll, updated_p_data, status="Approved")
-                        st.success(f"Student {app_roll} Approved successfully!")
+                        
+                        # If roll no was changed during approval, delete old temp roll
+                        roll_to_save = sanitize(new_roll_assign)
+                        if roll_to_save != app_roll:
+                            delete_student(cur_school, app_roll)
+                            
+                        save_student(cur_school, roll_to_save, updated_p_data, status="Approved")
+                        st.success(f"Student {roll_to_save} Approved successfully!")
                         st.rerun()
                 with c_act2:
                     if st.button("🚫 Reject & Delete Application"):
@@ -1360,7 +1054,7 @@ elif menu == "School Login":
                         st.error(f"Application for {app_roll} Rejected.")
                         st.rerun()
             else:
-                st.success("No pending applications.")
+                st.success("No pending applications at the moment.")
                 
         with tab_add:
             st.markdown(f"### 📝 {t('Add Student', s_lang)} | Add Student Direct (Pre-Approved)")
@@ -1453,7 +1147,6 @@ elif menu == "School Login":
                             "total_full": total_full_mark, "total_obt": total_obt_mark,
                             "percentage": round(percentage, 2), "result": result, "grade": grade
                         }
-                        # Auto Approved if added from School Panel directly
                         save_student(cur_school, roll_no_clean, new_data, status="Approved")
                         st.success(f"Roll No {roll_no_clean} Data Saved & Approved!")
                     else:
@@ -1572,7 +1265,7 @@ elif menu == "School Login":
                     save_student(cur_school, edit_roll, updated_data, status="Approved")
                     st.success("Record Updated!")
             else:
-                st.warning("No students available.")
+                st.warning("No approved students available to edit.")
 
         with tab_report:
             st.markdown(f"### 🖨️ {t('Report Card', s_lang)} | Report Card")
@@ -1622,8 +1315,6 @@ elif menu == "Results":
             ndob = normalize_dob(st_dob_input)
             
             c = conn.cursor()
-            # DIRECT O(1) HIGH-SPEED DATABASE QUERY TO PREVENT CRASH
-            # Added "AND status='Approved'" to only show approved results
             c.execute("SELECT school_id, roll_no, data FROM students WHERE (roll_no=? OR name=?) AND dob=? AND status='Approved'", (sq_low, sq_low, ndob))
             row = c.fetchone()
             
@@ -1656,7 +1347,6 @@ elif menu == "Results":
                     if st.button("🖨️ Print Result Card", key="print_stu"):
                         components.html("<script>window.parent.print();</script>", height=0)
             else:
-                # Check if it exists but is pending
                 c.execute("SELECT status FROM students WHERE (roll_no=? OR name=?) AND dob=?", (sq_low, sq_low, ndob))
                 pend_row = c.fetchone()
                 if pend_row and pend_row[0] == "Pending":
