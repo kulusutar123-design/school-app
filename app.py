@@ -12,7 +12,7 @@ import random
 import urllib.parse
 
 # ==========================================
-# 🌐 APP URL SETTING (ସ୍କାନ୍ କଲେ ଏହି ଲିଙ୍କ୍ ଖୋଲିବ)
+# 🌐 APP URL SETTING
 # ==========================================
 APP_URL = "http://localhost:8501"
 
@@ -56,46 +56,29 @@ STATE_LANG_MAP = {
 # ==========================================
 def t(eng_text, lang):
     translations = {
-        "School Portal": {
-            "Odia": "ସ୍କୁଲ୍ ପୋର୍ଟାଲ୍", "Hindi": "स्कूल पोर्टल", "Bengali": "স্কুল পোর্টাল", 
-            "Telugu": "పాఠశాల పోర్టల్", "Tamil": "பள்ளி போர்டல்", "Marathi": "शाळा पोर्टल", "Gujarati": "શાળા પોર્ટલ",
-            "Assamese": "বিদ্যালয় পৰ্টেল", "Kannada": "ಶಾಲಾ ಪೋರ್ಟಲ್", "Malayalam": "സ്കൂൾ പോർട്ടൽ", "Punjabi": "ਸਕੂਲ ਪੋਰਟਲ", "Urdu": "اسکول پورٹل"
-        },
-        "Logout": {
-            "Odia": "ଲଗ୍ ଆଉଟ୍", "Hindi": "लॉग आउट", "Bengali": "লগ আউট", 
-            "Telugu": "లాగ్ అవుట్", "Tamil": "வெளியேறு", "Marathi": "लॉग आउट", "Gujarati": "લૉગ આઉટ",
-            "Assamese": "লগ আউট", "Kannada": "ಲಾಗ್ ಔಟ್", "Malayalam": "ലോഗ് ഔട്ട്", "Punjabi": "ਲਾਗ ਆਉਟ", "Urdu": "لاگ آؤٹ"
-        },
-        "My Students": {
-            "Odia": "ମୋର ଛାତ୍ରଛାତ୍ରୀ", "Hindi": "मेरे छात्र", "Bengali": "আমার ছাত্র",
-            "Telugu": "నా విద్యార్థులు", "Tamil": "என் மாணவர்கள்", "Marathi": "माझे विद्यार्थी", "Gujarati": "મારા વિદ્યાર્થીઓ",
-            "Assamese": "মোৰ ছাত্ৰ-ছাত্ৰী", "Kannada": "ನನ್ನ ವಿದ್ಯಾರ್ಥಿಗಳು", "Malayalam": "എന്റെ വിദ്യാർത്ഥികൾ", "Punjabi": "ਮੇਰੇ ਵਿਦਿਆਰਥੀ", "Urdu": "میرے طلباء"
-        },
-        "Add Student": {
-            "Odia": "ନୂଆ ଛାତ୍ର ଯୋଡନ୍ତୁ", "Hindi": "नया छात्र जोड़ें", "Bengali": "নতুন ছাত্র যোগ করুন",
-            "Telugu": "కొత్త విద్యార్థిని జోడించండి", "Tamil": "புதிய மாணவரைச் சேர்க்கவும்", "Marathi": "नवीन विद्यार्थी जोडा", "Gujarati": "નવો વિદ્યાર્થી ઉમેરો",
-            "Assamese": "নতুন ছাত্ৰ যোগ কৰক", "Kannada": "ಹೊಸ ವಿದ್ಯಾರ್ಥಿಯನ್ನು ಸೇರಿಸಿ", "Malayalam": "പുതിയ വിദ്യാർത്ഥിയെ ചേർക്കുക", "Punjabi": "ਨਵਾਂ ਵਿਦਿਆਰਥੀ ਸ਼ਾਮਲ ਕਰੋ", "Urdu": "نیا طالب علم شامل کریں"
-        },
-        "Edit Student": {
-            "Odia": "ଛାତ୍ର ତଥ୍ୟ ବଦଳାନ୍ତୁ", "Hindi": "छात्र विवरण बदलें", "Bengali": "ছাত্র তথ্য আপডেট করুন",
-            "Telugu": "విద్యార్థి సమాచారం నవీకరించండి", "Tamil": "மாணவர் விவரங்களை புதுப்பிக்கவும்", "Marathi": "विद्यार्थी माहिती अपडेट करा", "Gujarati": "વિદ્યાર્થી માહિતી અપડેટ કરો",
-            "Assamese": "আপডেট কৰক", "Kannada": "ನವೀಕರಿಸಿ", "Malayalam": "അപ്ഡേറ്റ് ചെയ്യുക", "Punjabi": "ਅੱਪਡੇਟ ਕਰੋ", "Urdu": "طالب علم میں ترمیم کریں"
-        },
-        "Report Card": {
-            "Odia": "ରିପୋର୍ଟ କାର୍ଡ ପ୍ରିଣ୍ଟ୍", "Hindi": "रिपोर्ट कार्ड", "Bengali": "রিপোর্ট কার্ড",
-            "Telugu": "రిపోర్ట్ కార్డ్", "Tamil": "மதிப்பெண் அட்டை", "Marathi": "रिपोर्ट कार्ड", "Gujarati": "રિપોર્ટ કાર્ડ",
-            "Assamese": "ৰিপৰ্ট কাৰ্ড", "Kannada": "ವರದಿ ಕಾರ್ಡ್", "Malayalam": "റിപ്പോർട്ട് കാർഡ്", "Punjabi": "ਰਿਪੋਰਟ ਕਾਰਡ", "Urdu": "رپورٹ کارڈ"
-        },
-        "Search": {
-            "Odia": "ନାମ କିମ୍ବା ରୋଲ୍ ନମ୍ବର ଦେଇ ଖୋଜନ୍ତୁ", "Hindi": "नाम या रोल नंबर से खोजें", "Bengali": "নাম বা রোল নম্বর দিয়ে খুঁজুন",
-            "Telugu": "పేరు లేదా రోల్ నంబర్ ద్వారా శోధించండి", "Tamil": "பெயர் அல்லது பதிவு எண் மூலம் தேடவும்", "Marathi": "नाव किंवा रोल नंबरने शोधा", "Gujarati": "નામ અથવા રોલ નંબર દ્વારા શોધો",
-            "Assamese": "নাম বা ৰোল নম্বৰৰ দ্বাৰা বিচাৰক", "Kannada": "ಹೆಸರು ಅಥವಾ ರೋಲ್ ಸಂಖ್ಯೆಯಿಂದ ಹುಡುಕಿ", "Malayalam": "പേര് അല്ലെങ്കിൽ റോൾ നമ്പർ ഉപയോഗിച്ച് തിരയുക", "Punjabi": "ਨਾਮ ਜਾਂ ਰੋਲ ਨੰਬਰ ਰਾਹੀਂ ਖੋਜੋ", "Urdu": "نام یا رول نمبر سے تلاش کریں"
-        },
-        "Total Registered": {
-            "Odia": "ମୋଟ ପଞ୍ଜିକୃତ:", "Hindi": "कुल पंजीकृत:", "Bengali": "মোট নিবন্ধিত:",
-            "Telugu": "మొత్తం నమోదైనవి:", "Tamil": "மொத்தம் பதிவு செய்யப்பட்டவை:", "Marathi": "एकूण नोंदणीकृत:", "Gujarati": "કુલ નોંધાયેલ:",
-            "Assamese": "মুঠ পঞ্জীয়নকৃত:", "Kannada": "ಒಟ್ಟು ನೋಂದಾಯಿತ:", "Malayalam": "ആകെ രജിസ്റ്റർ ചെയ്തത്:", "Punjabi": "ਕੁੱਲ ਰਜਿਸਟਰਡ:", "Urdu": "کل رجسٹرڈ:"
-        }
+        "School Portal": {"Odia": "ସ୍କୁଲ୍ ପୋର୍ଟାଲ୍", "Hindi": "स्कूल पोर्टल", "Bengali": "স্কুল পোর্টাল", "Telugu": "పాఠశాల పోర్టల్", "Marathi": "शाळा पोर्टल"},
+        "Logout": {"Odia": "ଲଗ୍ ଆଉଟ୍", "Hindi": "लॉग आउट", "Bengali": "লগ আউট", "Marathi": "लॉग आउट"},
+        "My Students": {"Odia": "ମୋର ଛାତ୍ରଛାତ୍ରୀ", "Hindi": "मेरे छात्र", "Bengali": "আমার ছাত্র", "Marathi": "माझे विद्यार्थी"},
+        "Add Student": {"Odia": "ନୂଆ ଛାତ୍ର ଯୋଡନ୍ତୁ", "Hindi": "नया छात्र जोड़ें", "Bengali": "নতুন ছাত্র যোগ করুন", "Marathi": "नवीन विद्यार्थी जोडा"},
+        "Edit Student": {"Odia": "ଛାତ୍ର ତଥ୍ୟ ବଦଳାନ୍ତୁ", "Hindi": "छात्र विवरण बदलें", "Bengali": "তথ্য আপডেট করুন", "Marathi": "अपडेट करा"},
+        "Report Card": {"Odia": "ରିପୋର୍ଟ କାର୍ଡ ପ୍ରିଣ୍ଟ୍", "Hindi": "रिपोर्ट कार्ड", "Bengali": "রিপোর্ট কার্ড", "Marathi": "रिपोर्ट कार्ड"},
+        "Search": {"Odia": "ନାମ କିମ୍ବା ରୋଲ୍ ନମ୍ବର ଦେଇ ଖୋଜନ୍ତୁ", "Hindi": "नाम या रोल नंबर से खोजें", "Bengali": "নাম বা রোল নম্বর দিয়ে খুঁজুন"},
+        
+        # Certificate Translations
+        "NAME": {"Odia": "ଛାତ୍ର/ଛାତ୍ରୀଙ୍କ ନାମ", "Hindi": "नाम", "Bengali": "নাম", "Marathi": "नाव"},
+        "ROLL NO": {"Odia": "ରୋଲ୍ ନମ୍ବର", "Hindi": "रोल नंबर", "Bengali": "রোল নম্বর", "Marathi": "रोल नंबर"},
+        "CLASS": {"Odia": "ଶ୍ରେଣୀ", "Hindi": "कक्षा", "Bengali": "শ্রেণী", "Marathi": "वर्ग"},
+        "MOTHER'S NAME": {"Odia": "ମାତାଙ୍କ ନାମ", "Hindi": "माता का नाम", "Bengali": "মাতার নাম", "Marathi": "आईचे नाव"},
+        "FATHER'S NAME": {"Odia": "ପିତାଙ୍କ ନାମ", "Hindi": "पिता का नाम", "Bengali": "পিতার নাম", "Marathi": "वडिलांचे नाव"},
+        "DOB": {"Odia": "ଜନ୍ମ ତାରିଖ", "Hindi": "जन्म तिथि", "Bengali": "জন্ম তারিখ", "Marathi": "जन्म तारीख"},
+        "SUBJECT": {"Odia": "ବିଷୟ", "Hindi": "विषय", "Bengali": "বিষয়", "Marathi": "विषय"},
+        "FULL MARKS": {"Odia": "ମୋଟ ନମ୍ବର", "Hindi": "पूर्णांक", "Bengali": "পূর্ণমান", "Marathi": "एकूण गुण"},
+        "MARKS SECURED": {"Odia": "ପ୍ରାପ୍ତ ନମ୍ବର", "Hindi": "प्राप्तांक", "Bengali": "প্রাপ্ত নম্বর", "Marathi": "मिळवलेले गुण"},
+        "TOTAL MARKS": {"Odia": "ସମୁଦାୟ ପ୍ରାପ୍ତ ନମ୍ବର", "Hindi": "कुल प्राप्तांक", "Bengali": "মোট প্রাপ্ত নম্বর", "Marathi": "एकूण प्राप्त गुण"},
+        "GRADE": {"Odia": "ଗ୍ରେଡ୍", "Hindi": "ग्रेड", "Bengali": "গ্রেড", "Marathi": "श्रेणी"},
+        "ANNUAL EXAMINATION": {"Odia": "ବାର୍ଷିକ ପରୀକ୍ଷା", "Hindi": "वार्षिक परीक्षा", "Bengali": "বার্ষিক পরীক্ষা", "Marathi": "वार्षिक परीक्षा"},
+        "CERTIFICATE-CUM-MARK SHEET": {"Odia": "ପ୍ରମାଣପତ୍ର ଏବଂ ମାର୍କସିଟ୍", "Hindi": "प्रमाणपत्र सह अंकतालिका", "Bengali": "শংসাপত্র এবং মার্কশিট", "Marathi": "प्रमाणपत्र आणि गुणपत्रिका"},
+        "PASSED_TEXT": {"Odia": "ଉପରୋକ୍ତ ବ୍ୟାଚରେ ଅନୁଷ୍ଠିତ ବାର୍ଷିକ ପରୀକ୍ଷାରେ ଉତ୍ତୀର୍ଣ୍ଣ ହୋଇଛନ୍ତି।", "Hindi": "उपरोक्त शैक्षणिक बैच में आयोजित वार्षिक परीक्षा उत्तीर्ण की है।", "Bengali": "উপরে উল্লেখিত ব্যাচে অনুষ্ঠিত বার্ষিক পরীক্ষায় উত্তীর্ণ হয়েছে।", "Marathi": "शैक्षणिक बॅचमध्ये घेण्यात आलेली वार्षिक परीक्षा उत्तीर्ण केली आहे."}
     }
     return translations.get(eng_text, {}).get(lang, eng_text)
 
@@ -160,8 +143,8 @@ def save_data(schools, students):
     with open(STUDENTS_FILE, "w", encoding="utf-8") as f:
         json.dump(students, f, indent=4)
 
-# --- ସୁନ୍ଦର ରାଙ୍କ୍ କାର୍ଡ HTML ଡିଜାଇନ୍ ---
-def generate_result_card_html(school_name, st_data, roll_no):
+# --- ସୁନ୍ଦର ରାଙ୍କ୍ କାର୍ଡ HTML ଡିଜାଇନ୍ (BILINGUAL) ---
+def generate_result_card_html(school_name, st_data, roll_no, s_lang):
     raw_dob = st_data.get('dob', '')
     disp_dob = raw_dob
     if len(raw_dob.split('-')) == 3:
@@ -207,34 +190,34 @@ def generate_result_card_html(school_name, st_data, roll_no):
         
         f"<div style='text-align: center; color: {border_color}; margin-bottom: 20px;'>"
         f"<h1 style='margin: 0; font-size: {header_font_size}; text-transform: uppercase; font-family: \"Georgia\", serif; text-shadow: 1px 1px 1px #e1bee7;'>{school_name}</h1>"
-        f"<h3 style='margin: 8px 0; font-size: 16px; letter-spacing: 1px;'>ANNUAL EXAMINATION - {st_data.get('batch', '2025-2026')}</h3>"
-        "<p style='margin: 5px 0; font-weight: bold; font-size: 17px; text-decoration: underline;'>CERTIFICATE-CUM-MARK SHEET</p>"
+        f"<h3 style='margin: 5px 0; font-size: 16px; letter-spacing: 1px;'>ANNUAL EXAMINATION / <span style='font-size: 14px;'>{t('ANNUAL EXAMINATION', s_lang)}</span> - {st_data.get('batch', '2025-2026')}</h3>"
+        f"<p style='margin: 5px 0; font-weight: bold; font-size: 17px; text-decoration: underline;'>CERTIFICATE-CUM-MARK SHEET <br> <span style='font-size: 14px; text-decoration: none;'>({t('CERTIFICATE-CUM-MARK SHEET', s_lang)})</span></p>"
         "</div>"
         
         "<table style='width: 100%; font-size: 13px; color: #000000; margin-bottom: 20px; font-weight: bold;'>"
-        f"<tr><td><span style='color:{border_color}; font-weight:normal;'>ROLL NO:</span> {roll_no}</td><td style='text-align: right;'><span style='color:{border_color}; font-weight:normal;'>CLASS:</span> {st_data.get('class', 'N/A')}</td></tr>"
+        f"<tr><td><span style='color:{border_color}; font-weight:normal;'>ROLL NO / {t('ROLL NO', s_lang)}:</span> {roll_no}</td><td style='text-align: right;'><span style='color:{border_color}; font-weight:normal;'>CLASS / {t('CLASS', s_lang)}:</span> {st_data.get('class', 'N/A')}</td></tr>"
         f"<tr><td><span style='color:{border_color}; font-weight:normal;'>PEN NO:</span> {st_data.get('pen_no', 'N/A')}</td><td style='text-align: right;'><span style='color:{border_color}; font-weight:normal;'>APAAR NO:</span> {st_data.get('apaar_no', 'N/A')}</td></tr>"
         "</table>"
         
-        "<table style='width: 100%; font-size: 15px; margin-bottom: 15px; text-transform: uppercase; color: #000000; line-height: 1.8;'>"
-        f"<tr><td style='width: 160px; color: {border_color}; font-weight: bold; font-style: italic;'>Certify that</td><td style='font-weight: bold;'>{student_name}</td></tr>"
-        f"<tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Mother's Name</td><td style='font-weight: bold;'>{st_data.get('mother_name', 'N/A').upper()}</td></tr>"
-        f"<tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Father's Name</td><td style='font-weight: bold;'>{st_data.get('father_name', 'N/A').upper()}</td></tr>"
-        f"<tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Date of Birth</td><td style='font-weight: bold;'>{disp_dob}</td></tr>"
+        "<table style='width: 100%; font-size: 14px; margin-bottom: 15px; text-transform: uppercase; color: #000000; line-height: 1.8;'>"
+        f"<tr><td style='width: 220px; color: {border_color}; font-weight: bold; font-style: italic;'>Certify that / <span style='font-size:12px;'>{t('NAME', s_lang)}</span></td><td style='font-weight: bold; font-size: 16px;'>{student_name}</td></tr>"
+        f"<tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Mother's Name / <span style='font-size:12px;'>{t('MOTHER\\'S NAME', s_lang)}</span></td><td style='font-weight: bold;'>{st_data.get('mother_name', 'N/A').upper()}</td></tr>"
+        f"<tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Father's Name / <span style='font-size:12px;'>{t('FATHER\\'S NAME', s_lang)}</span></td><td style='font-weight: bold;'>{st_data.get('father_name', 'N/A').upper()}</td></tr>"
+        f"<tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Date of Birth / <span style='font-size:12px;'>{t('DOB', s_lang)}</span></td><td style='font-weight: bold;'>{disp_dob}</td></tr>"
         "</table>"
         
-        f"<p style='color: {border_color}; font-style: italic; font-size: 15px; text-align: center; margin-bottom: 20px;'>Passed the Annual Examination held in the academic batch of {st_data.get('batch', 'N/A')}.</p>"
+        f"<p style='color: {border_color}; font-style: italic; font-size: 14px; text-align: center; margin-bottom: 20px;'>Passed the Annual Examination held in the academic batch of {st_data.get('batch', 'N/A')}. <br><span style='font-size: 13px;'>{t('PASSED_TEXT', s_lang)}</span></p>"
         
         f"<div style='text-align: center; color: {border_color}; font-weight: bold; font-size: 14px; margin-bottom: 5px;'>SUBJECTS AND MARKS SECURED</div>"
-        f"<table style='width: 100%; border-collapse: collapse; border: 2px solid {border_color}; text-align: center; font-size: 14px; background-color: transparent; color: #000000;'>"
+        f"<table style='width: 100%; border-collapse: collapse; border: 2px solid {border_color}; text-align: center; font-size: 13px; background-color: transparent; color: #000000;'>"
         f"<tr style='color: {border_color}; background-color: {table_bg}; border-bottom: 2px solid {border_color};'>"
-        f"<th style='padding: 10px; border-right: 1px solid {border_color};'>SUBJECT</th>"
-        f"<th style='padding: 10px; border-right: 1px solid {border_color};'>FULL MARKS</th>"
-        "<th style='padding: 10px;'>MARKS SECURED</th>"
+        f"<th style='padding: 8px; border-right: 1px solid {border_color};'>SUBJECT / <span style='font-size:11px;'>{t('SUBJECT', s_lang)}</span></th>"
+        f"<th style='padding: 8px; border-right: 1px solid {border_color};'>FULL MARKS / <span style='font-size:11px;'>{t('FULL MARKS', s_lang)}</span></th>"
+        f"<th style='padding: 8px;'>MARKS SECURED / <span style='font-size:11px;'>{t('MARKS SECURED', s_lang)}</span></th>"
         "</tr>"
         f"{rows_html}"
         f"<tr style='color: {border_color}; font-weight: bold; background-color: {table_bg}; border-top: 2px solid {border_color};'>"
-        f"<td style='padding: 10px; border-right: 1px solid {border_color}; text-align: right;'>TOTAL MARKS</td>"
+        f"<td style='padding: 10px; border-right: 1px solid {border_color}; text-align: right;'>TOTAL MARKS / <span style='font-size:11px;'>{t('TOTAL MARKS', s_lang)}</span></td>"
         f"<td style='padding: 10px; border-right: 1px solid {border_color};'>{st_data.get('total_full', 0)}</td>"
         f"<td style='padding: 10px; color: #000;'>{total_obt}</td>"
         "</tr>"
@@ -247,14 +230,14 @@ def generate_result_card_html(school_name, st_data, roll_no):
         
         "<td style='width: 33%; vertical-align: bottom;'>"
         f"<img src='{barcode_url}' alt='Barcode' style='height: 35px; margin-bottom: 10px; max-width: 100%;'/>"
-        "<div style='font-size: 11px;'>DATE OF PUBLICATION OF RESULTS</div>"
+        "<div style='font-size: 11px;'>DATE OF PUBLICATION</div>"
         f"<div style='font-weight: bold; font-size: 14px; margin-top: 5px; margin-bottom: 30px;'>{datetime.date.today().strftime('%d/%m/%Y')}</div>"
         f"<div style='border-bottom: 1px solid {border_color}; width: 80%; margin: auto;'></div>"
         "<div style='font-size: 11px; margin-top: 5px; font-weight: bold;'>HM SIGNATURE</div>"
         "</td>"
         
         "<td style='width: 34%; vertical-align: top; padding-top: 5px;'>"
-        "<div style='font-size: 12px; margin-bottom: 5px;'>GRADE</div>"
+        f"<div style='font-size: 12px; margin-bottom: 5px;'>GRADE / {t('GRADE', s_lang)}</div>"
         f"<div style='border: 2px solid {border_color}; padding: 10px 25px; display: inline-block; min-width: 80px; background-color: {table_bg};'>"
         f"<div style='font-weight: bold; font-size: 22px; color: #000;'>{grade}</div>"
         "</div>"
@@ -274,7 +257,7 @@ def generate_result_card_html(school_name, st_data, roll_no):
     )
     return html_content
 
-# --- PDF ଜେନେରେଟର ---
+# --- PDF ଜେନେରେଟର (ENGLISH ONLY FOR FONT SUPPORT) ---
 def create_pdf(filename, school_name, st_data, roll_no):
     raw_dob = st_data.get('dob', '')
     disp_dob = raw_dob
@@ -285,17 +268,14 @@ def create_pdf(filename, school_name, st_data, roll_no):
             
     c = canvas.Canvas(filename, pagesize=letter)
     
-    # PDF Background color
     c.setFillColorRGB(0.99, 0.98, 0.97)
     c.rect(30, 30, 552, 732, fill=1, stroke=0)
     
-    # Outer Border
     c.setStrokeColorRGB(0.82, 0.60, 0.83)
     c.setLineWidth(15)
     c.rect(15, 15, 582, 762, fill=0, stroke=1)
     
-    # Inner Border
-    c.setStrokeColorRGB(0.59, 0.25, 0.60)
+    c.setStrokeColorRGB(0.59, 0.25, 0.60) 
     c.setLineWidth(2)
     c.rect(30, 30, 552, 732, fill=0, stroke=1)
     
@@ -371,7 +351,7 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.setStrokeColorRGB(0.59, 0.25, 0.60)
     c.line(50, 495, 550, 495)
     
-    c.setFillColorRGB(0.98, 0.95, 0.98)
+    c.setFillColorRGB(0.98, 0.95, 0.98) 
     c.rect(50, 465, 500, 30, fill=1, stroke=0)
     
     c.setFillColorRGB(0.59, 0.25, 0.60)
@@ -391,10 +371,12 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.setFont("Helvetica-Bold", 11)
     
     table_bottom_y = y + 10
+    
     for sub, m_info in st_data.get('subjects', {}).items():
         c.drawString(60, y, str(sub).upper())
         c.drawCentredString(350, y, str(m_info['full']))
         c.drawRightString(540, y, str(m_info['obt']))
+        
         c.setStrokeColorRGB(0.59, 0.25, 0.60)
         c.line(50, y-10, 550, y-10)
         y -= 20
@@ -881,9 +863,9 @@ elif menu == "School Login":
         
         col1, col2 = st.columns([8, 2])
         with col1:
-            st.info(f"🏫 **{t('School Portal', s_lang)}** | ID: {cur_school} | {schools_db[cur_school]['name']} ({s_state})")
+            st.info(f"🏫 **{t('School Portal', s_lang)} | School Portal** | ID: {cur_school} | {schools_db[cur_school]['name']} ({s_state})")
         with col2:
-            if st.button(f"🔴 {t('Logout', s_lang)}", key="s_logout"):
+            if st.button(f"🔴 {t('Logout', s_lang)} | Logout", key="s_logout"):
                 del st.session_state['school_logged_id']
                 st.rerun()
 
@@ -891,18 +873,18 @@ elif menu == "School Login":
         
         # 🌐 LANGUAGE TRANSLATED TABS
         tab_list, tab_add, tab_edit, tab_report = st.tabs([
-            f"📋 {t('My Students', s_lang)}", 
-            f"➕ {t('Add Student', s_lang)}", 
-            f"✏️ {t('Edit Student', s_lang)}", 
-            f"🖨️ {t('Report Card', s_lang)}"
+            f"📋 {t('My Students', s_lang)} | My Students", 
+            f"➕ {t('Add Student', s_lang)} | Add Student", 
+            f"✏️ {t('Edit Student', s_lang)} | Edit Student", 
+            f"🖨️ {t('Report Card', s_lang)} | Report Card"
         ])
         
         with tab_list:
-            st.markdown(f"### 📋 {t('My Students', s_lang)}")
+            st.markdown(f"### 📋 {t('My Students', s_lang)} | My Students")
             school_students = students_db.get(cur_school, {})
             if school_students:
                 st.write(f"{t('Total Registered', s_lang)} **{len(school_students)}**")
-                search_query = st.text_input(f"🔍 {t('Search', s_lang)}")
+                search_query = st.text_input(f"🔍 {t('Search', s_lang)} / Search")
                 for r_no, s_info in school_students.items():
                     if search_query.lower() in r_no.lower() or search_query.lower() in s_info['name'].lower() or search_query == "":
                         cols = st.columns([2, 4, 3, 3])
@@ -1081,7 +1063,7 @@ elif menu == "School Login":
                 st_data = school_students[rep_roll]
                 school_name = schools_db[cur_school]['name']
                 
-                st.markdown(generate_result_card_html(school_name, st_data, rep_roll), unsafe_allow_html=True)
+                st.markdown(generate_result_card_html(school_name, st_data, rep_roll, s_lang), unsafe_allow_html=True)
                 
                 col1, col2 = st.columns(2)
                 with col1:
@@ -1165,8 +1147,10 @@ elif menu == "Results":
                 f"🎉 **ସ୍ୱାଗତମ୍ {student_name}!** ଆପଣଙ୍କ ରେଜଲ୍ଟ ତଳେ ଦିଆଗଲା:"
             )
             school_name = schools_db[found_school_id]['name']
+            # Fetch specific language for this school
+            s_lang = schools_db[found_school_id].get("lang", "English")
             
-            st.markdown(generate_result_card_html(school_name, found_student, found_roll), unsafe_allow_html=True)
+            st.markdown(generate_result_card_html(school_name, found_student, found_roll, s_lang), unsafe_allow_html=True)
             
             col1, col2 = st.columns(2)
             with col1:
