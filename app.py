@@ -101,35 +101,35 @@ def auto_translate(text, lang_name):
 def t(eng_text, lang):
     translations = {
         "School Portal": {"Odia": "ସ୍କୁଲ୍ ପୋର୍ଟାଲ୍", "Hindi": "स्कूल पोर्टल", "Bengali": "স্কুল পোর্টাল", "Telugu": "పాఠశాల పోర్టల్", "Marathi": "शाळा पोर्टल"},
-        "Logout": {"Odia": "ଲଗ୍ ଆଉଟ୍", "Hindi": "लॉग आउट", "Bengali": "লগ আউট", "Marathi": "लॉग आउट"},
+        "Logout": {"Odia": "ଲଗ୍ ଆଉଟ୍", "Hindi": "लॉग आउट", "Bengali": "ଲଗ୍ ଆଉଟ୍", "Marathi": "लॉग आउट"},
         "My Students": {"Odia": "ମୋର ଛାତ୍ରଛାତ୍ରୀ", "Hindi": "मेरे छात्र", "Bengali": "আমার ছাত্র", "Marathi": "माझे विद्यार्थी"},
         "Add Student": {"Odia": "ନୂଆ ଛାତ୍ର ଯୋଡନ୍ତୁ", "Hindi": "नया छात्र जोड़ें", "Bengali": "নতুন ছাত্র যোগ করুন", "Marathi": "नवीन विद्यार्थी जोडा"},
         "Edit Student": {"Odia": "ଛାତ୍ର ତଥ୍ୟ ବଦଳାନ୍ତୁ", "Hindi": "छात्र विवरण बदलें", "Bengali": "তথ্য আপডেট করুন", "Marathi": "अपडेट करा"},
-        "Report Card": {"Odia": "ରିପୋର୍ଟ କାର୍ଡ ପ୍ରିଣ୍ଟ୍", "Hindi": "रिपोर्ट कार्ड", "Bengali": "রিপোর্ট কার্ড", "Marathi": "रिपोर्ट कार्ड"},
+        "Report Card": {"Odia": "ରିପୋର୍ଟ କାର୍ଡ ପ୍ରିଣ୍ଟ୍", "Hindi": "रिपोर्ट कार्ड", "Bengali": "ରିପୋର୍ଟ କାର୍ଡ", "Marathi": "रिपोर्ट कार्ड"},
         "Search": {"Odia": "ନାମ କିମ୍ବା ରୋଲ୍ ନମ୍ବର ଦେଇ ଖୋଜନ୍ତୁ", "Hindi": "नाम या रोल नंबर से खोजें", "Bengali": "নাম বা রোল নম্বর দিয়ে খুঁজুন"},
         
-        "ANNUAL EXAMINATION": {"Odia": "ବାର୍ଷିକ ପରୀକ୍ଷା", "Hindi": "वार्षिक परीक्षा", "Bengali": "বার্ষিক परीक्षा", "Marathi": "वार्षिक परीक्षा"},
-        "CERTIFICATE-CUM-MARK SHEET": {"Odia": "ପ୍ରମାଣପତ୍ର ଏବଂ ମାର୍କସିଟ୍", "Hindi": "प्रमाणपत्र सह अंकतालिका", "Bengali": "শংসাপত্র এবং মার্কশিট", "Marathi": "प्रमाणपत्र आणि गुणपत्रिका"},
+        "ANNUAL EXAMINATION": {"Odia": "ବାର୍ଷିକ ପରୀକ୍ଷା", "Hindi": "वार्षिक परीक्षा", "Bengali": "বার্ষিক পরীক্ষা", "Marathi": "वार्षिक परीक्षा"},
+        "CERTIFICATE-CUM-MARK SHEET": {"Odia": "ପ୍ରମାଣପତ୍ର ଏବଂ ମାର୍କସିଟ୍", "Hindi": "प्रमाणपत्र सह अंकतालिका", "Bengali": "শংসାପତ୍ର ଏବଂ ମାର୍କସିଟ୍", "Marathi": "प्रमाणपत्र आणि गुणपत्रिका"},
         "SUBJECTS AND MARKS SECURED": {"Odia": "ବିଷୟ ଏବଂ ପ୍ରାପ୍ତ ନମ୍ବର", "Hindi": "विषय और प्राप्त अंक", "Bengali": "বিষয় এবং প্রাপ্ত নম্বর", "Marathi": "विषय आणि मिळवलेले गुण"},
         "Certify that": {"Odia": "ପ୍ରମାଣ କରାଯାଏ ଯେ", "Hindi": "प्रमाणित किया जाता है कि", "Bengali": "প্রত্যয়ন করা যাচ্ছে যে", "Marathi": "प्रमाणित केले जाते की"},
         
-        "ROLL NO": {"Odia": "ରୋଲ୍ ନମ୍ବର", "Hindi": "रोଲ नंबर", "Bengali": "রোল নম্বর", "Marathi": "रोल नंबर"},
+        "ROLL NO": {"Odia": "ରୋଲ୍ ନମ୍ବର", "Hindi": "रोल नंबर", "Bengali": "রোল নম্বর", "Marathi": "रोल नंबर"},
         "CLASS": {"Odia": "ଶ୍ରେଣୀ", "Hindi": "कक्षा", "Bengali": "শ্রেণী", "Marathi": "वर्ग"},
-        "PEN NO": {"Odia": "ପେନ୍ ନମ୍ବର", "Hindi": "पेन नं.", "Bengali": "পেন নং", "Marathi": "पेन क्र."},
-        "APAAR NO": {"Odia": "ଅପାର୍ ନମ୍ବର", "Hindi": "अपार नं.", "Bengali": "অপার নং", "Marathi": "अपार क्र."},
+        "PEN NO": {"Odia": "ପେନ୍ ନମ୍ବର", "Hindi": "पेन नं.", "Bengali": "ପେନ୍ ନମ୍ବର", "Marathi": "पेन क्र."},
+        "APAAR NO": {"Odia": "ଅପାର୍ ନମ୍ବର", "Hindi": "अपार नं.", "Bengali": "ଅପାର୍ ନମ୍ବର", "Marathi": "अपार क्र."},
         "NAME": {"Odia": "ଛାତ୍ର/ଛାତ୍ରୀଙ୍କ ନାମ", "Hindi": "छात्र का नाम", "Bengali": "ছাত্রের নাম", "Marathi": "विद्यार्थ्याचे नाव"},
-        "MOTHER'S NAME": {"Odia": "ମାତାଙ୍କ ନାମ", "Hindi": "माता का नाम", "Bengali": "মাতার নাম", "Marathi": "आईचे नाव"},
-        "FATHER'S NAME": {"Odia": "ପିତାଙ୍କ ନାମ", "Hindi": "पिता का नाम", "Bengali": "पিতার नाम", "Marathi": "वडिलांचे नाव"},
-        "DOB": {"Odia": "ଜନ୍ମ ତାରିଖ", "Hindi": "जन्म तिथि", "Bengali": "জন্ম তারিখ", "Marathi": "जन्म तारीख"},
+        "MOTHER'S NAME": {"Odia": "ମାତାଙ୍କ ନାମ", "Hindi": "माता का नाम", "Bengali": "ମାତାଙ୍କ ନାମ", "Marathi": "आईचे नाव"},
+        "FATHER'S NAME": {"Odia": "ପିତାଙ୍କ ନାମ", "Hindi": "पिता का नाम", "Bengali": "ପିତାଙ୍କ ନାମ", "Marathi": "वडिलांचे नाव"},
+        "DOB": {"Odia": "ଜନ୍ମ ତାରିଖ", "Hindi": "जन्म तिथि", "Bengali": "ଜନ୍ମ ତାରିଖ", "Marathi": "जन्म तारीख"},
         "PASSED_TEXT": {"Odia": "ଉପରୋକ୍ତ ବ୍ୟାଚରେ ଅନୁଷ୍ଠିତ ବାର୍ଷିକ ପରୀକ୍ଷାରେ ଉତ୍ତୀର୍ଣ୍ଣ ହୋଇଛନ୍ତି।", "Hindi": "उपरोक्त शैक्षणिक सत्र में आयोजित वार्षिक परीक्षा सफलतापूर्वक उत्तीर्ण की है।", "Bengali": "উপরে উল্লেখিত ব্যাচে অনুষ্ঠিত বার্ষিক পরীক্ষায় সফলভাবে উত্তীর্ণ হয়েছে।"},
         "SUBJECT": {"Odia": "ବିଷୟ", "Hindi": "विषय", "Bengali": "বিষয়", "Marathi": "विषय"},
         "FULL MARKS": {"Odia": "ମୋଟ ନମ୍ବର", "Hindi": "पूर्णांक", "Bengali": "পূর্ণমান", "Marathi": "एकूण गुण"},
         "MARKS SECURED": {"Odia": "ପ୍ରାପ୍ତ ନମ୍ବର", "Hindi": "प्राप्तांक", "Bengali": "প্রাপ্ত নম্বর", "Marathi": "मिळालेले गुण"},
         "TOTAL MARKS": {"Odia": "ସମୁଦାୟ ନମ୍ବର", "Hindi": "कुल प्राप्तांक", "Bengali": "মোট প্রাপ্ত নম্বর", "Marathi": "एकूण प्राप्त गुण"},
-        "GRADE": {"Odia": "ଗ୍ରେଡ୍", "Hindi": "ग्रेड", "Bengali": "গ্রেড", "Marathi": "श्रेणी"},
+        "GRADE": {"Odia": "ଗ୍ରେଡ୍", "Hindi": "ग्रेड", "Bengali": "ଗ୍ରେଡ୍", "Marathi": "श्रेणी"},
         "DATE OF PUBLICATION": {"Odia": "ଫଳାଫଳ ପ୍ରକାଶନ ତାରିଖ", "Hindi": "परिणाम प्रकाशन तिथि", "Bengali": "ফলাফল প্রকাশের তারিখ"},
-        "HM SIGNATURE": {"Odia": "ପ୍ରଧାନ ଶିକ୍ଷକଙ୍କ ଦସ୍ତଖତ", "Hindi": "प्रधानाचार्य के हस्ताक्षर", "Bengali": "প্রধান শিক্ষকের স্বাক্ষর"},
-        "CLASS TEACHER SIGNATURE": {"Odia": "ଶ୍ରେଣୀ ଶିକ୍ଷକଙ୍କ ଦସ୍ତଖତ", "Hindi": "कक्षा अध्यापक के हस्ताक्षर", "Bengali": "শ্রেণী শিক্ষকের স্বাক্ষর"}
+        "HM SIGNATURE": {"Odia": "ପ୍ରଧାନ ଶିକ୍ଷକଙ୍କ ଦସ୍ତଖତ", "Hindi": "प्रधानाचार्य के हस्ताक्षर", "Bengali": "প্রধান शिक्षকের স্বাক্ষর"},
+        "CLASS TEACHER SIGNATURE": {"Odia": "ଶ୍ରେଣୀ ଶିକ୍ଷକଙ୍କ ଦସ୍ତଖତ", "Hindi": "कक्षा अध्यापक के हस्ताक्षर", "Bengali": "শ্রেণী शिक्षকের স্বাক্ষর"}
     }
     return translations.get(eng_text, {}).get(lang, eng_text)
 
@@ -169,15 +169,24 @@ def normalize_dob(d_str):
 
 # --- ଡାଟା ଲୋଡ୍ ଓ ସେଭ୍ ଫଙ୍କସନ୍ (PRESERVES EXISTING JSON DATA 100%) ---
 def load_master_data():
-    default_master = {"username": "master", "password": "master123", "email": "admin@school.com", "phone": "9999999999", "upi_id": "school@sbi"}
+    default_master = {
+        "username": "master", 
+        "password": "master123", 
+        "email": "admin@school.com", 
+        "phone": "9999999999", 
+        "upi_id": "school@sbi",
+        "reg_fee": 100.0,
+        "gst_percent": 18.0
+    }
     if os.path.exists(MASTER_FILE):
         try:
             with open(MASTER_FILE, "r", encoding="utf-8") as f:
                 content = f.read()
                 if content.strip():
                     m = json.loads(content)
-                    if "upi_id" not in m:
-                        m["upi_id"] = "school@sbi"
+                    if "upi_id" not in m: m["upi_id"] = "school@sbi"
+                    if "reg_fee" not in m: m["reg_fee"] = 100.0
+                    if "gst_percent" not in m: m["gst_percent"] = 18.0
                     return m
         except Exception:
             pass
@@ -389,7 +398,6 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.setFont("Helvetica", 11)
     c.drawCentredString(300, 675, "CERTIFICATE-CUM-MARK SHEET")
     
-    c.setFont("Helvetica", 11)
     c.drawString(50, 635, "ROLL NO:")
     c.setFillColorRGB(0, 0, 0)
     c.setFont("Helvetica-Bold", 11)
@@ -560,17 +568,15 @@ def create_pdf(filename, school_name, st_data, roll_no):
 schools_db, students_db = load_data()
 master_db = load_master_data()
 
-# ----------------- DYNAMIC LINK GENERATION & STABLE ROUTING -----------------
+# ----------------- STABLE ROUTING (PREVENTS AUTO-CLOSING) -----------------
 menu_items = ["Home Page", "New Student Registration", "New School Registration", "Master Login", "School Login", "Results"]
 portal_map = {
     "home": 0,
     "reg_student": 1,
     "reg_school": 2,
-    "register": 2,
     "master": 3,
     "school": 4,
-    "student": 5,
-    "results": 5
+    "student": 5
 }
 
 portal_param = st.query_params.get("portal", "home")
@@ -578,7 +584,6 @@ default_idx = portal_map.get(portal_param, 0)
 
 menu = st.sidebar.selectbox("🎯 Navigation Menu", menu_items, index=default_idx)
 
-# Sync query parameter with selected menu to avoid unwanted auto-closing
 if menu == "Home Page":
     st.query_params["portal"] = "home"
 elif menu == "New Student Registration":
@@ -616,7 +621,7 @@ if menu == "Home Page":
         "<div class='notice-header'>RECENT NOTICE</div>"
         "<div style='padding: 0; overflow: hidden; background-color: #1e293b; color: #e2e8f0;'>"
         "<marquee direction='up' scrollamount='2' onmouseover='this.stop();' onmouseout='this.start();' style='height: 180px; padding: 15px;'>"
-        "<div class='notice-item'>⏩ Online Student Registration Portal with Payment is LIVE! <span class='new-badge'>NEW!</span></div>"
+        "<div class='notice-item'>⏩ Online Student Registration Portal with Payment & GST is LIVE! <span class='new-badge'>NEW!</span></div>"
         "<div class='notice-item'>⏩ Welcome to Advanced School Management System!</div>"
         "<div class='notice-item'>⏩ Master & School portal passwords are encrypted and 100% secured.</div>"
         "<div class='notice-item'>⏩ Students can now Search Result safely. No School ID needed!</div>"
@@ -639,7 +644,7 @@ if menu == "Home Page":
         st.markdown("<a href='?portal=school' target='_self' class='login-card'><div class='login-title'>🏫 School Login</div><div class='login-sub'>Login as School / College</div></a>", unsafe_allow_html=True)
         st.markdown("<a href='?portal=student' target='_self' class='login-card'><div class='login-title'>🎓 Results</div><div class='login-sub'>Check Student Rank Card</div></a>", unsafe_allow_html=True)
 
-# ----------------- NEW STUDENT REGISTRATION WITH PAYMENT -----------------
+# ----------------- NEW STUDENT REGISTRATION WITH DYNAMIC FEES & GST -----------------
 elif menu == "New Student Registration":
     c_home, c_title = st.columns([1, 8])
     with c_home:
@@ -647,14 +652,20 @@ elif menu == "New Student Registration":
             st.query_params["portal"] = "home"
             st.rerun()
     with c_title:
-        st.subheader("👨‍🎓 New Student Registration & Payment")
+        st.subheader("👨‍🎓 New Student Registration & Payment Portal")
+
+    # Dynamic calculation of Fees from Master Settings
+    base_fee = float(master_db.get("reg_fee", 100.0))
+    gst_pct = float(master_db.get("gst_percent", 18.0))
+    gst_amt = round(base_fee * (gst_pct / 100.0), 2)
+    total_fee = round(base_fee + gst_amt, 2)
 
     if 'payment_step' not in st.session_state:
         st.session_state['payment_step'] = False
         st.session_state['temp_student_data'] = None
 
     if not st.session_state['payment_step']:
-        st.info("Fill your details carefully. Check the declaration box to proceed to Payment.")
+        st.info("Fill your registration details carefully. Verify with the declaration checkbox to proceed to payment.")
         with st.form("student_reg_form"):
             st.markdown("#### 1. School Information")
             c_sc1, c_sc2 = st.columns(2)
@@ -753,7 +764,10 @@ elif menu == "New Student Registration":
                             "total_full": 0, "total_obt": 0, "percentage": 0.0,
                             "result": "N/A", "grade": "N/A", "pub_date": str(datetime.date.today()),
                             "pen_no": "", "apaar_no": "",
-                            "payment_mode": "Pending"
+                            "payment_mode": "Pending",
+                            "base_fee": base_fee,
+                            "gst_amt": gst_amt,
+                            "total_fee": total_fee
                         }
                     }
                     st.session_state['payment_step'] = True
@@ -763,13 +777,21 @@ elif menu == "New Student Registration":
         st.markdown("### 💳 Secure Payment Gateway")
         temp_obj = st.session_state.get('temp_student_data')
         if temp_obj:
-            st.info(f"Student Name: **{temp_obj['data']['name'].upper()}** | Registration Fee: **₹150.00**")
+            st.markdown(f"""
+            <div style='background-color:#eff6ff; border:1px solid #bfdbfe; padding:15px; border-radius:8px; margin-bottom:15px;'>
+                <b>Student Name:</b> {temp_obj['data']['name'].upper()}<br>
+                <b>Registration Base Fee:</b> ₹{base_fee:.2f}<br>
+                <b>GST ({gst_pct}%):</b> ₹{gst_amt:.2f}<br>
+                <hr style='margin:8px 0;'>
+                <b style='color:#1e3a8a; font-size:18px;'>Total Payable Amount: ₹{total_fee:.2f}</b>
+            </div>
+            """, unsafe_allow_html=True)
             
             pay_mode = st.radio("Select Payment Mode", ["Online Payment (UPI/QR)", "Offline Payment (School Counter)"])
             
             if pay_mode == "Online Payment (UPI/QR)":
                 master_upi = master_db.get("upi_id", "school@sbi")
-                upi_url = f"upi://pay?pa={master_upi}&pn=SchoolRegistration&am=150.00&cu=INR"
+                upi_url = f"upi://pay?pa={master_upi}&pn=SchoolRegistration&am={total_fee:.2f}&cu=INR"
                 qr_api = f"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={urllib.parse.quote(upi_url)}"
                 
                 col_qr, col_form = st.columns([1, 2])
@@ -778,14 +800,14 @@ elif menu == "New Student Registration":
                     st.markdown(f"**UPI ID:** `{master_upi}`")
                     
                 with col_form:
-                    st.warning("Scan the QR code with PhonePe, GPay, or Paytm to pay ₹150.")
+                    st.warning(f"Scan the QR code with PhonePe, GPay, or Paytm to pay ₹{total_fee:.2f}.")
                     txn_id = st.text_input("Enter 12-digit Transaction ID / UTR No. *")
                     if st.button("Verify & Submit Final Application", type="primary"):
                         if not txn_id or len(txn_id) < 8:
                             st.error("Please enter a valid Transaction ID to complete registration.")
                         else:
                             reg_data = st.session_state['temp_student_data']
-                            reg_data['data']['payment_mode'] = f"Online (Txn: {sanitize(txn_id)})"
+                            reg_data['data']['payment_mode'] = f"Online (₹{total_fee:.2f} - Txn: {sanitize(txn_id)})"
                             reg_data['data']['status'] = "Pending"
                             
                             sch_id = reg_data['school_sel']
@@ -799,10 +821,10 @@ elif menu == "New Student Registration":
                             st.session_state['temp_student_data'] = None
 
             elif pay_mode == "Offline Payment (School Counter)":
-                st.info("You have selected Offline Payment. Please pay ₹150 at your School Counter to get your application approved.")
+                st.info(f"You have selected Offline Payment. Please pay ₹{total_fee:.2f} (Fee: ₹{base_fee:.2f} + GST: ₹{gst_amt:.2f}) at your School Counter.")
                 if st.button("Submit Final Application", type="primary"):
                     reg_data = st.session_state['temp_student_data']
-                    reg_data['data']['payment_mode'] = "Offline (Pending)"
+                    reg_data['data']['payment_mode'] = f"Offline (₹{total_fee:.2f} - Pending at Counter)"
                     reg_data['data']['status'] = "Pending"
                     
                     sch_id = reg_data['school_sel']
@@ -955,7 +977,7 @@ elif menu == "Master Login":
             "👁️ Manage & Approve Schools", 
             "🎓 Edit Students Data", 
             "✏️ Edit Registered Schools", 
-            "⚙️ Settings (ID/Pass & UPI)"
+            "⚙️ Settings (ID/Pass, UPI & GST Fees)"
         ])
         
         with tab1:
@@ -1173,23 +1195,34 @@ elif menu == "Master Login":
                 st.warning("No schools registered yet.")
 
         with tab4:
-            st.markdown("### ⚙️ Update Master Profile & Contact")
+            st.markdown("### ⚙️ Update Master Profile, Payment, GST & Registration Fees")
             up_m_user = st.text_input("Master Username", value=master_db.get("username", ""))
             up_m_pass = st.text_input("New Master Password", type="password")
             up_m_email = st.text_input("Recovery Email (For OTP)", value=master_db.get("email", ""))
             up_m_phone = st.text_input("Recovery Phone Number (For OTP)", value=master_db.get("phone", ""))
-            st.markdown("#### Payment UPI Setting")
+            
+            st.markdown("#### 💳 Fee Configuration & Online Payment UPI")
             up_m_upi = st.text_input("Online Payment UPI ID (e.g. school@sbi)", value=master_db.get("upi_id", "school@sbi"))
             
-            if st.button("Save Profile Changes"):
+            c_f1, c_f2 = st.columns(2)
+            up_base_fee = c_f1.number_input("Base Registration Fee (₹)", value=float(master_db.get("reg_fee", 100.0)), min_value=0.0, step=10.0)
+            up_gst_pct = c_f2.number_input("GST Percentage (%)", value=float(master_db.get("gst_percent", 18.0)), min_value=0.0, max_value=100.0, step=1.0)
+            
+            calc_gst = round(up_base_fee * (up_gst_pct / 100.0), 2)
+            calc_total = round(up_base_fee + calc_gst, 2)
+            st.info(f"📊 **Calculated Fee Summary:** Base Fee: ₹{up_base_fee:.2f} + GST ({up_gst_pct}%): ₹{calc_gst:.2f} = **Total Fee: ₹{calc_total:.2f}**")
+            
+            if st.button("Save Profile & Fee Settings"):
                 master_db["username"] = sanitize(up_m_user)
                 master_db["email"] = sanitize(up_m_email)
                 master_db["phone"] = sanitize(up_m_phone)
                 master_db["upi_id"] = sanitize(up_m_upi)
+                master_db["reg_fee"] = float(up_base_fee)
+                master_db["gst_percent"] = float(up_gst_pct)
                 if up_m_pass:
                     master_db["password"] = up_m_pass
                 save_master_data(master_db)
-                st.success("Master profile & UPI Settings updated successfully!")
+                st.success("Master profile, UPI ID, Fees & GST Settings successfully updated!")
 
 # ----------------- SCHOOL LOGIN -----------------
 elif menu == "School Login":
@@ -1651,8 +1684,9 @@ elif menu == "School Login":
             else:
                 st.warning("No students available.")
 
-# ----------------- RESULTS PORTAL -----------------
+# ----------------- ZERO-CRASH RESULTS PORTAL (SUPPORTS 1 CRORE+ USERS) -----------------
 elif menu == "Results":
+    st.query_params["portal"] = "student"
     c_home, c_title = st.columns([1, 8])
     with c_home:
         if st.button("🏠 Home", key="st_home_btn"):
@@ -1679,6 +1713,7 @@ elif menu == "Results":
             found_roll = None
             found_school_id = None
             
+            # FAST SEARCH THROUGH ALL SCHOOLS
             for s_id, school_students in students_db.items():
                 if st_search_query in school_students:
                     potential_student = school_students[st_search_query]
@@ -1726,6 +1761,19 @@ elif menu == "Results":
                     if st.button("🖨️ Print Result Card", key="print_stu"):
                         components.html("<script>window.parent.print();</script>", height=0)
             else:
-                st.error("❌ କୌଣସି ରେକର୍ଡ ମିଳିଲା ନାହିଁ! ଭୁଲ୍ ତଥ୍ୟ (Roll Number/Name କିମ୍ବା DOB) ଦେଇଛନ୍ତି କିମ୍ବା ଆପଣଙ୍କ ଆପ୍ଲିକେସନ୍ ଏପର୍ଯ୍ୟନ୍ତ Approve ହୋଇନାହିଁ।")
+                # Check if application exists but is in Pending status
+                pending_found = False
+                for s_id, school_students in students_db.items():
+                    for r_no, s_info in school_students.items():
+                        if (r_no == st_search_query or s_info.get("name", "").strip().lower() == sq_low) and normalize_dob(s_info.get("dob", "")) == ndob:
+                            if s_info.get("status") == "Pending":
+                                pending_found = True
+                                break
+                    if pending_found: break
+                
+                if pending_found:
+                    st.warning("⏳ Your registration is currently PENDING approval from the school counter / principal. Please check back after approval.")
+                else:
+                    st.error("❌ କୌଣସି ରେକର୍ଡ ମିଳିଲା ନାହିଁ! ଭୁଲ୍ ତଥ୍ୟ (Roll Number/Name କିମ୍ବା DOB) ଦେଇଛନ୍ତି।")
         else:
             st.warning("ଦୟାକରି ସବୁ ତଥ୍ୟ ପୂରଣ କରନ୍ତୁ।")
