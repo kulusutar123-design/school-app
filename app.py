@@ -173,7 +173,7 @@ def save_master_data(data):
         json.dump(data, f, indent=4)
 
 def load_data():
-    schools = {"S001": {"name": "LAXMI NARAYAN GIRLS HIGH SCHOOL, BANASAR KALYANI", "pass": "admin123", "state": "Odisha", "lang": "Odia"}}
+    schools = {"S001": {"name": "LAXMI NARAYAN GIRLS HIGH SCHOOL", "name_local": "", "pass": "admin123", "state": "Odisha", "lang": "Odia"}}
     students = {}
     
     if os.path.exists(SCHOOLS_FILE):
@@ -203,7 +203,7 @@ def save_data(schools, students):
         json.dump(students, f, indent=4)
 
 # --- ସୁନ୍ଦର ରାଙ୍କ୍ କାର୍ଡ HTML ଡିଜାଇନ୍ (BILINGUAL MANUAL + AUTO) ---
-def generate_result_card_html(school_name, st_data, roll_no, s_lang):
+def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no, s_lang):
     disp_dob = format_display_date(st_data.get('dob', ''))
     raw_pub_date = st_data.get('pub_date', '')
     disp_pub_date = format_display_date(raw_pub_date) if raw_pub_date else datetime.date.today().strftime('%d/%m/%Y')
@@ -224,7 +224,7 @@ def generate_result_card_html(school_name, st_data, roll_no, s_lang):
     result_stat = st_data.get('result', 'N/A')
     
     # Check if manual local language provided, else auto-translate
-    t_school = auto_translate(school_name, s_lang)
+    t_school = school_name_loc if school_name_loc.strip() else auto_translate(school_name_en, s_lang)
     
     t_student = st_data.get('name_local', '').strip()
     if not t_student: t_student = auto_translate(student_name_en, s_lang)
@@ -237,7 +237,7 @@ def generate_result_card_html(school_name, st_data, roll_no, s_lang):
         
     t_words_total = auto_translate(words_total_en, s_lang)
 
-    qr_text = f"SCHOOL: {school_name} | NAME: {student_name_en} | ROLL: {roll_no} | DOB: {disp_dob} | MARKS: {total_marks} | GRADE: {grade} | RESULT: {result_stat}"
+    qr_text = f"SCHOOL: {school_name_en} | NAME: {student_name_en} | ROLL: {roll_no} | DOB: {disp_dob} | MARKS: {total_marks} | GRADE: {grade} | RESULT: {result_stat}"
     qr_data = urllib.parse.quote(qr_text)
     qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={qr_data}"
     barcode_url = f"https://barcode.tec-it.com/barcode.ashx?data={roll_no}&code=Code128&dpi=96"
@@ -275,15 +275,15 @@ def generate_result_card_html(school_name, st_data, roll_no, s_lang):
         )
 
     header_font_size = "28px"
-    if len(school_name) > 40: header_font_size = "22px"
-    if len(school_name) > 55: header_font_size = "18px"
+    if len(school_name_en) > 40: header_font_size = "22px"
+    if len(school_name_en) > 55: header_font_size = "18px"
 
     html_content = (
         f"<div style='font-family: \"Times New Roman\", serif; border: 15px solid {outer_border}; padding: 4px; max-width: 800px; margin: auto; background-color: #ffffff;'>"
         f"<div style='border: 2px solid {border_color}; padding: 25px; background-color: {bg_color}; position: relative;'>"
         
         f"<div style='text-align: center; color: {border_color}; margin-bottom: 20px;'>"
-        f"<h1 style='margin: 0; font-size: {header_font_size}; text-transform: uppercase; font-family: \"Georgia\", serif; text-shadow: 1px 1px 1px #e1bee7;'>{school_name}</h1>"
+        f"<h1 style='margin: 0; font-size: {header_font_size}; text-transform: uppercase; font-family: \"Georgia\", serif; text-shadow: 1px 1px 1px #e1bee7;'>{school_name_en}</h1>"
         f"<h2 style='margin: 5px 0 10px 0; font-size: 20px; font-weight:normal;'>{t_school}</h2>"
         f"<h3 style='margin: 5px 0; font-size: 16px; letter-spacing: 1px;'>ANNUAL EXAMINATION / <span style='font-size: 14px;'>{lbl_annual}</span> - {st_data.get('batch', '2025-2026')}</h3>"
         f"<p style='margin: 5px 0; font-weight: bold; font-size: 17px; text-decoration: underline;'>CERTIFICATE-CUM-MARK SHEET <br> <span style='font-size: 14px; text-decoration: none;'>({lbl_cert})</span></p>"
@@ -294,7 +294,7 @@ def generate_result_card_html(school_name, st_data, roll_no, s_lang):
         f"<tr><td><span style='color:{border_color}; font-weight:normal;'>PEN NO / {lbl_pen}:</span> {st_data.get('pen_no', 'N/A')}</td><td style='text-align: right;'><span style='color:{border_color}; font-weight:normal;'>APAAR NO / {lbl_apaar}:</span> {st_data.get('apaar_no', 'N/A')}</td></tr>"
         "</table>"
         
-        "<table style='width: 100%; font-size: 15px; margin-bottom: 15px; text-transform: uppercase; color: #000000; line-height: 1.8;'>"
+        "<table style='width: 100%; font-size: 14px; margin-bottom: 15px; text-transform: uppercase; color: #000000; line-height: 1.8;'>"
         f"<tr><td style='width: 250px; color: {border_color}; font-weight: bold; font-style: italic;'>Certify that / <span style='font-size:12px;'>{lbl_certify}</span></td><td style='font-weight: bold; font-size: 15px;'>{student_name_en} <br><span style='font-size:14px; font-weight:normal; text-transform:none;'>{t_student}</span></td></tr>"
         f"<tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Mother's Name / <span style='font-size:12px;'>{lbl_mother}</span></td><td style='font-weight: bold;'>{mother_name_en} <br><span style='font-size:14px; font-weight:normal; text-transform:none;'>{t_mother}</span></td></tr>"
         f"<tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Father's Name / <span style='font-size:12px;'>{lbl_father}</span></td><td style='font-weight: bold;'>{father_name_en} <br><span style='font-size:14px; font-weight:normal; text-transform:none;'>{t_father}</span></td></tr>"
@@ -352,7 +352,7 @@ def generate_result_card_html(school_name, st_data, roll_no, s_lang):
     )
     return html_content
 
-# --- PDF ଜେନେରେଟର ---
+# --- PDF ଜେନେରେଟର (ENGLISH ONLY FOR PDF FONT SUPPORT) ---
 def create_pdf(filename, school_name, st_data, roll_no):
     disp_dob = format_display_date(st_data.get('dob', ''))
     raw_pub_date = st_data.get('pub_date', '')
@@ -744,7 +744,10 @@ elif menu == "Master Login":
         with tab2:
             st.markdown("### Register New School")
             new_s_id = st.text_input("New School ID (e.g. S002)")
-            new_s_name = st.text_input("School Name")
+            
+            c_s1, c_s2 = st.columns(2)
+            new_s_name = c_s1.text_input("School Name (English)")
+            new_s_name_loc = c_s2.text_input("School Name (Local Language) [Optional]")
             
             indian_states = list(STATE_LANG_MAP.keys())
             new_s_state = st.selectbox("Select State (ରାଜ୍ୟ ବାଛନ୍ତୁ)", indian_states, index=18) 
@@ -759,6 +762,7 @@ elif menu == "Master Login":
                 if new_s_id and new_s_name and new_s_pass:
                     schools_db[new_s_id] = {
                         "name": new_s_name, 
+                        "name_local": new_s_name_loc,
                         "pass": new_s_pass, 
                         "state": new_s_state, 
                         "lang": STATE_LANG_MAP[new_s_state]
@@ -871,7 +875,9 @@ elif menu == "Master Login":
                 selected_edit_school = st.selectbox("Select School ID to Edit", list(schools_db.keys()))
                 curr_s_data = schools_db[selected_edit_school]
                 
-                edit_s_name = st.text_input("Edit School Name", value=curr_s_data.get('name', ''))
+                c_se1, c_se2 = st.columns(2)
+                edit_s_name = c_se1.text_input("Edit School Name (English)", value=curr_s_data.get('name', ''))
+                edit_s_name_loc = c_se2.text_input("Edit School Name (Local Language)", value=curr_s_data.get('name_local', ''))
                 
                 indian_states = list(STATE_LANG_MAP.keys())
                 curr_state = curr_s_data.get('state', 'Odisha')
@@ -884,6 +890,7 @@ elif menu == "Master Login":
                     if edit_s_name and edit_s_pass:
                         schools_db[selected_edit_school].update({
                             "name": edit_s_name,
+                            "name_local": edit_s_name_loc,
                             "pass": edit_s_pass,
                             "state": edit_s_state,
                             "lang": STATE_LANG_MAP[edit_s_state]
@@ -1003,32 +1010,32 @@ elif menu == "School Login":
             st.markdown(f"### 📝 {t('Add Student', s_lang)} | Add Student")
             
             c_roll, c_gen = st.columns(2)
-            roll_no = c_roll.text_input("Roll No (Student ID)", key="add_roll")
+            roll_no = c_roll.text_input(f"Roll No / {t('ROLL NO', s_lang)}", key="add_roll")
             gender = c_gen.selectbox("Gender", ["Male", "Female", "Other"], key="add_gen")
             
             st.markdown("---")
             c_n1, c_n2 = st.columns(2)
-            st_name = c_n1.text_input("Student Name (English)", key="add_name")
+            st_name = c_n1.text_input(f"Student Name (English)", key="add_name")
             st_name_loc = c_n2.text_input(f"Student Name ({s_lang}) [Optional]", key="add_name_loc")
             
-            father_name = c_n1.text_input("Father's Name (English)", key="add_father")
+            father_name = c_n1.text_input(f"Father's Name (English)", key="add_father")
             father_name_loc = c_n2.text_input(f"Father's Name ({s_lang}) [Optional]", key="add_father_loc")
             
-            mother_name = c_n1.text_input("Mother's Name (English)", key="add_mother")
+            mother_name = c_n1.text_input(f"Mother's Name (English)", key="add_mother")
             mother_name_loc = c_n2.text_input(f"Mother's Name ({s_lang}) [Optional]", key="add_mother_loc")
             st.markdown("---")
             
             c_p1, c_p2 = st.columns(2)
-            pen_no = c_p1.text_input("PEN NO", key="add_pen")
-            apaar_no = c_p2.text_input("APAAR NO", key="add_apaar")
+            pen_no = c_p1.text_input(f"PEN NO / {t('PEN NO', s_lang)}", key="add_pen")
+            apaar_no = c_p2.text_input(f"APAAR NO / {t('APAAR NO', s_lang)}", key="add_apaar")
             
             min_date = datetime.date(2000, 1, 1)
             max_date = datetime.date(2065, 12, 31)
-            dob = st.date_input("DOB (YYYY-MM-DD)", min_value=min_date, max_value=max_date, key="add_dob")
+            dob = st.date_input(f"DOB (YYYY-MM-DD) / {t('DOB', s_lang)}", min_value=min_date, max_value=max_date, key="add_dob")
             
             c_c1, c_c2 = st.columns(2)
             with c_c1:
-                cls = st.selectbox("Class", classes_list, key="add_class")
+                cls = st.selectbox(f"Class / {t('CLASS', s_lang)}", classes_list, key="add_class")
             with c_c2:
                 add_batch = st.selectbox("Batch", batches_list, index=5, key="add_batch")
             
@@ -1123,16 +1130,16 @@ elif menu == "School Login":
                     g_val = curr_st.get('gender', 'Male')
                     up_gender = st.selectbox("Edit Gender", genders, index=genders.index(g_val) if g_val in genders else 0)
                 with c_up2:
-                    up_pen = st.text_input("Edit PEN NO", value=curr_st.get('pen_no', ''))
+                    up_pen = st.text_input(f"Edit PEN NO / {t('PEN NO', s_lang)}", value=curr_st.get('pen_no', ''))
                 with c_up3:
-                    up_apaar = st.text_input("Edit APAAR NO", value=curr_st.get('apaar_no', ''))
+                    up_apaar = st.text_input(f"Edit APAAR NO / {t('APAAR NO', s_lang)}", value=curr_st.get('apaar_no', ''))
 
-                up_dob = st.text_input("Edit DOB (YYYY-MM-DD)", value=curr_st['dob'])
+                up_dob = st.text_input(f"Edit DOB (YYYY-MM-DD) / {t('DOB', s_lang)}", value=curr_st['dob'])
                 
                 c_e1, c_e2 = st.columns(2)
                 with c_e1:
                     cls_val = curr_st.get('class', '1')
-                    up_cls = st.selectbox("Edit Class", classes_list, index=classes_list.index(cls_val) if cls_val in classes_list else 0)
+                    up_cls = st.selectbox(f"Edit Class / {t('CLASS', s_lang)}", classes_list, index=classes_list.index(cls_val) if cls_val in classes_list else 0)
                 with c_e2:
                     b_val = curr_st.get('batch', '2025-2026')
                     b_idx = batches_list.index(b_val) if b_val in batches_list else 5
@@ -1204,14 +1211,15 @@ elif menu == "School Login":
             if school_students:
                 rep_roll = st.selectbox("Select Student Roll No for Report", list(school_students.keys()), key="rep_sel")
                 st_data = school_students[rep_roll]
-                school_name = schools_db[cur_school]['name']
+                school_name_en = schools_db[cur_school]['name']
+                school_name_loc = schools_db[cur_school].get('name_local', '')
                 
-                st.markdown(generate_result_card_html(school_name, st_data, rep_roll, s_lang), unsafe_allow_html=True)
+                st.markdown(generate_result_card_html(school_name_en, school_name_loc, st_data, rep_roll, s_lang), unsafe_allow_html=True)
                 
                 col1, col2 = st.columns(2)
                 with col1:
                     pdf_file = f"Report_{rep_roll}.pdf"
-                    create_pdf(pdf_file, school_name, st_data, rep_roll)
+                    create_pdf(pdf_file, school_name_en, st_data, rep_roll)
                     with open(pdf_file, "rb") as f:
                         st.download_button("📥 Download PDF Report", f, file_name=pdf_file, mime="application/pdf", key="dl_sch")
                 with col2:
@@ -1289,15 +1297,16 @@ elif menu == "Results":
                 f"🎉 **स्वागत है {student_name}!** आपका परिणाम नीचे दिया गया है:  \n"
                 f"🎉 **ସ୍ୱାଗତମ୍ {student_name}!** ଆପଣଙ୍କ ରେଜଲ୍ଟ ତଳେ ଦିଆଗଲା:"
             )
-            school_name = schools_db[found_school_id]['name']
+            school_name_en = schools_db[found_school_id]['name']
+            school_name_loc = schools_db[found_school_id].get('name_local', '')
             s_lang = schools_db[found_school_id].get("lang", "English")
             
-            st.markdown(generate_result_card_html(school_name, found_student, found_roll, s_lang), unsafe_allow_html=True)
+            st.markdown(generate_result_card_html(school_name_en, school_name_loc, found_student, found_roll, s_lang), unsafe_allow_html=True)
             
             col1, col2 = st.columns(2)
             with col1:
                 pdf_file = f"Result_{found_roll}.pdf"
-                create_pdf(pdf_file, school_name, found_student, found_roll)
+                create_pdf(pdf_file, school_name_en, found_student, found_roll)
                 with open(pdf_file, "rb") as f:
                     st.download_button("📥 Download PDF", f, file_name=pdf_file, mime="application/pdf", key="dl_stu")
             
