@@ -70,7 +70,7 @@ def t(eng_text, lang):
         "CLASS": {"Odia": "ଶ୍ରେଣୀ", "Hindi": "कक्षा", "Bengali": "শ্রেণী", "Marathi": "वर्ग"},
         "MOTHER'S NAME": {"Odia": "ମାତାଙ୍କ ନାମ", "Hindi": "माता का नाम", "Bengali": "মাতার নাম", "Marathi": "आईचे नाव"},
         "FATHER'S NAME": {"Odia": "ପିତାଙ୍କ ନାମ", "Hindi": "पिता का नाम", "Bengali": "পিতার নাম", "Marathi": "वडिलांचे नाव"},
-        "DOB": {"Odia": "ଜନ୍ମ ତାରିଖ", "Hindi": "जन्म तिथि", "Bengali": "জন্ম তারিখ", "Marathi": "जन्म तारीख"},
+        "DOB": {"Odia": "ଜନ୍ମ ତାରିଖ", "Hindi": "जन्म तिथि", "Bengali": "जन्म তারিখ", "Marathi": "जन्म तारीख"},
         "SUBJECT": {"Odia": "ବିଷୟ", "Hindi": "विषय", "Bengali": "বিষয়", "Marathi": "विषय"},
         "FULL MARKS": {"Odia": "ମୋଟ ନମ୍ବର", "Hindi": "पूर्णांक", "Bengali": "পূর্ণমান", "Marathi": "एकूण गुण"},
         "MARKS SECURED": {"Odia": "ପ୍ରାପ୍ତ ନମ୍ବର", "Hindi": "प्राप्तांक", "Bengali": "প্রাপ্ত নম্বর", "Marathi": "मिळवलेले गुण"},
@@ -143,7 +143,7 @@ def save_data(schools, students):
     with open(STUDENTS_FILE, "w", encoding="utf-8") as f:
         json.dump(students, f, indent=4)
 
-# --- ସୁନ୍ଦର ରାଙ୍କ୍ କାର୍ଡ HTML ଡିଜାଇନ୍ (BILINGUAL) ---
+# --- ସୁନ୍ଦର ରାଙ୍କ୍ କାର୍ଡ HTML ଡିଜାଇନ୍ ---
 def generate_result_card_html(school_name, st_data, roll_no, s_lang):
     raw_dob = st_data.get('dob', '')
     disp_dob = raw_dob
@@ -170,6 +170,22 @@ def generate_result_card_html(school_name, st_data, roll_no, s_lang):
     qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={qr_data}"
     barcode_url = f"https://barcode.tec-it.com/barcode.ashx?data={roll_no}&code=Code128&dpi=96"
 
+    # Pre-calculate translated variables to avoid f-string syntax errors
+    lbl_annual = t('ANNUAL EXAMINATION', s_lang)
+    lbl_cert = t('CERTIFICATE-CUM-MARK SHEET', s_lang)
+    lbl_roll = t('ROLL NO', s_lang)
+    lbl_cls = t('CLASS', s_lang)
+    lbl_name = t('NAME', s_lang)
+    lbl_mother = t("MOTHER'S NAME", s_lang)
+    lbl_father = t("FATHER'S NAME", s_lang)
+    lbl_dob = t('DOB', s_lang)
+    lbl_pass_text = t('PASSED_TEXT', s_lang)
+    lbl_subject = t('SUBJECT', s_lang)
+    lbl_full = t('FULL MARKS', s_lang)
+    lbl_sec = t('MARKS SECURED', s_lang)
+    lbl_tot = t('TOTAL MARKS', s_lang)
+    lbl_grd = t('GRADE', s_lang)
+
     rows_html = ""
     for sub, m_info in st_data.get('subjects', {}).items():
         rows_html += (
@@ -190,34 +206,34 @@ def generate_result_card_html(school_name, st_data, roll_no, s_lang):
         
         f"<div style='text-align: center; color: {border_color}; margin-bottom: 20px;'>"
         f"<h1 style='margin: 0; font-size: {header_font_size}; text-transform: uppercase; font-family: \"Georgia\", serif; text-shadow: 1px 1px 1px #e1bee7;'>{school_name}</h1>"
-        f"<h3 style='margin: 5px 0; font-size: 16px; letter-spacing: 1px;'>ANNUAL EXAMINATION / <span style='font-size: 14px;'>{t('ANNUAL EXAMINATION', s_lang)}</span> - {st_data.get('batch', '2025-2026')}</h3>"
-        f"<p style='margin: 5px 0; font-weight: bold; font-size: 17px; text-decoration: underline;'>CERTIFICATE-CUM-MARK SHEET <br> <span style='font-size: 14px; text-decoration: none;'>({t('CERTIFICATE-CUM-MARK SHEET', s_lang)})</span></p>"
+        f"<h3 style='margin: 5px 0; font-size: 16px; letter-spacing: 1px;'>ANNUAL EXAMINATION / <span style='font-size: 14px;'>{lbl_annual}</span> - {st_data.get('batch', '2025-2026')}</h3>"
+        f"<p style='margin: 5px 0; font-weight: bold; font-size: 17px; text-decoration: underline;'>CERTIFICATE-CUM-MARK SHEET <br> <span style='font-size: 14px; text-decoration: none;'>({lbl_cert})</span></p>"
         "</div>"
         
         "<table style='width: 100%; font-size: 13px; color: #000000; margin-bottom: 20px; font-weight: bold;'>"
-        f"<tr><td><span style='color:{border_color}; font-weight:normal;'>ROLL NO / {t('ROLL NO', s_lang)}:</span> {roll_no}</td><td style='text-align: right;'><span style='color:{border_color}; font-weight:normal;'>CLASS / {t('CLASS', s_lang)}:</span> {st_data.get('class', 'N/A')}</td></tr>"
+        f"<tr><td><span style='color:{border_color}; font-weight:normal;'>ROLL NO / {lbl_roll}:</span> {roll_no}</td><td style='text-align: right;'><span style='color:{border_color}; font-weight:normal;'>CLASS / {lbl_cls}:</span> {st_data.get('class', 'N/A')}</td></tr>"
         f"<tr><td><span style='color:{border_color}; font-weight:normal;'>PEN NO:</span> {st_data.get('pen_no', 'N/A')}</td><td style='text-align: right;'><span style='color:{border_color}; font-weight:normal;'>APAAR NO:</span> {st_data.get('apaar_no', 'N/A')}</td></tr>"
         "</table>"
         
-        "<table style='width: 100%; font-size: 14px; margin-bottom: 15px; text-transform: uppercase; color: #000000; line-height: 1.8;'>"
-        f"<tr><td style='width: 220px; color: {border_color}; font-weight: bold; font-style: italic;'>Certify that / <span style='font-size:12px;'>{t('NAME', s_lang)}</span></td><td style='font-weight: bold; font-size: 16px;'>{student_name}</td></tr>"
-        f"<tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Mother's Name / <span style='font-size:12px;'>{t('MOTHER\\'S NAME', s_lang)}</span></td><td style='font-weight: bold;'>{st_data.get('mother_name', 'N/A').upper()}</td></tr>"
-        f"<tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Father's Name / <span style='font-size:12px;'>{t('FATHER\\'S NAME', s_lang)}</span></td><td style='font-weight: bold;'>{st_data.get('father_name', 'N/A').upper()}</td></tr>"
-        f"<tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Date of Birth / <span style='font-size:12px;'>{t('DOB', s_lang)}</span></td><td style='font-weight: bold;'>{disp_dob}</td></tr>"
+        "<table style='width: 100%; font-size: 15px; margin-bottom: 15px; text-transform: uppercase; color: #000000; line-height: 1.8;'>"
+        f"<tr><td style='width: 220px; color: {border_color}; font-weight: bold; font-style: italic;'>Certify that / <span style='font-size:12px;'>{lbl_name}</span></td><td style='font-weight: bold; font-size: 16px;'>{student_name}</td></tr>"
+        f"<tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Mother's Name / <span style='font-size:12px;'>{lbl_mother}</span></td><td style='font-weight: bold;'>{st_data.get('mother_name', 'N/A').upper()}</td></tr>"
+        f"<tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Father's Name / <span style='font-size:12px;'>{lbl_father}</span></td><td style='font-weight: bold;'>{st_data.get('father_name', 'N/A').upper()}</td></tr>"
+        f"<tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Date of Birth / <span style='font-size:12px;'>{lbl_dob}</span></td><td style='font-weight: bold;'>{disp_dob}</td></tr>"
         "</table>"
         
-        f"<p style='color: {border_color}; font-style: italic; font-size: 14px; text-align: center; margin-bottom: 20px;'>Passed the Annual Examination held in the academic batch of {st_data.get('batch', 'N/A')}. <br><span style='font-size: 13px;'>{t('PASSED_TEXT', s_lang)}</span></p>"
+        f"<p style='color: {border_color}; font-style: italic; font-size: 14px; text-align: center; margin-bottom: 20px;'>Passed the Annual Examination held in the academic batch of {st_data.get('batch', 'N/A')}. <br><span style='font-size: 13px;'>{lbl_pass_text}</span></p>"
         
         f"<div style='text-align: center; color: {border_color}; font-weight: bold; font-size: 14px; margin-bottom: 5px;'>SUBJECTS AND MARKS SECURED</div>"
         f"<table style='width: 100%; border-collapse: collapse; border: 2px solid {border_color}; text-align: center; font-size: 13px; background-color: transparent; color: #000000;'>"
         f"<tr style='color: {border_color}; background-color: {table_bg}; border-bottom: 2px solid {border_color};'>"
-        f"<th style='padding: 8px; border-right: 1px solid {border_color};'>SUBJECT / <span style='font-size:11px;'>{t('SUBJECT', s_lang)}</span></th>"
-        f"<th style='padding: 8px; border-right: 1px solid {border_color};'>FULL MARKS / <span style='font-size:11px;'>{t('FULL MARKS', s_lang)}</span></th>"
-        f"<th style='padding: 8px;'>MARKS SECURED / <span style='font-size:11px;'>{t('MARKS SECURED', s_lang)}</span></th>"
+        f"<th style='padding: 8px; border-right: 1px solid {border_color};'>SUBJECT / <span style='font-size:11px;'>{lbl_subject}</span></th>"
+        f"<th style='padding: 8px; border-right: 1px solid {border_color};'>FULL MARKS / <span style='font-size:11px;'>{lbl_full}</span></th>"
+        f"<th style='padding: 8px;'>MARKS SECURED / <span style='font-size:11px;'>{lbl_sec}</span></th>"
         "</tr>"
         f"{rows_html}"
         f"<tr style='color: {border_color}; font-weight: bold; background-color: {table_bg}; border-top: 2px solid {border_color};'>"
-        f"<td style='padding: 10px; border-right: 1px solid {border_color}; text-align: right;'>TOTAL MARKS / <span style='font-size:11px;'>{t('TOTAL MARKS', s_lang)}</span></td>"
+        f"<td style='padding: 10px; border-right: 1px solid {border_color}; text-align: right;'>TOTAL MARKS / <span style='font-size:11px;'>{lbl_tot}</span></td>"
         f"<td style='padding: 10px; border-right: 1px solid {border_color};'>{st_data.get('total_full', 0)}</td>"
         f"<td style='padding: 10px; color: #000;'>{total_obt}</td>"
         "</tr>"
@@ -237,7 +253,7 @@ def generate_result_card_html(school_name, st_data, roll_no, s_lang):
         "</td>"
         
         "<td style='width: 34%; vertical-align: top; padding-top: 5px;'>"
-        f"<div style='font-size: 12px; margin-bottom: 5px;'>GRADE / {t('GRADE', s_lang)}</div>"
+        f"<div style='font-size: 12px; margin-bottom: 5px;'>GRADE / {lbl_grd}</div>"
         f"<div style='border: 2px solid {border_color}; padding: 10px 25px; display: inline-block; min-width: 80px; background-color: {table_bg};'>"
         f"<div style='font-weight: bold; font-size: 22px; color: #000;'>{grade}</div>"
         "</div>"
@@ -857,7 +873,6 @@ elif menu == "School Login":
                 
     else: 
         cur_school = st.session_state['school_logged_id']
-        # 🌐 AUTO LANGUAGE SETTING BASED ON STATE
         s_lang = schools_db[cur_school].get("lang", "English")
         s_state = schools_db[cur_school].get("state", "Unknown State")
         
@@ -871,7 +886,6 @@ elif menu == "School Login":
 
         st.markdown("---")
         
-        # 🌐 LANGUAGE TRANSLATED TABS
         tab_list, tab_add, tab_edit, tab_report = st.tabs([
             f"📋 {t('My Students', s_lang)} | My Students", 
             f"➕ {t('Add Student', s_lang)} | Add Student", 
@@ -1147,7 +1161,6 @@ elif menu == "Results":
                 f"🎉 **ସ୍ୱାଗତମ୍ {student_name}!** ଆପଣଙ୍କ ରେଜଲ୍ଟ ତଳେ ଦିଆଗଲା:"
             )
             school_name = schools_db[found_school_id]['name']
-            # Fetch specific language for this school
             s_lang = schools_db[found_school_id].get("lang", "English")
             
             st.markdown(generate_result_card_html(school_name, found_student, found_roll, s_lang), unsafe_allow_html=True)
