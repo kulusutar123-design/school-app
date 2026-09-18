@@ -54,7 +54,7 @@ STATE_LANG_MAP = {
 }
 
 # ==========================================
-# 🤖 AUTO TRANSLATION ENGINE (FOR NAMES & FALLBACK)
+# 🤖 AUTO TRANSLATION ENGINE
 # ==========================================
 @st.cache_data(show_spinner=False)
 def auto_translate(text, lang_name):
@@ -122,7 +122,7 @@ def t(eng_text, lang):
     }
     return translations.get(eng_text, {}).get(lang, eng_text)
 
-# --- Number to Words Converter ---
+# --- Utilities ---
 def number_to_words(num):
     if num == 0: return "ZERO"
     ones = ["", "ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE", "TEN", "ELEVEN", "TWELVE", "THIRTEEN", "FOURTEEN", "FIFTEEN", "SIXTEEN", "SEVENTEEN", "EIGHTEEN", "NINETEEN"]
@@ -136,23 +136,25 @@ def number_to_words(num):
         
     return words(num)
 
-# --- Date Formatter ---
 def format_display_date(d_str):
     if not d_str:
-        return datetime.date.today().strftime('%d/%m/%Y')
-    d_str = str(d_str).strip()
-    if '-' in d_str:
-        parts = d_str.split('-')
-        if len(parts) == 3:
-            if len(parts[0]) == 4:
-                return f"{parts[2]}/{parts[1]}/{parts[0]}"
-            elif len(parts[2]) == 4:
-                return f"{parts[0]}/{parts[1]}/{parts[2]}"
-    elif '/' in d_str:
-        parts = d_str.split('/')
-        if len(parts) == 3 and len(parts[0]) == 4:
-            return f"{parts[2]}/{parts[1]}/{parts[0]}"
-        return d_str
+        return datetime.date.today().strftime('%d-%m-%Y')
+    d_str = str(d_str).strip().replace('/', '-')
+    parts = d_str.split('-')
+    if len(parts) == 3:
+        if len(parts[0]) == 4:
+            return f"{parts[2]}-{parts[1]}-{parts[0]}"
+    return d_str
+
+# 🟢 NORMALIZED DOB FOR PERFECT SEARCH MATCHING
+def normalize_dob(d_str):
+    d_str = d_str.strip().replace('/', '-')
+    if d_str.count('-') == 2:
+        p1, p2, p3 = d_str.split('-')
+        if len(p1) == 4: 
+            return f"{p1}-{p2}-{p3}" # Return YYYY-MM-DD
+        elif len(p3) == 4: 
+            return f"{p3}-{p2}-{p1}" # Convert DD-MM-YYYY to YYYY-MM-DD
     return d_str
 
 # --- ଡାଟା ଲୋଡ୍ ଓ ସେଭ୍ ଫଙ୍କସନ୍ ---
@@ -175,25 +177,18 @@ def save_master_data(data):
 def load_data():
     schools = {"S001": {"name": "LAXMI NARAYAN GIRLS HIGH SCHOOL", "name_local": "", "pass": "admin123", "state": "Odisha", "lang": "Odia"}}
     students = {}
-    
     if os.path.exists(SCHOOLS_FILE):
         try:
             with open(SCHOOLS_FILE, "r", encoding="utf-8") as f:
                 content = f.read()
-                if content.strip():
-                    schools = json.loads(content)
-        except Exception:
-            pass
-            
+                if content.strip(): schools = json.loads(content)
+        except: pass
     if os.path.exists(STUDENTS_FILE):
         try:
             with open(STUDENTS_FILE, "r", encoding="utf-8") as f:
                 content = f.read()
-                if content.strip():
-                    students = json.loads(content)
-        except Exception:
-            pass
-            
+                if content.strip(): students = json.loads(content)
+        except: pass
     return schools, students
 
 def save_data(schools, students):
@@ -206,7 +201,7 @@ def save_data(schools, students):
 def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no, s_lang):
     disp_dob = format_display_date(st_data.get('dob', ''))
     raw_pub_date = st_data.get('pub_date', '')
-    disp_pub_date = format_display_date(raw_pub_date) if raw_pub_date else datetime.date.today().strftime('%d/%m/%Y')
+    disp_pub_date = format_display_date(raw_pub_date) if raw_pub_date else datetime.date.today().strftime('%d-%m-%Y')
 
     bg_color = "#fef9f7"
     border_color = "#963f98"
@@ -223,18 +218,13 @@ def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no,
     grade = st_data.get('grade', 'N/A')
     result_stat = st_data.get('result', 'N/A')
     
-    # Text Translations
     t_school = school_name_loc if school_name_loc.strip() else auto_translate(school_name_en, s_lang)
-    
     t_student = st_data.get('name_local', '').strip()
     if not t_student: t_student = auto_translate(student_name_en, s_lang)
-        
     t_mother = st_data.get('mother_name_local', '').strip()
     if not t_mother: t_mother = auto_translate(mother_name_en, s_lang)
-        
     t_father = st_data.get('father_name_local', '').strip()
     if not t_father: t_father = auto_translate(father_name_en, s_lang)
-        
     t_words_total = auto_translate(words_total_en, s_lang)
 
     qr_text = f"SCHOOL: {school_name_en} | NAME: {student_name_en} | ROLL: {roll_no} | DOB: {disp_dob} | MARKS: {total_marks} | GRADE: {grade} | RESULT: {result_stat}"
@@ -263,9 +253,6 @@ def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no,
     lbl_hm_sign = t('HM SIGNATURE', s_lang)
     lbl_ct_sign = t('CLASS TEACHER SIGNATURE', s_lang)
 
-    # ==========================================
-    # 🌟 SUBJECTS IN ENGLISH ONLY
-    # ==========================================
     rows_html = ""
     for sub, m_info in st_data.get('subjects', {}).items():
         rows_html += (
@@ -354,11 +341,11 @@ def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no,
     )
     return html_content
 
-# --- PDF ଜେନେରେଟର ---
+# --- PDF ଜେନେରେଟର (ENGLISH ONLY) ---
 def create_pdf(filename, school_name, st_data, roll_no):
     disp_dob = format_display_date(st_data.get('dob', ''))
     raw_pub_date = st_data.get('pub_date', '')
-    disp_pub_date = format_display_date(raw_pub_date) if raw_pub_date else datetime.date.today().strftime('%d/%m/%Y')
+    disp_pub_date = format_display_date(raw_pub_date) if raw_pub_date else datetime.date.today().strftime('%d-%m-%Y')
 
     c = canvas.Canvas(filename, pagesize=letter)
     
@@ -809,12 +796,26 @@ elif menu == "Master Login":
                         m_up_cls = st.selectbox("Class", classes_list, index=classes_list.index(cls_val) if cls_val in classes_list else 0, key="m_up_c")
                         
                     with c2:
-                        m_up_dob = st.text_input("DOB (YYYY-MM-DD)", value=m_curr_st['dob'], key="m_up_d")
+                        db_dob_val = m_curr_st.get('dob', '')
+                        disp_edit_dob = db_dob_val
+                        if db_dob_val.count('-') == 2:
+                            parts = db_dob_val.split('-')
+                            if len(parts[0]) == 4:
+                                disp_edit_dob = f"{parts[2]}-{parts[1]}-{parts[0]}"
+                        
+                        m_up_dob_input = st.text_input("DOB (DD-MM-YYYY)", value=disp_edit_dob, key="m_up_d")
                         m_up_apaar = st.text_input("APAAR NO", value=m_curr_st.get('apaar_no', ''), key="m_up_apaar")
                         b_val = m_curr_st.get('batch', '2025-2026')
                         b_idx = batches_list.index(b_val) if b_val in batches_list else 5
                         m_up_batch = st.selectbox("Batch", batches_list, index=b_idx, key="m_up_batch")
-                        m_up_pub_date = st.text_input("Publication Date (YYYY-MM-DD)", value=m_curr_st.get('pub_date', ''), key="m_up_pub_date")
+                        
+                        prev_pub_str = m_curr_st.get('pub_date', str(datetime.date.today()))
+                        try:
+                            p_y, p_m, p_d = prev_pub_str.split('-')
+                            d_val = datetime.date(int(p_y), int(p_m), int(p_d))
+                        except:
+                            d_val = datetime.date.today()
+                        m_up_pub_date = st.date_input("Publication Date", value=d_val, key="m_up_pub_date")
                     
                     st.markdown("#### 📚 Edit Subjects & Marks")
                     m_subjects = m_curr_st.get('subjects', {})
@@ -845,6 +846,12 @@ elif menu == "Master Login":
                     col_sv, col_dl = st.columns(2)
                     with col_sv:
                         if st.button("💾 Force Update Record"):
+                            m_up_dob_save = m_up_dob_input
+                            if m_up_dob_input.count('-') == 2:
+                                parts = m_up_dob_input.split('-')
+                                if len(parts[2]) == 4:
+                                    m_up_dob_save = f"{parts[2]}-{parts[1]}-{parts[0]}"
+                                    
                             new_per = (m_tot_obt / m_tot_full * 100) if m_tot_full > 0 else 0.0
                             new_res = "PASS" if new_per >= 33 else "FAIL"
                             new_grd = "A1" if new_per >= 90 else "A2" if new_per >= 80 else "B1" if new_per >= 70 else "B2" if new_per >= 60 else "C1" if new_per >= 50 else "C2" if new_per >= 40 else "D" if new_per >= 33 else "F"
@@ -854,7 +861,7 @@ elif menu == "Master Login":
                                 "gender": m_up_gender, "pen_no": m_up_pen, "apaar_no": m_up_apaar,
                                 "father_name": m_up_father, "father_name_local": m_up_father_loc,
                                 "mother_name": m_up_mother, "mother_name_local": m_up_mother_loc,
-                                "dob": m_up_dob, "class": m_up_cls, "batch": m_up_batch, "pub_date": m_up_pub_date,
+                                "dob": m_up_dob_save, "class": m_up_cls, "batch": m_up_batch, "pub_date": str(m_up_pub_date),
                                 "subjects": new_m_subjects if new_m_subjects else m_subjects,
                                 "total_obt": m_tot_obt, "total_full": m_tot_full, 
                                 "percentage": round(new_per, 2), "result": new_res, "grade": new_grd
@@ -1033,7 +1040,7 @@ elif menu == "School Login":
             
             min_date = datetime.date(2000, 1, 1)
             max_date = datetime.date(2065, 12, 31)
-            dob = st.date_input(f"DOB (YYYY-MM-DD) / {t('DOB', s_lang)}", min_value=min_date, max_value=max_date, key="add_dob")
+            dob = st.date_input(f"DOB / {t('DOB', s_lang)}", min_value=min_date, max_value=max_date, key="add_dob")
             
             c_c1, c_c2 = st.columns(2)
             with c_c1:
@@ -1136,7 +1143,14 @@ elif menu == "School Login":
                 with c_up3:
                     up_apaar = st.text_input(f"Edit APAAR NO / {t('APAAR NO', s_lang)}", value=curr_st.get('apaar_no', ''))
 
-                up_dob = st.text_input(f"Edit DOB (YYYY-MM-DD) / {t('DOB', s_lang)}", value=curr_st['dob'])
+                db_dob_val = curr_st.get('dob', '')
+                disp_edit_dob = db_dob_val
+                if db_dob_val.count('-') == 2:
+                    parts = db_dob_val.split('-')
+                    if len(parts[0]) == 4:
+                        disp_edit_dob = f"{parts[2]}-{parts[1]}-{parts[0]}"
+                        
+                up_dob_input = st.text_input(f"Edit DOB (DD-MM-YYYY) / {t('DOB', s_lang)}", value=disp_edit_dob)
                 
                 c_e1, c_e2 = st.columns(2)
                 with c_e1:
@@ -1187,6 +1201,12 @@ elif menu == "School Login":
                 st.info(f"📊 **Auto Summary:** Total Marks: {up_tot_obt}/{up_tot_full}")
                 
                 if st.button("💾 Save Updated Record"):
+                    up_dob_save = up_dob_input
+                    if up_dob_input.count('-') == 2:
+                        parts = up_dob_input.split('-')
+                        if len(parts[2]) == 4:
+                            up_dob_save = f"{parts[2]}-{parts[1]}-{parts[0]}"
+                            
                     new_per = (up_tot_obt / up_tot_full * 100) if up_tot_full > 0 else 0.0
                     new_res = "PASS" if new_per >= 33 else "FAIL"
                     new_grd = "A1" if new_per >= 90 else "A2" if new_per >= 80 else "B1" if new_per >= 70 else "B2" if new_per >= 60 else "C1" if new_per >= 50 else "C2" if new_per >= 40 else "D" if new_per >= 33 else "F"
@@ -1196,7 +1216,7 @@ elif menu == "School Login":
                         "gender": up_gender, "pen_no": up_pen, "apaar_no": up_apaar,
                         "father_name": up_father, "father_name_local": up_father_loc,
                         "mother_name": up_mother, "mother_name_local": up_mother_loc,
-                        "dob": up_dob, "class": up_cls, "batch": up_batch, 
+                        "dob": up_dob_save, "class": up_cls, "batch": up_batch, 
                         "pub_date": str(up_pub_date),
                         "subjects": new_up_subjects if new_up_subjects else up_subjects,
                         "total_obt": up_tot_obt, "total_full": up_tot_full, 
@@ -1249,12 +1269,6 @@ elif menu == "Results":
         "🔗 **ଓଡ଼ିଆ:** ଏଠାରେ କୌଣସି School ID ଦରକାର ନାହିଁ। କେବଳ Roll Number କିମ୍ବା Name ଦେଇ ସର୍ଚ୍ଚ କରନ୍ତୁ।"
     )
     
-    col_c, col_b = st.columns(2)
-    with col_c:
-        st_class = st.selectbox("Select Class (1 to 10)", classes_list, key="st_login_class") 
-    with col_b:
-        st_batch = st.selectbox("Select Batch", batches_list, index=5, key="st_login_batch")
-        
     st_search_query = st.text_input("Roll Number OR Student Name (ରୋଲ୍ ନମ୍ବର କିମ୍ବା ନାମ ଦିଅନ୍ତୁ)", value=url_roll, key="st_login_search")
     st_dob_input = st.text_input("Date of Birth (DD-MM-YYYY)", value=url_dob, key="st_login_dob")
     
@@ -1264,26 +1278,23 @@ elif menu == "Results":
         found_school_id = None
         
         search_query_lower = st_search_query.strip().lower()
-        
-        db_dob_format = st_dob_input.strip()
-        if db_dob_format.count('-') == 2:
-            p1, p2, p3 = db_dob_format.split('-')
-            if len(p1) == 2 and len(p3) == 4:
-                db_dob_format = f"{p3}-{p2}-{p1}"
+        normalized_input_dob = normalize_dob(st_dob_input)
         
         for s_id, school_students in students_db.items():
+            # Search by Roll Number first
             if st_search_query in school_students:
                 potential_student = school_students[st_search_query]
-                if potential_student["dob"] == db_dob_format and potential_student.get("class") == st_class and potential_student.get("batch", "2025-2026") == st_batch:
+                if normalize_dob(potential_student.get("dob", "")) == normalized_input_dob:
                     found_student = potential_student
                     found_roll = st_search_query
                     found_school_id = s_id
                     break
             
+            # If not found by Roll No, search by Name
             if not found_student:
                 for r_no, s_info in school_students.items():
                     if s_info.get("name", "").strip().lower() == search_query_lower:
-                        if s_info["dob"] == db_dob_format and s_info.get("class") == st_class and s_info.get("batch", "2025-2026") == st_batch:
+                        if normalize_dob(s_info.get("dob", "")) == normalized_input_dob:
                             found_student = s_info
                             found_roll = r_no
                             found_school_id = s_id
@@ -1296,7 +1307,6 @@ elif menu == "Results":
             student_name = found_student.get('name', '').upper()
             st.success(
                 f"🎉 **Welcome {student_name}!** Your result is given below:  \n"
-                f"🎉 **स्वागत है {student_name}!** आपका परिणाम नीचे दिया गया है:  \n"
                 f"🎉 **ସ୍ୱାଗତମ୍ {student_name}!** ଆପଣଙ୍କ ରେଜଲ୍ଟ ତଳେ ଦିଆଗଲା:"
             )
             school_name_en = schools_db[found_school_id]['name']
@@ -1319,4 +1329,4 @@ elif menu == "Results":
             if not st_search_query or not st_dob_input:
                 st.warning("ଦୟାକରି ସବୁ ତଥ୍ୟ ପୂରଣ କରନ୍ତୁ।")
             else:
-                st.error("❌ କୌଣସି ରେକର୍ଡ ମିଳିଲା ନାହିଁ! ଭୁଲ୍ ତଥ୍ୟ (Roll Number/Name, DOB, Class କିମ୍ବା Batch) ଦେଇଛନ୍ତି।")
+                st.error("❌ କୌଣସି ରେକର୍ଡ ମିଳିଲା ନାହିଁ! ଭୁଲ୍ ତଥ୍ୟ (Roll Number/Name କିମ୍ବା DOB) ଦେଇଛନ୍ତି।")
