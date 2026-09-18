@@ -138,7 +138,7 @@ def t(eng_text, lang):
     }
     return translations.get(eng_text, {}).get(lang, eng_text)
 
-# --- Number to Words Converter ---
+# --- Utilities ---
 def number_to_words(num):
     if num == 0: return "ZERO"
     ones = ["", "ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE", "TEN", "ELEVEN", "TWELVE", "THIRTEEN", "FOURTEEN", "FIFTEEN", "SIXTEEN", "SEVENTEEN", "EIGHTEEN", "NINETEEN"]
@@ -181,7 +181,6 @@ def load_master_data():
                 content = f.read()
                 if content.strip():
                     data = json.loads(content)
-                    # Upgrade old unhashed password if needed
                     if len(data.get("password", "")) < 60 and "master123" in data.get("password",""):
                         data["password"] = hash_password(data["password"])
                         save_master_data(data)
@@ -718,8 +717,10 @@ elif menu == "New School Registration":
                     "address": sanitize(r_address_en),
                     "address_local": sanitize(r_address_loc),
                     "hm_name": sanitize(r_hm_name),
+                    "hm_name_local": "",
                     "hm_phone": sanitize(r_hm_phone),
-                    "pass": hash_password(r_pass), # Secure Password Hashing
+                    "hm_email": "",
+                    "pass": hash_password(r_pass), 
                     "state": r_state, 
                     "lang": STATE_LANG_MAP[r_state],
                     "status": "Pending"
@@ -823,7 +824,7 @@ elif menu == "Master Login":
                     st.markdown(f"""
                     <div style="border:1px solid #cbd5e1; border-radius:5px; padding:10px; margin-bottom:10px; background-color:{bg};">
                         <b>School ID:</b> {s_id} | <b>Name:</b> {s_info['name']} | <b>State:</b> {s_info.get('state', 'N/A')}<br>
-                        <b>HM Name:</b> {s_info.get('hm_name', 'N/A')} | <b>Phone:</b> {s_info.get('hm_phone', 'N/A')}<br>
+                        <b>HM Name:</b> {s_info.get('hm_name', 'N/A')} | <b>Phone:</b> {s_info.get('hm_phone', 'N/A')} | <b>Email:</b> {s_info.get('hm_email', 'N/A')}<br>
                         <b>Status:</b> <strong>{status}</strong>
                     </div>
                     """, unsafe_allow_html=True)
@@ -974,6 +975,7 @@ elif menu == "Master Login":
                 selected_edit_school = st.selectbox("Select School ID to Edit", list(schools_db.keys()))
                 curr_s_data = schools_db[selected_edit_school]
                 
+                st.markdown("#### School Details")
                 c_se1, c_se2 = st.columns(2)
                 edit_s_name = c_se1.text_input("Edit School Name (English)", value=curr_s_data.get('name', ''))
                 edit_s_name_loc = c_se2.text_input("Edit School Name (Local Language)", value=curr_s_data.get('name_local', ''))
@@ -983,6 +985,15 @@ elif menu == "Master Login":
                 state_idx = indian_states.index(curr_state) if curr_state in indian_states else 18
                 edit_s_state = st.selectbox("Edit School State", indian_states, index=state_idx)
                 
+                st.markdown("#### Head Master Details")
+                c_hm1, c_hm2 = st.columns(2)
+                edit_hm_name = c_hm1.text_input("Edit HM Name (English)", value=curr_s_data.get('hm_name', ''))
+                edit_hm_name_loc = c_hm2.text_input("Edit HM Name (Local Language)", value=curr_s_data.get('hm_name_local', ''))
+                
+                c_c1, c_c2 = st.columns(2)
+                edit_hm_phone = c_c1.text_input("Edit HM Mobile No.", value=curr_s_data.get('hm_phone', ''))
+                edit_hm_email = c_c2.text_input("Edit HM Email ID", value=curr_s_data.get('hm_email', ''))
+                
                 edit_s_pass = st.text_input("Edit School Password (Leave blank to keep current)", type="password")
                 
                 if st.button("Update School Profile"):
@@ -990,16 +1001,20 @@ elif menu == "Master Login":
                         schools_db[selected_edit_school].update({
                             "name": sanitize(edit_s_name),
                             "name_local": sanitize(edit_s_name_loc),
+                            "hm_name": sanitize(edit_hm_name),
+                            "hm_name_local": sanitize(edit_hm_name_loc),
+                            "hm_phone": sanitize(edit_hm_phone),
+                            "hm_email": sanitize(edit_hm_email),
                             "state": edit_s_state,
                             "lang": STATE_LANG_MAP[edit_s_state]
                         })
-                        if edit_s_pass: # Only update password if a new one is typed
+                        if edit_s_pass:
                             schools_db[selected_edit_school]["pass"] = hash_password(edit_s_pass)
                             
                         save_data(schools_db, students_db)
                         st.success(f"School Profile Updated! The portal language is now set to {STATE_LANG_MAP[edit_s_state]}.")
                     else:
-                        st.warning("Please fill all the details.")
+                        st.warning("Please fill all the mandatory details.")
             else:
                 st.warning("No schools registered yet.")
 
@@ -1142,7 +1157,7 @@ elif menu == "School Login":
             
             min_date = datetime.date(2000, 1, 1)
             max_date = datetime.date(2065, 12, 31)
-            dob = st.date_input(f"DOB / {t('DOB', s_lang)}", min_value=min_date, max_value=max_date, key="add_dob")
+            dob = st.date_input(f"DOB (YYYY-MM-DD) / {t('DOB', s_lang)}", min_value=min_date, max_value=max_date, key="add_dob")
             
             c_c1, c_c2 = st.columns(2)
             with c_c1:
