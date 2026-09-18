@@ -12,128 +12,146 @@ import random
 import urllib.parse
 import urllib.request
 import ssl
+import hashlib
 import html
 import threading
+import sqlite3
 
 # ==========================================
 # 🔒 CRASH PROTECTION & ANTI-HACK LOCKS
 # ==========================================
 file_lock = threading.Lock()
 
+def hash_password(password):
+    return hashlib.sha256(password.encode()).hexdigest()
+
 def sanitize(text):
-    """XSS Protection: Prevents hackers from injecting malicious scripts in forms"""
     if isinstance(text, str):
         return html.escape(text.strip())
     return text
 
+@st.cache_resource
+def get_db_connection():
+    conn = sqlite3.connect('school_ultimate_secure.db', check_same_thread=False, timeout=60)
+    conn.execute('PRAGMA journal_mode=WAL;') 
+    conn.execute('PRAGMA synchronous=NORMAL;')
+    conn.execute('PRAGMA cache_size=-64000;') 
+    
+    c = conn.cursor()
+    c.execute('''CREATE TABLE IF NOT EXISTS master (id TEXT PRIMARY KEY, data TEXT)''')
+    c.execute('''CREATE TABLE IF NOT EXISTS schools (id TEXT PRIMARY KEY, data TEXT)''')
+    c.execute('''CREATE TABLE IF NOT EXISTS students 
+                 (roll_no TEXT, dob TEXT, school_id TEXT, name TEXT, data TEXT, status TEXT, PRIMARY KEY (school_id, roll_no))''')
+    c.execute('''CREATE INDEX IF NOT EXISTS idx_student_search ON students(roll_no, dob, name)''')
+    
+    c.execute("SELECT data FROM master WHERE id='master'")
+    if not c.fetchone():
+        def_m = {"username": "master", "password": hash_password("master123"), "email": "admin@school.com", "phone": "9999999999", "upi_id": "school@sbi", "reg_fee": 150.0, "gst_percent": 18.0, "school_reg_fee": 1000.0, "school_gst_percent": 18.0}
+        c.execute("INSERT INTO master VALUES ('master', ?)", (json.dumps(def_m),))
+    conn.commit()
+    return conn
+
+conn = get_db_connection()
+
+def get_master():
+    row = conn.cursor().execute("SELECT data FROM master WHERE id='master'").fetchone()
+    return json.loads(row[0]) if row else {}
+
+def save_master(data):
+    with file_lock:
+        conn.cursor().execute("UPDATE master SET data=? WHERE id='master'", (json.dumps(data),))
+        conn.commit()
+
+def get_school(s_id):
+    row = conn.cursor().execute("SELECT data FROM schools WHERE id=?", (s_id,)).fetchone()
+    return json.loads(row[0]) if row else None
+
+def get_all_schools():
+    return {row[0]: json.loads(row[1]) for row in conn.cursor().execute("SELECT id, data FROM schools").fetchall()}
+
+def save_school(s_id, data):
+    with file_lock:
+        conn.cursor().execute("REPLACE INTO schools (id, data) VALUES (?, ?)", (sanitize(s_id), json.dumps(data)))
+        conn.commit()
+
+def delete_school(s_id):
+    with file_lock:
+        conn.cursor().execute("DELETE FROM schools WHERE id=?", (s_id,))
+        conn.cursor().execute("DELETE FROM students WHERE school_id=?", (s_id,))
+        conn.commit()
+
+def get_students_by_school(s_id, status=None):
+    if status:
+        return {row[0]: json.loads(row[1]) for row in conn.cursor().execute("SELECT roll_no, data FROM students WHERE school_id=? AND status=?", (s_id, status)).fetchall()}
+    return {row[0]: json.loads(row[1]) for row in conn.cursor().execute("SELECT roll_no, data FROM students WHERE school_id=?", (s_id,)).fetchall()}
+
+def get_all_students_by_status(status):
+    return [(row[0], row[1], json.loads(row[2])) for row in conn.cursor().execute("SELECT school_id, roll_no, data FROM students WHERE status=?", (status,)).fetchall()]
+
+def save_student(s_id, roll_no, data, status="Approved"):
+    n_dob = normalize_dob(data.get('dob',''))
+    n_name = data.get('name','').lower()
+    with file_lock:
+        conn.cursor().execute("REPLACE INTO students (roll_no, dob, school_id, name, data, status) VALUES (?, ?, ?, ?, ?, ?)",
+                              (sanitize(roll_no), n_dob, s_id, n_name, json.dumps(data), status))
+        conn.commit()
+
+def delete_student(s_id, roll_no):
+    with file_lock:
+        conn.cursor().execute("DELETE FROM students WHERE school_id=? AND roll_no=?", (s_id, roll_no))
+        conn.commit()
+
 # ==========================================
-# 🌐 APP URL SETTING
+# 🌐 APP URL SETTING & CONFIG
 # ==========================================
 APP_URL = "http://localhost:8501"
 
 st.set_page_config(page_title="Advanced School Management System", layout="wide")
+st.markdown("<style>#MainMenu {visibility: hidden;} header {visibility: hidden;} footer {visibility: hidden;}</style>", unsafe_allow_html=True)
 
-hide_st_style = """
-            <style>
-            #MainMenu {visibility: hidden;}
-            header {visibility: hidden;}
-            footer {visibility: hidden;}
-            </style>
-            """
-st.markdown(hide_st_style, unsafe_allow_html=True)
-
-SCHOOLS_FILE = "schools.json"
-STUDENTS_FILE = "students.txt"
-MASTER_FILE = "master.json"
-
-# ==========================================
-# 🗺️ ALL INDIAN STATES & LOCAL LANGUAGE MAPPING
-# ==========================================
 STATE_LANG_MAP = {
-    "Andhra Pradesh": "Telugu", "Arunachal Pradesh": "English", "Assam": "Assamese",
-    "Bihar": "Hindi", "Chhattisgarh": "Hindi", "Goa": "Konkani",
-    "Gujarat": "Gujarati", "Haryana": "Hindi", "Himachal Pradesh": "Hindi",
-    "Jharkhand": "Hindi", "Karnataka": "Kannada", "Kerala": "Malayalam",
-    "Madhya Pradesh": "Hindi", "Maharashtra": "Marathi", "Manipur": "English",
-    "Meghalaya": "English", "Mizoram": "English", "Nagaland": "English",
-    "Odisha": "Odia", "Punjab": "Punjabi", "Rajasthan": "Hindi",
-    "Sikkim": "English", "Tamil Nadu": "Tamil", "Telangana": "Telugu",
-    "Tripura": "Bengali", "Uttar Pradesh": "Hindi", "Uttarakhand": "Hindi",
-    "West Bengal": "Bengali", "Delhi": "Hindi", "Jammu and Kashmir": "Urdu",
-    "Ladakh": "English", "Puducherry": "Tamil", "Chandigarh": "Punjabi",
-    "Andaman and Nicobar": "English", "Lakshadweep": "Malayalam", "Dadra & Nagar Haveli": "Gujarati"
+    "Andhra Pradesh": "Telugu", "Arunachal Pradesh": "English", "Assam": "Assamese", "Bihar": "Hindi", "Chhattisgarh": "Hindi",
+    "Goa": "Konkani", "Gujarat": "Gujarati", "Haryana": "Hindi", "Himachal Pradesh": "Hindi", "Jharkhand": "Hindi",
+    "Karnataka": "Kannada", "Kerala": "Malayalam", "Madhya Pradesh": "Hindi", "Maharashtra": "Marathi", "Manipur": "English",
+    "Meghalaya": "English", "Mizoram": "English", "Nagaland": "English", "Odisha": "Odia", "Punjab": "Punjabi",
+    "Rajasthan": "Hindi", "Sikkim": "English", "Tamil Nadu": "Tamil", "Telangana": "Telugu", "Tripura": "Bengali",
+    "Uttar Pradesh": "Hindi", "Uttarakhand": "Hindi", "West Bengal": "Bengali", "Delhi": "Hindi"
 }
 
 COUNTRIES = ["Yes - Indian National", "No - Other Country"]
+# New Social Category Options
+SOCIAL_CATEGORIES = ["General", "SC (Scheduled Caste)", "ST (Scheduled Tribe)", "OBC (Other Backward Class)", "SEBC", "Minority", "Others"]
 
-# ==========================================
-# 🤖 AUTO TRANSLATION ENGINE
-# ==========================================
 @st.cache_data(show_spinner=False)
 def auto_translate(text, lang_name):
-    LANG_CODES = {
-        "Odia": "or", "Hindi": "hi", "Bengali": "bn", "Telugu": "te",
-        "Tamil": "ta", "Marathi": "mr", "Gujarati": "gu", "Assamese": "as",
-        "Kannada": "kn", "Malayalam": "ml", "Punjabi": "pa", "Urdu": "ur", "English": "en"
-    }
-    if lang_name == "English" or not text: 
-        return text
-    
-    target_code = LANG_CODES.get(lang_name, "en")
-    if target_code == "en": 
-        return text
-        
+    if lang_name == "English" or not text: return text
+    LC = {"Odia":"or", "Hindi":"hi", "Bengali":"bn", "Telugu":"te", "Tamil":"ta", "Marathi":"mr", "Gujarati":"gu", "Assamese":"as"}
+    tc = LC.get(lang_name, "en")
+    if tc == "en": return text
     try:
-        ctx = ssl.create_default_context()
-        ctx.check_hostname = False
-        ctx.verify_mode = ssl.CERT_NONE
-        
-        url = f"https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl={target_code}&dt=t&q={urllib.parse.quote(text)}"
+        ctx = ssl.create_default_context(); ctx.check_hostname = False; ctx.verify_mode = ssl.CERT_NONE
+        url = f"https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl={tc}&dt=t&q={urllib.parse.quote(text)}"
         req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-        response = urllib.request.urlopen(req, timeout=5, context=ctx)
-        data = json.loads(response.read().decode('utf-8'))
-        translated_text = "".join([sentence[0] for sentence in data[0]])
-        return translated_text
-    except Exception:
-        return text 
+        res = urllib.request.urlopen(req, timeout=3, context=ctx)
+        return "".join([s[0] for s in json.loads(res.read().decode('utf-8'))[0]])
+    except: return text 
 
-# ==========================================
-# 🗣️ STATIC TRANSLATION DICTIONARY
-# ==========================================
 def t(eng_text, lang):
-    translations = {
-        "School Portal": {"Odia": "ସ୍କୁଲ୍ ପୋର୍ଟାଲ୍", "Hindi": "स्कूल पोर्टल", "Bengali": "স্কুল পোর্টাল"},
-        "Logout": {"Odia": "ଲଗ୍ ଆଉଟ୍", "Hindi": "लॉग आउट", "Bengali": "লଗ୍ ଆଉଟ୍"},
-        "My Students": {"Odia": "ମୋର ଛାତ୍ରଛାତ୍ରୀ", "Hindi": "मेरे छात्र", "Bengali": "আমার ছাত্র"},
-        "Add Student": {"Odia": "ନୂଆ ଛାତ୍ର ଯୋଡନ୍ତୁ", "Hindi": "नया छात्र जोड़ें", "Bengali": "নতুন ছাত্র যোগ করুন"},
-        "Edit Student": {"Odia": "ଛାତ୍ର ତଥ୍ୟ ବଦଳାନ୍ତୁ", "Hindi": "छात्र विवरण बदलें", "Bengali": "তথ্য আপডেট করুন"},
-        "Report Card": {"Odia": "ରିପୋର୍ଟ କାର୍ଡ ପ୍ରିଣ୍ଟ୍", "Hindi": "रिपोर्ट कार्ड", "Bengali": "রিপোর্ট কার্ড"},
-        "Search": {"Odia": "ନାମ କିମ୍ବା ରୋଲ୍ ନମ୍ବର ଦେଇ ଖୋଜନ୍ତୁ", "Hindi": "नाम या रोल नंबर से खोजें", "Bengali": "নাম বা রোল নম্বর দিয়ে খুঁজুন"},
-        "ANNUAL EXAMINATION": {"Odia": "ବାର୍ଷିକ ପରୀକ୍ଷା", "Hindi": "वार्षिक परीक्षा", "Bengali": "বার্ষিক परीक्षा"},
-        "CERTIFICATE-CUM-MARK SHEET": {"Odia": "ପ୍ରମାଣପତ୍ର ଏବଂ ମାର୍କସିଟ୍", "Hindi": "प्रमाणपत्र सह अंकतालिका", "Bengali": "শংসাপত্র এবং মার্কশিট"},
-        "SUBJECTS AND MARKS SECURED": {"Odia": "ବିଷୟ ଏବଂ ପ୍ରାପ୍ତ ନମ୍ବର", "Hindi": "विषय और प्राप्त अंक", "Bengali": "বিষয় এবং প্রাপ্ত নম্বর"},
-        "Certify that": {"Odia": "ପ୍ରମାଣ କରାଯାଏ ଯେ", "Hindi": "प्रमाणित किया जाता है कि", "Bengali": "প্রত্যয়ন করা যাচ্ছে যে"},
-        "ROLL NO": {"Odia": "ରୋଲ୍ ନମ୍ବର", "Hindi": "रोल नंबर", "Bengali": "রোল নম্বর"},
-        "CLASS": {"Odia": "ଶ୍ରେଣୀ", "Hindi": "कक्षा", "Bengali": "শ্রেণী"},
-        "PEN NO": {"Odia": "ପେନ୍ ନମ୍ବର", "Hindi": "पेन नं.", "Bengali": "পেন নং"},
-        "APAAR NO": {"Odia": "ଅପାର୍ ନମ୍ବର", "Hindi": "अपार नं.", "Bengali": "অপার নং"},
-        "NAME": {"Odia": "ଛାତ୍ର/ଛାତ୍ରୀଙ୍କ ନାମ", "Hindi": "छात्र का नाम", "Bengali": "ছাত্রের নাম"},
-        "MOTHER'S NAME": {"Odia": "ମାତାଙ୍କ ନାମ", "Hindi": "माता का नाम", "Bengali": "মাতার নাম"},
-        "FATHER'S NAME": {"Odia": "ପିତାଙ୍କ ନାମ", "Hindi": "पिता का नाम", "Bengali": "पিতার नाम"},
-        "DOB": {"Odia": "ଜନ୍ମ ତାରିଖ", "Hindi": "जन्म तिथि", "Bengali": "जन्म তারিখ"},
-        "PASSED_TEXT": {"Odia": "ଉପରୋକ୍ତ ବ୍ୟାଚରେ ଅନୁଷ୍ଠିତ ବାର୍ଷିକ ପରୀକ୍ଷାରେ ଉତ୍ତୀର୍ଣ୍ଣ ହୋଇଛନ୍ତି।", "Hindi": "उपरोक्त शैक्षणिक सत्र में आयोजित वार्षिक परीक्षा सफलतापूर्वक उत्तीर्ण की है।", "Bengali": "উপরে উল্লেখিত ব্যাচে অনুষ্ঠিত বার্ষিক পরীক্ষায় সফলভাবে উত্তীর্ণ হয়েছে।"},
-        "SUBJECT": {"Odia": "ବିଷୟ", "Hindi": "विषय", "Bengali": "বিষয়"},
-        "FULL MARKS": {"Odia": "ମୋଟ ନମ୍ବର", "Hindi": "पूर्णांक", "Bengali": "পূর্ণমান"},
-        "MARKS SECURED": {"Odia": "ପ୍ରାପ୍ତ ନମ୍ବର", "Hindi": "प्राप्तांक", "Bengali": "প্রাপ্ত নম্বর"},
-        "TOTAL MARKS": {"Odia": "ସମୁଦାୟ ନମ୍ବର", "Hindi": "कुल प्राप्तांक", "Bengali": "মোট প্রাপ্ত নম্বর"},
-        "GRADE": {"Odia": "ଗ୍ରେଡ୍", "Hindi": "ग्रेड", "Bengali": "গ্রেড"},
-        "DATE OF PUBLICATION": {"Odia": "ଫଳାଫଳ ପ୍ରକାଶନ ତାରିଖ", "Hindi": "परिणाम प्रकाशन तिथि", "Bengali": "ফলাফল প্রকাশের তারিখ"},
-        "HM SIGNATURE": {"Odia": "ପ୍ରଧାନ ଶିକ୍ଷକଙ୍କ ଦସ୍ତଖତ", "Hindi": "प्रधानाचार्य के हस्ताक्षर", "Bengali": "প্রধান शिक्षকের স্বাক্ষর"},
-        "CLASS TEACHER SIGNATURE": {"Odia": "ଶ୍ରେଣୀ ଶିକ୍ଷକଙ୍କ ଦସ୍ତଖତ", "Hindi": "कक्षा अध्यापक के हस्ताक्षर", "Bengali": "শ্রেণী शिक्षকের স্বাক্ষর"}
+    tr = {
+        "School Portal": {"Odia": "ସ୍କୁଲ୍ ପୋର୍ଟାଲ୍", "Hindi": "स्कूल पोर्टल"},
+        "Logout": {"Odia": "ଲଗ୍ ଆଉଟ୍", "Hindi": "लॉग आउट"},
+        "ANNUAL EXAMINATION": {"Odia": "ବାର୍ଷିକ ପରୀକ୍ଷା", "Hindi": "वार्षिक परीक्षा"},
+        "CERTIFICATE-CUM-MARK SHEET": {"Odia": "ପ୍ରମାଣପତ୍ର ଏବଂ ମାର୍କସିଟ୍", "Hindi": "प्रमाणपत्र सह अंकतालिका"},
+        "ROLL NO": {"Odia": "ରୋଲ୍ ନମ୍ବର", "Hindi": "रोल नंबर"},
+        "CLASS": {"Odia": "ଶ୍ରେଣୀ", "Hindi": "कक्षा"},
+        "NAME": {"Odia": "ନାମ", "Hindi": "नाम"},
+        "DOB": {"Odia": "ଜନ୍ମ ତାରିଖ", "Hindi": "जन्म तिथि"},
+        "SUBJECT": {"Odia": "ବିଷୟ", "Hindi": "विषय"},
+        "TOTAL MARKS": {"Odia": "ସମୁଦାୟ ନମ୍ବର", "Hindi": "कुल प्राप्तांक"},
+        "GRADE": {"Odia": "ଗ୍ରେଡ୍", "Hindi": "ग्रेड"},
     }
-    return translations.get(eng_text, {}).get(lang, eng_text)
+    return tr.get(eng_text, {}).get(lang, eng_text)
 
-# --- Utilities ---
 def number_to_words(num):
     if num == 0: return "ZERO"
     ones = ["", "ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE", "TEN", "ELEVEN", "TWELVE", "THIRTEEN", "FOURTEEN", "FIFTEEN", "SIXTEEN", "SEVENTEEN", "EIGHTEEN", "NINETEEN"]
@@ -160,8 +178,12 @@ def normalize_dob(d_str):
         elif len(p3) == 4: return f"{p3}-{p2}-{p1}" 
     return d_str
 
-# --- ଡାଟା ଲୋଡ୍ ଓ ସେଭ୍ ଫଙ୍କସନ୍ (PRESERVES EXISTING JSON DATA 100% WITH CRASH PROTECTION) ---
-def load_master_data():
+# --- OLD JSON DATA LOAD/SAVE FUNCTIONS (PRESERVES EXISTING DATA) ---
+SCHOOLS_FILE = "schools.json"
+STUDENTS_FILE = "students.txt"
+MASTER_FILE = "master.json"
+
+def load_master_data_json():
     default_master = {
         "username": "master", 
         "password": "master123", 
@@ -169,7 +191,9 @@ def load_master_data():
         "phone": "9999999999", 
         "upi_id": "school@sbi",
         "reg_fee": 150.0,
-        "gst_percent": 18.0
+        "gst_percent": 18.0,
+        "school_reg_fee": 1000.0,
+        "school_gst_percent": 18.0
     }
     if os.path.exists(MASTER_FILE):
         try:
@@ -180,18 +204,20 @@ def load_master_data():
                     if "upi_id" not in m: m["upi_id"] = "school@sbi"
                     if "reg_fee" not in m: m["reg_fee"] = 150.0
                     if "gst_percent" not in m: m["gst_percent"] = 18.0
+                    if "school_reg_fee" not in m: m["school_reg_fee"] = 1000.0
+                    if "school_gst_percent" not in m: m["school_gst_percent"] = 18.0
                     return m
         except Exception:
             pass
     return default_master
 
-def save_master_data(data):
+def save_master_data_json(data):
     with file_lock:
         with open(MASTER_FILE, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=4)
 
-def load_data():
-    schools = {}
+def load_data_json():
+    schools = {"S001": {"name": "LAXMI NARAYAN GIRLS HIGH SCHOOL", "name_local": "", "address": "", "address_local": "", "hm_name": "", "hm_phone": "", "pass": "admin123", "state": "Odisha", "lang": "Odia", "status": "Active"}}
     students = {}
     if os.path.exists(SCHOOLS_FILE):
         try:
@@ -207,7 +233,7 @@ def load_data():
         except: pass
     return schools, students
 
-def save_data(schools, students):
+def save_data_json(schools, students):
     with file_lock:
         with open(SCHOOLS_FILE, "w", encoding="utf-8") as f:
             json.dump(schools, f, indent=4)
@@ -237,6 +263,7 @@ def create_student_receipt_pdf(filename, reg_id, s_data):
     c.drawString(50, y, f"Father's Name: {s_data.get('father_name', '').upper()}"); y -= 25
     c.drawString(50, y, f"Date of Birth: {s_data.get('dob', '')}"); y -= 25
     c.drawString(50, y, f"Gender: {s_data.get('gender', '')}"); y -= 25
+    c.drawString(50, y, f"Category: {s_data.get('category', 'General')}"); y -= 25
     c.drawString(50, y, f"Contact No: {s_data.get('phone', '')}"); y -= 25
     c.drawString(50, y, f"Applied School Code: {s_data.get('school_code', 'N/A')}"); y -= 25
     c.drawString(50, y, f"Payment Details: {s_data.get('payment_mode', 'N/A')}"); y -= 25
@@ -273,6 +300,7 @@ def create_school_receipt_pdf(filename, sch_id, sch_data):
     c.drawString(50, y, f"Head Master Name: {sch_data.get('hm_name', '').upper()}"); y -= 25
     c.drawString(50, y, f"Contact No: {sch_data.get('hm_phone', '')}"); y -= 25
     c.drawString(50, y, f"State: {sch_data.get('state', '')}"); y -= 25
+    c.drawString(50, y, f"Payment Mode: {sch_data.get('payment_mode', 'N/A')}"); y -= 25
     c.drawString(50, y, f"Status: {sch_data.get('status', 'Pending')}"); y -= 25
     c.drawString(50, y, f"Date: {datetime.date.today().strftime('%d-%m-%Y')}"); y -= 40
     
@@ -288,87 +316,68 @@ def create_school_receipt_pdf(filename, sch_id, sch_data):
 
 def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no, s_lang):
     disp_dob = format_display_date(st_data.get('dob', ''))
-    raw_pub_date = st_data.get('pub_date', '')
-    disp_pub_date = format_display_date(raw_pub_date) if raw_pub_date else datetime.date.today().strftime('%d-%m-%Y')
-    bg_color = "#fef9f7"; border_color = "#963f98"; outer_border = "#ce9bd0"; table_bg = "#fcf4fc"
-    
-    total_obt = st_data.get('total_obt', 0)
-    words_total_en = number_to_words(total_obt)
-    student_name_en = st_data.get('name', 'N/A').upper()
-    mother_name_en = st_data.get('mother_name', 'N/A').upper()
-    father_name_en = st_data.get('father_name', 'N/A').upper()
-    total_marks = f"{total_obt}/{st_data.get('total_full', 0)}"
-    grade = st_data.get('grade', 'N/A')
-    result_stat = st_data.get('result', 'N/A')
-    
-    t_school = school_name_loc if school_name_loc.strip() else auto_translate(school_name_en, s_lang)
-    t_student = st_data.get('name_local', '').strip() or auto_translate(student_name_en, s_lang)
-    t_mother = st_data.get('mother_name_local', '').strip() or auto_translate(mother_name_en, s_lang)
-    t_father = st_data.get('father_name_local', '').strip() or auto_translate(father_name_en, s_lang)
-    t_words_total = auto_translate(words_total_en, s_lang)
+    raw_pub = st_data.get('pub_date', '')
+    disp_pub_date = format_display_date(raw_pub) if raw_pub else datetime.date.today().strftime('%d-%m-%Y')
 
-    qr_text = f"SCHOOL: {school_name_en} | NAME: {student_name_en} | ROLL: {roll_no} | DOB: {disp_dob} | MARKS: {total_marks} | GRADE: {grade} | RESULT: {result_stat}"
+    bc, b_col, ob, t_bg = "#fef9f7", "#963f98", "#ce9bd0", "#fcf4fc"
+    tot_obt = st_data.get('total_obt', 0)
+    w_tot_en = number_to_words(tot_obt)
+    s_name_en = st_data.get('name', 'N/A').upper()
+    m_name_en = st_data.get('mother_name', 'N/A').upper()
+    f_name_en = st_data.get('father_name', 'N/A').upper()
+    
+    t_sch = school_name_loc if school_name_loc.strip() else auto_translate(school_name_en, s_lang)
+    t_stu = st_data.get('name_local', '').strip() or auto_translate(s_name_en, s_lang)
+    t_mot = st_data.get('mother_name_local', '').strip() or auto_translate(m_name_en, s_lang)
+    t_fat = st_data.get('father_name_local', '').strip() or auto_translate(f_name_en, s_lang)
+    t_w_tot = auto_translate(w_tot_en, s_lang)
+
+    qr_text = f"SCHOOL: {school_name_en} | NAME: {s_name_en} | ROLL: {roll_no} | DOB: {disp_dob} | MARKS: {tot_obt}/{st_data.get('total_full', 0)} | GRADE: {st_data.get('grade', '')}"
     qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={urllib.parse.quote(qr_text)}"
-    barcode_url = f"https://barcode.tec-it.com/barcode.ashx?data={roll_no}&code=Code128&dpi=96"
+    bc_url = f"https://barcode.tec-it.com/barcode.ashx?data={roll_no}&code=Code128&dpi=96"
 
-    lbl_annual = t('ANNUAL EXAMINATION', s_lang)
-    lbl_cert = t('CERTIFICATE-CUM-MARK SHEET', s_lang)
-    lbl_subj_marks = t('SUBJECTS AND MARKS SECURED', s_lang)
-    lbl_certify = t('Certify that', s_lang)
-    lbl_roll = t('ROLL NO', s_lang)
-    lbl_cls = t('CLASS', s_lang)
-    lbl_pen = t('PEN NO', s_lang)
-    lbl_apaar = t('APAAR NO', s_lang)
-    lbl_mother = t("MOTHER'S NAME", s_lang)
-    lbl_father = t("FATHER'S NAME", s_lang)
-    lbl_dob = t('DOB', s_lang)
-    lbl_pass_text = t('PASSED_TEXT', s_lang)
-    lbl_subject = t('SUBJECT', s_lang)
-    lbl_full = t('FULL MARKS', s_lang)
-    lbl_sec = t('MARKS SECURED', s_lang)
-    lbl_tot = t('TOTAL MARKS', s_lang)
-    lbl_grd = t('GRADE', s_lang)
-    lbl_pub_date = t('DATE OF PUBLICATION', s_lang)
-    lbl_hm_sign = t('HM SIGNATURE', s_lang)
-    lbl_ct_sign = t('CLASS TEACHER SIGNATURE', s_lang)
-
-    rows_html = "".join([f"<tr style='border-bottom: 1px solid {border_color};'><td style='padding: 8px; border-right: 1px solid {border_color}; text-align: left; font-weight: bold;'>{sub.upper()}</td><td style='padding: 8px; border-right: 1px solid {border_color};'>{m_info['full']}</td><td style='padding: 8px; font-weight: bold;'>{m_info['obt']}</td></tr>" for sub, m_info in st_data.get('subjects', {}).items()])
-
-    header_font_size = "28px" if len(school_name_en) <= 40 else "22px"
+    rows_html = "".join([f"<tr style='border-bottom: 1px solid {b_col};'><td style='padding: 8px; border-right: 1px solid {b_col}; text-align: left; font-weight: bold;'>{sub.upper()}</td><td style='padding: 8px; border-right: 1px solid {b_col};'>{m['full']}</td><td style='padding: 8px; font-weight: bold;'>{m['obt']}</td></tr>" for sub, m in st_data.get('subjects', {}).items()])
 
     return f"""
-    <div style='font-family: "Times New Roman", serif; border: 15px solid {outer_border}; padding: 4px; max-width: 800px; margin: auto; background-color: #ffffff;'>
-        <div style='border: 2px solid {border_color}; padding: 25px; background-color: {bg_color}; position: relative;'>
-        <div style='text-align: center; color: {border_color}; margin-bottom: 20px;'>
-        <h1 style='margin: 0; font-size: {header_font_size}; text-transform: uppercase; font-family: "Georgia", serif; text-shadow: 1px 1px 1px #e1bee7;'>{school_name_en}</h1>
-        <h2 style='margin: 5px 0 10px 0; font-size: 20px; font-weight:normal;'>{t_school}</h2>
-        <h3 style='margin: 5px 0; font-size: 16px; letter-spacing: 1px;'>ANNUAL EXAMINATION / <span style='font-size: 14px;'>{lbl_annual}</span> - {st_data.get('batch', '2025-2026')}</h3>
-        <p style='margin: 5px 0; font-weight: bold; font-size: 17px; text-decoration: underline;'>CERTIFICATE-CUM-MARK SHEET <br> <span style='font-size: 14px; text-decoration: none;'>({lbl_cert})</span></p>
+    <div style='font-family: "Times New Roman", serif; border: 15px solid {ob}; padding: 4px; max-width: 800px; margin: auto; background-color: #fff;'>
+        <div style='border: 2px solid {b_col}; padding: 25px; background-color: {bc}; position: relative;'>
+            <div style='text-align: center; color: {b_col}; margin-bottom: 20px;'>
+                <h1 style='margin: 0; font-size: 24px; text-transform: uppercase;'>{school_name_en}</h1>
+                <h2 style='margin: 5px 0 10px 0; font-size: 18px;'>{t_sch}</h2>
+                <h3 style='margin: 5px 0; font-size: 16px;'>ANNUAL EXAMINATION / {t('ANNUAL EXAMINATION', s_lang)} - {st_data.get('batch', '2025-2026')}</h3>
+                <p style='margin: 5px 0; font-weight: bold; font-size: 17px; text-decoration: underline;'>CERTIFICATE-CUM-MARK SHEET <br><span style='font-size:14px;text-decoration:none;'>({t('CERTIFICATE-CUM-MARK SHEET', s_lang)})</span></p>
+            </div>
+            <table style='width: 100%; font-size: 13px; margin-bottom: 20px; font-weight: bold;'>
+                <tr><td><span style='color:{b_col};'>ROLL NO:</span> {roll_no}</td><td style='text-align: right;'><span style='color:{b_col};'>CLASS:</span> {st_data.get('class', '')}</td></tr>
+                <tr><td><span style='color:{b_col};'>PEN NO:</span> {st_data.get('pen_no', '')}</td><td style='text-align: right;'><span style='color:{b_col};'>APAAR NO:</span> {st_data.get('apaar_no', '')}</td></tr>
+            </table>
+            <table style='width: 100%; font-size: 14px; margin-bottom: 15px; text-transform: uppercase; line-height: 1.8;'>
+                <tr><td style='width: 250px; color: {b_col}; font-weight: bold;'>Certify that / {t('NAME', s_lang)}</td><td><b>{s_name_en}</b><br><span style='font-size:14px; text-transform:none;'>{t_stu}</span></td></tr>
+                <tr><td style='color: {b_col}; font-weight: bold;'>Mother's Name</td><td><b>{m_name_en}</b><br><span style='font-size:14px; text-transform:none;'>{t_mot}</span></td></tr>
+                <tr><td style='color: {b_col}; font-weight: bold;'>Father's Name</td><td><b>{f_name_en}</b><br><span style='font-size:14px; text-transform:none;'>{t_fat}</span></td></tr>
+                <tr><td style='color: {b_col}; font-weight: bold;'>Date of Birth</td><td><b>{disp_dob}</b></td></tr>
+                <tr><td style='color: {b_col}; font-weight: bold;'>Category</td><td><b>{st_data.get('category', 'General')}</b></td></tr>
+            </table>
+            <p style='color: {b_col}; text-align: center; margin-bottom: 20px; font-style:italic;'>Passed the Annual Examination held in {st_data.get('batch', '')}.</p>
+            <table style='width: 100%; border-collapse: collapse; border: 2px solid {b_col}; text-align: center; font-size: 13px;'>
+                <tr style='color: {b_col}; background-color: {t_bg}; border-bottom: 2px solid {b_col};'>
+                    <th style='padding: 8px; border-right: 1px solid {b_col};'>SUBJECT</th><th style='padding: 8px; border-right: 1px solid {b_col};'>FULL MARKS</th><th style='padding: 8px;'>MARKS SECURED</th>
+                </tr>
+                {rows_html}
+                <tr style='color: {b_col}; font-weight: bold; background-color: {t_bg}; border-top: 2px solid {b_col};'>
+                    <td style='padding: 10px; border-right: 1px solid {b_col}; text-align: right;'>TOTAL MARKS</td><td style='padding: 10px; border-right: 1px solid {b_col};'>{st_data.get('total_full', 0)}</td><td style='padding: 10px; color:#000;'>{tot_obt}</td>
+                </tr>
+            </table>
+            <div style='text-align: center; font-weight: bold; font-size: 14px; margin-top: 20px;'>( {w_tot_en} ) <br><span style='font-size:13px; font-weight:normal;'>({t_w_tot})</span></div>
+            <table style='width: 100%; margin-top: 20px; text-align: center; color: {b_col};'>
+                <tr>
+                    <td style='width: 33%; vertical-align: bottom;'><img src='{bc_url}' style='height: 35px; margin-bottom: 10px;'/><br><div style='font-size: 11px;'>DATE OF PUBLICATION</div><div style='font-weight: bold; font-size: 14px; margin-bottom: 30px;'>{disp_pub_date}</div><div style='border-bottom: 1px solid {b_col}; width: 80%; margin: auto;'></div><div style='font-size: 11px; font-weight: bold; margin-top:5px;'>HM SIGNATURE</div></td>
+                    <td style='width: 34%; vertical-align: top;'><div style='font-size: 12px; margin-bottom: 5px;'>GRADE</div><div style='border: 2px solid {b_col}; padding: 10px 25px; display: inline-block; background-color: {t_bg};'><div style='font-weight: bold; font-size: 22px; color: #000;'>{st_data.get('grade', '')}</div></div></td>
+                    <td style='width: 33%; vertical-align: bottom;'><img src='{qr_url}' style='height: 65px; margin-bottom: 10px;'/><div style='height: 15px; margin-bottom: 30px;'></div><div style='border-bottom: 1px solid {b_col}; width: 80%; margin: auto;'></div><div style='font-size: 11px; font-weight: bold; margin-top:5px;'>CLASS TEACHER SIGNATURE</div></td>
+                </tr>
+            </table>
         </div>
-        <table style='width: 100%; font-size: 13px; color: #000000; margin-bottom: 20px; font-weight: bold;'>
-        <tr><td><span style='color:{border_color}; font-weight:normal;'>ROLL NO / {lbl_roll}:</span> {roll_no}</td><td style='text-align: right;'><span style='color:{border_color}; font-weight:normal;'>CLASS / {lbl_cls}:</span> {st_data.get('class', 'N/A')}</td></tr>
-        <tr><td><span style='color:{border_color}; font-weight:normal;'>PEN NO / {lbl_pen}:</span> {st_data.get('pen_no', 'N/A')}</td><td style='text-align: right;'><span style='color:{border_color}; font-weight:normal;'>APAAR NO / {lbl_apaar}:</span> {st_data.get('apaar_no', 'N/A')}</td></tr>
-        </table>
-        <table style='width: 100%; font-size: 14px; margin-bottom: 15px; text-transform: uppercase; color: #000000; line-height: 1.8;'>
-        <tr><td style='width: 250px; color: {border_color}; font-weight: bold; font-style: italic;'>Certify that / <span style='font-size:12px;'>{lbl_certify}</span></td><td style='font-weight: bold; font-size: 15px;'>{student_name_en} <br><span style='font-size:14px; font-weight:normal; text-transform:none;'>{t_student}</span></td></tr>
-        <tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Mother's Name / <span style='font-size:12px;'>{lbl_mother}</span></td><td style='font-weight: bold;'>{mother_name_en} <br><span style='font-size:14px; font-weight:normal; text-transform:none;'>{t_mother}</span></td></tr>
-        <tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Father's Name / <span style='font-size:12px;'>{lbl_father}</span></td><td style='font-weight: bold;'>{father_name_en} <br><span style='font-size:14px; font-weight:normal; text-transform:none;'>{t_father}</span></td></tr>
-        <tr><td style='color: {border_color}; font-weight: bold; font-style: italic;'>Date of Birth / <span style='font-size:12px;'>{lbl_dob}</span></td><td style='font-weight: bold;'>{disp_dob}</td></tr>
-        </table>
-        <p style='color: {border_color}; font-style: italic; font-size: 14px; text-align: center; margin-bottom: 20px;'>Passed the Annual Examination held in the academic batch of {st_data.get('batch', 'N/A')}. <br><span style='font-size: 13px;'>{lbl_pass_text}</span></p>
-        <div style='text-align: center; color: {border_color}; font-weight: bold; font-size: 14px; margin-bottom: 5px;'>SUBJECTS AND MARKS SECURED <br> <span style='font-size:12px;'>{lbl_subj_marks}</span></div>
-        <table style='width: 100%; border-collapse: collapse; border: 2px solid {border_color}; text-align: center; font-size: 13px; background-color: transparent; color: #000000;'>
-        <tr style='color: {border_color}; background-color: {table_bg}; border-bottom: 2px solid {border_color};'><th style='padding: 8px; border-right: 1px solid {border_color};'>SUBJECT / <span style='font-size:11px;'>{lbl_subject}</span></th><th style='padding: 8px; border-right: 1px solid {border_color};'>FULL MARKS / <span style='font-size:11px;'>{lbl_full}</span></th><th style='padding: 8px;'>MARKS SECURED / <span style='font-size:11px;'>{lbl_sec}</span></th></tr>
-        {rows_html}
-        <tr style='color: {border_color}; font-weight: bold; background-color: {table_bg}; border-top: 2px solid {border_color};'><td style='padding: 10px; border-right: 1px solid {border_color}; text-align: right;'>TOTAL MARKS / <span style='font-size:11px;'>{lbl_tot}</span></td><td style='padding: 10px; border-right: 1px solid {border_color};'>{st_data.get('total_full', 0)}</td><td style='padding: 10px; color: #000;'>{total_obt}</td></tr>
-        </table>
-        <div style='text-align: center; font-weight: bold; font-size: 14px; color: #000; margin-top: 20px;'>( {words_total_en} ) <br> <span style='font-size:13px; font-weight:normal;'>({t_words_total})</span></div>
-        <table style='width: 100%; margin-top: 20px; text-align: center; color: {border_color};'><tr>
-        <td style='width: 33%; vertical-align: bottom;'><img src='{barcode_url}' alt='Barcode' style='height: 35px; margin-bottom: 10px; max-width: 100%;'/><div style='font-size: 11px;'>DATE OF PUBLICATION <br><span style='font-size:10px;'>({lbl_pub_date})</span></div><div style='font-weight: bold; font-size: 14px; margin-top: 5px; margin-bottom: 30px;'>{disp_pub_date}</div><div style='border-bottom: 1px solid {border_color}; width: 80%; margin: auto;'></div><div style='font-size: 11px; margin-top: 5px; font-weight: bold;'>HM SIGNATURE <br><span style='font-size:10px;'>({lbl_hm_sign})</span></div></td>
-        <td style='width: 34%; vertical-align: top; padding-top: 5px;'><div style='font-size: 12px; margin-bottom: 5px;'>GRADE / {lbl_grd}</div><div style='border: 2px solid {border_color}; padding: 10px 25px; display: inline-block; min-width: 80px; background-color: {table_bg};'><div style='font-weight: bold; font-size: 22px; color: #000;'>{grade}</div></div></td>
-        <td style='width: 33%; vertical-align: bottom;'><img src='{qr_url}' alt='QR Code' style='height: 65px; margin-bottom: 10px; max-width: 100%;'/><div style='height: 15px; margin-bottom: 30px;'></div><div style='border-bottom: 1px solid {border_color}; width: 80%; margin: auto;'></div><div style='font-size: 11px; margin-top: 5px; font-weight: bold;'>CLASS TEACHER SIGNATURE <br><span style='font-size:10px;'>({lbl_ct_sign})</span></div></td>
-        </tr></table>
-        </div></div>
+    </div>
     """
 
 def create_pdf(filename, school_name, st_data, roll_no):
@@ -397,19 +406,21 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.setFillColorRGB(0,0,0); c.setFont("Helvetica-Bold", 11); c.drawString(150, 545, f"{st_data.get('father_name', '').upper()}")
     c.setFillColorRGB(0.59, 0.25, 0.60); c.setFont("Helvetica-Oblique", 11); c.drawString(50, 525, "Date of Birth")
     c.setFillColorRGB(0,0,0); c.setFont("Helvetica-Bold", 11); c.drawString(150, 525, f"{disp_dob}")
+    c.setFillColorRGB(0.59, 0.25, 0.60); c.setFont("Helvetica-Oblique", 11); c.drawString(50, 505, "Category")
+    c.setFillColorRGB(0,0,0); c.setFont("Helvetica-Bold", 11); c.drawString(150, 505, f"{st_data.get('category', 'General')}")
     
-    c.setStrokeColorRGB(0.59, 0.25, 0.60); c.line(50, 495, 550, 495)
-    c.setFillColorRGB(0.98, 0.95, 0.98); c.rect(50, 465, 500, 30, fill=1, stroke=0)
+    c.setStrokeColorRGB(0.59, 0.25, 0.60); c.line(50, 485, 550, 485)
+    c.setFillColorRGB(0.98, 0.95, 0.98); c.rect(50, 455, 500, 30, fill=1, stroke=0)
     c.setFillColorRGB(0.59, 0.25, 0.60); c.setFont("Helvetica-Bold", 11)
-    c.drawString(60, 475, "SUBJECT"); c.drawCentredString(350, 475, "FULL MARKS"); c.drawRightString(540, 475, "MARKS SECURED")
-    c.line(50, 465, 550, 465); c.line(50, 495, 50, 465); c.line(280, 495, 280, 465); c.line(420, 495, 420, 465); c.line(550, 495, 550, 465)
+    c.drawString(60, 465, "SUBJECT"); c.drawCentredString(350, 465, "FULL MARKS"); c.drawRightString(540, 465, "MARKS SECURED")
+    c.line(50, 455, 550, 455); c.line(50, 485, 50, 455); c.line(280, 485, 280, 455); c.line(420, 485, 420, 455); c.line(550, 485, 550, 455)
     
-    c.setFillColorRGB(0,0,0); y = 445; t_b_y = y + 10
+    c.setFillColorRGB(0,0,0); y = 435; t_b_y = y + 10
     for sub, m_info in st_data.get('subjects', {}).items():
         c.drawString(60, y, str(sub).upper()); c.drawCentredString(350, y, str(m_info['full'])); c.drawRightString(540, y, str(m_info['obt']))
         c.setStrokeColorRGB(0.59, 0.25, 0.60); c.line(50, y-10, 550, y-10)
         y -= 20; t_b_y = y + 10
-    c.line(50, 465, 50, t_b_y); c.line(280, 465, 280, t_b_y); c.line(420, 465, 420, t_b_y); c.line(550, 465, 550, t_b_y)
+    c.line(50, 455, 50, t_b_y); c.line(280, 455, 280, t_b_y); c.line(420, 455, 420, t_b_y); c.line(550, 455, 550, t_b_y)
     
     c.setFillColorRGB(0.98, 0.95, 0.98); c.rect(50, t_b_y-25, 500, 25, fill=1, stroke=0)
     c.setFillColorRGB(0.59, 0.25, 0.60); c.setFont("Helvetica-Bold", 11)
@@ -438,44 +449,28 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.save()
 
 # --- MAIN APP START ---
-schools_db, students_db = load_data()
-master_db = load_master_data()
+schools_db, students_db = load_data_json()
+master_db = load_master_data_json()
 
 # ----------------- STABLE ROUTING (PREVENTS AUTO-CLOSING) -----------------
 menu_items = ["Home Page", "New Student Registration", "New School Registration", "Master Login", "School Login", "Results"]
-portal_map = {
-    "home": 0,
-    "reg_student": 1,
-    "reg_school": 2,
-    "master": 3,
-    "school": 4,
-    "student": 5
-}
-
+portal_map = {"home": 0, "reg_student": 1, "reg_school": 2, "master": 3, "school": 4, "student": 5}
 portal_param = st.query_params.get("portal", "home")
 default_idx = portal_map.get(portal_param, 0)
-
 menu = st.sidebar.selectbox("🎯 Navigation Menu", menu_items, index=default_idx)
 
-if menu == "Home Page":
-    st.query_params["portal"] = "home"
-elif menu == "New Student Registration":
-    st.query_params["portal"] = "reg_student"
-elif menu == "New School Registration":
-    st.query_params["portal"] = "reg_school"
-elif menu == "Master Login":
-    st.query_params["portal"] = "master"
-elif menu == "School Login":
-    st.query_params["portal"] = "school"
-elif menu == "Results":
-    st.query_params["portal"] = "student"
+if menu == "Home Page": st.query_params["portal"] = "home"
+elif menu == "New Student Registration": st.query_params["portal"] = "reg_student"
+elif menu == "New School Registration": st.query_params["portal"] = "reg_school"
+elif menu == "Master Login": st.query_params["portal"] = "master"
+elif menu == "School Login": st.query_params["portal"] = "school"
+elif menu == "Results": st.query_params["portal"] = "student"
 
 classes_list = [str(i) for i in range(1, 11)]
 batches_list = [f"{y}-{y+1}" for y in range(2020, 2051)]
 
 # ----------------- HOME PAGE (ERP STYLE UI) -----------------
 if menu == "Home Page":
-    st.query_params["portal"] = "home"
     st.markdown("""
     <style>
     .notice-container { background-color: #1e293b; border-radius: 5px; margin-bottom: 25px; border: 1px solid #475569; }
@@ -487,7 +482,26 @@ if menu == "Home Page":
     .login-card:hover { background: #f8fafc; border-bottom: 5px solid #1e3a8a; transform: translateY(-2px); }
     .login-title { font-size: 24px; font-weight: bold; margin-bottom: 5px; display: flex; align-items: center; justify-content: center; gap: 10px; }
     .login-sub { font-size: 14px; color: #64748b; }
+    /* Carousel CSS */
+    .carousel { width: 100%; height: 350px; overflow: hidden; border-radius: 10px; margin-bottom: 25px; position: relative; border: 3px solid #1e3a8a; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+    .carousel-inner { display: flex; width: 400%; height: 100%; animation: slide 16s infinite; }
+    .carousel-img { width: 25%; height: 100%; object-fit: cover; }
+    @keyframes slide { 0%, 20% { transform: translateX(0); } 25%, 45% { transform: translateX(-25%); } 50%, 70% { transform: translateX(-50%); } 75%, 95% { transform: translateX(-75%); } 100% { transform: translateX(0); } }
+    .carousel-overlay { position: absolute; bottom: 0; background: rgba(30,58,138,0.7); width: 100%; color: white; text-align: center; padding: 10px; font-weight: bold; font-size: 18px; }
     </style>
+    """, unsafe_allow_html=True)
+
+    # Auto Sliding Image Carousel
+    st.markdown("""
+    <div class="carousel">
+        <div class="carousel-inner">
+            <img class="carousel-img" src="https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&q=80&w=1200" alt="School 1">
+            <img class="carousel-img" src="https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?auto=format&fit=crop&q=80&w=1200" alt="School 2">
+            <img class="carousel-img" src="https://images.unsplash.com/photo-1546410531-bb4caa6b424d?auto=format&fit=crop&q=80&w=1200" alt="School 3">
+            <img class="carousel-img" src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80&w=1200" alt="School 4">
+        </div>
+        <div class="carousel-overlay">Welcome to the Advanced School Management System</div>
+    </div>
     """, unsafe_allow_html=True)
 
     notice_html = (
@@ -495,10 +509,10 @@ if menu == "Home Page":
         "<div class='notice-header'>RECENT NOTICE</div>"
         "<div style='padding: 0; overflow: hidden; background-color: #1e293b; color: #e2e8f0;'>"
         "<marquee direction='up' scrollamount='2' onmouseover='this.stop();' onmouseout='this.start();' style='height: 180px; padding: 15px;'>"
-        "<div class='notice-item'>⏩ Download PDF Receipt & Print Option is LIVE! <span class='new-badge'>NEW!</span></div>"
+        "<div class='notice-item'>⏩ Social Category Option added in Registration Form! <span class='new-badge'>NEW!</span></div>"
+        "<div class='notice-item'>⏩ Download PDF Receipt & Print Option is LIVE! </div>"
         "<div class='notice-item'>⏩ Online Student Registration Portal with Payment & GST is LIVE!</div>"
         "<div class='notice-item'>⏩ Master & School portal passwords are encrypted and 100% secured.</div>"
-        "<div class='notice-item'>⏩ Students can now Search Result safely. No School ID needed!</div>"
         "<div class='notice-item' style='border-bottom: none; margin-top: 15px; text-align: center; line-height: 2.5;'>"
         "<span style='color: #fbbf24; font-weight: bold; font-size: 18px;'>📞 Helpdesk 24x7:</span><br>"
         "<span style='background-color: #25D366; color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold; display: inline-block; margin-bottom: 5px;'>💬 WhatsApp: 8910223342</span><br>"
@@ -581,9 +595,10 @@ elif menu == "New Student Registration":
             stu_name_en = c_n1.text_input("1. Student's Name (English) *")
             stu_name_loc = c_n2.text_input("1. Student's Name (Local Language)")
             
-            c_g1, c_g2 = st.columns(2)
+            c_g1, c_g2, c_g3 = st.columns(3)
             stu_gender_en = c_g1.selectbox("2. Gender (English)", ["Male", "Female", "Other"])
             stu_gender_loc = c_g2.text_input("2. Gender (Local Language)")
+            stu_category = c_g3.selectbox("Social Category *", SOCIAL_CATEGORIES)
             
             c_d1, c_d2 = st.columns(2)
             stu_dob = c_d1.date_input("3. Date of Birth *", min_value=datetime.date(2000, 1, 1), max_value=datetime.date.today())
@@ -639,6 +654,7 @@ elif menu == "New Student Registration":
                             "name_local": sanitize(stu_name_loc),
                             "gender": stu_gender_en, 
                             "gender_local": sanitize(stu_gender_loc),
+                            "category": stu_category,
                             "father_name": sanitize(f_name_en), 
                             "father_name_local": sanitize(f_name_loc),
                             "mother_name": sanitize(m_name_en), 
@@ -671,7 +687,7 @@ elif menu == "New Student Registration":
                     st.session_state['payment_step'] = True
                     st.rerun()
 
-    elif st.session_state.get('payment_step', False):
+    if st.session_state.get('payment_step', False):
         st.markdown("### 💳 Secure Payment Gateway")
         temp_obj = st.session_state.get('temp_student_data')
         if temp_obj:
@@ -712,7 +728,7 @@ elif menu == "New Student Registration":
                             if sch_id not in students_db:
                                 students_db[sch_id] = {}
                             students_db[sch_id][reg_data['reg_id']] = reg_data['data']
-                            save_data(schools_db, students_db)
+                            save_data_json(schools_db, students_db)
                             
                             st.session_state['stu_reg_success'] = True
                             st.session_state['stu_reg_id'] = reg_data['reg_id']
@@ -732,7 +748,7 @@ elif menu == "New Student Registration":
                     if sch_id not in students_db:
                         students_db[sch_id] = {}
                     students_db[sch_id][reg_data['reg_id']] = reg_data['data']
-                    save_data(schools_db, students_db)
+                    save_data_json(schools_db, students_db)
                     
                     st.session_state['stu_reg_success'] = True
                     st.session_state['stu_reg_id'] = reg_data['reg_id']
@@ -769,6 +785,7 @@ elif menu == "New School Registration":
 
     if st.session_state['sch_reg_success']:
         st.success("✅ Registration Successful! Your account is PENDING approval from the Master Admin.")
+        st.info("Please download your registration receipt below.")
         
         pdf_file = f"School_Receipt_{st.session_state['sch_reg_id']}.pdf"
         create_school_receipt_pdf(pdf_file, st.session_state['sch_reg_id'], st.session_state['sch_reg_data'])
@@ -883,7 +900,7 @@ elif menu == "New School Registration":
                             reg_data = st.session_state['temp_school_data']
                             reg_data['data']['payment_mode'] = f"Online (₹{s_total_fee:.2f} - Txn: {sanitize(txn_id)})"
                             schools_db[reg_data["school_id"]] = reg_data["data"]
-                            save_data(schools_db, students_db)
+                            save_data_json(schools_db, students_db)
                             
                             st.session_state['sch_reg_success'] = True
                             st.session_state['sch_reg_id'] = reg_data['school_id']
@@ -898,7 +915,7 @@ elif menu == "New School Registration":
                     reg_data = st.session_state['temp_school_data']
                     reg_data['data']['payment_mode'] = f"Offline (₹{s_total_fee:.2f} - Pending)"
                     schools_db[reg_data["school_id"]] = reg_data["data"]
-                    save_data(schools_db, students_db)
+                    save_data_json(schools_db, students_db)
                     
                     st.session_state['sch_reg_success'] = True
                     st.session_state['sch_reg_id'] = reg_data['school_id']
@@ -999,7 +1016,7 @@ elif menu == "Master Login":
                 for s_id, s_info in list(schools_db.items()):
                     status = s_info.get("status", "Active") 
                     if status == "Pending_Master_Approval":
-                        continue # Show in Payment Approvals tab
+                        continue 
                         
                     bg = "#f0fdf4" if status == "Active" else "#fef2f2"
 
@@ -1015,13 +1032,13 @@ elif menu == "Master Login":
                     if status == "Inactive":
                         if c_btn1.button("✅ Make Active", key=f"act_{s_id}"):
                             s_info["status"] = "Active"
-                            save_data(schools_db, students_db)
+                            save_data_json(schools_db, students_db)
                             st.success(f"School {s_id} is now Active!")
                             st.rerun()
                     if status == "Active":
                         if c_btn2.button("🚫 Make Inactive", key=f"deact_{s_id}"):
                             s_info["status"] = "Inactive"
-                            save_data(schools_db, students_db)
+                            save_data_json(schools_db, students_db)
                             st.warning(f"School {s_id} is now Inactive!")
                             st.rerun()
                             
@@ -1029,7 +1046,7 @@ elif menu == "Master Login":
                         del schools_db[s_id]
                         if s_id in students_db:
                             del students_db[s_id]
-                        save_data(schools_db, students_db)
+                        save_data_json(schools_db, students_db)
                         st.error(f"School '{s_id}' deleted!")
                         st.rerun()
 
@@ -1048,13 +1065,13 @@ elif menu == "Master Login":
                     with cp1:
                         if st.button(f"✅ Approve Payment & Activate", key=f"vps_{s_id}"):
                             s_info["status"] = "Active"
-                            save_data(schools_db, students_db)
+                            save_data_json(schools_db, students_db)
                             st.success(f"School {s_id} Activated!")
                             st.rerun()
                     with cp2:
                         if st.button(f"🚫 Reject (Auto Refund)", key=f"rps_{s_id}"):
                             del schools_db[s_id]
-                            save_data(schools_db, students_db)
+                            save_data_json(schools_db, students_db)
                             st.error(f"School {s_id} Rejected & Refund Initiated.")
                             st.rerun()
             else:
@@ -1083,14 +1100,14 @@ elif menu == "Master Login":
                     with c_pay1:
                         if st.button(f"✅ Verify Payment & Send to School", key=f"vp_{r_no}"):
                             p_st["status"] = "Pending_School"
-                            save_data(schools_db, students_db)
+                            save_data_json(schools_db, students_db)
                             st.success(f"Payment for {r_no} verified! Application sent to School.")
                             st.rerun()
                     with c_pay2:
                         if st.button(f"🚫 Reject (Auto Refund)", key=f"rp_{r_no}"):
                             p_st['payment_mode'] = p_st.get('payment_mode', '') + " - [REFUND INITIATED]"
                             p_st['status'] = "Rejected_Refund"
-                            save_data(schools_db, students_db)
+                            save_data_json(schools_db, students_db)
                             st.error(f"Payment rejected and Refund initiated for {r_no}.")
                             st.rerun()
             else:
@@ -1203,13 +1220,13 @@ elif menu == "Master Login":
                                 "total_obt": m_tot_obt, "total_full": m_tot_full, 
                                 "percentage": round(new_per, 2), "result": new_res, "grade": new_grd
                             })
-                            save_data(schools_db, students_db)
+                            save_data_json(schools_db, students_db)
                             st.success(f"Roll No {m_edit_roll} data updated successfully!")
                             
                     with col_dl:
                         if st.button("🗑️ Delete Student (Master Only)", type="primary"):
                             del students_db[master_school_sel][m_edit_roll]
-                            save_data(schools_db, students_db)
+                            save_data_json(schools_db, students_db)
                             st.success("Student deleted successfully!")
                             st.rerun()
                 else:
@@ -1257,7 +1274,7 @@ elif menu == "Master Login":
                         if edit_s_pass:
                             curr_s_data["pass"] = edit_s_pass
                             
-                        save_data(schools_db, students_db)
+                        save_data_json(schools_db, students_db)
                         st.success(f"School Profile Updated! The portal language is now set to {STATE_LANG_MAP[edit_s_state]}.")
                     else:
                         st.warning("Please fill all the mandatory details.")
@@ -1509,7 +1526,7 @@ elif menu == "School Login":
                             del students_db[cur_school][app_roll]
                             
                         students_db[cur_school][roll_to_save] = updated_p_data
-                        save_data(schools_db, students_db)
+                        save_data_json(schools_db, students_db)
                         st.success(f"Student {roll_to_save} Approved successfully!")
                         st.rerun()
                 with c_act2:
@@ -1517,7 +1534,7 @@ elif menu == "School Login":
                         p_st['payment_mode'] = p_st.get('payment_mode', '') + " - [REFUND INITIATED]"
                         p_st['status'] = "Rejected_Refund"
                         students_db[cur_school][app_roll] = p_st
-                        save_data(schools_db, students_db)
+                        save_data_json(schools_db, students_db)
                         st.error(f"Application for {app_roll} Rejected. Payment Refund Process Automatically Initiated.")
                         st.rerun()
             else:
@@ -1618,7 +1635,7 @@ elif menu == "School Login":
                         if cur_school not in students_db:
                             students_db[cur_school] = {}
                         students_db[cur_school][roll_no_clean] = new_data
-                        save_data(schools_db, students_db)
+                        save_data_json(schools_db, students_db)
                         st.success(f"Roll No {roll_no_clean} Data Saved & Approved!")
                     else:
                         st.error("Roll No and Student Name required.")
@@ -1732,7 +1749,7 @@ elif menu == "School Login":
                         "total_obt": up_tot_obt, "total_full": up_tot_full, 
                         "percentage": round(new_per, 2), "result": new_res, "grade": new_grd
                     })
-                    save_data(schools_db, students_db)
+                    save_data_json(schools_db, students_db)
                     st.success("Record Updated!")
             else:
                 st.warning("No approved students available to edit.")
