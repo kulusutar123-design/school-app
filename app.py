@@ -385,6 +385,7 @@ portal_map = {"home": 0, "reg_student": 1, "reg_school": 2, "master": 3, "school
 portal_param = st.query_params.get("portal", "home")
 default_idx = portal_map.get(portal_param, 0)
 
+# Sidebar Background Color Customization
 st.sidebar.markdown("---")
 user_bg_color = st.sidebar.color_picker("🎨 Custom Background Color", "#ffffff")
 st.markdown(f"<style>.stApp {{ background-color: {user_bg_color} !important; }}</style>", unsafe_allow_html=True)
@@ -424,6 +425,9 @@ if menu == "Home Page":
     .login-card:hover { background: #f8fafc; border-bottom: 5px solid #1e3a8a; transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
     .login-title { font-size: 24px; font-weight: bold; margin-bottom: 8px; }
     .login-sub { font-size: 15px; color: #64748b; }
+    
+    .dev-footer { text-align: center; margin-top: 40px; padding: 15px; background: linear-gradient(90deg, #1e3a8a, #9333ea); color: white; border-radius: 8px; font-weight: bold; font-size: 18px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
+    .dev-highlight { color: #fbbf24; font-size: 20px; text-shadow: 1px 1px 2px #000; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -435,26 +439,27 @@ if menu == "Home Page":
     event_title = "Welcome to Advanced School Management System"
     
     if mm_dd == "10-02":
-        special_event_html = "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Mahatma-Gandhi%2C_studio%2C_1931.jpg/512px-Mahatma-Gandhi%2C_studio%2C_1931.jpg' alt='Gandhi Jayanti'>"
+        special_event_html = "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/7/7a/Mahatma-Gandhi%2C_studio%2C_1931.jpg' alt='Gandhi Jayanti'>"
         event_title = "🙏 Happy Gandhi Jayanti 🙏"
     elif mm_dd == "08-15":
-        special_event_html = "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Flag_of_India.svg/512px-Flag_of_India.svg.png' alt='Independence Day'>"
+        special_event_html = "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/4/41/Flag_of_India.svg' alt='Independence Day'>"
         event_title = "🇮🇳 Happy Independence Day 🇮🇳"
     elif mm_dd == "01-26":
-        special_event_html = "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Flag_of_India.svg/512px-Flag_of_India.svg.png' alt='Republic Day'>"
+        special_event_html = "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/4/41/Flag_of_India.svg' alt='Republic Day'>"
         event_title = "🇮🇳 Happy Republic Day 🇮🇳"
     elif mm_dd == "09-05":
-        special_event_html = "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Dr_Sarvepalli_Radhakrishnan.jpg/512px-Dr_Sarvepalli_Radhakrishnan.jpg' alt='Teachers Day'>"
+        special_event_html = "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/d/d1/Dr_Sarvepalli_Radhakrishnan.jpg' alt='Teachers Day'>"
         event_title = "📚 Happy Teachers' Day 📚"
     elif mm_dd == "04-01":
-        special_event_html = "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Seal_of_Odisha.png/512px-Seal_of_Odisha.png' alt='Utkal Divas'>"
+        special_event_html = "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/f/fe/Seal_of_Odisha.png' alt='Utkal Divas'>"
         event_title = "🔴 ଉତ୍କଳ ଦିବସର ହାର୍ଦ୍ଦିକ ଶୁଭେଚ୍ଛା 🔴"
 
-    # Perfected Iframe HTML to ensure NO rendering issues
+    # Perfected HTML with meta referrer tag to fix broken images in Streamlit iframe
     carousel_html = f"""
     <!DOCTYPE html>
     <html>
     <head>
+    <meta name="referrer" content="no-referrer">
     <style>
     body {{ margin: 0; padding: 0; background-color: transparent; font-family: sans-serif; }}
     .carousel-container {{ width: 100%; height: 350px; overflow: hidden; border-radius: 10px; position: relative; border: 4px solid #1e3a8a; box-shadow: 0 4px 10px rgba(0,0,0,0.3); background-color: #000; }}
@@ -466,11 +471,11 @@ if menu == "Home Page":
     <div class="carousel-container">
         <marquee behavior="scroll" direction="left" scrollamount="12" onmouseover="this.stop();" onmouseout="this.start();">
             {special_event_html}
-            <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Raja_Ravi_Varma_-_Saraswati.jpg/512px-Raja_Ravi_Varma_-_Saraswati.jpg" alt="Saraswati Maa">
-            <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Ganesha_Basohli_miniature_circa_1730_Dubost_p73.jpg/512px-Ganesha_Basohli_miniature_circa_1730_Dubost_p73.jpg" alt="Lord Ganesha">
-            <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Jagannath.jpg/512px-Jagannath.jpg" alt="Lord Jagannath">
-            <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Droupadi_Murmu_Official_Portrait.jpg/512px-Droupadi_Murmu_Official_Portrait.jpg" alt="President of India">
-            <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Official_Photograph_of_Prime_Minister_Narendra_Modi_Portrait.png/512px-Official_Photograph_of_Prime_Minister_Narendra_Modi_Portrait.png" alt="PM of India">
+            <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/e/e0/Raja_Ravi_Varma_-_Saraswati.jpg" alt="Saraswati Maa">
+            <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/1/19/Ganesha_Basohli_miniature_circa_1730_Dubost_p73.jpg" alt="Lord Ganesha">
+            <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/b/b3/Jagannath.jpg" alt="Lord Jagannath">
+            <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/e/e2/Droupadi_Murmu_Official_Portrait.jpg" alt="President of India">
+            <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/c/c0/Official_Photograph_of_Prime_Minister_Narendra_Modi_Portrait.png" alt="PM of India">
         </marquee>
         <div class="carousel-overlay">Connecting Students, Teachers & Administration Seamlessly</div>
     </div>
@@ -482,7 +487,7 @@ if menu == "Home Page":
     components.html(carousel_html, height=360)
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # Running Long Notification using Iframe to guarantee safety
+    # Running Long Notification
     notice_text_html = """
     <!DOCTYPE html>
     <html>
@@ -503,6 +508,7 @@ if menu == "Home Page":
     components.html(notice_text_html, height=50)
     st.markdown("</div>", unsafe_allow_html=True)
 
+    # Prominent Action Buttons
     c1, c2, c3 = st.columns(3)
     with c1:
         st.markdown("<a href='?portal=reg_school' target='_self' class='login-card'><div class='login-title'>🏫 New School Registration</div><div class='login-sub'>Register your institution</div></a>", unsafe_allow_html=True)
@@ -513,7 +519,7 @@ if menu == "Home Page":
     with c3:
         st.markdown("<a href='?portal=student' target='_self' class='login-card' style='height: 94%; display: flex; flex-direction: column; justify-content: center;'><div class='login-title' style='font-size: 32px;'>🎓 Check Results</div><div class='login-sub'>Download Student Rank Card</div></a>", unsafe_allow_html=True)
 
-# ----------------- NEW STUDENT REGISTRATION -----------------
+# ----------------- NEW STUDENT REGISTRATION WITH DYNAMIC FEES & GST -----------------
 elif menu == "New Student Registration":
     c_home, c_title = st.columns([1, 8])
     with c_home:
@@ -719,7 +725,7 @@ elif menu == "New Student Registration":
                             st.rerun()
 
             elif pay_mode == "Offline Payment (School Counter)":
-                st.info(f"You have selected Offline Payment. Please pay ₹{total_fee:.2f} at your School Counter.")
+                st.info(f"You have selected Offline Payment. Please pay ₹{total_fee:.2f} (Fee: ₹{base_fee:.2f} + GST: ₹{gst_amt:.2f}) at your School Counter.")
                 if st.button("Submit Final Application", type="primary"):
                     reg_data = st.session_state['temp_student_data']
                     reg_data['data']['payment_mode'] = f"Offline (₹{total_fee:.2f} - Pending at Counter)"
