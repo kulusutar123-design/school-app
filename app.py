@@ -13,20 +13,31 @@ import urllib.parse
 import urllib.request
 import ssl
 import hashlib
+import html
 import threading
 
 # ==========================================
-# 🌐 APP URL SETTING & SECURITY LOCKS
+# 🔒 SECURITY LOCK & HASHING
+# ==========================================
+file_lock = threading.Lock()
+
+def hash_password(password):
+    return hashlib.sha256(password.encode()).hexdigest()
+
+def sanitize(text):
+    if isinstance(text, str):
+        return html.escape(text.strip())
+    return text
+
+# ==========================================
+# 🌐 APP URL SETTING
 # ==========================================
 APP_URL = "http://localhost:8501"
-
-# Anti-Crash File Lock (ଏକାସାଙ୍ଗରେ ବହୁତ ଲୋକ ବ୍ୟବହାର କଲେ ଫାଇଲ୍ କ୍ରାସ୍ ହେବନାହିଁ)
-db_lock = threading.Lock()
 
 # ପେଜ୍ ସେଟିଂ
 st.set_page_config(page_title="Advanced School Management System", layout="wide")
 
-# --- HIDE STREAMLIT DEFAULT MENU & HEADER (SECURITY) ---
+# --- HIDE STREAMLIT DEFAULT MENU & HEADER ---
 hide_st_style = """
             <style>
             #MainMenu {visibility: hidden;}
@@ -39,13 +50,6 @@ st.markdown(hide_st_style, unsafe_allow_html=True)
 SCHOOLS_FILE = "schools.json"
 STUDENTS_FILE = "students.txt"
 MASTER_FILE = "master.json"
-
-# ==========================================
-# 🔐 PASSWORD ENCRYPTION SYSTEM (ANTI-HACK)
-# ==========================================
-def hash_password(password):
-    """ପାସୱାର୍ଡ କୁ ଗୁପ୍ତ କୋଡ୍ (SHA-256) ରେ ପରିବର୍ତ୍ତନ କରେ"""
-    return hashlib.sha256(password.encode()).hexdigest()
 
 # ==========================================
 # 🗺️ ALL INDIAN STATES & LOCAL LANGUAGE MAPPING
@@ -66,7 +70,7 @@ STATE_LANG_MAP = {
 }
 
 # ==========================================
-# 🤖 AUTO TRANSLATION ENGINE (SAFE MODE)
+# 🤖 AUTO TRANSLATION ENGINE
 # ==========================================
 @st.cache_data(show_spinner=False)
 def auto_translate(text, lang_name):
@@ -132,82 +136,85 @@ def t(eng_text, lang):
     }
     return translations.get(eng_text, {}).get(lang, eng_text)
 
+# --- Utilities ---
 def number_to_words(num):
     if num == 0: return "ZERO"
     ones = ["", "ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE", "TEN", "ELEVEN", "TWELVE", "THIRTEEN", "FOURTEEN", "FIFTEEN", "SIXTEEN", "SEVENTEEN", "EIGHTEEN", "NINETEEN"]
     tens = ["", "", "TWENTY", "THIRTY", "FORTY", "FIFTY", "SIXTY", "SEVENTY", "EIGHTY", "NINETY"]
+    
     def words(n):
         if n < 20: return ones[int(n)]
         elif n < 100: return tens[int(n // 10)] + ("-" + ones[int(n % 10)] if n % 10 != 0 else "")
         elif n < 1000: return ones[int(n // 100)] + " HUNDRED" + (" AND " + words(n % 100) if n % 100 != 0 else "")
         else: return str(n)
+        
     return words(num)
 
 def format_display_date(d_str):
-    if not d_str: return datetime.date.today().strftime('%d-%m-%Y')
+    if not d_str:
+        return datetime.date.today().strftime('%d-%m-%Y')
     d_str = str(d_str).strip().replace('/', '-')
     parts = d_str.split('-')
     if len(parts) == 3:
-        if len(parts[0]) == 4: return f"{parts[2]}-{parts[1]}-{parts[0]}"
+        if len(parts[0]) == 4:
+            return f"{parts[2]}-{parts[1]}-{parts[0]}"
     return d_str
 
 def normalize_dob(d_str):
     d_str = d_str.strip().replace('/', '-')
     if d_str.count('-') == 2:
         p1, p2, p3 = d_str.split('-')
-        if len(p1) == 4: return f"{p1}-{p2}-{p3}" 
-        elif len(p3) == 4: return f"{p3}-{p2}-{p1}" 
+        if len(p1) == 4: 
+            return f"{p1}-{p2}-{p3}" 
+        elif len(p3) == 4: 
+            return f"{p3}-{p2}-{p1}" 
     return d_str
 
-# --- ଡାଟା ଲୋଡ୍ ଓ ସେଭ୍ ଫଙ୍କସନ୍ (WITH CRASH PROTECTION) ---
+# --- ଡାଟା ଲୋଡ୍ ଓ ସେଭ୍ ଫଙ୍କସନ୍ (WITH SECURITY LOCKS) ---
 def load_master_data():
-    default_master = {"username": "master", "password": "master123", "email": "admin@school.com", "phone": "9999999999"}
-    with db_lock:
-        if os.path.exists(MASTER_FILE):
-            try:
-                with open(MASTER_FILE, "r", encoding="utf-8") as f:
-                    content = f.read()
-                    if content.strip():
-                        return json.loads(content)
-            except Exception:
-                pass
+    default_master = {"username": "master", "password": hash_password("master123"), "email": "admin@school.com", "phone": "9999999999"}
+    if os.path.exists(MASTER_FILE):
+        try:
+            with open(MASTER_FILE, "r", encoding="utf-8") as f:
+                content = f.read()
+                if content.strip():
+                    data = json.loads(content)
+                    if len(data.get("password", "")) < 60 and "master123" in data.get("password",""):
+                        data["password"] = hash_password(data["password"])
+                        save_master_data(data)
+                    return data
+        except Exception:
+            pass
     return default_master
 
 def save_master_data(data):
-    with db_lock:
-        try:
-            with open(MASTER_FILE, "w", encoding="utf-8") as f:
-                json.dump(data, f, indent=4)
-        except Exception as e:
-            st.error("System Storage Error!")
+    with file_lock:
+        with open(MASTER_FILE, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=4)
 
 def load_data():
-    schools = {"S001": {"name": "LAXMI NARAYAN GIRLS HIGH SCHOOL", "name_local": "", "address": "", "address_local": "", "hm_name": "", "hm_phone": "", "pass": "admin123", "state": "Odisha", "lang": "Odia", "status": "Active"}}
+    schools = {}
     students = {}
-    with db_lock:
-        if os.path.exists(SCHOOLS_FILE):
-            try:
-                with open(SCHOOLS_FILE, "r", encoding="utf-8") as f:
-                    content = f.read()
-                    if content.strip(): schools = json.loads(content)
-            except: pass
-        if os.path.exists(STUDENTS_FILE):
-            try:
-                with open(STUDENTS_FILE, "r", encoding="utf-8") as f:
-                    content = f.read()
-                    if content.strip(): students = json.loads(content)
-            except: pass
+    if os.path.exists(SCHOOLS_FILE):
+        try:
+            with open(SCHOOLS_FILE, "r", encoding="utf-8") as f:
+                content = f.read()
+                if content.strip(): schools = json.loads(content)
+        except: pass
+    if os.path.exists(STUDENTS_FILE):
+        try:
+            with open(STUDENTS_FILE, "r", encoding="utf-8") as f:
+                content = f.read()
+                if content.strip(): students = json.loads(content)
+        except: pass
     return schools, students
 
 def save_data(schools, students):
-    with db_lock:
-        try:
-            with open(SCHOOLS_FILE, "w", encoding="utf-8") as f:
-                json.dump(schools, f, indent=4)
-            with open(STUDENTS_FILE, "w", encoding="utf-8") as f:
-                json.dump(students, f, indent=4)
-        except Exception:
-            st.error("System Database Error! Data could not be saved.")
+    with file_lock:
+        with open(SCHOOLS_FILE, "w", encoding="utf-8") as f:
+            json.dump(schools, f, indent=4)
+        with open(STUDENTS_FILE, "w", encoding="utf-8") as f:
+            json.dump(students, f, indent=4)
 
 # --- ସୁନ୍ଦର ରାଙ୍କ୍ କାର୍ଡ HTML ଡିଜାଇନ୍ (BILINGUAL) ---
 def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no, s_lang):
@@ -353,18 +360,21 @@ def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no,
     )
     return html_content
 
-# --- PDF ଜେନେରେଟର (ENGLISH ONLY) ---
+# --- PDF ଜେନେରେଟର ---
 def create_pdf(filename, school_name, st_data, roll_no):
     disp_dob = format_display_date(st_data.get('dob', ''))
     raw_pub_date = st_data.get('pub_date', '')
     disp_pub_date = format_display_date(raw_pub_date) if raw_pub_date else datetime.date.today().strftime('%d-%m-%Y')
 
     c = canvas.Canvas(filename, pagesize=letter)
+    
     c.setFillColorRGB(0.99, 0.98, 0.97)
     c.rect(30, 30, 552, 732, fill=1, stroke=0)
+    
     c.setStrokeColorRGB(0.82, 0.60, 0.83)
     c.setLineWidth(15)
     c.rect(15, 15, 582, 762, fill=0, stroke=1)
+    
     c.setStrokeColorRGB(0.59, 0.25, 0.60) 
     c.setLineWidth(2)
     c.rect(30, 30, 552, 732, fill=0, stroke=1)
@@ -377,6 +387,7 @@ def create_pdf(filename, school_name, st_data, roll_no):
     
     c.setFont("Times-Bold", title_size)
     c.drawCentredString(300, 720, school_title)
+    
     c.setFont("Helvetica-Bold", 12)
     c.drawCentredString(300, 695, f"ANNUAL EXAMINATION - {st_data.get('batch', '2025-2026')}")
     c.setFont("Helvetica", 11)
@@ -439,6 +450,7 @@ def create_pdf(filename, school_name, st_data, roll_no):
     
     c.setStrokeColorRGB(0.59, 0.25, 0.60)
     c.line(50, 495, 550, 495)
+    
     c.setFillColorRGB(0.98, 0.95, 0.98) 
     c.rect(50, 465, 500, 30, fill=1, stroke=0)
     
@@ -459,10 +471,12 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.setFont("Helvetica-Bold", 11)
     
     table_bottom_y = y + 10
+    
     for sub, m_info in st_data.get('subjects', {}).items():
         c.drawString(60, y, str(sub).upper())
         c.drawCentredString(350, y, str(m_info['full']))
         c.drawRightString(540, y, str(m_info['obt']))
+        
         c.setStrokeColorRGB(0.59, 0.25, 0.60)
         c.line(50, y-10, 550, y-10)
         y -= 20
@@ -485,6 +499,7 @@ def create_pdf(filename, school_name, st_data, roll_no):
     
     c.setStrokeColorRGB(0.59, 0.25, 0.60)
     c.line(50, table_bottom_y-25, 550, table_bottom_y-25)
+    
     c.line(50, table_bottom_y, 50, table_bottom_y-25)
     c.line(280, table_bottom_y, 280, table_bottom_y-25)
     c.line(420, table_bottom_y, 420, table_bottom_y-25)
@@ -497,6 +512,7 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.drawCentredString(300, y, f"( {number_to_words(total_obt)} )")
     
     y -= 60
+    
     try:
         bc = code128.Code128(str(roll_no), barHeight=25, barWidth=1.2)
         bc.drawOn(c, 50, y+15)
@@ -552,10 +568,14 @@ master_db = load_master_data()
 portal_param = st.query_params.get("portal", "home")
 
 default_idx = 0
-if portal_param == "register": default_idx = 1
-elif portal_param == "master": default_idx = 2
-elif portal_param == "school": default_idx = 3
-elif portal_param == "student": default_idx = 4
+if portal_param == "register":
+    default_idx = 1
+elif portal_param == "master":
+    default_idx = 2
+elif portal_param == "school":
+    default_idx = 3
+elif portal_param == "student":
+    default_idx = 4
 
 st.markdown("<h3 style='text-align: center; color: #0284C7; margin-top:-20px;'>✨ WELCOME KULU SUTAR ✨</h3>", unsafe_allow_html=True)
 st.markdown("<h1 style='text-align: center; color: #1E3A8A; font-size: 30px;'>🏫 ADVANCED SCHOOL MANAGEMENT SYSTEM</h1>", unsafe_allow_html=True)
@@ -577,7 +597,7 @@ elif menu == "Results":
 classes_list = [str(i) for i in range(1, 11)]
 batches_list = [f"{y}-{y+1}" for y in range(2020, 2051)]
 
-# ----------------- HOME PAGE -----------------
+# ----------------- HOME PAGE (ERP STYLE UI) -----------------
 if menu == "Home Page":
     st.markdown("""
     <style>
@@ -598,8 +618,8 @@ if menu == "Home Page":
         "<div class='notice-header'>RECENT NOTICE</div>"
         "<div style='padding: 0; overflow: hidden; background-color: #1e293b; color: #e2e8f0;'>"
         "<marquee direction='up' scrollamount='2' onmouseover='this.stop();' onmouseout='this.start();' style='height: 180px; padding: 15px;'>"
-        "<div class='notice-item'>⏩ Welcome to Advanced School Management System! <span class='new-badge'>NEW!</span></div>"
-        "<div class='notice-item'>⏩ New School Registration is now live! <span class='new-badge'>UPDATE!</span></div>"
+        "<div class='notice-item'>⏩ Security Update: Password Hashing & Anti-Crash Locks added! <span class='new-badge'>NEW!</span></div>"
+        "<div class='notice-item'>⏩ Welcome to Advanced School Management System!</div>"
         "<div class='notice-item'>⏩ Master & School portal passwords are encrypted and secured.</div>"
         "<div class='notice-item'>⏩ Students can now Search Result by Batch, Roll No OR Name. No School ID needed!</div>"
         "<div class='notice-item' style='border-bottom: none; margin-top: 15px; text-align: center; line-height: 2.5;'>"
@@ -669,9 +689,16 @@ elif menu == "New School Registration":
         r_address_en = c_a1.text_area("School Address (English)")
         r_address_loc = c_a2.text_area("School Address (Local Language) [Optional]")
         
+        # 🟢 HM DETAILS IN REGISTRATION 🟢
+        st.markdown("---")
         c_h1, c_h2 = st.columns(2)
-        r_hm_name = c_h1.text_input("Head Master Name")
-        r_hm_phone = c_h2.text_input("Head Master Mobile No.")
+        r_hm_name_en = c_h1.text_input("Head Master Name (English)")
+        r_hm_name_loc = c_h2.text_input("Head Master Name (Local Language) [Optional]")
+        
+        c_h3, c_h4 = st.columns(2)
+        r_hm_phone = c_h3.text_input("Head Master Mobile No.")
+        r_hm_email = c_h4.text_input("Head Master Email ID")
+        st.markdown("---")
         
         c_p1, c_p2 = st.columns(2)
         r_pass = c_p1.text_input("New Password *", type="password")
@@ -679,6 +706,9 @@ elif menu == "New School Registration":
         
         submitted = st.form_submit_button("Submit Registration")
         if submitted:
+            r_id = sanitize(r_id)
+            r_name_en = sanitize(r_name_en)
+            r_name_loc = sanitize(r_name_loc)
             if not r_id or not r_name_en or not r_pass:
                 st.error("Please fill all the mandatory fields (*) including School ID, Name, and Password.")
             elif r_pass != r_cpass:
@@ -689,11 +719,13 @@ elif menu == "New School Registration":
                 schools_db[r_id] = {
                     "name": r_name_en, 
                     "name_local": r_name_loc,
-                    "address": r_address_en,
-                    "address_local": r_address_loc,
-                    "hm_name": r_hm_name,
-                    "hm_phone": r_hm_phone,
-                    "pass": hash_password(r_pass), # Saved as HASH for Security
+                    "address": sanitize(r_address_en),
+                    "address_local": sanitize(r_address_loc),
+                    "hm_name": sanitize(r_hm_name_en),
+                    "hm_name_local": sanitize(r_hm_name_loc),
+                    "hm_phone": sanitize(r_hm_phone),
+                    "hm_email": sanitize(r_hm_email),
+                    "pass": hash_password(r_pass),
                     "state": r_state, 
                     "lang": STATE_LANG_MAP[r_state],
                     "status": "Pending"
@@ -719,11 +751,7 @@ elif menu == "Master Login":
             m_pass = st.text_input("Master Password", type="password")
             
             if st.button("Login"):
-                input_hash = hash_password(m_pass)
-                db_pass = master_db.get("password", "")
-                
-                # Check for either plain text match (if old data) or hash match (new security)
-                if m_user == master_db["username"] and (m_pass == db_pass or input_hash == db_pass):
+                if m_user == master_db["username"] and hash_password(m_pass) == master_db["password"]:
                     st.session_state['master_logged'] = True
                     st.rerun()
                 else:
@@ -757,8 +785,8 @@ elif menu == "Master Login":
                 new_m_pass = st.text_input("New Master Password", type="password")
                 if st.button("Save New Credentials"):
                     if new_m_user and new_m_pass:
-                        master_db["username"] = new_m_user
-                        master_db["password"] = hash_password(new_m_pass) # Save as HASH
+                        master_db["username"] = sanitize(new_m_user)
+                        master_db["password"] = hash_password(new_m_pass)
                         save_master_data(master_db)
                         st.success("Master ID & Password successfully updated! Please go to 'Login'.")
                         del st.session_state['master_otp']
@@ -798,10 +826,11 @@ elif menu == "Master Login":
                     elif status == "Inactive": bg = "#fef2f2"
                     elif status == "Active": bg = "#f0fdf4"
 
+                    # 🟢 HM EMAIL ADDED TO VIEW 🟢
                     st.markdown(f"""
                     <div style="border:1px solid #cbd5e1; border-radius:5px; padding:10px; margin-bottom:10px; background-color:{bg};">
                         <b>School ID:</b> {s_id} | <b>Name:</b> {s_info['name']} | <b>State:</b> {s_info.get('state', 'N/A')}<br>
-                        <b>HM Name:</b> {s_info.get('hm_name', 'N/A')} | <b>Phone:</b> {s_info.get('hm_phone', 'N/A')}<br>
+                        <b>HM Name:</b> {s_info.get('hm_name', 'N/A')} | <b>Phone:</b> {s_info.get('hm_phone', 'N/A')} | <b>Email:</b> {s_info.get('hm_email', 'N/A')}<br>
                         <b>Status:</b> <strong>{status}</strong>
                     </div>
                     """, unsafe_allow_html=True)
@@ -901,7 +930,7 @@ elif menu == "Master Login":
                             with sc3:
                                 u_o = st.number_input("Obtained Mark", value=float(sub_info['obt']), key=f"m_o_{sub_name}")
                             if u_sub:
-                                new_m_subjects[u_sub] = {"full": u_f, "obt": u_o}
+                                new_m_subjects[sanitize(u_sub)] = {"full": u_f, "obt": u_o}
                                 m_tot_full += u_f
                                 m_tot_obt += u_o
                     else:
@@ -914,7 +943,7 @@ elif menu == "Master Login":
                     col_sv, col_dl = st.columns(2)
                     with col_sv:
                         if st.button("💾 Force Update Record"):
-                            m_up_dob_save = m_up_dob_input
+                            m_up_dob_save = sanitize(m_up_dob_input)
                             if m_up_dob_input.count('-') == 2:
                                 parts = m_up_dob_input.split('-')
                                 if len(parts[2]) == 4:
@@ -925,10 +954,10 @@ elif menu == "Master Login":
                             new_grd = "A1" if new_per >= 90 else "A2" if new_per >= 80 else "B1" if new_per >= 70 else "B2" if new_per >= 60 else "C1" if new_per >= 50 else "C2" if new_per >= 40 else "D" if new_per >= 33 else "F"
                             
                             school_students[m_edit_roll].update({
-                                "name": m_up_name, "name_local": m_up_name_loc,
-                                "gender": m_up_gender, "pen_no": m_up_pen, "apaar_no": m_up_apaar,
-                                "father_name": m_up_father, "father_name_local": m_up_father_loc,
-                                "mother_name": m_up_mother, "mother_name_local": m_up_mother_loc,
+                                "name": sanitize(m_up_name), "name_local": sanitize(m_up_name_loc),
+                                "gender": m_up_gender, "pen_no": sanitize(m_up_pen), "apaar_no": sanitize(m_up_apaar),
+                                "father_name": sanitize(m_up_father), "father_name_local": sanitize(m_up_father_loc),
+                                "mother_name": sanitize(m_up_mother), "mother_name_local": sanitize(m_up_mother_loc),
                                 "dob": m_up_dob_save, "class": m_up_cls, "batch": m_up_batch, "pub_date": str(m_up_pub_date),
                                 "subjects": new_m_subjects if new_m_subjects else m_subjects,
                                 "total_obt": m_tot_obt, "total_full": m_tot_full, 
@@ -961,34 +990,54 @@ elif menu == "Master Login":
                 state_idx = indian_states.index(curr_state) if curr_state in indian_states else 18
                 edit_s_state = st.selectbox("Edit School State", indian_states, index=state_idx)
                 
-                edit_s_pass = st.text_input("Edit School Password (Set New Hash)", type="password")
+                # 🟢 HM DETAILS IN EDIT 🟢
+                st.markdown("---")
+                c_he1, c_he2 = st.columns(2)
+                edit_hm_name = c_he1.text_input("Edit HM Name (English)", value=curr_s_data.get('hm_name', ''))
+                edit_hm_name_loc = c_he2.text_input("Edit HM Name (Local Language)", value=curr_s_data.get('hm_name_local', ''))
+                
+                c_pe1, c_pe2 = st.columns(2)
+                edit_hm_phone = c_pe1.text_input("Edit HM Mobile No.", value=curr_s_data.get('hm_phone', ''))
+                edit_hm_email = c_pe2.text_input("Edit HM Email ID", value=curr_s_data.get('hm_email', ''))
+                st.markdown("---")
+                
+                edit_s_pass = st.text_input("Edit School Password (Leave blank to keep current)", type="password")
                 
                 if st.button("Update School Profile"):
                     if edit_s_name:
-                        schools_db[selected_edit_school]["name"] = edit_s_name
-                        schools_db[selected_edit_school]["name_local"] = edit_s_name_loc
-                        schools_db[selected_edit_school]["state"] = edit_s_state
-                        schools_db[selected_edit_school]["lang"] = STATE_LANG_MAP[edit_s_state]
-                        
-                        if edit_s_pass:
-                            schools_db[selected_edit_school]["pass"] = hash_password(edit_s_pass) # Secured Update
+                        schools_db[selected_edit_school].update({
+                            "name": sanitize(edit_s_name),
+                            "name_local": sanitize(edit_s_name_loc),
+                            "state": edit_s_state,
+                            "lang": STATE_LANG_MAP[edit_s_state],
+                            "hm_name": sanitize(edit_hm_name),
+                            "hm_name_local": sanitize(edit_hm_name_loc),
+                            "hm_phone": sanitize(edit_hm_phone),
+                            "hm_email": sanitize(edit_hm_email)
+                        })
+                        if edit_s_pass: 
+                            schools_db[selected_edit_school]["pass"] = hash_password(edit_s_pass)
                             
                         save_data(schools_db, students_db)
-                        st.success(f"School Profile Updated! Portal language set to {STATE_LANG_MAP[edit_s_state]}.")
+                        st.success(f"School Profile Updated! The portal language is now set to {STATE_LANG_MAP[edit_s_state]}.")
                     else:
-                        st.warning("Please fill required details.")
+                        st.warning("Please fill all the details.")
             else:
                 st.warning("No schools registered yet.")
 
         with tab4:
-            st.markdown("### ⚙️ Update Master Profile")
+            st.markdown("### ⚙️ Update Master Profile & Contact")
             up_m_user = st.text_input("Master Username", value=master_db.get("username", ""))
             up_m_pass = st.text_input("New Master Password", type="password")
+            up_m_email = st.text_input("Recovery Email (For OTP)", value=master_db.get("email", ""))
+            up_m_phone = st.text_input("Recovery Phone Number (For OTP)", value=master_db.get("phone", ""))
             
             if st.button("Save Profile Changes"):
-                master_db["username"] = up_m_user
+                master_db["username"] = sanitize(up_m_user)
+                master_db["email"] = sanitize(up_m_email)
+                master_db["phone"] = sanitize(up_m_phone)
                 if up_m_pass:
-                    master_db["password"] = hash_password(up_m_pass) # Secured Update
+                    master_db["password"] = hash_password(up_m_pass)
                 save_master_data(master_db)
                 st.success("Master profile updated successfully!")
 
@@ -1036,25 +1085,16 @@ elif menu == "School Login":
                 st.error("❌ ଭୁଲ୍ CAPTCHA! ଦୟାକରି ସଠିକ୍ କ୍ୟାପ୍ଚା କୋଡ୍ ଦିଅନ୍ତୁ।")
                 st.session_state['school_captcha'] = str(random.randint(10000, 99999))
                 st.rerun()
-            elif s_id in schools_db:
-                db_pass = schools_db[s_id].get("pass", "")
-                input_hash = hash_password(s_pass)
-                
-                # Verify password (either old plain text or new hash)
-                if db_pass == s_pass or db_pass == input_hash:
-                    sch_status = schools_db[s_id].get("status", "Active")
-                    if sch_status == "Active":
-                        st.session_state['school_logged_id'] = s_id
-                        del st.session_state['school_captcha']
-                        st.rerun()
-                    elif sch_status == "Pending":
-                        st.error("⏳ ଆପଣଙ୍କ ସ୍କୁଲ୍ ଆକାଉଣ୍ଟ୍ ବର୍ତ୍ତମାନ ପେଣ୍ଡିଂ (Pending) ଅଛି। ମାଷ୍ଟର୍ ଙ୍କ ଅନୁମୋଦନ ପରେ ଆପଣ ଲଗ୍ଇନ୍ କରିପାରିବେ।")
-                    elif sch_status == "Inactive":
-                        st.error("🚫 ଆପଣଙ୍କ ସ୍କୁଲ୍ ଆକାଉଣ୍ଟ୍ କୁ ବର୍ତ୍ତମାନ ବନ୍ଦ (Inactive) କରାଯାଇଛି। ଦୟାକରି ମାଷ୍ଟର୍ ଙ୍କ ସହ ଯୋଗାଯୋଗ କରନ୍ତୁ।")
-                else:
-                    st.error("❌ ଭୁଲ୍ School ID କିମ୍ବା Password!")
-                    st.session_state['school_captcha'] = str(random.randint(10000, 99999))
+            elif s_id in schools_db and schools_db[s_id]["pass"] == hash_password(s_pass):
+                sch_status = schools_db[s_id].get("status", "Active")
+                if sch_status == "Active":
+                    st.session_state['school_logged_id'] = s_id
+                    del st.session_state['school_captcha']
                     st.rerun()
+                elif sch_status == "Pending":
+                    st.error("⏳ ଆପଣଙ୍କ ସ୍କୁଲ୍ ଆକାଉଣ୍ଟ୍ ବର୍ତ୍ତମାନ ପେଣ୍ଡିଂ (Pending) ଅଛି। ମାଷ୍ଟର୍ ଙ୍କ ଅନୁମୋଦନ ପରେ ଆପଣ ଲଗ୍ଇନ୍ କରିପାରିବେ।")
+                elif sch_status == "Inactive":
+                    st.error("🚫 ଆପଣଙ୍କ ସ୍କୁଲ୍ ଆକାଉଣ୍ଟ୍ କୁ ବର୍ତ୍ତମାନ ବନ୍ଦ (Inactive) କରାଯାଇଛି। ଦୟାକରି ମାଷ୍ଟର୍ ଙ୍କ ସହ ଯୋଗାଯୋଗ କରନ୍ତୁ।")
             else:
                 st.error("❌ ଭୁଲ୍ School ID କିମ୍ବା Password!")
                 st.session_state['school_captcha'] = str(random.randint(10000, 99999))
@@ -1164,7 +1204,7 @@ elif menu == "School Login":
                     o_mark = st.number_input("Obtained Mark", value=0.0, key=f"o_mark_{i}")
                 
                 if s_name:
-                    subjects_data[s_name] = {"full": f_mark, "obt": o_mark}
+                    subjects_data[sanitize(s_name)] = {"full": f_mark, "obt": o_mark}
                     total_full_mark += f_mark
                     total_obt_mark += o_mark
 
@@ -1178,13 +1218,14 @@ elif menu == "School Login":
             with c_save:
                 if st.button("💾 Save Student Data"):
                     if roll_no and st_name:
+                        roll_no = sanitize(roll_no)
                         if cur_school not in students_db:
                             students_db[cur_school] = {}
                         students_db[cur_school][roll_no] = {
-                            "name": st_name, "name_local": st_name_loc,
-                            "gender": gender, "pen_no": pen_no, "apaar_no": apaar_no,
-                            "father_name": father_name, "father_name_local": father_name_loc,
-                            "mother_name": mother_name, "mother_name_local": mother_name_loc,
+                            "name": sanitize(st_name), "name_local": sanitize(st_name_loc),
+                            "gender": gender, "pen_no": sanitize(pen_no), "apaar_no": sanitize(apaar_no),
+                            "father_name": sanitize(father_name), "father_name_local": sanitize(father_name_loc),
+                            "mother_name": sanitize(mother_name), "mother_name_local": sanitize(mother_name_loc),
                             "dob": str(dob), "class": cls, "batch": add_batch, 
                             "pub_date": str(opt_pub_date), 
                             "subjects": subjects_data,
@@ -1274,7 +1315,7 @@ elif menu == "School Login":
                         with sc3:
                             u_o = st.number_input("Obtained Mark", value=float(sub_info['obt']), key=f"s_o_{sub_name}")
                         if u_sub:
-                            new_up_subjects[u_sub] = {"full": u_f, "obt": u_o}
+                            new_up_subjects[sanitize(u_sub)] = {"full": u_f, "obt": u_o}
                             up_tot_full += u_f
                             up_tot_obt += u_o
                 else:
@@ -1285,7 +1326,7 @@ elif menu == "School Login":
                 st.info(f"📊 **Auto Summary:** Total Marks: {up_tot_obt}/{up_tot_full}")
                 
                 if st.button("💾 Save Updated Record"):
-                    up_dob_save = up_dob_input
+                    up_dob_save = sanitize(up_dob_input)
                     if up_dob_input.count('-') == 2:
                         parts = up_dob_input.split('-')
                         if len(parts[2]) == 4:
@@ -1296,10 +1337,10 @@ elif menu == "School Login":
                     new_grd = "A1" if new_per >= 90 else "A2" if new_per >= 80 else "B1" if new_per >= 70 else "B2" if new_per >= 60 else "C1" if new_per >= 50 else "C2" if new_per >= 40 else "D" if new_per >= 33 else "F"
                     
                     school_students[edit_roll].update({
-                        "name": up_name, "name_local": up_name_loc, 
-                        "gender": up_gender, "pen_no": up_pen, "apaar_no": up_apaar,
-                        "father_name": up_father, "father_name_local": up_father_loc,
-                        "mother_name": up_mother, "mother_name_local": up_mother_loc,
+                        "name": sanitize(up_name), "name_local": sanitize(up_name_loc), 
+                        "gender": up_gender, "pen_no": sanitize(up_pen), "apaar_no": sanitize(up_apaar),
+                        "father_name": sanitize(up_father), "father_name_local": sanitize(up_father_loc),
+                        "mother_name": sanitize(up_mother), "mother_name_local": sanitize(up_mother_loc),
                         "dob": up_dob_save, "class": up_cls, "batch": up_batch, 
                         "pub_date": str(up_pub_date),
                         "subjects": new_up_subjects if new_up_subjects else up_subjects,
@@ -1353,6 +1394,12 @@ elif menu == "Results":
         "🔗 **ଓଡ଼ିଆ:** ଏଠାରେ କୌଣସି School ID ଦରକାର ନାହିଁ। କେବଳ Roll Number କିମ୍ବା Name ଦେଇ ସର୍ଚ୍ଚ କରନ୍ତୁ।"
     )
     
+    col_c, col_b = st.columns(2)
+    with col_c:
+        st_class = st.selectbox("Select Class (1 to 10)", classes_list, key="st_login_class") 
+    with col_b:
+        st_batch = st.selectbox("Select Batch", batches_list, index=5, key="st_login_batch")
+        
     st_search_query = st.text_input("Roll Number OR Student Name (ରୋଲ୍ ନମ୍ବର କିମ୍ବା ନାମ ଦିଅନ୍ତୁ)", value=url_roll, key="st_login_search")
     st_dob_input = st.text_input("Date of Birth (DD-MM-YYYY)", value=url_dob, key="st_login_dob")
     
