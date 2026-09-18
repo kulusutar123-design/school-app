@@ -33,6 +33,64 @@ SCHOOLS_FILE = "schools.json"
 STUDENTS_FILE = "students.txt"
 MASTER_FILE = "master.json"
 
+# ==========================================
+# 🗺️ INDIAN STATES & LANGUAGE MAPPING
+# ==========================================
+STATE_LANG_MAP = {
+    "Andhra Pradesh": "Telugu", "Arunachal Pradesh": "English", "Assam": "Assamese",
+    "Bihar": "Hindi", "Chhattisgarh": "Hindi", "Goa": "Konkani",
+    "Gujarat": "Gujarati", "Haryana": "Hindi", "Himachal Pradesh": "Hindi",
+    "Jharkhand": "Hindi", "Karnataka": "Kannada", "Kerala": "Malayalam",
+    "Madhya Pradesh": "Hindi", "Maharashtra": "Marathi", "Manipur": "English",
+    "Meghalaya": "English", "Mizoram": "English", "Nagaland": "English",
+    "Odisha": "Odia", "Punjab": "Punjabi", "Rajasthan": "Hindi",
+    "Sikkim": "English", "Tamil Nadu": "Tamil", "Telangana": "Telugu",
+    "Tripura": "Bengali", "Uttar Pradesh": "Hindi", "Uttarakhand": "Hindi",
+    "West Bengal": "Bengali", "Delhi": "Hindi", "Jammu and Kashmir": "Urdu",
+    "Ladakh": "English", "Puducherry": "Tamil", "Chandigarh": "Punjabi",
+    "Andaman and Nicobar": "English", "Lakshadweep": "Malayalam", "Dadra & Nagar Haveli": "Gujarati"
+}
+
+# ==========================================
+# 🗣️ TRANSLATION DICTIONARY FOR SCHOOL PORTAL
+# ==========================================
+def t(eng_text, lang):
+    translations = {
+        "School Portal": {
+            "Odia": "ସ୍କୁଲ୍ ପୋର୍ଟାଲ୍", "Hindi": "स्कूल पोर्टल", "Bengali": "স্কুল পোর্টাল", 
+            "Telugu": "పాఠశాల పోర్టల్", "Tamil": "பள்ளி போர்டல்", "Marathi": "शाळा पोर्टल", "Gujarati": "શાળા પોર્ટલ"
+        },
+        "Logout": {
+            "Odia": "ଲଗ୍ ଆଉଟ୍", "Hindi": "लॉग आउट", "Bengali": "লগ আউট", 
+            "Telugu": "లాగ్ అవుట్", "Tamil": "வெளியேறு", "Marathi": "लॉग आउट", "Gujarati": "લૉગ આઉટ"
+        },
+        "My Students": {
+            "Odia": "ମୋର ଛାତ୍ରଛାତ୍ରୀ", "Hindi": "मेरे छात्र", "Bengali": "আমার ছাত্র",
+            "Telugu": "నా విద్యార్థులు", "Tamil": "என் மாணவர்கள்", "Marathi": "माझे विद्यार्थी", "Gujarati": "મારા વિદ્યાર્થીઓ"
+        },
+        "Add Student": {
+            "Odia": "ନୂଆ ଛାତ୍ର ଯୋଡନ୍ତୁ", "Hindi": "नया छात्र जोड़ें", "Bengali": "নতুন ছাত্র যোগ করুন",
+            "Telugu": "కొత్త విద్యార్థిని జోడించండి", "Tamil": "புதிய மாணவரைச் சேர்க்கவும்", "Marathi": "नवीन विद्यार्थी जोडा", "Gujarati": "નવો વિદ્યાર્થી ઉમેરો"
+        },
+        "Edit Student": {
+            "Odia": "ଏଡିଟ୍ କରନ୍ତୁ", "Hindi": "अपडेट करें", "Bengali": "আপডেট করুন",
+            "Telugu": "నవీకరించండి", "Tamil": "புதுப்பிக்கவும்", "Marathi": "अपडेट करा", "Gujarati": "અપડેટ કરો"
+        },
+        "Report Card": {
+            "Odia": "ରିପୋର୍ଟ କାର୍ଡ ପ୍ରିଣ୍ଟ୍", "Hindi": "रिपोर्ट कार्ड", "Bengali": "রিপোর্ট কার্ড",
+            "Telugu": "రిపోర్ట్ కార్డ్", "Tamil": "மதிப்பெண் அட்டை", "Marathi": "रिपोर्ट कार्ड", "Gujarati": "રિપોર્ટ કાર્ડ"
+        },
+        "Search": {
+            "Odia": "ନାମ କିମ୍ବା ରୋଲ୍ ନମ୍ବର ଦେଇ ଖୋଜନ୍ତୁ", "Hindi": "नाम या रोल नंबर से खोजें", "Bengali": "নাম বা রোল নম্বর দিয়ে খুঁজুন",
+            "Telugu": "పేరు లేదా రోల్ నంబర్ ద్వారా శోధించండి", "Tamil": "பெயர் அல்லது பதிவு எண் மூலம் தேடவும்", "Marathi": "नाव किंवा रोल नंबरने शोधा", "Gujarati": "નામ અથવા રોલ નંબર દ્વારા શોધો"
+        },
+        "Total Registered": {
+            "Odia": "ମୋଟ ପଞ୍ଜିକୃତ:", "Hindi": "कुल पंजीकृत:", "Bengali": "মোট নিবন্ধিত:",
+            "Telugu": "మొత్తం నమోదైనవి:", "Tamil": "மொத்தம் பதிவு செய்யப்பட்டவை:", "Marathi": "एकूण नोंदणीकृत:", "Gujarati": "કુલ નોંધાયેલ:"
+        }
+    }
+    return translations.get(eng_text, {}).get(lang, eng_text)
+
 # --- Number to Words Converter ---
 def number_to_words(num):
     if num == 0: return "ZERO"
@@ -65,7 +123,7 @@ def save_master_data(data):
         json.dump(data, f, indent=4)
 
 def load_data():
-    schools = {"S001": {"name": "LAXMI NARAYAN GIRLS HIGH SCHOOL, BANASAR KALYANI", "pass": "admin123"}}
+    schools = {"S001": {"name": "LAXMI NARAYAN GIRLS HIGH SCHOOL, BANASAR KALYANI", "pass": "admin123", "state": "Odisha", "lang": "Odia"}}
     students = {}
     
     if os.path.exists(SCHOOLS_FILE):
@@ -601,7 +659,7 @@ elif menu == "Master Login":
             else:
                 for s_id, s_info in list(schools_db.items()):
                     c_1, c_2, c_3 = st.columns([2, 4, 2])
-                    c_1.write(f"**School ID:** {s_id}")
+                    c_1.write(f"**School ID:** {s_id} | State: {s_info.get('state', 'N/A')}")
                     c_2.write(f"**Name:** {s_info['name']}")
                     if c_3.button(f"🗑️ Delete School", key=f"del_school_{s_id}"):
                         del schools_db[s_id]
@@ -625,12 +683,27 @@ elif menu == "Master Login":
             st.markdown("### Register New School")
             new_s_id = st.text_input("New School ID (e.g. S002)")
             new_s_name = st.text_input("School Name")
+            
+            # 🗺️ ALL INDIAN STATES SELECTION
+            indian_states = list(STATE_LANG_MAP.keys())
+            new_s_state = st.selectbox("Select State (ରାଜ୍ୟ ବାଛନ୍ତୁ)", indian_states, index=18) # 18 is Odisha
+            
             new_s_pass = st.text_input("School Password", type="password")
+            
+            if new_s_state:
+                new_s_lang = STATE_LANG_MAP[new_s_state]
+                st.info(f"🌐 System Language for this school will be: **{new_s_lang}**")
+
             if st.button("Create School Account"):
                 if new_s_id and new_s_name and new_s_pass:
-                    schools_db[new_s_id] = {"name": new_s_name, "pass": new_s_pass}
+                    schools_db[new_s_id] = {
+                        "name": new_s_name, 
+                        "pass": new_s_pass, 
+                        "state": new_s_state, 
+                        "lang": STATE_LANG_MAP[new_s_state]
+                    }
                     save_data(schools_db, students_db)
-                    st.success(f"ସ୍କୁଲ୍ '{new_s_name}' ସଫଳତାର ସହ ପଞ୍ଜୀକୃତ ହୋଇଗଲା!")
+                    st.success(f"ସ୍କୁଲ୍ '{new_s_name}' ସଫଳତାର ସହ ପଞ୍ଜୀକୃତ ହୋଇଗଲା! (State: {new_s_state})")
                 else:
                     st.warning("ସମସ୍ତ ଫିଲ୍ଡ ପୂରଣ କରନ୍ତୁ।")
                     
@@ -795,27 +868,33 @@ elif menu == "School Login":
                 
     else: 
         cur_school = st.session_state['school_logged_id']
+        s_lang = schools_db[cur_school].get("lang", "English")
+        s_state = schools_db[cur_school].get("state", "Unknown State")
         
         col1, col2 = st.columns([8, 2])
         with col1:
-            st.info(f"🏫 **Your School ID:** {cur_school} | **School Name:** {schools_db[cur_school]['name']}")
+            st.info(f"🏫 **{t('School Portal', s_lang)}** | ID: {cur_school} | {schools_db[cur_school]['name']} ({s_state})")
         with col2:
-            if st.button("🔴 Logout", key="s_logout"):
+            if st.button(f"🔴 {t('Logout', s_lang)}", key="s_logout"):
                 del st.session_state['school_logged_id']
                 st.rerun()
 
         st.markdown("---")
-        st.success("🔗 **Share Direct Results Link:** `?portal=student`")
-
-        tab_list, tab_add, tab_edit, tab_report = st.tabs(["📋 My Students & IDs", "Add/Save Student", "Edit/Update by Roll No", "Generate & Print Report"])
+        
+        # 🌐 LANGUAGE LOCALIZED TABS
+        tab_list, tab_add, tab_edit, tab_report = st.tabs([
+            f"📋 {t('My Students', s_lang)}", 
+            f"➕ {t('Add Student', s_lang)}", 
+            f"✏️ {t('Edit Student', s_lang)}", 
+            f"🖨️ {t('Report Card', s_lang)}"
+        ])
         
         with tab_list:
-            st.markdown("### 📋 Student List, Search & IDs")
-            st.error("🚫 **SECURITY LOCK:** ପିଲାଙ୍କ ଡାଟା ଡିଲିଟ୍ କରିବାର ଅନୁମତି ବର୍ତ୍ତମାନ କେବଳ Master ଙ୍କ ପାଖରେ ଅଛି। ଆପଣ କେବଳ ଦେଖିବେ ବା ଏଡିଟ୍ କରିପାରିବେ।")
+            st.markdown(f"### 📋 {t('My Students', s_lang)}")
             school_students = students_db.get(cur_school, {})
             if school_students:
-                st.write(f"Total Students Registered: **{len(school_students)}**")
-                search_query = st.text_input("🔍 Search by Name or Student ID (Roll No)")
+                st.write(f"{t('Total Registered', s_lang)} **{len(school_students)}**")
+                search_query = st.text_input(f"🔍 {t('Search', s_lang)}")
                 for r_no, s_info in school_students.items():
                     if search_query.lower() in r_no.lower() or search_query.lower() in s_info['name'].lower() or search_query == "":
                         cols = st.columns([2, 4, 3, 3])
@@ -828,7 +907,7 @@ elif menu == "School Login":
                 st.warning("No students registered in your school yet.")
                 
         with tab_add:
-            st.markdown("### 📝 Student Registration & Subject Marks Entry")
+            st.markdown(f"### 📝 {t('Add Student', s_lang)}")
             roll_no = st.text_input("Roll No (Student ID)", key="add_roll")
             st_name = st.text_input("Student Name", key="add_name")
             
@@ -903,15 +982,15 @@ elif menu == "School Login":
                             "percentage": round(percentage, 2), "result": result, "grade": grade
                         }
                         save_data(schools_db, students_db)
-                        st.success(f"Roll No {roll_no} ସେଭ୍ ହୋଇଗଲା!")
+                        st.success(f"Roll No {roll_no} Data Saved!")
                     else:
-                        st.error("Roll No ଏବଂ Student Name ଦିଅନ୍ତୁ।")
+                        st.error("Roll No and Student Name required.")
             with c_clear:
                 if st.button("🧹 Clear Form"):
                     st.rerun()
 
         with tab_edit:
-            st.markdown("### ✏️ Edit / Update Student Record")
+            st.markdown(f"### ✏️ {t('Edit Student', s_lang)}")
             school_students = students_db.get(cur_school, {})
             if school_students:
                 edit_roll = st.selectbox("Select Roll No", list(school_students.keys()), key="edit_roll_sel")
@@ -982,12 +1061,12 @@ elif menu == "School Login":
                         "percentage": round(new_per, 2), "result": new_res, "grade": new_grd
                     })
                     save_data(schools_db, students_db)
-                    st.success("ରେକର୍ଡ ଅପଡେଟ୍ ହୋଇଗଲା!")
+                    st.success("Record Updated!")
             else:
-                st.warning("କୌଣସି ଷ୍ଟୁଡେଣ୍ଟ୍ ନାହାଁନ୍ତି।")
+                st.warning("No students available.")
 
         with tab_report:
-            st.markdown("### 🖨️ Generate & Print Report Cards")
+            st.markdown(f"### 🖨️ {t('Report Card', s_lang)}")
             school_students = students_db.get(cur_school, {})
             if school_students:
                 rep_roll = st.selectbox("Select Student Roll No for Report", list(school_students.keys()), key="rep_sel")
@@ -1006,7 +1085,7 @@ elif menu == "School Login":
                     if st.button("🖨️ Print Result Card", key="print_sch"):
                         components.html("<script>window.parent.print();</script>", height=0)
             else:
-                st.warning("କୌଣସି ଷ୍ଟୁଡେଣ୍ଟ୍ ନାହାଁନ୍ତି।")
+                st.warning("No students available.")
 
 # ----------------- RESULTS PORTAL -----------------
 elif menu == "Results":
@@ -1052,7 +1131,7 @@ elif menu == "Results":
         for s_id, school_students in students_db.items():
             if st_search_query in school_students:
                 potential_student = school_students[st_search_query]
-                if potential_student["dob"] == db_dob_format:
+                if potential_student["dob"] == db_dob_format and potential_student.get("class") == st_class and potential_student.get("batch", "2025-2026") == st_batch:
                     found_student = potential_student
                     found_roll = st_search_query
                     found_school_id = s_id
@@ -1061,7 +1140,7 @@ elif menu == "Results":
             if not found_student:
                 for r_no, s_info in school_students.items():
                     if s_info.get("name", "").strip().lower() == search_query_lower:
-                        if s_info["dob"] == db_dob_format:
+                        if s_info["dob"] == db_dob_format and s_info.get("class") == st_class and s_info.get("batch", "2025-2026") == st_batch:
                             found_student = s_info
                             found_roll = r_no
                             found_school_id = s_id
