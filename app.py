@@ -54,7 +54,7 @@ STATE_LANG_MAP = {
 }
 
 # ==========================================
-# 🤖 AUTO TRANSLATION ENGINE (FOR SUBJECTS/FALLBACK)
+# 🤖 AUTO TRANSLATION ENGINE (FOR NAMES & FALLBACK)
 # ==========================================
 @st.cache_data(show_spinner=False)
 def auto_translate(text, lang_name):
@@ -202,7 +202,7 @@ def save_data(schools, students):
     with open(STUDENTS_FILE, "w", encoding="utf-8") as f:
         json.dump(students, f, indent=4)
 
-# --- ସୁନ୍ଦର ରାଙ୍କ୍ କାର୍ଡ HTML ଡିଜାଇନ୍ (BILINGUAL MANUAL + AUTO) ---
+# --- ସୁନ୍ଦର ରାଙ୍କ୍ କାର୍ଡ HTML ଡିଜାଇନ୍ (BILINGUAL) ---
 def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no, s_lang):
     disp_dob = format_display_date(st_data.get('dob', ''))
     raw_pub_date = st_data.get('pub_date', '')
@@ -223,7 +223,7 @@ def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no,
     grade = st_data.get('grade', 'N/A')
     result_stat = st_data.get('result', 'N/A')
     
-    # Check if manual local language provided, else auto-translate
+    # Text Translations
     t_school = school_name_loc if school_name_loc.strip() else auto_translate(school_name_en, s_lang)
     
     t_student = st_data.get('name_local', '').strip()
@@ -263,12 +263,14 @@ def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no,
     lbl_hm_sign = t('HM SIGNATURE', s_lang)
     lbl_ct_sign = t('CLASS TEACHER SIGNATURE', s_lang)
 
+    # ==========================================
+    # 🌟 SUBJECTS IN ENGLISH ONLY
+    # ==========================================
     rows_html = ""
     for sub, m_info in st_data.get('subjects', {}).items():
-        t_sub = auto_translate(sub, s_lang)
         rows_html += (
             f"<tr style='border-bottom: 1px solid {border_color};'>"
-            f"<td style='padding: 8px; border-right: 1px solid {border_color}; text-align: left; font-weight: bold;'>{sub.upper()} <br><span style='font-size:12px; font-weight:normal;'>{t_sub}</span></td>"
+            f"<td style='padding: 8px; border-right: 1px solid {border_color}; text-align: left; font-weight: bold;'>{sub.upper()}</td>"
             f"<td style='padding: 8px; border-right: 1px solid {border_color};'>{m_info['full']}</td>"
             f"<td style='padding: 8px; font-weight: bold;'>{m_info['obt']}</td>"
             "</tr>"
@@ -352,7 +354,7 @@ def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no,
     )
     return html_content
 
-# --- PDF ଜେନେରେଟର (ENGLISH ONLY FOR PDF FONT SUPPORT) ---
+# --- PDF ଜେନେରେଟର ---
 def create_pdf(filename, school_name, st_data, roll_no):
     disp_dob = format_display_date(st_data.get('dob', ''))
     raw_pub_date = st_data.get('pub_date', '')
