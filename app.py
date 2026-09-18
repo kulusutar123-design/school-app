@@ -90,18 +90,16 @@ def auto_translate(text, lang_name):
 def t(eng_text, lang):
     translations = {
         "School Portal": {"Odia": "ସ୍କୁଲ୍ ପୋର୍ଟାଲ୍", "Hindi": "स्कूल पोर्टल", "Bengali": "স্কুল পোর্টাল", "Telugu": "పాఠశాల పోర్టల్", "Marathi": "शाळा पोर्टल"},
-        "Logout": {"Odia": "ଲଗ୍ ଆଉଟ୍", "Hindi": "लॉग आउट", "Bengali": "লগ আউট", "Marathi": "लॉग आउट"},
+        "Logout": {"Odia": "ଲଗ୍ ଆଉଟ୍", "Hindi": "लॉग आउट", "Bengali": "লॉग আউট", "Marathi": "लॉग आउट"},
         "My Students": {"Odia": "ମୋର ଛାତ୍ରଛାତ୍ରୀ", "Hindi": "मेरे छात्र", "Bengali": "আমার ছাত্র", "Marathi": "माझे विद्यार्थी"},
         "Add Student": {"Odia": "ନୂଆ ଛାତ୍ର ଯୋଡନ୍ତୁ", "Hindi": "नया छात्र जोड़ें", "Bengali": "নতুন ছাত্র যোগ করুন", "Marathi": "नवीन विद्यार्थी जोडा"},
         "Edit Student": {"Odia": "ଛାତ୍ର ତଥ୍ୟ ବଦଳାନ୍ତୁ", "Hindi": "छात्र विवरण बदलें", "Bengali": "তথ্য আপডেট করুন", "Marathi": "अपडेट करा"},
         "Report Card": {"Odia": "ରିପୋର୍ଟ କାର୍ଡ ପ୍ରିଣ୍ଟ୍", "Hindi": "रिपोर्ट कार्ड", "Bengali": "রিপোর্ট কার্ড", "Marathi": "रिपोर्ट कार्ड"},
         "Search": {"Odia": "ନାମ କିମ୍ବା ରୋଲ୍ ନମ୍ବର ଦେଇ ଖୋଜନ୍ତୁ", "Hindi": "नाम या रोल नंबर से खोजें", "Bengali": "নাম বা রোল নম্বর দিয়ে খুঁজুন"},
-        
         "ANNUAL EXAMINATION": {"Odia": "ବାର୍ଷିକ ପରୀକ୍ଷା", "Hindi": "वार्षिक परीक्षा", "Bengali": "বার্ষিক পরীক্ষা", "Marathi": "वार्षिक परीक्षा"},
         "CERTIFICATE-CUM-MARK SHEET": {"Odia": "ପ୍ରମାଣପତ୍ର ଏବଂ ମାର୍କସିଟ୍", "Hindi": "प्रमाणपत्र सह अंकतालिका", "Bengali": "শংসাপত্র এবং মার্কশিট", "Marathi": "प्रमाणपत्र आणि गुणपत्रिका"},
         "SUBJECTS AND MARKS SECURED": {"Odia": "ବିଷୟ ଏବଂ ପ୍ରାପ୍ତ ନମ୍ବର", "Hindi": "विषय और प्राप्त अंक", "Bengali": "বিষয় এবং প্রাপ্ত নম্বর", "Marathi": "विषय आणि मिळवलेले गुण"},
         "Certify that": {"Odia": "ପ୍ରମାଣ କରାଯାଏ ଯେ", "Hindi": "प्रमाणित किया जाता है कि", "Bengali": "প্রত্যয়ন করা যাচ্ছে যে", "Marathi": "प्रमाणित केले जाते की"},
-        
         "ROLL NO": {"Odia": "ରୋଲ୍ ନମ୍ବର", "Hindi": "रोल नंबर", "Bengali": "রোল নম্বর", "Marathi": "रोल नंबर"},
         "CLASS": {"Odia": "ଶ୍ରେଣୀ", "Hindi": "कक्षा", "Bengali": "শ্রেণী", "Marathi": "वर्ग"},
         "PEN NO": {"Odia": "ପେନ୍ ନମ୍ବର", "Hindi": "पेन नं.", "Bengali": "পেন নং", "Marathi": "पेन क्र."},
@@ -146,15 +144,14 @@ def format_display_date(d_str):
             return f"{parts[2]}-{parts[1]}-{parts[0]}"
     return d_str
 
-# 🟢 NORMALIZED DOB FOR PERFECT SEARCH MATCHING
 def normalize_dob(d_str):
     d_str = d_str.strip().replace('/', '-')
     if d_str.count('-') == 2:
         p1, p2, p3 = d_str.split('-')
         if len(p1) == 4: 
-            return f"{p1}-{p2}-{p3}" # Return YYYY-MM-DD
+            return f"{p1}-{p2}-{p3}" 
         elif len(p3) == 4: 
-            return f"{p3}-{p2}-{p1}" # Convert DD-MM-YYYY to YYYY-MM-DD
+            return f"{p3}-{p2}-{p1}" 
     return d_str
 
 # --- ଡାଟା ଲୋଡ୍ ଓ ସେଭ୍ ଫଙ୍କସନ୍ ---
@@ -175,7 +172,7 @@ def save_master_data(data):
         json.dump(data, f, indent=4)
 
 def load_data():
-    schools = {"S001": {"name": "LAXMI NARAYAN GIRLS HIGH SCHOOL", "name_local": "", "pass": "admin123", "state": "Odisha", "lang": "Odia"}}
+    schools = {"S001": {"name": "LAXMI NARAYAN GIRLS HIGH SCHOOL", "name_local": "", "address": "", "address_local": "", "hm_name": "", "hm_phone": "", "pass": "admin123", "state": "Odisha", "lang": "Odia", "status": "Active"}}
     students = {}
     if os.path.exists(SCHOOLS_FILE):
         try:
@@ -549,21 +546,25 @@ master_db = load_master_data()
 portal_param = st.query_params.get("portal", "home")
 
 default_idx = 0
-if portal_param == "master":
+if portal_param == "register":
     default_idx = 1
-elif portal_param == "school":
+elif portal_param == "master":
     default_idx = 2
-elif portal_param == "student":
+elif portal_param == "school":
     default_idx = 3
+elif portal_param == "student":
+    default_idx = 4
 
 st.markdown("<h3 style='text-align: center; color: #0284C7; margin-top:-20px;'>✨ WELCOME KULU SUTAR ✨</h3>", unsafe_allow_html=True)
 st.markdown("<h1 style='text-align: center; color: #1E3A8A; font-size: 30px;'>🏫 ADVANCED SCHOOL MANAGEMENT SYSTEM</h1>", unsafe_allow_html=True)
 st.markdown("<hr style='margin-bottom: 10px;'>", unsafe_allow_html=True)
 
-menu = st.sidebar.selectbox("🎯 Navigation Menu", ["Home Page", "Master Login", "School Login", "Results"], index=default_idx)
+menu = st.sidebar.selectbox("🎯 Navigation Menu", ["Home Page", "New School Registration", "Master Login", "School Login", "Results"], index=default_idx)
 
 if menu == "Home Page":
     st.query_params["portal"] = "home"
+elif menu == "New School Registration":
+    st.query_params["portal"] = "register"
 elif menu == "Master Login":
     st.query_params["portal"] = "master"
 elif menu == "School Login":
@@ -596,10 +597,9 @@ if menu == "Home Page":
         "<div style='padding: 0; overflow: hidden; background-color: #1e293b; color: #e2e8f0;'>"
         "<marquee direction='up' scrollamount='2' onmouseover='this.stop();' onmouseout='this.start();' style='height: 180px; padding: 15px;'>"
         "<div class='notice-item'>⏩ Welcome to Advanced School Management System! <span class='new-badge'>NEW!</span></div>"
+        "<div class='notice-item'>⏩ New School Registration is now live! <span class='new-badge'>UPDATE!</span></div>"
         "<div class='notice-item'>⏩ Master & School portal passwords are encrypted and secured.</div>"
-        "<div class='notice-item'>⏩ Online Student Rank Card generation is now active for all classes.</div>"
-        "<div class='notice-item'>⏩ Students can now Search Result by Batch, Roll No OR Name. No School ID needed! <span class='new-badge'>UPDATE!</span></div>"
-        "<div class='notice-item'>⏩ APAAR and PEN details have been integrated into the system.</div>"
+        "<div class='notice-item'>⏩ Students can now Search Result by Batch, Roll No OR Name. No School ID needed!</div>"
         "<div class='notice-item' style='border-bottom: none; margin-top: 15px; text-align: center; line-height: 2.5;'>"
         "<span style='color: #fbbf24; font-weight: bold; font-size: 18px;'>📞 Helpdesk 24x7:</span><br>"
         "<span style='background-color: #25D366; color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold; display: inline-block; margin-bottom: 5px;'>💬 WhatsApp: 8910223342</span><br>"
@@ -611,20 +611,93 @@ if menu == "Home Page":
     )
     st.markdown(notice_html, unsafe_allow_html=True)
 
-    st.markdown("""
-    <a href="?portal=master" target="_self" class="login-card" style="text-decoration: none;">
-        <div class="login-title">🏛️ Master Login</div>
-        <div class="login-sub">Click here to login as Admin / University</div>
-    </a>
-    <a href="?portal=school" target="_self" class="login-card" style="text-decoration: none;">
-        <div class="login-title">🏫 School Login</div>
-        <div class="login-sub">Click here to login as School / College</div>
-    </a>
-    <a href="?portal=student" target="_self" class="login-card" style="text-decoration: none;">
-        <div class="login-title">🎓 Results</div>
-        <div class="login-sub">Click here to check Student Rank Card</div>
-    </a>
-    """, unsafe_allow_html=True)
+    c1, c2 = st.columns(2)
+    with c1:
+        st.markdown("""
+        <a href="?portal=register" target="_self" class="login-card" style="text-decoration: none;">
+            <div class="login-title">📝 New School Registration</div>
+            <div class="login-sub">Register a new school in the system</div>
+        </a>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("""
+        <a href="?portal=master" target="_self" class="login-card" style="text-decoration: none;">
+            <div class="login-title">🏛️ Master Login</div>
+            <div class="login-sub">Login as Admin / University</div>
+        </a>
+        """, unsafe_allow_html=True)
+    with c2:
+        st.markdown("""
+        <a href="?portal=school" target="_self" class="login-card" style="text-decoration: none;">
+            <div class="login-title">🏫 School Login</div>
+            <div class="login-sub">Login as School / College</div>
+        </a>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("""
+        <a href="?portal=student" target="_self" class="login-card" style="text-decoration: none;">
+            <div class="login-title">🎓 Results</div>
+            <div class="login-sub">Check Student Rank Card</div>
+        </a>
+        """, unsafe_allow_html=True)
+
+# ----------------- NEW SCHOOL REGISTRATION -----------------
+elif menu == "New School Registration":
+    c_home, c_title = st.columns([1, 8])
+    with c_home:
+        if st.button("🏠 Home", key="reg_home_btn"):
+            st.query_params["portal"] = "home"
+            st.rerun()
+    with c_title:
+        st.subheader("📝 New School Registration Portal")
+
+    st.info("Submit your school details. Wait for the Master Admin to approve and ACTIVATE your account before logging in.")
+    
+    with st.form("school_reg_form"):
+        r_id = st.text_input("School ID (Create a Unique ID)")
+        
+        c_n1, c_n2 = st.columns(2)
+        r_name_en = c_n1.text_input("School Name (English) *")
+        r_name_loc = c_n2.text_input("School Name (Local Language) [Optional]")
+        
+        indian_states = list(STATE_LANG_MAP.keys())
+        r_state = st.selectbox("Select State", indian_states, index=18)
+        
+        c_a1, c_a2 = st.columns(2)
+        r_address_en = c_a1.text_area("School Address (English)")
+        r_address_loc = c_a2.text_area("School Address (Local Language) [Optional]")
+        
+        c_h1, c_h2 = st.columns(2)
+        r_hm_name = c_h1.text_input("Head Master Name")
+        r_hm_phone = c_h2.text_input("Head Master Mobile No.")
+        
+        c_p1, c_p2 = st.columns(2)
+        r_pass = c_p1.text_input("New Password *", type="password")
+        r_cpass = c_p2.text_input("Confirm Password *", type="password")
+        
+        submitted = st.form_submit_button("Submit Registration")
+        if submitted:
+            if not r_id or not r_name_en or not r_pass:
+                st.error("Please fill all the mandatory fields (*) including School ID, Name, and Password.")
+            elif r_pass != r_cpass:
+                st.error("Passwords do not match!")
+            elif r_id in schools_db:
+                st.error("This School ID already exists. Please choose a different ID.")
+            else:
+                schools_db[r_id] = {
+                    "name": r_name_en, 
+                    "name_local": r_name_loc,
+                    "address": r_address_en,
+                    "address_local": r_address_loc,
+                    "hm_name": r_hm_name,
+                    "hm_phone": r_hm_phone,
+                    "pass": r_pass, 
+                    "state": r_state, 
+                    "lang": STATE_LANG_MAP[r_state],
+                    "status": "Pending"
+                }
+                save_data(schools_db, students_db)
+                st.success("✅ Registration Successful! Your account is PENDING approval from the Master Admin. You will be able to login once it is activated.")
 
 # ----------------- MASTER LOGIN -----------------
 elif menu == "Master Login":
@@ -697,71 +770,60 @@ elif menu == "Master Login":
                 st.rerun()
 
         st.markdown("---")
-        tab1, tab2, tab3, tab4, tab5 = st.tabs(["📊 All IDs & Schools", "🏫 Register School", "🎓 Edit Students Data", "✏️ Edit Registered Schools", "⚙️ Settings (Change ID/Pass)"])
+        tab1, tab2, tab3, tab4 = st.tabs([
+            "👁️ Manage & Approve Schools", 
+            "🎓 Edit Students Data", 
+            "✏️ Edit Registered Schools", 
+            "⚙️ Settings (ID/Pass)"
+        ])
         
         with tab1:
-            st.markdown("### 👁️ System Overview & Manage Schools")
-            st.info("🔒 ଏହି ମାଷ୍ଟର୍ ପ୍ୟାନେଲ୍ କେବଳ ଆପଣ ହିଁ ଦେଖିପାରିବେ।")
-            st.success("🔗 **Share Direct School Login Link:** `?portal=school`")
+            st.markdown("### 🔔 Pending Approvals & Manage Schools")
+            st.info("Here you can Activate, Deactivate, or Delete registered schools.")
 
-            st.markdown("#### 🏫 Registered Schools (View & Delete):")
             if not schools_db:
                 st.write("କୌଣସି ସ୍କୁଲ୍ ରେଜିଷ୍ଟର୍ ହୋଇନାହିଁ।")
             else:
                 for s_id, s_info in list(schools_db.items()):
-                    c_1, c_2, c_3 = st.columns([2, 4, 2])
-                    c_1.write(f"**School ID:** {s_id} | State: {s_info.get('state', 'N/A')}")
-                    c_2.write(f"**Name:** {s_info['name']}")
-                    if c_3.button(f"🗑️ Delete School", key=f"del_school_{s_id}"):
+                    status = s_info.get("status", "Active") # Default active for older entries
+                    
+                    bg = "#ffffff"
+                    if status == "Pending": bg = "#fffbeb"
+                    elif status == "Inactive": bg = "#fef2f2"
+                    elif status == "Active": bg = "#f0fdf4"
+
+                    st.markdown(f"""
+                    <div style="border:1px solid #cbd5e1; border-radius:5px; padding:10px; margin-bottom:10px; background-color:{bg};">
+                        <b>School ID:</b> {s_id} | <b>Name:</b> {s_info['name']} | <b>State:</b> {s_info.get('state', 'N/A')}<br>
+                        <b>HM Name:</b> {s_info.get('hm_name', 'N/A')} | <b>Phone:</b> {s_info.get('hm_phone', 'N/A')}<br>
+                        <b>Status:</b> <strong>{status}</strong>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    
+                    c_btn1, c_btn2, c_btn3 = st.columns(3)
+                    
+                    if status == "Pending" or status == "Inactive":
+                        if c_btn1.button("✅ Make Active", key=f"act_{s_id}"):
+                            schools_db[s_id]["status"] = "Active"
+                            save_data(schools_db, students_db)
+                            st.success(f"School {s_id} is now Active!")
+                            st.rerun()
+                    if status == "Active" or status == "Pending":
+                        if c_btn2.button("🚫 Make Inactive", key=f"deact_{s_id}"):
+                            schools_db[s_id]["status"] = "Inactive"
+                            save_data(schools_db, students_db)
+                            st.warning(f"School {s_id} is now Inactive!")
+                            st.rerun()
+                            
+                    if c_btn3.button("🗑️ Delete School", key=f"del_{s_id}"):
                         del schools_db[s_id]
                         if s_id in students_db:
                             del students_db[s_id]
                         save_data(schools_db, students_db)
-                        st.success(f"School '{s_id}' ସମ୍ପୂର୍ଣ୍ଣ ରୂପେ ଡିଲିଟ୍ ହୋଇଗଲା!")
+                        st.error(f"School '{s_id}' deleted!")
                         st.rerun()
-                
-            st.markdown("#### 🎓 Registered Student IDs:")
-            total_students = 0
-            for s_id, studs in students_db.items():
-                for r_no, st_info in studs.items():
-                    b_info = st_info.get("batch", "N/A")
-                    st.write(f"- **Student ID:** {r_no} | **School ID:** {s_id} | Name: {st_info['name']} | Batch: {b_info}")
-                    total_students += 1
-            if total_students == 0:
-                st.write("No students registered yet.")
 
         with tab2:
-            st.markdown("### Register New School")
-            new_s_id = st.text_input("New School ID (e.g. S002)")
-            
-            c_s1, c_s2 = st.columns(2)
-            new_s_name = c_s1.text_input("School Name (English)")
-            new_s_name_loc = c_s2.text_input("School Name (Local Language) [Optional]")
-            
-            indian_states = list(STATE_LANG_MAP.keys())
-            new_s_state = st.selectbox("Select State (ରାଜ୍ୟ ବାଛନ୍ତୁ)", indian_states, index=18) 
-            
-            new_s_pass = st.text_input("School Password", type="password")
-            
-            if new_s_state:
-                new_s_lang = STATE_LANG_MAP[new_s_state]
-                st.info(f"🌐 System Language for this school will be: **{new_s_lang}**")
-
-            if st.button("Create School Account"):
-                if new_s_id and new_s_name and new_s_pass:
-                    schools_db[new_s_id] = {
-                        "name": new_s_name, 
-                        "name_local": new_s_name_loc,
-                        "pass": new_s_pass, 
-                        "state": new_s_state, 
-                        "lang": STATE_LANG_MAP[new_s_state]
-                    }
-                    save_data(schools_db, students_db)
-                    st.success(f"ସ୍କୁଲ୍ '{new_s_name}' ସଫଳତାର ସହ ପଞ୍ଜୀକୃତ ହୋଇଗଲା! (State: {new_s_state})")
-                else:
-                    st.warning("ସମସ୍ତ ଫିଲ୍ଡ ପୂରଣ କରନ୍ତୁ।")
-                    
-        with tab3:
             st.markdown("### 📋 Manage All Students (Master Access)")
             master_school_sel = st.selectbox("Select School", ["--Select--"] + list(schools_db.keys()))
             if master_school_sel != "--Select--":
@@ -878,7 +940,7 @@ elif menu == "Master Login":
                 else:
                     st.warning("No students in this school.")
 
-        with tab4:
+        with tab3:
             st.markdown("### ✏️ Edit Registered Schools")
             if schools_db:
                 selected_edit_school = st.selectbox("Select School ID to Edit", list(schools_db.keys()))
@@ -911,7 +973,7 @@ elif menu == "Master Login":
             else:
                 st.warning("No schools registered yet.")
 
-        with tab5:
+        with tab4:
             st.markdown("### ⚙️ Update Master Profile & Contact")
             up_m_user = st.text_input("Master Username", value=master_db.get("username", ""))
             up_m_pass = st.text_input("Master Password", value=master_db.get("password", ""), type="password")
@@ -968,9 +1030,15 @@ elif menu == "School Login":
                 st.session_state['school_captcha'] = str(random.randint(10000, 99999))
                 st.rerun()
             elif s_id in schools_db and schools_db[s_id]["pass"] == s_pass:
-                st.session_state['school_logged_id'] = s_id
-                del st.session_state['school_captcha']
-                st.rerun()
+                sch_status = schools_db[s_id].get("status", "Active")
+                if sch_status == "Active":
+                    st.session_state['school_logged_id'] = s_id
+                    del st.session_state['school_captcha']
+                    st.rerun()
+                elif sch_status == "Pending":
+                    st.error("⏳ ଆପଣଙ୍କ ସ୍କୁଲ୍ ଆକାଉଣ୍ଟ୍ ବର୍ତ୍ତମାନ ପେଣ୍ଡିଂ (Pending) ଅଛି। ମାଷ୍ଟର୍ ଙ୍କ ଅନୁମୋଦନ ପରେ ଆପଣ ଲଗ୍ଇନ୍ କରିପାରିବେ।")
+                elif sch_status == "Inactive":
+                    st.error("🚫 ଆପଣଙ୍କ ସ୍କୁଲ୍ ଆକାଉଣ୍ଟ୍ କୁ ବର୍ତ୍ତମାନ ବନ୍ଦ (Inactive) କରାଯାଇଛି। ଦୟାକରି ମାଷ୍ଟର୍ ଙ୍କ ସହ ଯୋଗାଯୋଗ କରନ୍ତୁ।")
             else:
                 st.error("❌ ଭୁଲ୍ School ID କିମ୍ବା Password!")
                 st.session_state['school_captcha'] = str(random.randint(10000, 99999))
@@ -1040,7 +1108,7 @@ elif menu == "School Login":
             
             min_date = datetime.date(2000, 1, 1)
             max_date = datetime.date(2065, 12, 31)
-            dob = st.date_input(f"DOB / {t('DOB', s_lang)}", min_value=min_date, max_value=max_date, key="add_dob")
+            dob = st.date_input(f"DOB (YYYY-MM-DD) / {t('DOB', s_lang)}", min_value=min_date, max_value=max_date, key="add_dob")
             
             c_c1, c_c2 = st.columns(2)
             with c_c1:
@@ -1281,7 +1349,6 @@ elif menu == "Results":
         normalized_input_dob = normalize_dob(st_dob_input)
         
         for s_id, school_students in students_db.items():
-            # Search by Roll Number first
             if st_search_query in school_students:
                 potential_student = school_students[st_search_query]
                 if normalize_dob(potential_student.get("dob", "")) == normalized_input_dob:
@@ -1290,7 +1357,6 @@ elif menu == "Results":
                     found_school_id = s_id
                     break
             
-            # If not found by Roll No, search by Name
             if not found_student:
                 for r_no, s_info in school_students.items():
                     if s_info.get("name", "").strip().lower() == search_query_lower:
