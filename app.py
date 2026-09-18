@@ -34,7 +34,7 @@ STUDENTS_FILE = "students.txt"
 MASTER_FILE = "master.json"
 
 # ==========================================
-# 🗺️ INDIAN STATES & LANGUAGE MAPPING
+# 🗺️ ALL INDIAN STATES & LOCAL LANGUAGE MAPPING
 # ==========================================
 STATE_LANG_MAP = {
     "Andhra Pradesh": "Telugu", "Arunachal Pradesh": "English", "Assam": "Assamese",
@@ -52,41 +52,49 @@ STATE_LANG_MAP = {
 }
 
 # ==========================================
-# 🗣️ TRANSLATION DICTIONARY FOR SCHOOL PORTAL
+# 🗣️ TRANSLATION DICTIONARY FOR AUTO LANGUAGE CHANGE
 # ==========================================
 def t(eng_text, lang):
     translations = {
         "School Portal": {
             "Odia": "ସ୍କୁଲ୍ ପୋର୍ଟାଲ୍", "Hindi": "स्कूल पोर्टल", "Bengali": "স্কুল পোর্টাল", 
-            "Telugu": "పాఠశాల పోర్టల్", "Tamil": "பள்ளி போர்டல்", "Marathi": "शाळा पोर्टल", "Gujarati": "શાળા પોર્ટલ"
+            "Telugu": "పాఠశాల పోర్టల్", "Tamil": "பள்ளி போர்டல்", "Marathi": "शाळा पोर्टल", "Gujarati": "શાળા પોર્ટલ",
+            "Assamese": "বিদ্যালয় পৰ্টেল", "Kannada": "ಶಾಲಾ ಪೋರ್ಟಲ್", "Malayalam": "സ്കൂൾ പോർട്ടൽ", "Punjabi": "ਸਕੂਲ ਪੋਰਟਲ", "Urdu": "اسکول پورٹل"
         },
         "Logout": {
             "Odia": "ଲଗ୍ ଆଉଟ୍", "Hindi": "लॉग आउट", "Bengali": "লগ আউট", 
-            "Telugu": "లాగ్ అవుట్", "Tamil": "வெளியேறு", "Marathi": "लॉग आउट", "Gujarati": "લૉગ આઉટ"
+            "Telugu": "లాగ్ అవుట్", "Tamil": "வெளியேறு", "Marathi": "लॉग आउट", "Gujarati": "લૉગ આઉટ",
+            "Assamese": "লগ আউট", "Kannada": "ಲಾಗ್ ಔಟ್", "Malayalam": "ലോഗ് ഔട്ട്", "Punjabi": "ਲਾਗ ਆਉਟ", "Urdu": "لاگ آؤٹ"
         },
         "My Students": {
             "Odia": "ମୋର ଛାତ୍ରଛାତ୍ରୀ", "Hindi": "मेरे छात्र", "Bengali": "আমার ছাত্র",
-            "Telugu": "నా విద్యార్థులు", "Tamil": "என் மாணவர்கள்", "Marathi": "माझे विद्यार्थी", "Gujarati": "મારા વિદ્યાર્થીઓ"
+            "Telugu": "నా విద్యార్థులు", "Tamil": "என் மாணவர்கள்", "Marathi": "माझे विद्यार्थी", "Gujarati": "મારા વિદ્યાર્થીઓ",
+            "Assamese": "মোৰ ছাত্ৰ-ছাত্ৰী", "Kannada": "ನನ್ನ ವಿದ್ಯಾರ್ಥಿಗಳು", "Malayalam": "എന്റെ വിദ്യാർത്ഥികൾ", "Punjabi": "ਮੇਰੇ ਵਿਦਿਆਰਥੀ", "Urdu": "میرے طلباء"
         },
         "Add Student": {
             "Odia": "ନୂଆ ଛାତ୍ର ଯୋଡନ୍ତୁ", "Hindi": "नया छात्र जोड़ें", "Bengali": "নতুন ছাত্র যোগ করুন",
-            "Telugu": "కొత్త విద్యార్థిని జోడించండి", "Tamil": "புதிய மாணவரைச் சேர்க்கவும்", "Marathi": "नवीन विद्यार्थी जोडा", "Gujarati": "નવો વિદ્યાર્થી ઉમેરો"
+            "Telugu": "కొత్త విద్యార్థిని జోడించండి", "Tamil": "புதிய மாணவரைச் சேர்க்கவும்", "Marathi": "नवीन विद्यार्थी जोडा", "Gujarati": "નવો વિદ્યાર્થી ઉમેરો",
+            "Assamese": "নতুন ছাত্ৰ যোগ কৰক", "Kannada": "ಹೊಸ ವಿದ್ಯಾರ್ಥಿಯನ್ನು ಸೇರಿಸಿ", "Malayalam": "പുതിയ വിദ്യാർത്ഥിയെ ചേർക്കുക", "Punjabi": "ਨਵਾਂ ਵਿਦਿਆਰਥੀ ਸ਼ਾਮਲ ਕਰੋ", "Urdu": "نیا طالب علم شامل کریں"
         },
         "Edit Student": {
-            "Odia": "ଏଡିଟ୍ କରନ୍ତୁ", "Hindi": "अपडेट करें", "Bengali": "আপডেট করুন",
-            "Telugu": "నవీకరించండి", "Tamil": "புதுப்பிக்கவும்", "Marathi": "अपडेट करा", "Gujarati": "અપડેટ કરો"
+            "Odia": "ଛାତ୍ର ତଥ୍ୟ ବଦଳାନ୍ତୁ", "Hindi": "छात्र विवरण बदलें", "Bengali": "ছাত্র তথ্য আপডেট করুন",
+            "Telugu": "విద్యార్థి సమాచారం నవీకరించండి", "Tamil": "மாணவர் விவரங்களை புதுப்பிக்கவும்", "Marathi": "विद्यार्थी माहिती अपडेट करा", "Gujarati": "વિદ્યાર્થી માહિતી અપડેટ કરો",
+            "Assamese": "আপডেট কৰক", "Kannada": "ನವೀಕರಿಸಿ", "Malayalam": "അപ്ഡേറ്റ് ചെയ്യുക", "Punjabi": "ਅੱਪਡੇਟ ਕਰੋ", "Urdu": "طالب علم میں ترمیم کریں"
         },
         "Report Card": {
             "Odia": "ରିପୋର୍ଟ କାର୍ଡ ପ୍ରିଣ୍ଟ୍", "Hindi": "रिपोर्ट कार्ड", "Bengali": "রিপোর্ট কার্ড",
-            "Telugu": "రిపోర్ట్ కార్డ్", "Tamil": "மதிப்பெண் அட்டை", "Marathi": "रिपोर्ट कार्ड", "Gujarati": "રિપોર્ટ કાર્ડ"
+            "Telugu": "రిపోర్ట్ కార్డ్", "Tamil": "மதிப்பெண் அட்டை", "Marathi": "रिपोर्ट कार्ड", "Gujarati": "રિપોર્ટ કાર્ડ",
+            "Assamese": "ৰিপৰ্ট কাৰ্ড", "Kannada": "ವರದಿ ಕಾರ್ಡ್", "Malayalam": "റിപ്പോർട്ട് കാർഡ്", "Punjabi": "ਰਿਪੋਰਟ ਕਾਰਡ", "Urdu": "رپورٹ کارڈ"
         },
         "Search": {
             "Odia": "ନାମ କିମ୍ବା ରୋଲ୍ ନମ୍ବର ଦେଇ ଖୋଜନ୍ତୁ", "Hindi": "नाम या रोल नंबर से खोजें", "Bengali": "নাম বা রোল নম্বর দিয়ে খুঁজুন",
-            "Telugu": "పేరు లేదా రోల్ నంబర్ ద్వారా శోధించండి", "Tamil": "பெயர் அல்லது பதிவு எண் மூலம் தேடவும்", "Marathi": "नाव किंवा रोल नंबरने शोधा", "Gujarati": "નામ અથવા રોલ નંબર દ્વારા શોધો"
+            "Telugu": "పేరు లేదా రోల్ నంబర్ ద్వారా శోధించండి", "Tamil": "பெயர் அல்லது பதிவு எண் மூலம் தேடவும்", "Marathi": "नाव किंवा रोल नंबरने शोधा", "Gujarati": "નામ અથવા રોલ નંબર દ્વારા શોધો",
+            "Assamese": "নাম বা ৰোল নম্বৰৰ দ্বাৰা বিচাৰক", "Kannada": "ಹೆಸರು ಅಥವಾ ರೋಲ್ ಸಂಖ್ಯೆಯಿಂದ ಹುಡುಕಿ", "Malayalam": "പേര് അല്ലെങ്കിൽ റോൾ നമ്പർ ഉപയോഗിച്ച് തിരയുക", "Punjabi": "ਨਾਮ ਜਾਂ ਰੋਲ ਨੰਬਰ ਰਾਹੀਂ ਖੋਜੋ", "Urdu": "نام یا رول نمبر سے تلاش کریں"
         },
         "Total Registered": {
             "Odia": "ମୋଟ ପଞ୍ଜିକୃତ:", "Hindi": "कुल पंजीकृत:", "Bengali": "মোট নিবন্ধিত:",
-            "Telugu": "మొత్తం నమోదైనవి:", "Tamil": "மொத்தம் பதிவு செய்யப்பட்டவை:", "Marathi": "एकूण नोंदणीकृत:", "Gujarati": "કુલ નોંધાયેલ:"
+            "Telugu": "మొత్తం నమోదైనవి:", "Tamil": "மொத்தம் பதிவு செய்யப்பட்டவை:", "Marathi": "एकूण नोंदणीकृत:", "Gujarati": "કુલ નોંધાયેલ:",
+            "Assamese": "মুঠ পঞ্জীয়নকৃত:", "Kannada": "ಒಟ್ಟು ನೋಂದಾಯಿತ:", "Malayalam": "ആകെ രജിസ്റ്റർ ചെയ്തത്:", "Punjabi": "ਕੁੱਲ ਰਜਿਸਟਰਡ:", "Urdu": "کل رجسٹرڈ:"
         }
     }
     return translations.get(eng_text, {}).get(lang, eng_text)
@@ -123,7 +131,7 @@ def save_master_data(data):
         json.dump(data, f, indent=4)
 
 def load_data():
-    schools = {"S001": {"name": "LAXMI NARAYAN GIRLS HIGH SCHOOL, BANASAR KALYANI", "pass": "admin123", "state": "Odisha", "lang": "Odia"}}
+    schools = {"S001": {"name": "LAXMI NARAYAN GIRLS HIGH SCHOOL", "pass": "admin123", "state": "Odisha", "lang": "Odia"}}
     students = {}
     
     if os.path.exists(SCHOOLS_FILE):
@@ -152,7 +160,7 @@ def save_data(schools, students):
     with open(STUDENTS_FILE, "w", encoding="utf-8") as f:
         json.dump(students, f, indent=4)
 
-# --- ସୁନ୍ଦର ରାଙ୍କ୍ କାର୍ଡ HTML ଡିଜାଇନ୍ (100% ORIGINAL COLORS) ---
+# --- ସୁନ୍ଦର ରାଙ୍କ୍ କାର୍ଡ HTML ଡିଜାଇନ୍ ---
 def generate_result_card_html(school_name, st_data, roll_no):
     raw_dob = st_data.get('dob', '')
     disp_dob = raw_dob
@@ -161,16 +169,14 @@ def generate_result_card_html(school_name, st_data, roll_no):
         if len(y) == 4:
             disp_dob = f"{d}-{m}-{y}"
 
-    # EXACT ORIGINAL COLORS
-    bg_color = "#fef9f7"      # Very light off-white/beige background
-    border_color = "#963f98"  # Original board Purple/Magenta color
-    outer_border = "#ce9bd0"  # Lighter purple for outer border
-    table_bg = "#fcf4fc"      # Very faint purple for table headers
+    bg_color = "#fef9f7"
+    border_color = "#963f98"
+    outer_border = "#ce9bd0"
+    table_bg = "#fcf4fc"
     
     total_obt = st_data.get('total_obt', 0)
     words_total = number_to_words(total_obt)
 
-    # OFFLINE VERIFICATION DATA (QR Code)
     student_name = st_data.get('name', 'N/A').upper()
     total_marks = f"{total_obt}/{st_data.get('total_full', 0)}"
     grade = st_data.get('grade', 'N/A')
@@ -179,8 +185,6 @@ def generate_result_card_html(school_name, st_data, roll_no):
     qr_text = f"SCHOOL: {school_name} | NAME: {student_name} | ROLL: {roll_no} | DOB: {disp_dob} | MARKS: {total_marks} | GRADE: {grade} | RESULT: {result_stat}"
     qr_data = urllib.parse.quote(qr_text)
     qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={qr_data}"
-    
-    # Barcode
     barcode_url = f"https://barcode.tec-it.com/barcode.ashx?data={roll_no}&code=Code128&dpi=96"
 
     rows_html = ""
@@ -193,7 +197,6 @@ def generate_result_card_html(school_name, st_data, roll_no):
             "</tr>"
         )
 
-    # Dynamic Header Font Size
     header_font_size = "28px"
     if len(school_name) > 40: header_font_size = "22px"
     if len(school_name) > 55: header_font_size = "18px"
@@ -271,7 +274,7 @@ def generate_result_card_html(school_name, st_data, roll_no):
     )
     return html_content
 
-# --- PDF ଜେନେରେଟର (100% ORIGINAL COLORS & LAYOUT) ---
+# --- PDF ଜେନେରେଟର ---
 def create_pdf(filename, school_name, st_data, roll_no):
     raw_dob = st_data.get('dob', '')
     disp_dob = raw_dob
@@ -282,21 +285,20 @@ def create_pdf(filename, school_name, st_data, roll_no):
             
     c = canvas.Canvas(filename, pagesize=letter)
     
-    # PDF Background color (Very faint warm white/beige)
+    # PDF Background color
     c.setFillColorRGB(0.99, 0.98, 0.97)
     c.rect(30, 30, 552, 732, fill=1, stroke=0)
     
-    # Outer Border (Lighter Purple)
+    # Outer Border
     c.setStrokeColorRGB(0.82, 0.60, 0.83)
     c.setLineWidth(15)
     c.rect(15, 15, 582, 762, fill=0, stroke=1)
     
-    # Inner Border (Original Purple)
-    c.setStrokeColorRGB(0.59, 0.25, 0.60) # Exact #963f98
+    # Inner Border
+    c.setStrokeColorRGB(0.59, 0.25, 0.60)
     c.setLineWidth(2)
     c.rect(30, 30, 552, 732, fill=0, stroke=1)
     
-    # PDF HEADER
     c.setFillColorRGB(0.59, 0.25, 0.60)
     school_title = school_name.upper()
     title_size = 22
@@ -311,7 +313,6 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.setFont("Helvetica", 11)
     c.drawCentredString(300, 675, "CERTIFICATE-CUM-MARK SHEET")
     
-    # STUDENT DETAILS
     c.setFont("Helvetica", 11)
     c.drawString(50, 635, "ROLL NO:")
     c.setFillColorRGB(0, 0, 0)
@@ -367,12 +368,10 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.setFont("Helvetica-Bold", 11)
     c.drawString(150, 525, f"{disp_dob}")
     
-    # MARKS TABLE
     c.setStrokeColorRGB(0.59, 0.25, 0.60)
     c.line(50, 495, 550, 495)
     
-    # Table Header Background
-    c.setFillColorRGB(0.98, 0.95, 0.98) # Faint purple for header
+    c.setFillColorRGB(0.98, 0.95, 0.98)
     c.rect(50, 465, 500, 30, fill=1, stroke=0)
     
     c.setFillColorRGB(0.59, 0.25, 0.60)
@@ -382,7 +381,6 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.drawRightString(540, 475, "MARKS SECURED")
     c.line(50, 465, 550, 465)
     
-    # Vertical lines for table
     c.line(50, 495, 50, 465)
     c.line(280, 495, 280, 465)
     c.line(420, 495, 420, 465)
@@ -393,24 +391,20 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.setFont("Helvetica-Bold", 11)
     
     table_bottom_y = y + 10
-    
     for sub, m_info in st_data.get('subjects', {}).items():
         c.drawString(60, y, str(sub).upper())
         c.drawCentredString(350, y, str(m_info['full']))
         c.drawRightString(540, y, str(m_info['obt']))
-        
         c.setStrokeColorRGB(0.59, 0.25, 0.60)
         c.line(50, y-10, 550, y-10)
         y -= 20
         table_bottom_y = y + 10
 
-    # Draw vertical lines for data rows
     c.line(50, 465, 50, table_bottom_y)
     c.line(280, 465, 280, table_bottom_y)
     c.line(420, 465, 420, table_bottom_y)
     c.line(550, 465, 550, table_bottom_y)
     
-    # TOTAL ROW
     c.setFillColorRGB(0.98, 0.95, 0.98)
     c.rect(50, table_bottom_y-25, 500, 25, fill=1, stroke=0)
     
@@ -424,13 +418,11 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.setStrokeColorRGB(0.59, 0.25, 0.60)
     c.line(50, table_bottom_y-25, 550, table_bottom_y-25)
     
-    # Vertical lines for total row
     c.line(50, table_bottom_y, 50, table_bottom_y-25)
     c.line(280, table_bottom_y, 280, table_bottom_y-25)
     c.line(420, table_bottom_y, 420, table_bottom_y-25)
     c.line(550, table_bottom_y, 550, table_bottom_y-25)
     
-    # --- PDF FOOTER ---
     y = table_bottom_y - 45
     total_obt = st_data.get('total_obt', 0)
     c.setFillColorRGB(0, 0, 0)
@@ -439,7 +431,6 @@ def create_pdf(filename, school_name, st_data, roll_no):
     
     y -= 60
     
-    # 1. 1D Barcode (Just Roll No)
     try:
         bc = code128.Code128(str(roll_no), barHeight=25, barWidth=1.2)
         bc.drawOn(c, 50, y+15)
@@ -455,7 +446,6 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.setFont("Helvetica-Bold", 10)
     c.drawCentredString(140, y-75, "HM SIGNATURE")
     
-    # 2. Grade Box (Center)
     c.setStrokeColorRGB(0.59, 0.25, 0.60)
     c.setFillColorRGB(0.98, 0.95, 0.98)
     c.rect(260, y-30, 80, 40, fill=1, stroke=1)
@@ -466,11 +456,9 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.setFont("Helvetica-Bold", 18)
     c.drawCentredString(300, y-15, f"{st_data.get('grade', 'N/A')}")
     
-    # 3. QR Code & Class Teacher Signature (Right) - OFFLINE VERIFICATION
     student_name = st_data.get('name', 'N/A').upper()
     grade = st_data.get('grade', 'N/A')
     result_stat = st_data.get('result', 'N/A')
-    
     qr_text = f"SCHOOL: {school_name}\nNAME: {student_name}\nROLL: {roll_no}\nDOB: {disp_dob}\nMARKS: {total_obt}/{st_data.get('total_full', 0)}\nGRADE: {grade}\nRESULT: {result_stat}"
     
     try:
@@ -646,7 +634,7 @@ elif menu == "Master Login":
                 st.rerun()
 
         st.markdown("---")
-        tab1, tab2, tab3, tab4, tab5 = st.tabs(["📊 All IDs & Schools", "🏫 Register School", "🎓 Edit Students Data", "🔄 Forgot School Password", "⚙️ Settings (Change ID/Pass)"])
+        tab1, tab2, tab3, tab4, tab5 = st.tabs(["📊 All IDs & Schools", "🏫 Register School", "🎓 Edit Students Data", "✏️ Edit Registered Schools", "⚙️ Settings (Change ID/Pass)"])
         
         with tab1:
             st.markdown("### 👁️ System Overview & Manage Schools")
@@ -684,9 +672,8 @@ elif menu == "Master Login":
             new_s_id = st.text_input("New School ID (e.g. S002)")
             new_s_name = st.text_input("School Name")
             
-            # 🗺️ ALL INDIAN STATES SELECTION
             indian_states = list(STATE_LANG_MAP.keys())
-            new_s_state = st.selectbox("Select State (ରାଜ୍ୟ ବାଛନ୍ତୁ)", indian_states, index=18) # 18 is Odisha
+            new_s_state = st.selectbox("Select State (ରାଜ୍ୟ ବାଛନ୍ତୁ)", indian_states, index=18) 
             
             new_s_pass = st.text_input("School Password", type="password")
             
@@ -792,14 +779,34 @@ elif menu == "Master Login":
                     st.warning("No students in this school.")
 
         with tab4:
-            st.markdown("### 🔄 Forgot / Reset School Password")
-            selected_school = st.selectbox("Select School ID", list(schools_db.keys()))
-            new_reset_pass = st.text_input("Enter New Password for this School", type="password")
-            if st.button("Update School Password"):
-                if new_reset_pass:
-                    schools_db[selected_school]['pass'] = new_reset_pass
-                    save_data(schools_db, students_db)
-                    st.success("School password changed successfully!")
+            st.markdown("### ✏️ Edit Registered Schools")
+            if schools_db:
+                selected_edit_school = st.selectbox("Select School ID to Edit", list(schools_db.keys()))
+                curr_s_data = schools_db[selected_edit_school]
+                
+                edit_s_name = st.text_input("Edit School Name", value=curr_s_data.get('name', ''))
+                
+                indian_states = list(STATE_LANG_MAP.keys())
+                curr_state = curr_s_data.get('state', 'Odisha')
+                state_idx = indian_states.index(curr_state) if curr_state in indian_states else 18
+                edit_s_state = st.selectbox("Edit School State", indian_states, index=state_idx)
+                
+                edit_s_pass = st.text_input("Edit School Password", value=curr_s_data.get('pass', ''), type="password")
+                
+                if st.button("Update School Profile"):
+                    if edit_s_name and edit_s_pass:
+                        schools_db[selected_edit_school].update({
+                            "name": edit_s_name,
+                            "pass": edit_s_pass,
+                            "state": edit_s_state,
+                            "lang": STATE_LANG_MAP[edit_s_state]
+                        })
+                        save_data(schools_db, students_db)
+                        st.success(f"School Profile Updated! The portal language is now set to {STATE_LANG_MAP[edit_s_state]}.")
+                    else:
+                        st.warning("Please fill all the details.")
+            else:
+                st.warning("No schools registered yet.")
 
         with tab5:
             st.markdown("### ⚙️ Update Master Profile & Contact")
@@ -868,6 +875,7 @@ elif menu == "School Login":
                 
     else: 
         cur_school = st.session_state['school_logged_id']
+        # 🌐 AUTO LANGUAGE SETTING BASED ON STATE
         s_lang = schools_db[cur_school].get("lang", "English")
         s_state = schools_db[cur_school].get("state", "Unknown State")
         
@@ -881,7 +889,7 @@ elif menu == "School Login":
 
         st.markdown("---")
         
-        # 🌐 LANGUAGE LOCALIZED TABS
+        # 🌐 LANGUAGE TRANSLATED TABS
         tab_list, tab_add, tab_edit, tab_report = st.tabs([
             f"📋 {t('My Students', s_lang)}", 
             f"➕ {t('Add Student', s_lang)}", 
