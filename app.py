@@ -21,6 +21,7 @@ import threading
 file_lock = threading.Lock()
 
 def sanitize(text):
+    """XSS Protection: Prevents hackers from injecting malicious scripts in forms"""
     if isinstance(text, str):
         return html.escape(text.strip())
     return text
@@ -385,7 +386,7 @@ portal_map = {"home": 0, "reg_student": 1, "reg_school": 2, "master": 3, "school
 portal_param = st.query_params.get("portal", "home")
 default_idx = portal_map.get(portal_param, 0)
 
-# Page Styling Customizer (For Login Pages only)
+# Background color chooser only for non-home pages
 if portal_param != "home":
     st.sidebar.markdown("---")
     user_bg_color = st.sidebar.color_picker("🎨 Custom Background Color", "#ffffff")
@@ -403,16 +404,13 @@ elif menu == "Results": st.query_params["portal"] = "student"
 classes_list = [str(i) for i in range(1, 11)]
 batches_list = [f"{y}-{y+1}" for y in range(2020, 2051)]
 
-# ----------------- HOME PAGE (BEAUTIFUL DYNAMIC UI WITH FIXED IMAGES) -----------------
+# ----------------- HOME PAGE (DYNAMIC UI) -----------------
 if menu == "Home Page":
-    
-    # 🌟 DYNAMIC SCHOOL BACKGROUND LOGIC
-    # List of school/university background images
+    # School Background Logic
     bg_images = [
-        "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1920",
-        "https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?q=80&w=1920",
-        "https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=1920",
-        "https://images.unsplash.com/photo-1592289635031-645ce1e6c381?q=80&w=1920"
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/School_building_in_Taiwan.jpg/1200px-School_building_in_Taiwan.jpg",
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/High_School_Building_Front.jpg/1200px-High_School_Building_Front.jpg",
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/The_Indian_High_School%2C_Dubai_campus.jpg/1200px-The_Indian_High_School%2C_Dubai_campus.jpg"
     ]
     selected_bg = random.choice(bg_images)
     
@@ -440,14 +438,13 @@ if menu == "Home Page":
     </style>
     """, unsafe_allow_html=True)
 
-    # Date Logic for Jayantis/Festivals
     today = datetime.date.today()
     mm_dd = today.strftime("%m-%d")
     
     event_images = ""
     event_title = "Welcome to Advanced School Management System"
     
-    # PERMANENT AND 100% WORKING LINKS
+    # RELIABLE IMAGE LINKS (Base Wikimedia URLs - No Thumbnails to prevent broken links)
     if mm_dd == "10-02":
         event_images += "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/7/7a/Mahatma-Gandhi%2C_studio%2C_1931.jpg' alt='Gandhi Jayanti'>"
         event_title = "🙏 Happy Gandhi Jayanti 🙏"
@@ -460,12 +457,6 @@ if menu == "Home Page":
     elif mm_dd == "09-05":
         event_images += "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/d/d1/Dr_Sarvepalli_Radhakrishnan.jpg' alt='Teachers Day'>"
         event_title = "📚 Happy Teachers' Day 📚"
-    elif mm_dd == "04-14":
-        event_images += "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/c/c3/Dr._Bhimrao_Ambedkar.jpg' alt='Ambedkar Jayanti'>"
-        event_title = "🙏 Happy Ambedkar Jayanti 🙏"
-    elif mm_dd == "11-14":
-        event_images += "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/5/5f/Jawaharlal_Nehru_1946.jpg' alt='Childrens Day'>"
-        event_title = "🌹 Happy Children's Day 🌹"
 
     base_images = (
         "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/e/e2/Droupadi_Murmu_Official_Portrait.jpg' alt='President Murmu'>"
@@ -475,7 +466,6 @@ if menu == "Home Page":
         "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/b/b3/Jagannath.jpg' alt='Lord Jagannath'>"
     )
 
-    # 100% BLANK BOX FREE COMPONENT - USING PURE HTML COMPONENTS ONLY
     carousel_html = f"""
     <!DOCTYPE html>
     <html>
@@ -484,14 +474,13 @@ if menu == "Home Page":
     <style>
     body {{ margin: 0; padding: 0; background-color: transparent; font-family: sans-serif; overflow: hidden;}}
     .carousel-container {{ width: 100%; height: 350px; overflow: hidden; border-radius: 10px; position: relative; border: 2px solid #38bdf8; box-sizing: border-box; background: transparent; }}
-    .marquee-wrapper {{ display: flex; align-items: center; height: 100%; white-space: nowrap; }}
     .marquee-img {{ height: 260px; border-radius: 10px; margin-right: 20px; object-fit: contain; display: inline-block; vertical-align: middle; margin-top: 20px; border: 2px solid #fbbf24; background-color: #fff; padding: 5px; box-shadow: 2px 2px 10px rgba(0,0,0,0.5); }}
-    .carousel-overlay {{ position: absolute; bottom: 0; background: rgba(30,58,138,0.9); width: 100%; color: white; text-align: center; padding: 12px; font-weight: bold; font-size: 20px; letter-spacing: 1px; box-sizing: border-box; text-shadow: 1px 1px 2px #000; }}
+    .carousel-overlay {{ position: absolute; bottom: 0; background: rgba(30,58,138,0.9); width: 100%; color: white; text-align: center; padding: 12px; font-weight: bold; font-size: 20px; letter-spacing: 1px; box-sizing: border-box; text-shadow: 1px 1px 2px #000; z-index: 10;}}
     </style>
     </head>
     <body>
     <div class="carousel-container">
-        <marquee behavior="scroll" direction="left" scrollamount="12" onmouseover="this.stop();" onmouseout="this.start();">
+        <marquee behavior="scroll" direction="left" scrollamount="12" onmouseover="this.stop();" onmouseout="this.start();" style="height: 100%; display: flex; align-items: center; white-space: nowrap;">
             {event_images}
             {base_images}
         </marquee>
@@ -505,7 +494,6 @@ if menu == "Home Page":
     components.html(carousel_html, height=360)
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # Running Long Notification Banner in Glass Panel
     notice_text_html = """
     <!DOCTYPE html>
     <html>
@@ -526,7 +514,6 @@ if menu == "Home Page":
     components.html(notice_text_html, height=40)
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # Prominent Action Buttons
     c1, c2, c3 = st.columns(3)
     with c1:
         st.markdown("<a href='?portal=reg_school' target='_self' class='login-card'><div class='login-title'>🏫 New School Registration</div><div class='login-sub'>Register your institution</div></a>", unsafe_allow_html=True)
