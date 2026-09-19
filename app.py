@@ -263,7 +263,7 @@ def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no,
     qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={urllib.parse.quote(qr_text)}"
     bc_url = f"https://barcode.tec-it.com/barcode.ashx?data={roll_no}&code=Code128&dpi=96"
 
-    rows_html = "".join([f"<tr style='border-bottom: 1px solid {b_col};'><td style='padding: 8px; border-right: 1px solid {b_col}; text-align: left; font-weight: bold;'>{sub.upper()}</td><td style='padding: 8px; border-right: 1px solid {b_col};'>{m['full']}</td><td style='padding: 8px; font-weight: bold;'>{m['obt']}</td></tr>" for sub, m in st_data.get('subjects', {}).items()])
+    rows_html = "".join([f"<tr style='border-bottom: 1px solid {b_col};'><td style='padding: 8px; border-right: 1px solid {b_col}; text-align: left; font-weight: bold; color: #000;'>{sub.upper()}</td><td style='padding: 8px; border-right: 1px solid {b_col}; color: #000;'>{m['full']}</td><td style='padding: 8px; font-weight: bold; color: #000;'>{m['obt']}</td></tr>" for sub, m in st_data.get('subjects', {}).items()])
 
     return f"""
     <div style='font-family: "Times New Roman", serif; border: 15px solid {ob}; padding: 4px; max-width: 800px; margin: auto; background-color: #fff;'>
@@ -275,15 +275,15 @@ def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no,
                 <p style='margin: 5px 0; font-weight: bold; font-size: 17px; text-decoration: underline;'>CERTIFICATE-CUM-MARK SHEET <br><span style='font-size:14px;text-decoration:none;'>({t('CERTIFICATE-CUM-MARK SHEET', s_lang)})</span></p>
             </div>
             <table style='width: 100%; font-size: 13px; margin-bottom: 20px; font-weight: bold;'>
-                <tr><td><span style='color:{b_col};'>ROLL NO:</span> {roll_no}</td><td style='text-align: right;'><span style='color:{b_col};'>CLASS:</span> {st_data.get('class', '')}</td></tr>
-                <tr><td><span style='color:{b_col};'>PEN NO:</span> {st_data.get('pen_no', '')}</td><td style='text-align: right;'><span style='color:{b_col};'>APAAR NO:</span> {st_data.get('apaar_no', '')}</td></tr>
+                <tr><td><span style='color:{b_col};'>ROLL NO:</span> <span style='color:#000;'>{roll_no}</span></td><td style='text-align: right;'><span style='color:{b_col};'>CLASS:</span> <span style='color:#000;'>{st_data.get('class', '')}</span></td></tr>
+                <tr><td><span style='color:{b_col};'>PEN NO:</span> <span style='color:#000;'>{st_data.get('pen_no', '')}</span></td><td style='text-align: right;'><span style='color:{b_col};'>APAAR NO:</span> <span style='color:#000;'>{st_data.get('apaar_no', '')}</span></td></tr>
             </table>
             <table style='width: 100%; font-size: 14px; margin-bottom: 15px; text-transform: uppercase; line-height: 1.8;'>
-                <tr><td style='width: 250px; color: {b_col}; font-weight: bold;'>Certify that / {t('NAME', s_lang)}</td><td><b>{s_name_en}</b><br><span style='font-size:14px; text-transform:none;'>{t_stu}</span></td></tr>
-                <tr><td style='color: {b_col}; font-weight: bold;'>Mother's Name</td><td><b>{m_name_en}</b><br><span style='font-size:14px; text-transform:none;'>{t_mot}</span></td></tr>
-                <tr><td style='color: {b_col}; font-weight: bold;'>Father's Name</td><td><b>{f_name_en}</b><br><span style='font-size:14px; text-transform:none;'>{t_fat}</span></td></tr>
-                <tr><td style='color: {b_col}; font-weight: bold;'>Date of Birth</td><td><b>{disp_dob}</b></td></tr>
-                <tr><td style='color: {b_col}; font-weight: bold;'>Category</td><td><b>{st_data.get('category', 'General')}</b></td></tr>
+                <tr><td style='width: 250px; color: {b_col}; font-weight: bold;'>Certify that / {t('NAME', s_lang)}</td><td><b style='color:#000;'>{s_name_en}</b><br><span style='font-size:14px; text-transform:none; color:#000;'>{t_stu}</span></td></tr>
+                <tr><td style='color: {b_col}; font-weight: bold;'>Mother's Name</td><td><b style='color:#000;'>{m_name_en}</b><br><span style='font-size:14px; text-transform:none; color:#000;'>{t_mot}</span></td></tr>
+                <tr><td style='color: {b_col}; font-weight: bold;'>Father's Name</td><td><b style='color:#000;'>{f_name_en}</b><br><span style='font-size:14px; text-transform:none; color:#000;'>{t_fat}</span></td></tr>
+                <tr><td style='color: {b_col}; font-weight: bold;'>Date of Birth</td><td><b style='color:#000;'>{disp_dob}</b></td></tr>
+                <tr><td style='color: {b_col}; font-weight: bold;'>Category</td><td><b style='color:#000;'>{st_data.get('category', 'General')}</b></td></tr>
             </table>
             <p style='color: {b_col}; text-align: center; margin-bottom: 20px; font-style:italic;'>Passed the Annual Examination held in {st_data.get('batch', '')}.</p>
             <table style='width: 100%; border-collapse: collapse; border: 2px solid {b_col}; text-align: center; font-size: 13px;'>
@@ -292,13 +292,13 @@ def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no,
                 </tr>
                 {rows_html}
                 <tr style='color: {b_col}; font-weight: bold; background-color: {t_bg}; border-top: 2px solid {b_col};'>
-                    <td style='padding: 10px; border-right: 1px solid {b_col}; text-align: right;'>TOTAL MARKS</td><td style='padding: 10px; border-right: 1px solid {b_col};'>{st_data.get('total_full', 0)}</td><td style='padding: 10px; color:#000;'>{tot_obt}</td>
+                    <td style='padding: 10px; border-right: 1px solid {b_col}; text-align: right;'>TOTAL MARKS</td><td style='padding: 10px; border-right: 1px solid {b_col}; color:#000;'>{st_data.get('total_full', 0)}</td><td style='padding: 10px; color:#000;'>{tot_obt}</td>
                 </tr>
             </table>
-            <div style='text-align: center; font-weight: bold; font-size: 14px; margin-top: 20px;'>( {w_tot_en} ) <br><span style='font-size:13px; font-weight:normal;'>({t_w_tot})</span></div>
+            <div style='text-align: center; font-weight: bold; font-size: 14px; margin-top: 20px; color:#000;'>( {w_tot_en} ) <br><span style='font-size:13px; font-weight:normal;'>({t_w_tot})</span></div>
             <table style='width: 100%; margin-top: 20px; text-align: center; color: {b_col};'>
                 <tr>
-                    <td style='width: 33%; vertical-align: bottom;'><img src='{bc_url}' style='height: 35px; margin-bottom: 10px;'/><br><div style='font-size: 11px;'>DATE OF PUBLICATION</div><div style='font-weight: bold; font-size: 14px; margin-bottom: 30px;'>{disp_pub_date}</div><div style='border-bottom: 1px solid {b_col}; width: 80%; margin: auto;'></div><div style='font-size: 11px; font-weight: bold; margin-top:5px;'>HM SIGNATURE</div></td>
+                    <td style='width: 33%; vertical-align: bottom;'><img src='{bc_url}' style='height: 35px; margin-bottom: 10px;'/><br><div style='font-size: 11px;'>DATE OF PUBLICATION</div><div style='font-weight: bold; font-size: 14px; margin-bottom: 30px; color:#000;'>{disp_pub_date}</div><div style='border-bottom: 1px solid {b_col}; width: 80%; margin: auto;'></div><div style='font-size: 11px; font-weight: bold; margin-top:5px;'>HM SIGNATURE</div></td>
                     <td style='width: 34%; vertical-align: top;'><div style='font-size: 12px; margin-bottom: 5px;'>GRADE</div><div style='border: 2px solid {b_col}; padding: 10px 25px; display: inline-block; background-color: {t_bg};'><div style='font-weight: bold; font-size: 22px; color: #000;'>{st_data.get('grade', '')}</div></div></td>
                     <td style='width: 33%; vertical-align: bottom;'><img src='{qr_url}' style='height: 65px; margin-bottom: 10px;'/><div style='height: 15px; margin-bottom: 30px;'></div><div style='border-bottom: 1px solid {b_col}; width: 80%; margin: auto;'></div><div style='font-size: 11px; font-weight: bold; margin-top:5px;'>CLASS TEACHER SIGNATURE</div></td>
                 </tr>
@@ -445,6 +445,8 @@ if menu == "Home Page":
         event_title = "🔴 ଉତ୍କଳ ଦିବସର ହାର୍ଦ୍ଦିକ ଶୁଭେଚ୍ଛା 🔴"
 
     base_images = """
+        <img class="marquee-img" src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&q=80" alt="School">
+        <img class="marquee-img" src="https://images.unsplash.com/photo-1509062522246-3755977927d7?w=600&q=80" alt="Students">
         <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Droupadi_Murmu_Official_Portrait.jpg/512px-Droupadi_Murmu_Official_Portrait.jpg" alt="President Murmu">
         <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Official_Photograph_of_Prime_Minister_Narendra_Modi_Portrait.png/512px-Official_Photograph_of_Prime_Minister_Narendra_Modi_Portrait.png" alt="PM Modi">
         <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Raja_Ravi_Varma_-_Saraswati.jpg/512px-Raja_Ravi_Varma_-_Saraswati.jpg" alt="Saraswati Maa">
