@@ -16,7 +16,7 @@ import html
 import threading
 
 # ==========================================
-# 🔒 CRASH PROTECTION & DATA SAFETY LOCKS
+# 🔒 CRASH PROTECTION & DATA SAFETY LOCKS (100% SAFE)
 # ==========================================
 file_lock = threading.Lock()
 
@@ -139,13 +139,13 @@ def normalize_dob(d_str):
         elif len(p3) == 4: return f"{p3}-{p2}-{p1}" 
     return d_str
 
-# --- 100% SAFE JSON DATA LOAD/SAVE FUNCTIONS ---
+# --- 100% SAFE JSON DATA LOAD/SAVE FUNCTIONS (NO DATA DELETION) ---
 def load_master_data():
     default_master = {
         "username": "master", 
         "password": "master123", 
-        "email": "admin@school.com", 
-        "phone": "9999999999", 
+        "email": "kulusutar123@gmail.com", 
+        "phone": "8910223342", 
         "upi_id": "school@sbi",
         "reg_fee": 150.0,
         "gst_percent": 18.0,
@@ -385,28 +385,25 @@ portal_map = {"home": 0, "reg_student": 1, "reg_school": 2, "master": 3, "school
 portal_param = st.query_params.get("portal", "home")
 default_idx = portal_map.get(portal_param, 0)
 
+# Page Styling Customizer
+st.sidebar.markdown("---")
+st.sidebar.markdown("### 🎨 Page Styling Options")
+user_bg_color = st.sidebar.color_picker("Background Color", "#ffffff")
+user_text_color = st.sidebar.color_picker("Text Color", "#000000")
+user_font = st.sidebar.selectbox("Font Style", ["sans-serif", "serif", "monospace", "cursive"])
+
+custom_css = f"""
+<style>
+.stApp {{ background-color: {user_bg_color} !important; }}
+p, div, span, label, h1, h2, h3, h4, h5, h6, li {{
+    color: {user_text_color} !important;
+    font-family: {user_font} !important;
+}}
+</style>
+"""
+st.markdown(custom_css, unsafe_allow_html=True)
+
 menu = st.sidebar.selectbox("🎯 Navigation Menu", menu_items, index=default_idx)
-
-# CUSTOM STYLING SIDEBAR (Only for Logins/Results, NOT Home Page)
-if menu in ["Master Login", "School Login", "Results"]:
-    st.sidebar.markdown("---")
-    st.sidebar.markdown("### 🎨 Page Styling Options")
-    user_bg_color = st.sidebar.color_picker("Background Color", "#ffffff")
-    user_text_color = st.sidebar.color_picker("Text Color", "#000000")
-    user_font = st.sidebar.selectbox("Font Style", ["sans-serif", "serif", "monospace", "cursive", "system-ui"])
-
-    custom_css = f"""
-    <style>
-    .stApp {{
-        background-color: {user_bg_color} !important;
-    }}
-    p, div, span, label, h1, h2, h3, h4, h5, h6, li {{
-        color: {user_text_color} !important;
-        font-family: {user_font} !important;
-    }}
-    </style>
-    """
-    st.markdown(custom_css, unsafe_allow_html=True)
 
 if menu == "Home Page": st.query_params["portal"] = "home"
 elif menu == "New Student Registration": st.query_params["portal"] = "reg_student"
@@ -418,14 +415,14 @@ elif menu == "Results": st.query_params["portal"] = "student"
 classes_list = [str(i) for i in range(1, 11)]
 batches_list = [f"{y}-{y+1}" for y in range(2020, 2051)]
 
-# ----------------- HOME PAGE (BEAUTIFUL DYNAMIC UI) -----------------
+# ----------------- HOME PAGE (DYNAMIC UI WITHOUT ERROR) -----------------
 if menu == "Home Page":
     st.markdown("""
     <style>
-    .login-card { background: white; border: 1px solid #cbd5e1; border-bottom: 5px solid #fbbf24; border-radius: 8px; padding: 25px; margin-bottom: 20px; text-align: center; text-decoration: none; display: block; color: #1e3a8a; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.3s; }
+    .login-card { background: white; border: 1px solid #cbd5e1; border-bottom: 5px solid #fbbf24; border-radius: 8px; padding: 25px; margin-bottom: 20px; text-align: center; text-decoration: none; display: block; color: #1e3a8a !important; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.3s; }
     .login-card:hover { background: #f8fafc; border-bottom: 5px solid #1e3a8a; transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
-    .login-title { font-size: 24px; font-weight: bold; margin-bottom: 8px; }
-    .login-sub { font-size: 15px; color: #64748b; }
+    .login-title { font-size: 24px; font-weight: bold; margin-bottom: 8px; color: #1e3a8a !important;}
+    .login-sub { font-size: 15px; color: #64748b !important;}
     </style>
     """, unsafe_allow_html=True)
 
@@ -433,25 +430,41 @@ if menu == "Home Page":
     today = datetime.date.today()
     mm_dd = today.strftime("%m-%d")
     
-    special_event_html = ""
+    event_images = ""
     event_title = "Welcome to Advanced School Management System"
     
     if mm_dd == "10-02":
-        special_event_html = "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Mahatma-Gandhi%2C_studio%2C_1931.jpg/512px-Mahatma-Gandhi%2C_studio%2C_1931.jpg' alt='Gandhi Jayanti'>"
+        event_images += "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/7/7a/Mahatma-Gandhi%2C_studio%2C_1931.jpg' alt='Gandhi Jayanti'>"
         event_title = "🙏 Happy Gandhi Jayanti 🙏"
     elif mm_dd == "08-15":
-        special_event_html = "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Flag_of_India.svg/512px-Flag_of_India.svg.png' alt='Independence Day'>"
+        event_images += "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/4/41/Flag_of_India.svg' alt='Independence Day'>"
         event_title = "🇮🇳 Happy Independence Day 🇮🇳"
     elif mm_dd == "01-26":
-        special_event_html = "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Flag_of_India.svg/512px-Flag_of_India.svg.png' alt='Republic Day'>"
+        event_images += "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/4/41/Flag_of_India.svg' alt='Republic Day'>"
         event_title = "🇮🇳 Happy Republic Day 🇮🇳"
     elif mm_dd == "09-05":
-        special_event_html = "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Dr_Sarvepalli_Radhakrishnan.jpg/512px-Dr_Sarvepalli_Radhakrishnan.jpg' alt='Teachers Day'>"
+        event_images += "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/d/d1/Dr_Sarvepalli_Radhakrishnan.jpg' alt='Teachers Day'>"
         event_title = "📚 Happy Teachers' Day 📚"
+    elif mm_dd == "04-14":
+        event_images += "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/c/c3/Dr._Bhimrao_Ambedkar.jpg' alt='Ambedkar Jayanti'>"
+        event_title = "🙏 Happy Ambedkar Jayanti 🙏"
+    elif mm_dd == "11-14":
+        event_images += "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/5/5f/Jawaharlal_Nehru_1946.jpg' alt='Childrens Day'>"
+        event_title = "🌹 Happy Children's Day 🌹"
     elif mm_dd == "04-01":
-        special_event_html = "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Seal_of_Odisha.png/512px-Seal_of_Odisha.png' alt='Utkal Divas'>"
+        event_images += "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/f/fe/Seal_of_Odisha.png' alt='Utkal Divas'>"
         event_title = "🔴 ଉତ୍କଳ ଦିବସର ହାର୍ଦ୍ଦିକ ଶୁଭେଚ୍ଛା 🔴"
 
+    base_images = """
+        <img class="marquee-img" src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&q=80" alt="School Building">
+        <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/e/e2/Droupadi_Murmu_Official_Portrait.jpg" alt="President Murmu">
+        <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/c/c0/Official_Photograph_of_Prime_Minister_Narendra_Modi_Portrait.png" alt="PM Modi">
+        <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/e/e0/Raja_Ravi_Varma_-_Saraswati.jpg" alt="Saraswati Maa">
+        <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/1/19/Ganesha_Basohli_miniature_circa_1730_Dubost_p73.jpg" alt="Lord Ganesha">
+        <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/b/b3/Jagannath.jpg" alt="Lord Jagannath">
+    """
+
+    # Flawless HTML structure for the running photo display
     carousel_html = f"""
     <!DOCTYPE html>
     <html>
@@ -459,20 +472,16 @@ if menu == "Home Page":
     <meta name="referrer" content="no-referrer">
     <style>
     body {{ margin: 0; padding: 0; background-color: transparent; font-family: sans-serif; }}
-    .carousel-container {{ width: 100%; height: 350px; overflow: hidden; border-radius: 10px; position: relative; border: 4px solid #1e3a8a; box-shadow: 0 4px 10px rgba(0,0,0,0.3); background-color: #000; }}
-    .marquee-img {{ height: 280px; border-radius: 10px; margin-right: 20px; object-fit: contain; display: inline-block; vertical-align: middle; margin-top: 15px; }}
-    .carousel-overlay {{ position: absolute; bottom: 0; background: rgba(30,58,138,0.85); width: 100%; color: white; text-align: center; padding: 12px; font-weight: bold; font-size: 20px; letter-spacing: 1px; box-sizing: border-box; }}
+    .carousel-container {{ width: 100%; height: 350px; overflow: hidden; border-radius: 10px; position: relative; border: 4px solid #1e3a8a; box-shadow: 0 4px 10px rgba(0,0,0,0.3); background-color: #0f172a; }}
+    .marquee-img {{ height: 280px; border-radius: 10px; margin-right: 20px; object-fit: contain; display: inline-block; vertical-align: middle; margin-top: 15px; border: 2px solid #38bdf8; background-color: #fff; padding: 5px; }}
+    .carousel-overlay {{ position: absolute; bottom: 0; background: rgba(30,58,138,0.9); width: 100%; color: white; text-align: center; padding: 12px; font-weight: bold; font-size: 20px; letter-spacing: 1px; box-sizing: border-box; text-shadow: 1px 1px 2px #000; }}
     </style>
     </head>
     <body>
     <div class="carousel-container">
-        <marquee behavior="scroll" direction="left" scrollamount="12" onmouseover="this.stop();" onmouseout="this.start();">
-            {special_event_html}
-            <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Raja_Ravi_Varma_-_Saraswati.jpg/512px-Raja_Ravi_Varma_-_Saraswati.jpg" alt="Saraswati Maa">
-            <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Ganesha_Basohli_miniature_circa_1730_Dubost_p73.jpg/512px-Ganesha_Basohli_miniature_circa_1730_Dubost_p73.jpg" alt="Lord Ganesha">
-            <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Jagannath.jpg/512px-Jagannath.jpg" alt="Lord Jagannath">
-            <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Droupadi_Murmu_Official_Portrait.jpg/512px-Droupadi_Murmu_Official_Portrait.jpg" alt="President of India">
-            <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Official_Photograph_of_Prime_Minister_Narendra_Modi_Portrait.png/512px-Official_Photograph_of_Prime_Minister_Narendra_Modi_Portrait.png" alt="PM of India">
+        <marquee behavior="scroll" direction="left" scrollamount="15" onmouseover="this.stop();" onmouseout="this.start();" style="height: 100%; display: flex; align-items: center; white-space: nowrap;">
+            {event_images}
+            {base_images}
         </marquee>
         <div class="carousel-overlay">Connecting Students, Teachers & Administration Seamlessly</div>
     </div>
@@ -483,7 +492,7 @@ if menu == "Home Page":
     st.markdown(f"<h2 style='text-align: center; color: #1e3a8a; margin-top: 0;'>🏫 {event_title}</h2>", unsafe_allow_html=True)
     components.html(carousel_html, height=360)
 
-    # Running Long Notification
+    # Lamba Running Notification Banner
     notice_text_html = """
     <!DOCTYPE html>
     <html>
@@ -504,6 +513,7 @@ if menu == "Home Page":
     components.html(notice_text_html, height=50)
     st.markdown("</div>", unsafe_allow_html=True)
 
+    # Prominent Action Buttons
     c1, c2, c3 = st.columns(3)
     with c1:
         st.markdown("<a href='?portal=reg_school' target='_self' class='login-card'><div class='login-title'>🏫 New School Registration</div><div class='login-sub'>Register your institution</div></a>", unsafe_allow_html=True)
@@ -1787,7 +1797,6 @@ elif menu == "Results":
             found_roll = None
             found_school_id = None
             
-            # FAST SEARCH THROUGH ALL SCHOOLS
             for s_id, school_students in students_db.items():
                 if st_search_query in school_students:
                     potential_student = school_students[st_search_query]
