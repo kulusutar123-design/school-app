@@ -405,12 +405,38 @@ batches_list = [f"{y}-{y+1}" for y in range(2020, 2051)]
 
 # ----------------- HOME PAGE (BEAUTIFUL DYNAMIC UI WITH FIXED IMAGES) -----------------
 if menu == "Home Page":
-    st.markdown("""
+    
+    # 🌟 DYNAMIC SCHOOL BACKGROUND LOGIC
+    # List of school/university background images
+    bg_images = [
+        "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1920",
+        "https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?q=80&w=1920",
+        "https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=1920",
+        "https://images.unsplash.com/photo-1592289635031-645ce1e6c381?q=80&w=1920"
+    ]
+    selected_bg = random.choice(bg_images)
+    
+    st.markdown(f"""
     <style>
-    .login-card { background: white; border: 1px solid #cbd5e1; border-bottom: 5px solid #fbbf24; border-radius: 8px; padding: 25px; margin-bottom: 20px; text-align: center; text-decoration: none; display: block; color: #1e3a8a !important; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.3s; }
-    .login-card:hover { background: #f8fafc; border-bottom: 5px solid #1e3a8a; transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
-    .login-title { font-size: 24px; font-weight: bold; margin-bottom: 8px; color: #1e3a8a !important;}
-    .login-sub { font-size: 15px; color: #64748b !important;}
+    .stApp {{
+        background-image: url("{selected_bg}");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }}
+    .glass-panel {{
+        background: rgba(15, 23, 42, 0.85);
+        padding: 20px;
+        border-radius: 15px;
+        border: 2px solid #38bdf8;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        backdrop-filter: blur(4px);
+        margin-bottom: 25px;
+    }}
+    .login-card {{ background: rgba(255, 255, 255, 0.95) !important; border: 1px solid #cbd5e1; border-bottom: 5px solid #fbbf24; border-radius: 8px; padding: 25px; margin-bottom: 20px; text-align: center; text-decoration: none; display: block; color: #1e3a8a !important; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.3s; }}
+    .login-card:hover {{ background: #ffffff !important; border-bottom: 5px solid #1e3a8a; transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.2); }}
+    .login-title {{ font-size: 24px; font-weight: bold; margin-bottom: 8px; color: #1e3a8a !important;}}
+    .login-sub {{ font-size: 15px; color: #64748b !important;}}
     </style>
     """, unsafe_allow_html=True)
 
@@ -421,7 +447,7 @@ if menu == "Home Page":
     event_images = ""
     event_title = "Welcome to Advanced School Management System"
     
-    # PERMANENT AND 100% WORKING LINKS - NO BROKEN IMAGES
+    # PERMANENT AND 100% WORKING LINKS
     if mm_dd == "10-02":
         event_images += "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/7/7a/Mahatma-Gandhi%2C_studio%2C_1931.jpg' alt='Gandhi Jayanti'>"
         event_title = "🙏 Happy Gandhi Jayanti 🙏"
@@ -442,7 +468,6 @@ if menu == "Home Page":
         event_title = "🌹 Happy Children's Day 🌹"
 
     base_images = (
-        "<img class='marquee-img' src='https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=600&q=80' alt='School Building'>"
         "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/e/e2/Droupadi_Murmu_Official_Portrait.jpg' alt='President Murmu'>"
         "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/c/c0/Official_Photograph_of_Prime_Minister_Narendra_Modi_Portrait.png' alt='PM Modi'>"
         "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/e/e0/Raja_Ravi_Varma_-_Saraswati.jpg' alt='Saraswati Maa'>"
@@ -455,11 +480,12 @@ if menu == "Home Page":
     <!DOCTYPE html>
     <html>
     <head>
+    <meta name="referrer" content="no-referrer">
     <style>
-    body {{ margin: 0; padding: 0; background-color: #0f172a; font-family: sans-serif; overflow: hidden;}}
-    .carousel-container {{ width: 100%; height: 350px; overflow: hidden; border-radius: 10px; position: relative; border: 4px solid #1e3a8a; box-sizing: border-box; }}
+    body {{ margin: 0; padding: 0; background-color: transparent; font-family: sans-serif; overflow: hidden;}}
+    .carousel-container {{ width: 100%; height: 350px; overflow: hidden; border-radius: 10px; position: relative; border: 2px solid #38bdf8; box-sizing: border-box; background: transparent; }}
     .marquee-wrapper {{ display: flex; align-items: center; height: 100%; white-space: nowrap; }}
-    .marquee-img {{ height: 260px; border-radius: 10px; margin-right: 20px; object-fit: contain; display: inline-block; vertical-align: middle; border: 2px solid #38bdf8; background-color: #fff; padding: 5px; box-shadow: 2px 2px 10px rgba(0,0,0,0.5); margin-top: 20px; }}
+    .marquee-img {{ height: 260px; border-radius: 10px; margin-right: 20px; object-fit: contain; display: inline-block; vertical-align: middle; margin-top: 20px; border: 2px solid #fbbf24; background-color: #fff; padding: 5px; box-shadow: 2px 2px 10px rgba(0,0,0,0.5); }}
     .carousel-overlay {{ position: absolute; bottom: 0; background: rgba(30,58,138,0.9); width: 100%; color: white; text-align: center; padding: 12px; font-weight: bold; font-size: 20px; letter-spacing: 1px; box-sizing: border-box; text-shadow: 1px 1px 2px #000; }}
     </style>
     </head>
@@ -475,29 +501,29 @@ if menu == "Home Page":
     </html>
     """
 
-    st.markdown(f"<div style='padding: 25px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin-bottom: 25px; border: 2px solid #cbd5e1; background-color: #f1f5f9;'><h2 style='text-align: center; color: #1e3a8a; margin-top: 0;'>🏫 {event_title}</h2>", unsafe_allow_html=True)
+    st.markdown(f"<div class='glass-panel'><h2 style='text-align: center; color: #fbbf24; margin-top: 0; text-shadow: 1px 1px 2px #000;'>🏫 {event_title}</h2>", unsafe_allow_html=True)
     components.html(carousel_html, height=360)
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # Running Long Notification Banner
+    # Running Long Notification Banner in Glass Panel
     notice_text_html = """
     <!DOCTYPE html>
     <html>
     <head>
     <style>
-    body { margin: 0; padding: 0; background-color: #1e293b; color: #e2e8f0; font-family: sans-serif; font-size: 18px; display: flex; align-items: center; border-radius: 5px;}
+    body { margin: 0; padding: 0; background-color: transparent; color: #fff; font-family: sans-serif; font-size: 18px; display: flex; align-items: center; }
     .new-badge { background-color: #fbbf24; color: black; font-size: 14px; font-weight: bold; padding: 2px 6px; border-radius: 3px; margin-left: 5px; }
     </style>
     </head>
     <body>
-        <marquee direction='left' scrollamount='8' style='padding: 12px; font-weight: bold;'>
+        <marquee direction='left' scrollamount='8' style='padding: 5px; font-weight: bold; text-shadow: 1px 1px 2px #000;'>
             <span style='color: #fbbf24;'>📢 ନୂଆ ଅପଡେଟ୍: ଛାତ୍ରଛାତ୍ରୀମାନେ ଏବେ ଅନଲାଇନ୍ ରେଜିଷ୍ଟ୍ରେସନ୍ ଏବଂ ପେମେଣ୍ଟ କରିପାରିବେ! <span class='new-badge'>NEW</span> &nbsp;&nbsp;|&nbsp;&nbsp; 👨‍💻 Software Developed by: KULU SUTAR &nbsp;&nbsp;|&nbsp;&nbsp; 📞 Helpdesk No: 8910223342 &nbsp;&nbsp;|&nbsp;&nbsp; ✉️ Mail ID: kulusutar123@gmail.com &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 📢 उन्नत स्कूल प्रबंधन प्रणाली में आपका स्वागत है! &nbsp;&nbsp;|&nbsp;&nbsp; 👨‍💻 डेवलपर: कुलु सुतार &nbsp;&nbsp;|&nbsp;&nbsp; 📞 हेल्पडेस्क: 8910223342 &nbsp;&nbsp;|&nbsp;&nbsp; ✉️ ईमेल: kulusutar123@gmail.com </span>
         </marquee>
     </body>
     </html>
     """
-    st.markdown("<div style='border: 1px solid #475569; border-radius: 5px; margin-bottom: 25px;'>", unsafe_allow_html=True)
-    components.html(notice_text_html, height=50)
+    st.markdown("<div class='glass-panel' style='padding: 10px;'>", unsafe_allow_html=True)
+    components.html(notice_text_html, height=40)
     st.markdown("</div>", unsafe_allow_html=True)
 
     # Prominent Action Buttons
