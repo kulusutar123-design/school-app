@@ -144,8 +144,8 @@ def load_master_data():
     default_master = {
         "username": "master", 
         "password": "master123", 
-        "email": "admin@school.com", 
-        "phone": "9999999999", 
+        "email": "kulusutar123@gmail.com", 
+        "phone": "8910223342", 
         "upi_id": "school@sbi",
         "reg_fee": 150.0,
         "gst_percent": 18.0,
@@ -385,7 +385,7 @@ portal_map = {"home": 0, "reg_student": 1, "reg_school": 2, "master": 3, "school
 portal_param = st.query_params.get("portal", "home")
 default_idx = portal_map.get(portal_param, 0)
 
-# Sidebar Background Color Customization (Only for Login pages as requested)
+# Page Styling Customizer (For Login Pages only)
 if portal_param != "home":
     st.sidebar.markdown("---")
     user_bg_color = st.sidebar.color_picker("🎨 Custom Background Color", "#ffffff")
@@ -407,21 +407,6 @@ batches_list = [f"{y}-{y+1}" for y in range(2020, 2051)]
 if menu == "Home Page":
     st.markdown("""
     <style>
-    @keyframes colorChange {
-        0% { background-color: #e0e7ff; }
-        25% { background-color: #fce7f3; }
-        50% { background-color: #ffedd5; }
-        75% { background-color: #dcfce7; }
-        100% { background-color: #e0e7ff; }
-    }
-    .dynamic-bg-box {
-        animation: colorChange 15s infinite alternate;
-        padding: 25px;
-        border-radius: 15px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        margin-bottom: 25px;
-        border: 2px solid #cbd5e1;
-    }
     .login-card { background: white; border: 1px solid #cbd5e1; border-bottom: 5px solid #fbbf24; border-radius: 8px; padding: 25px; margin-bottom: 20px; text-align: center; text-decoration: none; display: block; color: #1e3a8a !important; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.3s; }
     .login-card:hover { background: #f8fafc; border-bottom: 5px solid #1e3a8a; transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
     .login-title { font-size: 24px; font-weight: bold; margin-bottom: 8px; color: #1e3a8a !important;}
@@ -463,27 +448,27 @@ if menu == "Home Page":
         event_images += "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/f/fe/Seal_of_Odisha.png' alt='Utkal Divas'>"
         event_title = "🔴 ଉତ୍କଳ ଦିବସର ହାର୍ଦ୍ଦିକ ଶୁଭେଚ୍ଛା 🔴"
 
-    base_images = """
-        <img class="marquee-img" src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&q=80" alt="School Building">
-        <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/e/e2/Droupadi_Murmu_Official_Portrait.jpg" alt="President Murmu">
-        <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/c/c0/Official_Photograph_of_Prime_Minister_Narendra_Modi_Portrait.png" alt="PM Modi">
-        <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/e/e0/Raja_Ravi_Varma_-_Saraswati.jpg" alt="Saraswati Maa">
-        <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/1/19/Ganesha_Basohli_miniature_circa_1730_Dubost_p73.jpg" alt="Lord Ganesha">
-        <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/b/b3/Jagannath.jpg" alt="Lord Jagannath">
-    """
+    base_images = (
+        "<img class='marquee-img' src='https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&q=80' alt='School Building'>"
+        "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/e/e2/Droupadi_Murmu_Official_Portrait.jpg' alt='President Murmu'>"
+        "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/c/c0/Official_Photograph_of_Prime_Minister_Narendra_Modi_Portrait.png' alt='PM Modi'>"
+        "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/e/e0/Raja_Ravi_Varma_-_Saraswati.jpg' alt='Saraswati Maa'>"
+        "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/1/19/Ganesha_Basohli_miniature_circa_1730_Dubost_p73.jpg' alt='Lord Ganesha'>"
+        "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/b/b3/Jagannath.jpg' alt='Lord Jagannath'>"
+    )
 
-    # Fix: Removed iframe (components.html) and used direct st.markdown to bypass display blocks
     st.markdown(f"<div class='dynamic-bg-box'><h2 style='text-align: center; color: #1e3a8a; margin-top: 0;'>🏫 {event_title}</h2>", unsafe_allow_html=True)
     
-    st.markdown(f"""
-    <div class="marquee-container">
-        <marquee behavior="scroll" direction="left" scrollamount="15" onmouseover="this.stop();" onmouseout="this.start();" style="height: 100%; display: flex; align-items: center; white-space: nowrap;">
-            {event_images}
-            {base_images}
-        </marquee>
-        <div class="carousel-overlay">Connecting Students, Teachers & Administration Seamlessly</div>
-    </div>
-    """, unsafe_allow_html=True)
+    # Text block issue solved: No spaces before HTML elements!
+    st.markdown(
+        f'<div class="marquee-container">'
+        f'<marquee behavior="scroll" direction="left" scrollamount="15" onmouseover="this.stop();" onmouseout="this.start();" style="height: 100%; display: flex; align-items: center; white-space: nowrap;">'
+        f'{event_images}{base_images}'
+        f'</marquee>'
+        f'<div class="carousel-overlay">Connecting Students, Teachers & Administration Seamlessly</div>'
+        f'</div>', 
+        unsafe_allow_html=True
+    )
     
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -714,7 +699,7 @@ elif menu == "New Student Registration":
                             st.rerun()
 
             elif pay_mode == "Offline Payment (School Counter)":
-                st.info(f"You have selected Offline Payment. Please pay ₹{total_fee:.2f} (Fee: ₹{base_fee:.2f} + GST: ₹{gst_amt:.2f}) at your School Counter.")
+                st.info(f"You have selected Offline Payment. Please pay ₹{total_fee:.2f} at your School Counter.")
                 if st.button("Submit Final Application", type="primary"):
                     reg_data = st.session_state['temp_student_data']
                     reg_data['data']['payment_mode'] = f"Offline (₹{total_fee:.2f} - Pending at Counter)"
