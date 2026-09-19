@@ -1,5 +1,4 @@
 import streamlit as st
-import streamlit.components.v1 as components
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.graphics.barcode import code128, qr
@@ -14,6 +13,7 @@ import urllib.request
 import ssl
 import html
 import threading
+import base64
 
 # ==========================================
 # 🔒 CRASH PROTECTION & DATA SAFETY LOCKS
@@ -139,7 +139,7 @@ def normalize_dob(d_str):
         elif len(p3) == 4: return f"{p3}-{p2}-{p1}" 
     return d_str
 
-# --- 100% SAFE JSON DATA LOAD/SAVE FUNCTIONS ---
+# --- 100% SAFE JSON DATA LOAD/SAVE FUNCTIONS (NO DATA DELETION) ---
 def load_master_data():
     default_master = {
         "username": "master", 
@@ -196,6 +196,21 @@ def save_data(schools, students):
             json.dump(schools, f, indent=4)
         with open(STUDENTS_FILE, "w", encoding="utf-8") as f:
             json.dump(students, f, indent=4)
+
+# --- IMAGE LOADING SYSTEM FOR DISPLAY (SAFE BASE64) ---
+def get_img_html(filepath, fallback_url, alt_text):
+    """Loads local image if exists, else uses web fallback."""
+    src = fallback_url
+    if os.path.exists(filepath):
+        try:
+            with open(filepath, "rb") as img_file:
+                b64_string = base64.b64encode(img_file.read()).decode()
+                ext = filepath.split('.')[-1].lower()
+                mime = "png" if ext == "png" else "jpeg"
+                src = f"data:image/{mime};base64,{b64_string}"
+        except:
+            pass
+    return f'<img class="marquee-img" src="{src}" alt="{alt_text}">'
 
 # ==========================================
 # 🎨 RESULT CARD & RECEIPT PDF GENERATORS
@@ -263,7 +278,7 @@ def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no,
     qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={urllib.parse.quote(qr_text)}"
     bc_url = f"https://barcode.tec-it.com/barcode.ashx?data={roll_no}&code=Code128&dpi=96"
 
-    rows_html = "".join([f"<tr style='border-bottom: 1px solid {b_col};'><td style='padding: 8px; border-right: 1px solid {b_col}; text-align: left; font-weight: bold; color: #000;'>{sub.upper()}</td><td style='padding: 8px; border-right: 1px solid {b_col}; color: #000;'>{m['full']}</td><td style='padding: 8px; font-weight: bold; color: #000;'>{m['obt']}</td></tr>" for sub, m in st_data.get('subjects', {}).items()])
+    rows_html = "".join([f"<tr style='border-bottom: 1px solid {b_col};'><td style='padding: 8px; border-right: 1px solid {b_col}; text-align: left; font-weight: bold;'>{sub.upper()}</td><td style='padding: 8px; border-right: 1px solid {b_col};'>{m['full']}</td><td style='padding: 8px; font-weight: bold;'>{m['obt']}</td></tr>" for sub, m in st_data.get('subjects', {}).items()])
 
     return f"""
     <div style='font-family: "Times New Roman", serif; border: 15px solid {ob}; padding: 4px; max-width: 800px; margin: auto; background-color: #fff;'>
@@ -275,15 +290,15 @@ def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no,
                 <p style='margin: 5px 0; font-weight: bold; font-size: 17px; text-decoration: underline;'>CERTIFICATE-CUM-MARK SHEET <br><span style='font-size:14px;text-decoration:none;'>({t('CERTIFICATE-CUM-MARK SHEET', s_lang)})</span></p>
             </div>
             <table style='width: 100%; font-size: 13px; margin-bottom: 20px; font-weight: bold;'>
-                <tr><td><span style='color:{b_col};'>ROLL NO:</span> <span style='color:#000;'>{roll_no}</span></td><td style='text-align: right;'><span style='color:{b_col};'>CLASS:</span> <span style='color:#000;'>{st_data.get('class', '')}</span></td></tr>
-                <tr><td><span style='color:{b_col};'>PEN NO:</span> <span style='color:#000;'>{st_data.get('pen_no', '')}</span></td><td style='text-align: right;'><span style='color:{b_col};'>APAAR NO:</span> <span style='color:#000;'>{st_data.get('apaar_no', '')}</span></td></tr>
+                <tr><td><span style='color:{b_col};'>ROLL NO:</span> {roll_no}</td><td style='text-align: right;'><span style='color:{b_col};'>CLASS:</span> {st_data.get('class', '')}</td></tr>
+                <tr><td><span style='color:{b_col};'>PEN NO:</span> {st_data.get('pen_no', '')}</td><td style='text-align: right;'><span style='color:{b_col};'>APAAR NO:</span> {st_data.get('apaar_no', '')}</td></tr>
             </table>
             <table style='width: 100%; font-size: 14px; margin-bottom: 15px; text-transform: uppercase; line-height: 1.8;'>
-                <tr><td style='width: 250px; color: {b_col}; font-weight: bold;'>Certify that / {t('NAME', s_lang)}</td><td><b style='color:#000;'>{s_name_en}</b><br><span style='font-size:14px; text-transform:none; color:#000;'>{t_stu}</span></td></tr>
-                <tr><td style='color: {b_col}; font-weight: bold;'>Mother's Name</td><td><b style='color:#000;'>{m_name_en}</b><br><span style='font-size:14px; text-transform:none; color:#000;'>{t_mot}</span></td></tr>
-                <tr><td style='color: {b_col}; font-weight: bold;'>Father's Name</td><td><b style='color:#000;'>{f_name_en}</b><br><span style='font-size:14px; text-transform:none; color:#000;'>{t_fat}</span></td></tr>
-                <tr><td style='color: {b_col}; font-weight: bold;'>Date of Birth</td><td><b style='color:#000;'>{disp_dob}</b></td></tr>
-                <tr><td style='color: {b_col}; font-weight: bold;'>Category</td><td><b style='color:#000;'>{st_data.get('category', 'General')}</b></td></tr>
+                <tr><td style='width: 250px; color: {b_col}; font-weight: bold;'>Certify that / {t('NAME', s_lang)}</td><td><b>{s_name_en}</b><br><span style='font-size:14px; text-transform:none;'>{t_stu}</span></td></tr>
+                <tr><td style='color: {b_col}; font-weight: bold;'>Mother's Name</td><td><b>{m_name_en}</b><br><span style='font-size:14px; text-transform:none;'>{t_mot}</span></td></tr>
+                <tr><td style='color: {b_col}; font-weight: bold;'>Father's Name</td><td><b>{f_name_en}</b><br><span style='font-size:14px; text-transform:none;'>{t_fat}</span></td></tr>
+                <tr><td style='color: {b_col}; font-weight: bold;'>Date of Birth</td><td><b>{disp_dob}</b></td></tr>
+                <tr><td style='color: {b_col}; font-weight: bold;'>Category</td><td><b>{st_data.get('category', 'General')}</b></td></tr>
             </table>
             <p style='color: {b_col}; text-align: center; margin-bottom: 20px; font-style:italic;'>Passed the Annual Examination held in {st_data.get('batch', '')}.</p>
             <table style='width: 100%; border-collapse: collapse; border: 2px solid {b_col}; text-align: center; font-size: 13px;'>
@@ -292,13 +307,13 @@ def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no,
                 </tr>
                 {rows_html}
                 <tr style='color: {b_col}; font-weight: bold; background-color: {t_bg}; border-top: 2px solid {b_col};'>
-                    <td style='padding: 10px; border-right: 1px solid {b_col}; text-align: right;'>TOTAL MARKS</td><td style='padding: 10px; border-right: 1px solid {b_col}; color:#000;'>{st_data.get('total_full', 0)}</td><td style='padding: 10px; color:#000;'>{tot_obt}</td>
+                    <td style='padding: 10px; border-right: 1px solid {b_col}; text-align: right;'>TOTAL MARKS</td><td style='padding: 10px; border-right: 1px solid {b_col};'>{st_data.get('total_full', 0)}</td><td style='padding: 10px; color:#000;'>{tot_obt}</td>
                 </tr>
             </table>
-            <div style='text-align: center; font-weight: bold; font-size: 14px; margin-top: 20px; color:#000;'>( {w_tot_en} ) <br><span style='font-size:13px; font-weight:normal;'>({t_w_tot})</span></div>
+            <div style='text-align: center; font-weight: bold; font-size: 14px; margin-top: 20px;'>( {w_tot_en} ) <br><span style='font-size:13px; font-weight:normal;'>({t_w_tot})</span></div>
             <table style='width: 100%; margin-top: 20px; text-align: center; color: {b_col};'>
                 <tr>
-                    <td style='width: 33%; vertical-align: bottom;'><img src='{bc_url}' style='height: 35px; margin-bottom: 10px;'/><br><div style='font-size: 11px;'>DATE OF PUBLICATION</div><div style='font-weight: bold; font-size: 14px; margin-bottom: 30px; color:#000;'>{disp_pub_date}</div><div style='border-bottom: 1px solid {b_col}; width: 80%; margin: auto;'></div><div style='font-size: 11px; font-weight: bold; margin-top:5px;'>HM SIGNATURE</div></td>
+                    <td style='width: 33%; vertical-align: bottom;'><img src='{bc_url}' style='height: 35px; margin-bottom: 10px;'/><br><div style='font-size: 11px;'>DATE OF PUBLICATION</div><div style='font-weight: bold; font-size: 14px; margin-bottom: 30px;'>{disp_pub_date}</div><div style='border-bottom: 1px solid {b_col}; width: 80%; margin: auto;'></div><div style='font-size: 11px; font-weight: bold; margin-top:5px;'>HM SIGNATURE</div></td>
                     <td style='width: 34%; vertical-align: top;'><div style='font-size: 12px; margin-bottom: 5px;'>GRADE</div><div style='border: 2px solid {b_col}; padding: 10px 25px; display: inline-block; background-color: {t_bg};'><div style='font-weight: bold; font-size: 22px; color: #000;'>{st_data.get('grade', '')}</div></div></td>
                     <td style='width: 33%; vertical-align: bottom;'><img src='{qr_url}' style='height: 65px; margin-bottom: 10px;'/><div style='height: 15px; margin-bottom: 30px;'></div><div style='border-bottom: 1px solid {b_col}; width: 80%; margin: auto;'></div><div style='font-size: 11px; font-weight: bold; margin-top:5px;'>CLASS TEACHER SIGNATURE</div></td>
                 </tr>
@@ -403,7 +418,7 @@ elif menu == "Results": st.query_params["portal"] = "student"
 classes_list = [str(i) for i in range(1, 11)]
 batches_list = [f"{y}-{y+1}" for y in range(2020, 2051)]
 
-# ----------------- HOME PAGE (BEAUTIFUL DYNAMIC UI WITH FIXED IMAGES) -----------------
+# ----------------- HOME PAGE (NATIVE STREAMLIT MARQUEE) -----------------
 if menu == "Home Page":
     st.markdown("""
     <style>
@@ -411,97 +426,81 @@ if menu == "Home Page":
     .login-card:hover { background: #f8fafc; border-bottom: 5px solid #1e3a8a; transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
     .login-title { font-size: 24px; font-weight: bold; margin-bottom: 8px; color: #1e3a8a !important;}
     .login-sub { font-size: 15px; color: #64748b !important;}
+    
+    .marquee-container { width: 100%; overflow: hidden; white-space: nowrap; background-color: #0f172a; padding: 15px 0; border-radius: 10px; border: 4px solid #1e3a8a; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+    .marquee-img { height: 250px; border-radius: 10px; margin: 0 15px; display: inline-block; border: 2px solid #38bdf8; background-color: #fff; padding: 5px; object-fit: contain; }
     </style>
     """, unsafe_allow_html=True)
 
     # Date Logic for Jayantis/Festivals
     today = datetime.date.today()
     mm_dd = today.strftime("%m-%d")
-    
-    event_images = ""
     event_title = "Welcome to Advanced School Management System"
-    
-    # FIXED IMAGE URLS (Wikipedia Thumbnails to bypass hotlinking blocks)
+    event_img_tag = ""
+
     if mm_dd == "10-02":
-        event_images += "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Mahatma-Gandhi%2C_studio%2C_1931.jpg/512px-Mahatma-Gandhi%2C_studio%2C_1931.jpg' alt='Gandhi Jayanti'>"
+        event_img_tag = "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/7/7a/Mahatma-Gandhi%2C_studio%2C_1931.jpg' alt='Gandhi Jayanti'>"
         event_title = "🙏 Happy Gandhi Jayanti 🙏"
     elif mm_dd == "08-15":
-        event_images += "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Flag_of_India.svg/512px-Flag_of_India.svg.png' alt='Independence Day'>"
+        event_img_tag = "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/4/41/Flag_of_India.svg' alt='Independence Day'>"
         event_title = "🇮🇳 Happy Independence Day 🇮🇳"
     elif mm_dd == "01-26":
-        event_images += "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Flag_of_India.svg/512px-Flag_of_India.svg.png' alt='Republic Day'>"
+        event_img_tag = "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/4/41/Flag_of_India.svg' alt='Republic Day'>"
         event_title = "🇮🇳 Happy Republic Day 🇮🇳"
     elif mm_dd == "09-05":
-        event_images += "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Dr_Sarvepalli_Radhakrishnan.jpg/512px-Dr_Sarvepalli_Radhakrishnan.jpg' alt='Teachers Day'>"
+        event_img_tag = "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/d/d1/Dr_Sarvepalli_Radhakrishnan.jpg' alt='Teachers Day'>"
         event_title = "📚 Happy Teachers' Day 📚"
     elif mm_dd == "04-14":
-        event_images += "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Dr._Bhimrao_Ambedkar.jpg/512px-Dr._Bhimrao_Ambedkar.jpg' alt='Ambedkar Jayanti'>"
+        event_img_tag = "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/c/c3/Dr._Bhimrao_Ambedkar.jpg' alt='Ambedkar Jayanti'>"
         event_title = "🙏 Happy Ambedkar Jayanti 🙏"
     elif mm_dd == "11-14":
-        event_images += "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Jawaharlal_Nehru_1946.jpg/512px-Jawaharlal_Nehru_1946.jpg' alt='Childrens Day'>"
+        event_img_tag = "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/5/5f/Jawaharlal_Nehru_1946.jpg' alt='Childrens Day'>"
         event_title = "🌹 Happy Children's Day 🌹"
     elif mm_dd == "04-01":
-        event_images += "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Seal_of_Odisha.png/512px-Seal_of_Odisha.png' alt='Utkal Divas'>"
+        event_img_tag = "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/f/fe/Seal_of_Odisha.png' alt='Utkal Divas'>"
         event_title = "🔴 ଉତ୍କଳ ଦିବସର ହାର୍ଦ୍ଦିକ ଶୁଭେଚ୍ଛା 🔴"
 
-    base_images = """
-        <img class="marquee-img" src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&q=80" alt="School">
-        <img class="marquee-img" src="https://images.unsplash.com/photo-1509062522246-3755977927d7?w=600&q=80" alt="Students">
-        <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Droupadi_Murmu_Official_Portrait.jpg/512px-Droupadi_Murmu_Official_Portrait.jpg" alt="President Murmu">
-        <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Official_Photograph_of_Prime_Minister_Narendra_Modi_Portrait.png/512px-Official_Photograph_of_Prime_Minister_Narendra_Modi_Portrait.png" alt="PM Modi">
-        <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Raja_Ravi_Varma_-_Saraswati.jpg/512px-Raja_Ravi_Varma_-_Saraswati.jpg" alt="Saraswati Maa">
-        <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Ganesha_Basohli_miniature_circa_1730_Dubost_p73.jpg/512px-Ganesha_Basohli_miniature_circa_1730_Dubost_p73.jpg" alt="Lord Ganesha">
-        <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Jagannath.jpg/512px-Jagannath.jpg" alt="Lord Jagannath">
-    """
-
-    # Flawless HTML structure for the running photo display with referrer bypass
-    carousel_html = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-    <meta name="referrer" content="no-referrer">
-    <style>
-    body {{ margin: 0; padding: 0; background-color: transparent; font-family: sans-serif; }}
-    .carousel-container {{ width: 100%; height: 350px; overflow: hidden; border-radius: 10px; position: relative; border: 4px solid #1e3a8a; box-shadow: 0 4px 10px rgba(0,0,0,0.3); background-color: #0f172a; }}
-    .marquee-img {{ height: 280px; border-radius: 10px; margin-right: 20px; object-fit: contain; display: inline-block; vertical-align: middle; margin-top: 15px; border: 2px solid #38bdf8; background-color: #fff; padding: 5px; }}
-    .carousel-overlay {{ position: absolute; bottom: 0; background: rgba(30,58,138,0.9); width: 100%; color: white; text-align: center; padding: 12px; font-weight: bold; font-size: 20px; letter-spacing: 1px; box-sizing: border-box; text-shadow: 1px 1px 2px #000; }}
-    </style>
-    </head>
-    <body>
-    <div class="carousel-container">
-        <marquee behavior="scroll" direction="left" scrollamount="15" onmouseover="this.stop();" onmouseout="this.start();" style="height: 100%; display: flex; align-items: center; white-space: nowrap;">
-            {event_images}
-            {base_images}
-        </marquee>
-        <div class="carousel-overlay">Connecting Students, Teachers & Administration Seamlessly</div>
-    </div>
-    </body>
-    </html>
-    """
+    # NATIVE STREAMLIT MARQUEE (NO IFRAME = NO BLANK SCREEN)
+    # The get_img_html function automatically converts local files to base64 if you put them in the same folder as app.py
+    # If the file is not there, it uses the reliable Wikipedia link so the display never breaks.
+    
+    img_modi_murmu = get_img_html("image_51f22e.png", "https://upload.wikimedia.org/wikipedia/commons/e/e2/Droupadi_Murmu_Official_Portrait.jpg", "President Murmu")
+    img_modi_murmu2 = get_img_html("image_51f2a8.jpg", "https://upload.wikimedia.org/wikipedia/commons/c/c0/Official_Photograph_of_Prime_Minister_Narendra_Modi_Portrait.png", "PM Modi")
+    img_school1 = get_img_html("image_51f68a.png", "https://upload.wikimedia.org/wikipedia/commons/3/39/Hibbing_High_School_2014.jpg", "School Front")
+    img_school2 = get_img_html("image_5bd489.jpg", "https://upload.wikimedia.org/wikipedia/commons/e/e6/Main_Building_of_the_School.jpg", "School Building")
+    img_students = get_img_html("image_5bd888.jpg", "https://upload.wikimedia.org/wikipedia/commons/6/69/Indian_School_Children.jpg", "Students Collage")
+    img_saraswati = get_img_html("saraswati.jpg", "https://upload.wikimedia.org/wikipedia/commons/e/e0/Raja_Ravi_Varma_-_Saraswati.jpg", "Saraswati Maa")
+    img_ganesha = get_img_html("ganesha.jpg", "https://upload.wikimedia.org/wikipedia/commons/1/19/Ganesha_Basohli_miniature_circa_1730_Dubost_p73.jpg", "Lord Ganesha")
+    img_jagannath = get_img_html("jagannath.jpg", "https://upload.wikimedia.org/wikipedia/commons/b/b3/Jagannath.jpg", "Lord Jagannath")
 
     st.markdown(f"<h2 style='text-align: center; color: #1e3a8a; margin-top: 0;'>🏫 {event_title}</h2>", unsafe_allow_html=True)
-    components.html(carousel_html, height=360)
+    
+    marquee_html = f"""
+    <div class="marquee-container">
+        <marquee behavior="scroll" direction="left" scrollamount="12" onmouseover="this.stop();" onmouseout="this.start();">
+            {event_img_tag}
+            {img_modi_murmu}
+            {img_modi_murmu2}
+            {img_saraswati}
+            {img_ganesha}
+            {img_jagannath}
+            {img_school1}
+            {img_school2}
+            {img_students}
+        </marquee>
+    </div>
+    """
+    st.markdown(marquee_html, unsafe_allow_html=True)
 
     # Running Long Notification
     notice_text_html = """
-    <!DOCTYPE html>
-    <html>
-    <head>
-    <style>
-    body { margin: 0; padding: 0; background-color: #1e293b; color: #e2e8f0; font-family: sans-serif; font-size: 18px; display: flex; align-items: center; border-radius: 5px;}
-    .new-badge { background-color: #fbbf24; color: black; font-size: 14px; font-weight: bold; padding: 2px 6px; border-radius: 3px; margin-left: 5px; }
-    </style>
-    </head>
-    <body>
-        <marquee direction='left' scrollamount='8' style='padding: 12px; font-weight: bold;'>
-            <span style='color: #fbbf24;'>📢 ନୂଆ ଅପଡେଟ୍: ଛାତ୍ରଛାତ୍ରୀମାନେ ଏବେ ଅନଲାଇନ୍ ରେଜିଷ୍ଟ୍ରେସନ୍ ଏବଂ ପେମେଣ୍ଟ କରିପାରିବେ! <span class='new-badge'>NEW</span> &nbsp;&nbsp;|&nbsp;&nbsp; 👨‍💻 Software Developed by: KULU SUTAR &nbsp;&nbsp;|&nbsp;&nbsp; 📞 Helpdesk No: 8910223342 &nbsp;&nbsp;|&nbsp;&nbsp; ✉️ Mail ID: kulusutar123@gmail.com &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 📢 उन्नत स्कूल प्रबंधन प्रणाली में आपका स्वागत है! &nbsp;&nbsp;|&nbsp;&nbsp; 👨‍💻 डेवलपर: कुलु सुतार &nbsp;&nbsp;|&nbsp;&nbsp; 📞 हेल्पडेस्क: 8910223342 &nbsp;&nbsp;|&nbsp;&nbsp; ✉️ ईमेल: kulusutar123@gmail.com </span>
+    <div style='background-color: #1e293b; border-radius: 5px; margin: 25px 0; border: 1px solid #475569; overflow: hidden; color: #e2e8f0; font-size: 18px; padding: 12px;'>
+        <marquee direction='left' scrollamount='8' style='padding: 5px; font-weight: bold;'>
+            <span style='color: #fbbf24;'>📢 ନୂଆ ଅପଡେଟ୍: ଛାତ୍ରଛାତ୍ରୀମାନେ ଏବେ ଅନଲାଇନ୍ ରେଜିଷ୍ଟ୍ରେସନ୍ ଏବଂ ପେମେଣ୍ଟ କରିପାରିବେ! <span style='background-color: #fbbf24; color: black; font-size: 14px; font-weight: bold; padding: 2px 6px; border-radius: 3px; margin-left: 5px;'>NEW</span> &nbsp;&nbsp;|&nbsp;&nbsp; 👨‍💻 Software Developed by: KULU SUTAR &nbsp;&nbsp;|&nbsp;&nbsp; 📞 Helpdesk No: 8910223342 &nbsp;&nbsp;|&nbsp;&nbsp; ✉️ Mail ID: kulusutar123@gmail.com &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 📢 उन्नत स्कूल प्रबंधन प्रणाली में आपका स्वागत है! &nbsp;&nbsp;|&nbsp;&nbsp; 👨‍💻 डेवलपर: कुलु सुतार &nbsp;&nbsp;|&nbsp;&nbsp; 📞 हेल्पडेस्क: 8910223342 &nbsp;&nbsp;|&nbsp;&nbsp; ✉️ ईमेल: kulusutar123@gmail.com </span>
         </marquee>
-    </body>
-    </html>
+    </div>
     """
-    st.markdown("<div style='border: 1px solid #475569; border-radius: 5px; margin-bottom: 25px;'>", unsafe_allow_html=True)
-    components.html(notice_text_html, height=50)
-    st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown(notice_text_html, unsafe_allow_html=True)
 
     # Prominent Action Buttons
     c1, c2, c3 = st.columns(3)
@@ -720,7 +719,7 @@ elif menu == "New Student Registration":
                             st.rerun()
 
             elif pay_mode == "Offline Payment (School Counter)":
-                st.info(f"You have selected Offline Payment. Please pay ₹{total_fee:.2f} (Fee: ₹{base_fee:.2f} + GST: ₹{gst_amt:.2f}) at your School Counter.")
+                st.info(f"You have selected Offline Payment. Please pay ₹{total_fee:.2f} at your School Counter.")
                 if st.button("Submit Final Application", type="primary"):
                     reg_data = st.session_state['temp_student_data']
                     reg_data['data']['payment_mode'] = f"Offline (₹{total_fee:.2f} - Pending at Counter)"
