@@ -16,7 +16,7 @@ import html
 import threading
 
 # ==========================================
-# 🔒 CRASH PROTECTION & DATA SAFETY LOCKS
+# 🔒 CRASH PROTECTION & DATA SAFETY LOCKS (100% SAFE)
 # ==========================================
 file_lock = threading.Lock()
 
@@ -139,7 +139,7 @@ def normalize_dob(d_str):
         elif len(p3) == 4: return f"{p3}-{p2}-{p1}" 
     return d_str
 
-# --- 100% SAFE JSON DATA LOAD/SAVE FUNCTIONS (PRESERVES EXISTING DATA) ---
+# --- 100% SAFE JSON DATA LOAD/SAVE FUNCTIONS (NO DATA DELETION) ---
 def load_master_data():
     default_master = {
         "username": "master", 
@@ -385,11 +385,23 @@ portal_map = {"home": 0, "reg_student": 1, "reg_school": 2, "master": 3, "school
 portal_param = st.query_params.get("portal", "home")
 default_idx = portal_map.get(portal_param, 0)
 
-# Page Styling Customizer (For Login Pages only)
-if portal_param != "home":
-    st.sidebar.markdown("---")
-    user_bg_color = st.sidebar.color_picker("🎨 Custom Background Color", "#ffffff")
-    st.markdown(f"<style>.stApp {{ background-color: {user_bg_color} !important; }}</style>", unsafe_allow_html=True)
+# Page Styling Customizer
+st.sidebar.markdown("---")
+st.sidebar.markdown("### 🎨 Page Styling Options")
+user_bg_color = st.sidebar.color_picker("Background Color", "#ffffff")
+user_text_color = st.sidebar.color_picker("Text Color", "#000000")
+user_font = st.sidebar.selectbox("Font Style", ["sans-serif", "serif", "monospace", "cursive"])
+
+custom_css = f"""
+<style>
+.stApp {{ background-color: {user_bg_color} !important; }}
+p, div, span, label, h1, h2, h3, h4, h5, h6, li {{
+    color: {user_text_color} !important;
+    font-family: {user_font} !important;
+}}
+</style>
+"""
+st.markdown(custom_css, unsafe_allow_html=True)
 
 menu = st.sidebar.selectbox("🎯 Navigation Menu", menu_items, index=default_idx)
 
@@ -403,7 +415,7 @@ elif menu == "Results": st.query_params["portal"] = "student"
 classes_list = [str(i) for i in range(1, 11)]
 batches_list = [f"{y}-{y+1}" for y in range(2020, 2051)]
 
-# ----------------- HOME PAGE (BEAUTIFUL DYNAMIC UI WITH FIXED IMAGES) -----------------
+# ----------------- HOME PAGE (DYNAMIC UI WITHOUT ERROR) -----------------
 if menu == "Home Page":
     st.markdown("""
     <style>
@@ -411,11 +423,6 @@ if menu == "Home Page":
     .login-card:hover { background: #f8fafc; border-bottom: 5px solid #1e3a8a; transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
     .login-title { font-size: 24px; font-weight: bold; margin-bottom: 8px; color: #1e3a8a !important;}
     .login-sub { font-size: 15px; color: #64748b !important;}
-    
-    /* Native Marquee Styles */
-    .marquee-container { width: 100%; height: 350px; overflow: hidden; border-radius: 10px; position: relative; border: 4px solid #1e3a8a; box-shadow: 0 4px 10px rgba(0,0,0,0.3); background-color: #0f172a; }
-    .marquee-img { height: 280px; border-radius: 10px; margin-right: 20px; object-fit: contain; display: inline-block; vertical-align: middle; margin-top: 15px; border: 2px solid #38bdf8; background-color: #fff; padding: 5px; }
-    .carousel-overlay { position: absolute; bottom: 0; background: rgba(30,58,138,0.9); width: 100%; color: white; text-align: center; padding: 12px; font-weight: bold; font-size: 20px; letter-spacing: 1px; box-sizing: border-box; text-shadow: 1px 1px 2px #000; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -448,39 +455,63 @@ if menu == "Home Page":
         event_images += "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/f/fe/Seal_of_Odisha.png' alt='Utkal Divas'>"
         event_title = "🔴 ଉତ୍କଳ ଦିବସର ହାର୍ଦ୍ଦିକ ଶୁଭେଚ୍ଛା 🔴"
 
-    base_images = (
-        "<img class='marquee-img' src='https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&q=80' alt='School Building'>"
-        "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/e/e2/Droupadi_Murmu_Official_Portrait.jpg' alt='President Murmu'>"
-        "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/c/c0/Official_Photograph_of_Prime_Minister_Narendra_Modi_Portrait.png' alt='PM Modi'>"
-        "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/e/e0/Raja_Ravi_Varma_-_Saraswati.jpg' alt='Saraswati Maa'>"
-        "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/1/19/Ganesha_Basohli_miniature_circa_1730_Dubost_p73.jpg' alt='Lord Ganesha'>"
-        "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/b/b3/Jagannath.jpg' alt='Lord Jagannath'>"
-    )
-
-    st.markdown(f"<div class='dynamic-bg-box'><h2 style='text-align: center; color: #1e3a8a; margin-top: 0;'>🏫 {event_title}</h2>", unsafe_allow_html=True)
-    
-    # Text block issue solved: No spaces before HTML elements!
-    st.markdown(
-        f'<div class="marquee-container">'
-        f'<marquee behavior="scroll" direction="left" scrollamount="15" onmouseover="this.stop();" onmouseout="this.start();" style="height: 100%; display: flex; align-items: center; white-space: nowrap;">'
-        f'{event_images}{base_images}'
-        f'</marquee>'
-        f'<div class="carousel-overlay">Connecting Students, Teachers & Administration Seamlessly</div>'
-        f'</div>', 
-        unsafe_allow_html=True
-    )
-    
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    # Running Long Notification
-    notice_text_html = """
-    <div style='background-color: #1e293b; border-radius: 5px; margin-bottom: 25px; border: 1px solid #475569; overflow: hidden; color: #e2e8f0; font-size: 18px; padding: 12px;'>
-        <marquee direction='left' scrollamount='8' style='font-weight: bold;'>
-            <span style='color: #fbbf24;'>📢 ନୂଆ ଅପଡେଟ୍: ଛାତ୍ରଛାତ୍ରୀମାନେ ଏବେ ଅନଲାଇନ୍ ରେଜିଷ୍ଟ୍ରେସନ୍ ଏବଂ ପେମେଣ୍ଟ କରିପାରିବେ! <span style='background-color: #fbbf24; color: black; font-size: 14px; font-weight: bold; padding: 2px 6px; border-radius: 3px; margin-left: 5px;'>NEW</span> &nbsp;&nbsp;|&nbsp;&nbsp; 👨‍💻 Software Developed by: KULU SUTAR &nbsp;&nbsp;|&nbsp;&nbsp; 📞 Helpdesk No: 8910223342 &nbsp;&nbsp;|&nbsp;&nbsp; ✉️ Mail ID: kulusutar123@gmail.com &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 📢 उन्नत स्कूल प्रबंधन प्रणाली में आपका स्वागत है! &nbsp;&nbsp;|&nbsp;&nbsp; 👨‍💻 डेवलपर: कुलु सुतार &nbsp;&nbsp;|&nbsp;&nbsp; 📞 हेल्पडेस्क: 8910223342 &nbsp;&nbsp;|&nbsp;&nbsp; ✉️ ईमेल: kulusutar123@gmail.com </span>
-        </marquee>
-    </div>
+    base_images = """
+        <img class="marquee-img" src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&q=80" alt="School Building">
+        <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/e/e2/Droupadi_Murmu_Official_Portrait.jpg" alt="President Murmu">
+        <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/c/c0/Official_Photograph_of_Prime_Minister_Narendra_Modi_Portrait.png" alt="PM Modi">
+        <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/e/e0/Raja_Ravi_Varma_-_Saraswati.jpg" alt="Saraswati Maa">
+        <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/1/19/Ganesha_Basohli_miniature_circa_1730_Dubost_p73.jpg" alt="Lord Ganesha">
+        <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/b/b3/Jagannath.jpg" alt="Lord Jagannath">
     """
-    st.markdown(notice_text_html, unsafe_allow_html=True)
+
+    # Flawless HTML structure for the running photo display
+    carousel_html = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <meta name="referrer" content="no-referrer">
+    <style>
+    body {{ margin: 0; padding: 0; background-color: transparent; font-family: sans-serif; }}
+    .carousel-container {{ width: 100%; height: 350px; overflow: hidden; border-radius: 10px; position: relative; border: 4px solid #1e3a8a; box-shadow: 0 4px 10px rgba(0,0,0,0.3); background-color: #0f172a; }}
+    .marquee-img {{ height: 280px; border-radius: 10px; margin-right: 20px; object-fit: contain; display: inline-block; vertical-align: middle; margin-top: 15px; border: 2px solid #38bdf8; background-color: #fff; padding: 5px; }}
+    .carousel-overlay {{ position: absolute; bottom: 0; background: rgba(30,58,138,0.9); width: 100%; color: white; text-align: center; padding: 12px; font-weight: bold; font-size: 20px; letter-spacing: 1px; box-sizing: border-box; text-shadow: 1px 1px 2px #000; }}
+    </style>
+    </head>
+    <body>
+    <div class="carousel-container">
+        <marquee behavior="scroll" direction="left" scrollamount="15" onmouseover="this.stop();" onmouseout="this.start();" style="height: 100%; display: flex; align-items: center; white-space: nowrap;">
+            {event_images}
+            {base_images}
+        </marquee>
+        <div class="carousel-overlay">{html.escape(event_title)}</div>
+    </div>
+    </body>
+    </html>
+    """
+
+    st.markdown(f"<h2 style='text-align: center; color: #1e3a8a; margin-top: 0;'>🏫 {event_title}</h2>", unsafe_allow_html=True)
+    components.html(carousel_html, height=360)
+
+    # Lamba Running Notification Banner
+    notice_text_html = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <style>
+    body { margin: 0; padding: 0; background-color: #1e293b; color: #e2e8f0; font-family: sans-serif; font-size: 18px; display: flex; align-items: center; border-radius: 5px;}
+    .new-badge { background-color: #fbbf24; color: black; font-size: 14px; font-weight: bold; padding: 2px 6px; border-radius: 3px; margin-left: 5px; }
+    </style>
+    </head>
+    <body>
+        <marquee direction='left' scrollamount='8' style='padding: 12px; font-weight: bold;'>
+            <span style='color: #fbbf24;'>📢 ନୂଆ ଅପଡେଟ୍: ଛାତ୍ରଛାତ୍ରୀମାନେ ଏବେ ଅନଲାଇନ୍ ରେଜିଷ୍ଟ୍ରେସନ୍ ଏବଂ ପେମେଣ୍ଟ କରିପାରିବେ! <span class='new-badge'>NEW</span> &nbsp;&nbsp;|&nbsp;&nbsp; 👨‍💻 Software Developed by: KULU SUTAR &nbsp;&nbsp;|&nbsp;&nbsp; 📞 Helpdesk No: 8910223342 &nbsp;&nbsp;|&nbsp;&nbsp; ✉️ Mail ID: kulusutar123@gmail.com &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 📢 उन्नत स्कूल प्रबंधन प्रणाली में आपका स्वागत है! &nbsp;&nbsp;|&nbsp;&nbsp; 👨‍💻 डेवलपर: कुलु सुतार &nbsp;&nbsp;|&nbsp;&nbsp; 📞 हेल्पडेस्क: 8910223342 &nbsp;&nbsp;|&nbsp;&nbsp; ✉️ ईमेल: kulusutar123@gmail.com </span>
+        </marquee>
+    </body>
+    </html>
+    """
+    st.markdown("<div style='border: 1px solid #475569; border-radius: 5px; margin-bottom: 25px;'>", unsafe_allow_html=True)
+    components.html(notice_text_html, height=50)
+    st.markdown("</div>", unsafe_allow_html=True)
 
     # Prominent Action Buttons
     c1, c2, c3 = st.columns(3)
