@@ -139,7 +139,7 @@ def normalize_dob(d_str):
         elif len(p3) == 4: return f"{p3}-{p2}-{p1}" 
     return d_str
 
-# --- 100% SAFE JSON DATA LOAD/SAVE FUNCTIONS ---
+# --- 100% SAFE JSON DATA LOAD/SAVE FUNCTIONS (PRESERVES EXISTING DATA) ---
 def load_master_data():
     default_master = {
         "username": "master", 
@@ -385,23 +385,11 @@ portal_map = {"home": 0, "reg_student": 1, "reg_school": 2, "master": 3, "school
 portal_param = st.query_params.get("portal", "home")
 default_idx = portal_map.get(portal_param, 0)
 
-# Page Styling Customizer (For Login Pages only)
-st.sidebar.markdown("---")
-st.sidebar.markdown("### 🎨 Page Styling Options")
-user_bg_color = st.sidebar.color_picker("Background Color", "#ffffff")
-user_text_color = st.sidebar.color_picker("Text Color", "#000000")
-user_font = st.sidebar.selectbox("Font Style", ["sans-serif", "serif", "monospace", "cursive"])
-
-custom_css = f"""
-<style>
-.stApp {{ background-color: {user_bg_color} !important; }}
-p, div, span, label, h1, h2, h3, h4, h5, h6, li {{
-    color: {user_text_color} !important;
-    font-family: {user_font} !important;
-}}
-</style>
-"""
-st.markdown(custom_css, unsafe_allow_html=True)
+# Sidebar Background Color Customization (Only for Login pages as requested)
+if portal_param != "home":
+    st.sidebar.markdown("---")
+    user_bg_color = st.sidebar.color_picker("🎨 Custom Background Color", "#ffffff")
+    st.markdown(f"<style>.stApp {{ background-color: {user_bg_color} !important; }}</style>", unsafe_allow_html=True)
 
 menu = st.sidebar.selectbox("🎯 Navigation Menu", menu_items, index=default_idx)
 
@@ -415,14 +403,34 @@ elif menu == "Results": st.query_params["portal"] = "student"
 classes_list = [str(i) for i in range(1, 11)]
 batches_list = [f"{y}-{y+1}" for y in range(2020, 2051)]
 
-# ----------------- HOME PAGE (DYNAMIC UI WITHOUT ERROR) -----------------
+# ----------------- HOME PAGE (BEAUTIFUL DYNAMIC UI WITH FIXED IMAGES) -----------------
 if menu == "Home Page":
     st.markdown("""
     <style>
+    @keyframes colorChange {
+        0% { background-color: #e0e7ff; }
+        25% { background-color: #fce7f3; }
+        50% { background-color: #ffedd5; }
+        75% { background-color: #dcfce7; }
+        100% { background-color: #e0e7ff; }
+    }
+    .dynamic-bg-box {
+        animation: colorChange 15s infinite alternate;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        margin-bottom: 25px;
+        border: 2px solid #cbd5e1;
+    }
     .login-card { background: white; border: 1px solid #cbd5e1; border-bottom: 5px solid #fbbf24; border-radius: 8px; padding: 25px; margin-bottom: 20px; text-align: center; text-decoration: none; display: block; color: #1e3a8a !important; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.3s; }
     .login-card:hover { background: #f8fafc; border-bottom: 5px solid #1e3a8a; transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
     .login-title { font-size: 24px; font-weight: bold; margin-bottom: 8px; color: #1e3a8a !important;}
     .login-sub { font-size: 15px; color: #64748b !important;}
+    
+    /* Native Marquee Styles */
+    .marquee-container { width: 100%; height: 350px; overflow: hidden; border-radius: 10px; position: relative; border: 4px solid #1e3a8a; box-shadow: 0 4px 10px rgba(0,0,0,0.3); background-color: #0f172a; }
+    .marquee-img { height: 280px; border-radius: 10px; margin-right: 20px; object-fit: contain; display: inline-block; vertical-align: middle; margin-top: 15px; border: 2px solid #38bdf8; background-color: #fff; padding: 5px; }
+    .carousel-overlay { position: absolute; bottom: 0; background: rgba(30,58,138,0.9); width: 100%; color: white; text-align: center; padding: 12px; font-weight: bold; font-size: 20px; letter-spacing: 1px; box-sizing: border-box; text-shadow: 1px 1px 2px #000; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -433,7 +441,6 @@ if menu == "Home Page":
     event_images = ""
     event_title = "Welcome to Advanced School Management System"
     
-    # RELIABLE IMAGE URLS (Bypassing hotlinking issues)
     if mm_dd == "10-02":
         event_images += "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/7/7a/Mahatma-Gandhi%2C_studio%2C_1931.jpg' alt='Gandhi Jayanti'>"
         event_title = "🙏 Happy Gandhi Jayanti 🙏"
@@ -456,7 +463,6 @@ if menu == "Home Page":
         event_images += "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/f/fe/Seal_of_Odisha.png' alt='Utkal Divas'>"
         event_title = "🔴 ଉତ୍କଳ ଦିବସର ହାର୍ଦ୍ଦିକ ଶୁଭେଚ୍ଛା 🔴"
 
-    # Base images for regular scroll - President, PM, School, Deities
     base_images = """
         <img class="marquee-img" src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&q=80" alt="School Building">
         <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/e/e2/Droupadi_Murmu_Official_Portrait.jpg" alt="President Murmu">
@@ -466,54 +472,30 @@ if menu == "Home Page":
         <img class="marquee-img" src="https://upload.wikimedia.org/wikipedia/commons/b/b3/Jagannath.jpg" alt="Lord Jagannath">
     """
 
-    # Flawless HTML structure for the running photo display without display text bugs
-    carousel_html = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-    <meta name="referrer" content="no-referrer">
-    <style>
-    body {{ margin: 0; padding: 0; background-color: transparent; font-family: sans-serif; }}
-    .carousel-container {{ width: 100%; height: 350px; overflow: hidden; border-radius: 10px; position: relative; border: 4px solid #1e3a8a; box-shadow: 0 4px 10px rgba(0,0,0,0.3); background-color: #0f172a; }}
-    .marquee-img {{ height: 280px; border-radius: 10px; margin-right: 20px; object-fit: contain; display: inline-block; vertical-align: middle; margin-top: 15px; border: 2px solid #38bdf8; background-color: #fff; padding: 5px; }}
-    .carousel-overlay {{ position: absolute; bottom: 0; background: rgba(30,58,138,0.9); width: 100%; color: white; text-align: center; padding: 12px; font-weight: bold; font-size: 20px; letter-spacing: 1px; box-sizing: border-box; text-shadow: 1px 1px 2px #000; }}
-    </style>
-    </head>
-    <body>
-    <div class="carousel-container">
+    # Fix: Removed iframe (components.html) and used direct st.markdown to bypass display blocks
+    st.markdown(f"<div class='dynamic-bg-box'><h2 style='text-align: center; color: #1e3a8a; margin-top: 0;'>🏫 {event_title}</h2>", unsafe_allow_html=True)
+    
+    st.markdown(f"""
+    <div class="marquee-container">
         <marquee behavior="scroll" direction="left" scrollamount="15" onmouseover="this.stop();" onmouseout="this.start();" style="height: 100%; display: flex; align-items: center; white-space: nowrap;">
             {event_images}
             {base_images}
         </marquee>
         <div class="carousel-overlay">Connecting Students, Teachers & Administration Seamlessly</div>
     </div>
-    </body>
-    </html>
-    """
-
-    st.markdown(f"<h2 style='text-align: center; color: #1e3a8a; margin-top: 0;'>🏫 {event_title}</h2>", unsafe_allow_html=True)
-    components.html(carousel_html, height=360)
-
-    # Lamba Running Notification Banner
-    notice_text_html = """
-    <!DOCTYPE html>
-    <html>
-    <head>
-    <style>
-    body { margin: 0; padding: 0; background-color: #1e293b; color: #e2e8f0; font-family: sans-serif; font-size: 18px; display: flex; align-items: center; border-radius: 5px;}
-    .new-badge { background-color: #fbbf24; color: black; font-size: 14px; font-weight: bold; padding: 2px 6px; border-radius: 3px; margin-left: 5px; }
-    </style>
-    </head>
-    <body>
-        <marquee direction='left' scrollamount='8' style='padding: 12px; font-weight: bold;'>
-            <span style='color: #fbbf24;'>📢 ନୂଆ ଅପଡେଟ୍: ଛାତ୍ରଛାତ୍ରୀମାନେ ଏବେ ଅନଲାଇନ୍ ରେଜିଷ୍ଟ୍ରେସନ୍ ଏବଂ ପେମେଣ୍ଟ କରିପାରିବେ! <span class='new-badge'>NEW</span> &nbsp;&nbsp;|&nbsp;&nbsp; 👨‍💻 Software Developed by: KULU SUTAR &nbsp;&nbsp;|&nbsp;&nbsp; 📞 Helpdesk No: 8910223342 &nbsp;&nbsp;|&nbsp;&nbsp; ✉️ Mail ID: kulusutar123@gmail.com &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 📢 उन्नत स्कूल प्रबंधन प्रणाली में आपका स्वागत है! &nbsp;&nbsp;|&nbsp;&nbsp; 👨‍💻 डेवलपर: कुलु सुतार &nbsp;&nbsp;|&nbsp;&nbsp; 📞 हेल्पडेस्क: 8910223342 &nbsp;&nbsp;|&nbsp;&nbsp; ✉️ ईमेल: kulusutar123@gmail.com </span>
-        </marquee>
-    </body>
-    </html>
-    """
-    st.markdown("<div style='border: 1px solid #475569; border-radius: 5px; margin-bottom: 25px;'>", unsafe_allow_html=True)
-    components.html(notice_text_html, height=50)
+    """, unsafe_allow_html=True)
+    
     st.markdown("</div>", unsafe_allow_html=True)
+
+    # Running Long Notification
+    notice_text_html = """
+    <div style='background-color: #1e293b; border-radius: 5px; margin-bottom: 25px; border: 1px solid #475569; overflow: hidden; color: #e2e8f0; font-size: 18px; padding: 12px;'>
+        <marquee direction='left' scrollamount='8' style='font-weight: bold;'>
+            <span style='color: #fbbf24;'>📢 ନୂଆ ଅପଡେଟ୍: ଛାତ୍ରଛାତ୍ରୀମାନେ ଏବେ ଅନଲାଇନ୍ ରେଜିଷ୍ଟ୍ରେସନ୍ ଏବଂ ପେମେଣ୍ଟ କରିପାରିବେ! <span style='background-color: #fbbf24; color: black; font-size: 14px; font-weight: bold; padding: 2px 6px; border-radius: 3px; margin-left: 5px;'>NEW</span> &nbsp;&nbsp;|&nbsp;&nbsp; 👨‍💻 Software Developed by: KULU SUTAR &nbsp;&nbsp;|&nbsp;&nbsp; 📞 Helpdesk No: 8910223342 &nbsp;&nbsp;|&nbsp;&nbsp; ✉️ Mail ID: kulusutar123@gmail.com &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 📢 उन्नत स्कूल प्रबंधन प्रणाली में आपका स्वागत है! &nbsp;&nbsp;|&nbsp;&nbsp; 👨‍💻 डेवलपर: कुलु सुतार &nbsp;&nbsp;|&nbsp;&nbsp; 📞 हेल्पडेस्क: 8910223342 &nbsp;&nbsp;|&nbsp;&nbsp; ✉️ ईमेल: kulusutar123@gmail.com </span>
+        </marquee>
+    </div>
+    """
+    st.markdown(notice_text_html, unsafe_allow_html=True)
 
     # Prominent Action Buttons
     c1, c2, c3 = st.columns(3)
@@ -732,7 +714,7 @@ elif menu == "New Student Registration":
                             st.rerun()
 
             elif pay_mode == "Offline Payment (School Counter)":
-                st.info(f"You have selected Offline Payment. Please pay ₹{total_fee:.2f} at your School Counter.")
+                st.info(f"You have selected Offline Payment. Please pay ₹{total_fee:.2f} (Fee: ₹{base_fee:.2f} + GST: ₹{gst_amt:.2f}) at your School Counter.")
                 if st.button("Submit Final Application", type="primary"):
                     reg_data = st.session_state['temp_student_data']
                     reg_data['data']['payment_mode'] = f"Offline (₹{total_fee:.2f} - Pending at Counter)"
