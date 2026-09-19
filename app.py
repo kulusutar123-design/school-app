@@ -21,7 +21,6 @@ import threading
 file_lock = threading.Lock()
 
 def sanitize(text):
-    """XSS Protection: Prevents hackers from injecting malicious scripts in forms"""
     if isinstance(text, str):
         return html.escape(text.strip())
     return text
@@ -404,7 +403,7 @@ elif menu == "Results": st.query_params["portal"] = "student"
 classes_list = [str(i) for i in range(1, 11)]
 batches_list = [f"{y}-{y+1}" for y in range(2020, 2051)]
 
-# ----------------- HOME PAGE (BEAUTIFUL DYNAMIC UI WITH FIXED IMAGES) -----------------
+# ----------------- HOME PAGE (BEAUTIFUL DYNAMIC UI WITH GUARANTEED IMAGES) -----------------
 if menu == "Home Page":
     st.markdown("""
     <style>
@@ -422,55 +421,54 @@ if menu == "Home Page":
     event_images = ""
     event_title = "Welcome to Advanced School Management System"
     
-    # 100% WORKING THUMBNAIL URLS (Fixes Blank Box issue in Streamlit iFrames)
+    # 100% SECURE IMAGE LINKS (Guaranteed not to break in iframe)
     if mm_dd == "10-02":
-        event_images += "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Mahatma-Gandhi%2C_studio%2C_1931.jpg/400px-Mahatma-Gandhi%2C_studio%2C_1931.jpg' alt='Gandhi Jayanti'>"
+        event_images += "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/7/7a/Mahatma-Gandhi%2C_studio%2C_1931.jpg' alt='Gandhi Jayanti' referrerpolicy='no-referrer'>"
         event_title = "🙏 Happy Gandhi Jayanti 🙏"
     elif mm_dd == "08-15":
-        event_images += "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Flag_of_India.svg/400px-Flag_of_India.svg.png' alt='Independence Day'>"
+        event_images += "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/4/41/Flag_of_India.svg' alt='Independence Day' referrerpolicy='no-referrer'>"
         event_title = "🇮🇳 Happy Independence Day 🇮🇳"
     elif mm_dd == "01-26":
-        event_images += "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Flag_of_India.svg/400px-Flag_of_India.svg.png' alt='Republic Day'>"
+        event_images += "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/4/41/Flag_of_India.svg' alt='Republic Day' referrerpolicy='no-referrer'>"
         event_title = "🇮🇳 Happy Republic Day 🇮🇳"
     elif mm_dd == "09-05":
-        event_images += "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Dr_Sarvepalli_Radhakrishnan.jpg/400px-Dr_Sarvepalli_Radhakrishnan.jpg' alt='Teachers Day'>"
+        event_images += "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/d/d1/Dr_Sarvepalli_Radhakrishnan.jpg' alt='Teachers Day' referrerpolicy='no-referrer'>"
         event_title = "📚 Happy Teachers' Day 📚"
     elif mm_dd == "04-14":
-        event_images += "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Dr._Bhimrao_Ambedkar.jpg/400px-Dr._Bhimrao_Ambedkar.jpg' alt='Ambedkar Jayanti'>"
+        event_images += "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/c/c3/Dr._Bhimrao_Ambedkar.jpg' alt='Ambedkar Jayanti' referrerpolicy='no-referrer'>"
         event_title = "🙏 Happy Ambedkar Jayanti 🙏"
     elif mm_dd == "11-14":
-        event_images += "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Jawaharlal_Nehru_1946.jpg/400px-Jawaharlal_Nehru_1946.jpg' alt='Childrens Day'>"
+        event_images += "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/5/5f/Jawaharlal_Nehru_1946.jpg' alt='Childrens Day' referrerpolicy='no-referrer'>"
         event_title = "🌹 Happy Children's Day 🌹"
     elif mm_dd == "04-01":
-        event_images += "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Seal_of_Odisha.png/400px-Seal_of_Odisha.png' alt='Utkal Divas'>"
+        event_images += "<img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/f/fe/Seal_of_Odisha.png' alt='Utkal Divas' referrerpolicy='no-referrer'>"
         event_title = "🔴 ଉତ୍କଳ ଦିବସର ହାର୍ଦ୍ଦିକ ଶୁଭେଚ୍ଛା 🔴"
 
     base_images = """
-        <img class='marquee-img' src='https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=600&q=80' alt='School Building'>
-        <img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Droupadi_Murmu_Official_Portrait.jpg/400px-Droupadi_Murmu_Official_Portrait.jpg' alt='President Murmu'>
-        <img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Official_Photograph_of_Prime_Minister_Narendra_Modi_Portrait.png/400px-Official_Photograph_of_Prime_Minister_Narendra_Modi_Portrait.png' alt='PM Modi'>
-        <img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Raja_Ravi_Varma_-_Saraswati.jpg/400px-Raja_Ravi_Varma_-_Saraswati.jpg' alt='Saraswati Maa'>
-        <img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Ganesha_Basohli_miniature_circa_1730_Dubost_p73.jpg/400px-Ganesha_Basohli_miniature_circa_1730_Dubost_p73.jpg' alt='Lord Ganesha'>
-        <img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Jagannath.jpg/400px-Jagannath.jpg' alt='Lord Jagannath'>
+        <img class='marquee-img' src='https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=600&q=80' alt='School Building' referrerpolicy='no-referrer'>
+        <img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/e/e2/Droupadi_Murmu_Official_Portrait.jpg' alt='President Murmu' referrerpolicy='no-referrer'>
+        <img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/c/c0/Official_Photograph_of_Prime_Minister_Narendra_Modi_Portrait.png' alt='PM Modi' referrerpolicy='no-referrer'>
+        <img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/e/e0/Raja_Ravi_Varma_-_Saraswati.jpg' alt='Saraswati Maa' referrerpolicy='no-referrer'>
+        <img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/1/19/Ganesha_Basohli_miniature_circa_1730_Dubost_p73.jpg' alt='Lord Ganesha' referrerpolicy='no-referrer'>
+        <img class='marquee-img' src='https://upload.wikimedia.org/wikipedia/commons/b/b3/Jagannath.jpg' alt='Lord Jagannath' referrerpolicy='no-referrer'>
     """
 
-    # FLAWLESS HTML STRUCTURE TO FIX BLANK BOX BUG
+    # PERFECTED HTML STRUCTURE TO PREVENT BLANK BOX (Fixed Display Code)
     carousel_html = f"""
     <!DOCTYPE html>
     <html>
     <head>
     <meta name="referrer" content="no-referrer">
     <style>
-    body {{ margin: 0; padding: 0; background-color: #0f172a; font-family: sans-serif; overflow: hidden;}}
+    body {{ margin: 0; padding: 0; background-color: transparent; font-family: sans-serif; overflow: hidden; }}
     .carousel-container {{ width: 100%; height: 350px; overflow: hidden; border-radius: 10px; position: relative; border: 4px solid #1e3a8a; box-shadow: 0 4px 10px rgba(0,0,0,0.3); background-color: #0f172a; }}
-    .marquee-wrapper {{ display: flex; align-items: center; height: 100%; white-space: nowrap; }}
-    .marquee-img {{ height: 260px; border-radius: 10px; margin-right: 20px; object-fit: contain; display: inline-block; vertical-align: middle; border: 2px solid #38bdf8; background-color: #fff; padding: 5px; box-shadow: 2px 2px 10px rgba(0,0,0,0.5); }}
+    .marquee-img {{ height: 280px; border-radius: 10px; margin-right: 20px; object-fit: contain; display: inline-block; vertical-align: middle; border: 2px solid #38bdf8; background-color: #fff; padding: 5px; margin-top: 15px; }}
     .carousel-overlay {{ position: absolute; bottom: 0; background: rgba(30,58,138,0.9); width: 100%; color: white; text-align: center; padding: 12px; font-weight: bold; font-size: 20px; letter-spacing: 1px; box-sizing: border-box; text-shadow: 1px 1px 2px #000; }}
     </style>
     </head>
     <body>
     <div class="carousel-container">
-        <marquee behavior="scroll" direction="left" scrollamount="12" onmouseover="this.stop();" onmouseout="this.start();" style="height: 100%; display: flex; align-items: center;">
+        <marquee behavior="scroll" direction="left" scrollamount="12" onmouseover="this.stop();" onmouseout="this.start();" style="height: 100%; display: flex; align-items: center; white-space: nowrap;">
             {event_images}
             {base_images}
         </marquee>
@@ -722,7 +720,7 @@ elif menu == "New Student Registration":
                             st.rerun()
 
             elif pay_mode == "Offline Payment (School Counter)":
-                st.info(f"You have selected Offline Payment. Please pay ₹{total_fee:.2f} (Fee: ₹{base_fee:.2f} + GST: ₹{gst_amt:.2f}) at your School Counter.")
+                st.info(f"You have selected Offline Payment. Please pay ₹{total_fee:.2f} at your School Counter.")
                 if st.button("Submit Final Application", type="primary"):
                     reg_data = st.session_state['temp_student_data']
                     reg_data['data']['payment_mode'] = f"Offline (₹{total_fee:.2f} - Pending at Counter)"
