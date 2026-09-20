@@ -1153,16 +1153,33 @@ elif menu == "Master Login":
                     
                     st.markdown("#### 📚 Edit Subjects & Marks")
                     m_subjects = m_curr_st.get('subjects', {})
-                    new_m_subjects = {}; m_tot_full = 0; m_tot_obt = 0
+                    new_m_subjects = {}
+                    m_tot_full = 0
+                    m_tot_obt = 0
                     
-                    for sub_name, sub_info in m_subjects.items():
+                    # 🛠️ FIXED: Show 6 blank slots if subjects dictionary is empty.
+                    existing_keys = list(m_subjects.keys())
+                    num_rows_to_show = max(6, len(existing_keys) + 2)
+                    
+                    for i in range(num_rows_to_show):
+                        if i < len(existing_keys):
+                            def_name = existing_keys[i]
+                            def_fm = float(m_subjects[def_name]['full'])
+                            def_om = float(m_subjects[def_name]['obt'])
+                        else:
+                            def_name = ""
+                            def_fm = 100.0
+                            def_om = 0.0
+
                         sc1, sc2, sc3 = st.columns(3)
-                        with sc1: u_sub = st.text_input("Subject Name", value=sub_name, key=f"m_fix_sub_{sub_name}_{m_edit_roll}")
-                        with sc2: u_f = st.number_input("Full Mark", value=float(sub_info['full']), key=f"m_fix_fm_{sub_name}_{m_edit_roll}")
-                        with sc3: u_o = st.number_input("Obtained", value=float(sub_info['obt']), key=f"m_fix_om_{sub_name}_{m_edit_roll}")
-                        if u_sub:
+                        u_sub = sc1.text_input(f"Subject {i+1}", value=def_name, key=f"m_esub_{i}_{m_edit_roll}")
+                        u_f = sc2.number_input(f"Full Mark {i+1}", value=def_fm, key=f"m_efm_{i}_{m_edit_roll}")
+                        u_o = sc3.number_input(f"Obtained {i+1}", value=def_om, key=f"m_eom_{i}_{m_edit_roll}")
+
+                        if u_sub.strip():
                             new_m_subjects[sanitize(u_sub)] = {"full": u_f, "obt": u_o}
-                            m_tot_full += u_f; m_tot_obt += u_o
+                            m_tot_full += u_f
+                            m_tot_obt += u_o
                     
                     col_sv, col_dl = st.columns(2)
                     with col_sv:
@@ -1176,7 +1193,7 @@ elif menu == "Master Login":
                                 "father_name": sanitize(m_up_father), "father_name_local": sanitize(m_up_father_loc),
                                 "gender": m_up_gender, "pen_no": sanitize(m_up_pen), "apaar_no": sanitize(m_up_apaar),
                                 "dob": sanitize(m_up_dob), "class": m_up_class, "batch": m_up_batch,
-                                "subjects": new_m_subjects if new_m_subjects else m_subjects,
+                                "subjects": new_m_subjects,
                                 "total_obt": m_tot_obt, "total_full": m_tot_full, 
                                 "percentage": round(new_per, 2), "result": new_res, "grade": new_grd
                             })
@@ -1319,16 +1336,14 @@ elif menu == "School Login":
             opt_pub_date = st.date_input("Results Publication Date", value=datetime.date.today(), key="s_add_pub_v2")
             
             st.markdown("#### 📚 Add Subjects & Marks")
-            if 'num_subjects' not in st.session_state: st.session_state.num_subjects = 3
-            if st.button("➕ Add Sub", key="s_add_sub_btn_v2"): st.session_state.num_subjects += 1
-            
+            # 🛠️ FIXED: Show 6 blank slots by default to add subjects securely
             subjects_data = {}; total_full = 0; total_obt = 0
-            for i in range(st.session_state.num_subjects):
+            for i in range(6):
                 c1, c2, c3 = st.columns(3)
                 s_name = c1.text_input(f"Subject {i+1}", key=f"s_as_v2_{i}")
                 f_m = c2.number_input(f"FM {i+1}", value=100.0, key=f"s_af_v2_{i}")
                 o_m = c3.number_input(f"OM {i+1}", value=0.0, key=f"s_ao_v2_{i}")
-                if s_name:
+                if s_name.strip():
                     subjects_data[sanitize(s_name)] = {"full": f_m, "obt": o_m}
                     total_full += f_m; total_obt += o_m
 
@@ -1382,12 +1397,26 @@ elif menu == "School Login":
                 up_subjects = curr_st.get('subjects', {})
                 new_up_subjects = {}; up_tot_full = 0; up_tot_obt = 0
                 
-                for sub_name, sub_info in up_subjects.items():
+                # 🛠️ FIXED: Show 6 blank slots if subjects dictionary is empty.
+                existing_keys = list(up_subjects.keys())
+                num_rows_to_show = max(6, len(existing_keys) + 2)
+                
+                for i in range(num_rows_to_show):
+                    if i < len(existing_keys):
+                        def_name = existing_keys[i]
+                        def_fm = float(up_subjects[def_name]['full'])
+                        def_om = float(up_subjects[def_name]['obt'])
+                    else:
+                        def_name = ""
+                        def_fm = 100.0
+                        def_om = 0.0
+
                     sc1, sc2, sc3 = st.columns(3)
-                    u_sub = sc1.text_input("Subject", value=sub_name, key=f"s_us_v2_{sub_name}_{edit_roll}")
-                    u_f = sc2.number_input("Full Mark", value=float(sub_info['full']), key=f"s_uf_v2_{sub_name}_{edit_roll}")
-                    u_o = sc3.number_input("Obtained Mark", value=float(sub_info['obt']), key=f"s_uo_v2_{sub_name}_{edit_roll}")
-                    if u_sub:
+                    u_sub = sc1.text_input(f"Subject {i+1}", value=def_name, key=f"s_esub_{i}_{edit_roll}")
+                    u_f = sc2.number_input(f"Full Mark {i+1}", value=def_fm, key=f"s_efm_{i}_{edit_roll}")
+                    u_o = sc3.number_input(f"Obtained {i+1}", value=def_om, key=f"s_eom_{i}_{edit_roll}")
+
+                    if u_sub.strip():
                         new_up_subjects[sanitize(u_sub)] = {"full": u_f, "obt": u_o}
                         up_tot_full += u_f; up_tot_obt += u_o
                 
@@ -1402,7 +1431,7 @@ elif menu == "School Login":
                         "mother_name": sanitize(up_mother), "mother_name_local": sanitize(up_mother_loc),
                         "gender": up_gender, "pen_no": sanitize(up_pen), "apaar_no": sanitize(up_apaar),
                         "dob": sanitize(up_dob_input), "class": up_class, "batch": up_batch,
-                        "subjects": new_up_subjects if new_up_subjects else up_subjects,
+                        "subjects": new_up_subjects,
                         "total_obt": up_tot_obt, "total_full": up_tot_full, 
                         "percentage": round(new_per, 2), "result": new_res, "grade": new_grd
                     })
