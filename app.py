@@ -36,6 +36,31 @@ def atomic_save(data, filename):
             st.error(f"Save Error ({filename}): {e}")
 
 # ==========================================
+# 📂 DIRECTORY CREATION FOR SCHOLARSHIPS
+# ==========================================
+os.makedirs("Scholarship_Data/Student_Submissions", exist_ok=True)
+os.makedirs("Scholarship_Data/Approved_Master", exist_ok=True)
+
+def save_master_approved_folder(app_id, s_data):
+    folder_path = f"Scholarship_Data/Approved_Master/{app_id}"
+    os.makedirs(folder_path, exist_ok=True)
+    
+    pdf_path = f"{folder_path}/Application_{app_id}.pdf"
+    create_scholarship_pdf(pdf_path, app_id, s_data)
+    
+    if s_data.get('photo_b64'):
+        with open(f"{folder_path}/Profile_Photo.jpg", "wb") as f: f.write(base64.b64decode(s_data['photo_b64']))
+    if s_data.get('inc_file_b64'):
+        with open(f"{folder_path}/Income_Cert.jpg", "wb") as f: f.write(base64.b64decode(s_data['inc_file_b64']))
+    if s_data.get('cas_file_b64'):
+        with open(f"{folder_path}/Caste_Cert.jpg", "wb") as f: f.write(base64.b64decode(s_data['cas_file_b64']))
+    if s_data.get('passbook_b64'):
+        with open(f"{folder_path}/Bank_Passbook.jpg", "wb") as f: f.write(base64.b64decode(s_data['passbook_b64']))
+            
+    with open(f"{folder_path}/Student_Data.json", "w", encoding="utf-8") as f:
+        json.dump(s_data, f, indent=4)
+
+# ==========================================
 # 🌐 APP URL SETTING & CONFIG
 # ==========================================
 APP_URL = "http://localhost:8501"
@@ -230,7 +255,7 @@ def create_scholarship_pdf(filename, app_id, s_data):
     c.setStrokeColorRGB(0.8, 0.8, 0.8); c.line(50, y, 550, y); y -= 20
     c.setFont("Helvetica-Bold", 12); c.drawString(50, y, "Payment & Status"); c.setFont("Helvetica", 11); y -= 20
     c.drawString(50, y, f"Payment Mode: {s_data.get('payment_mode', 'N/A')}"); y -= 25
-    c.drawString(50, y, f"Current Status: {s_data.get('status', 'Pending')}"); y -= 40
+    c.drawString(50, y, f"Current Status: {s_data.get('status', 'Pending_Master')}"); y -= 40
     c.line(50, y, 550, y); y -= 20
     c.setFont("Helvetica-Oblique", 10); c.drawCentredString(300, y, "Computer-generated receipt. Keep for future reference.")
     try: bc = code128.Code128(str(app_id), barHeight=30, barWidth=1.5); bc.drawOn(c, 50, 40)
@@ -633,7 +658,7 @@ if menu == "Home Page":
         st.markdown("<a href='?portal=reg_school' target='_self' class='login-card'><div class='login-title'>🏫 New School Reg.</div><div class='login-sub'>Register institution</div></a>", unsafe_allow_html=True)
         st.markdown("<a href='?portal=student' target='_self' class='login-card' style='height: 43%; display: flex; flex-direction: column; justify-content: center;'><div class='login-title' style='font-size: 32px;'>🎓 Check Results</div><div class='login-sub'>Download Rank Card</div></a>", unsafe_allow_html=True)
 
-# ----------------- SCHOLARSHIP PORTAL -----------------
+# ----------------- SCHOLARSHIP PORTAL (WITH NEW TABS) -----------------
 elif menu == "Scholarship Portal":
     c_h, c_t = st.columns([1, 8])
     with c_h:
@@ -642,195 +667,236 @@ elif menu == "Scholarship Portal":
     
     sch_fee = float(master_db.get("scholarship_fee", 50.0))
     
-    if 'sch_app_step' not in st.session_state: st.session_state['sch_app_step'] = False
-    if 'sch_app_success' not in st.session_state: st.session_state['sch_app_success'] = False
+    sch_tab1, sch_tab2 = st.tabs(["🆕 Apply for Scholarship", "🔍 Check Application Status"])
+    
+    with sch_tab1:
+        if 'sch_app_step' not in st.session_state: st.session_state['sch_app_step'] = False
+        if 'sch_app_success' not in st.session_state: st.session_state['sch_app_success'] = False
 
-    if st.session_state['sch_app_success']:
-        st.success(f"✅ Application Submitted! Reference ID is **{st.session_state['sch_app_id']}**.")
-        pdf_file = f"Scholarship_{st.session_state['sch_app_id']}.pdf"
-        create_scholarship_pdf(pdf_file, st.session_state['sch_app_id'], st.session_state['sch_app_data'])
-        c1, c2 = st.columns(2)
-        with c1:
-            with open(pdf_file, "rb") as f: st.download_button("📥 Download PDF Receipt", f, file_name=pdf_file, mime="application/pdf")
-        with c2:
-            if st.button("⬅️ Back to Portal"): st.session_state['sch_app_success'] = False; st.rerun()
-
-    elif not st.session_state['sch_app_step']:
-        col_o1, col_o2 = st.columns([8, 2])
-        otr_input = col_o1.text_input("OTR No. *", key="otr_inp_val")
-        if col_o2.button("VERIFY OTR"):
-            if otr_input:
-                st.session_state['v_otr'] = otr_input
-                st.session_state['v_name'] = "JYOTI PRAKASH SUTAR" 
-                st.session_state['v_aadhaar'] = "8899-0011-2233" 
-                st.success("✅ OTR Verified Successfully!")
-            else: st.error("Please enter OTR No.")
-
-        c_ad1, c_ad2 = st.columns([8, 2])
-        aadhaar_input = c_ad1.text_input("Aadhaar No. *", value=st.session_state.get('v_aadhaar', ''), key="ad_inp_val")
-        if c_ad2.button("VERIFY AADHAAR"):
-            if aadhaar_input: st.success("✅ Aadhaar Linked & Verified Successfully!")
-            else: st.error("Please enter Aadhaar No.")
-
-        c1, c2, c3 = st.columns(3)
-        ac_year = c1.selectbox("Academic Year", ["2026-27", "2027-28"])
-        dept = c2.selectbox("Department", ["ST&SC and MBC Welfare Depart", "Higher Education"])
-        scheme = c3.selectbox("Scheme", ["Pre Matric", "Post Matric"])
-        
-        c4, c5 = st.columns(2)
-        app_name = c4.text_input("Applicant Name *", value=st.session_state.get('v_name', ''))
-        category = c5.selectbox("Category *", SOCIAL_CATEGORIES)
-        
-        c6, c7, c8 = st.columns(3)
-        gender = c6.radio("Applicant Gender:", ["Male", "Female", "Transgender"])
-        religion = c7.selectbox("Religion", ["Select", "Hindu", "Muslim", "Christian", "Other"])
-        photo = c8.file_uploader("Profile Photo (jpg, png)", type=['png', 'jpg', 'jpeg'], key="sch_photo_input")
-        
-        c9, c10 = st.columns(2)
-        dob = c9.date_input("Date of Birth *", min_value=datetime.date(1990, 1, 1), max_value=datetime.date.today())
-        mob_no = c10.text_input("Student/Parent's Mobile No. *")
-        
-        c13, c14 = st.columns(2)
-        f_name = c13.text_input("Father's Name *")
-        m_name = c14.text_input("Mother's Name *")
-        
-        addr = st.text_area("Full Address *", placeholder="Enter your complete address")
-        c_st, c_dt = st.columns(2)
-        state = c_st.selectbox("State *", list(STATE_LANG_MAP.keys()), index=18)
-        dist = c_dt.text_input("District *")
-        c_blk, c_pin = st.columns(2)
-        block = c_blk.text_input("Block/ULB *")
-        pin = c_pin.text_input("Pin Code *", max_chars=6)
-        
-        active_schools = {k: v for k, v in schools_db.items() if v.get("status", "Active") == "Active"}
-        school_options = [f"{k} - {v['name']}" for k, v in active_schools.items()]
-        c24, c25 = st.columns(2)
-        school_sel_str = c24.selectbox("Institute (School) *", ["--Select--"] + school_options) if school_options else "--Select--"
-        sch_class = c25.selectbox("Class *", ["IX", "X", "XI", "XII"])
-        school_code = school_sel_str.split(" - ")[0] if school_sel_str != "--Select--" else None
-        
-        c33, c34 = st.columns(2)
-        with c33:
-            st.markdown("**Income Certificate**")
-            inc_year = st.selectbox("Issuing Year", CERT_YEARS)
-            col_inc1, col_inc2 = st.columns([7, 3])
-            inc_no = col_inc1.text_input("Income Certificate No. *")
-            if col_inc2.button("VERIFY INCOME"):
-                if inc_no: st.success("Verified")
-            inc_whom = st.selectbox("To Whom Issued", RELATIONSHIPS)
-            inc_auth = st.selectbox("Issuing Authority (Income)", ISSUING_AUTHORITIES)
-            inc_file = st.file_uploader("Upload Income Certificate Photo *", type=['png', 'jpg', 'jpeg'], key="sch_inc_input")
+        if st.session_state['sch_app_success']:
+            st.success(f"✅ Application Submitted! Reference ID is **{st.session_state['sch_app_id']}**.")
+            st.info("Payment Received Successfully. All your data is securely saved in your Application Folder.")
             
-        with c34:
-            st.markdown("**Caste Certificate**")
-            cas_year = st.selectbox("Caste Issuing Year", CERT_YEARS)
-            col_cas1, col_cas2 = st.columns([7, 3])
-            cas_no = col_cas1.text_input("Caste Certificate No. *")
-            if col_cas2.button("VERIFY CASTE"):
-                if cas_no: st.success("Verified")
-            cas_auth = st.selectbox("Issuing Authority (Caste)", ISSUING_AUTHORITIES)
-            cas_file = st.file_uploader("Upload Caste Certificate Photo *", type=['png', 'jpg', 'jpeg'], key="sch_cas_input")
-        
-        st.markdown("### 🏦 Bank Information")
-        st.warning("Please note that your Aadhaar Number will be used for crediting scholarship amount via DBT.")
-        
-        c35, c36 = st.columns([8, 2])
-        ifsc = c35.text_input("IFSC Code *")
-        if c36.button("FIND IFSC"):
-            if ifsc:
-                try:
-                    url = f"https://ifsc.razorpay.com/{ifsc.strip()}"
-                    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-                    with urllib.request.urlopen(req, timeout=5) as response:
-                        data = json.loads(response.read().decode('utf-8'))
-                        st.session_state['v_bank'] = data.get('BANK', 'Unknown Bank')
-                        st.session_state['v_branch'] = data.get('BRANCH', 'Unknown Branch')
-                        st.success("✅ IFSC Verified & Bank Auto-Fetched!")
-                except Exception: st.error("❌ Invalid IFSC")
+            pdf_path = f"Scholarship_Data/Student_Submissions/{st.session_state['sch_app_id']}/Payment_Receipt_Application.pdf"
             
-        c36a, c37a = st.columns(2)
-        b_name = c36a.text_input("Bank Name", value=st.session_state.get('v_bank', ''), disabled=True)
-        b_branch = c37a.text_input("Branch Name", value=st.session_state.get('v_branch', ''), disabled=True)
-        
-        c38, c39 = st.columns([8, 2])
-        acc_no = c38.text_input("Account Number *", type="password")
-        if c39.button("VERIFY ACCOUNT"):
-            if acc_no:
-                st.session_state['v_acc_name'] = app_name
-                st.success("✅ Account Verified!")
+            c_suc1, c_suc2 = st.columns(2)
+            with c_suc1:
+                if os.path.exists(pdf_path):
+                    with open(pdf_path, "rb") as f: 
+                        st.download_button("📥 Download Application & Receipt PDF", f, file_name=f"Scholarship_{st.session_state['sch_app_id']}.pdf", mime="application/pdf", key="sch_dl_success")
+            with c_suc2:
+                if st.button("🏠 Go to Home Page", key="sch_go_home"): 
+                    st.query_params["portal"] = "home"
+                    st.session_state['sch_app_success'] = False
+                    st.session_state['sch_app_step'] = False
+                    st.rerun()
+
+        elif not st.session_state['sch_app_step']:
+            col_o1, col_o2 = st.columns([8, 2])
+            otr_input = col_o1.text_input("OTR No. *", key="otr_inp_val")
+            if col_o2.button("VERIFY OTR"):
+                if otr_input:
+                    st.session_state['v_otr'] = otr_input
+                    st.session_state['v_name'] = "JYOTI PRAKASH SUTAR" 
+                    st.session_state['v_aadhaar'] = "8899-0011-2233" 
+                    st.success("✅ OTR Verified Successfully!")
+                else: st.error("Please enter OTR No.")
+
+            c_ad1, c_ad2 = st.columns([8, 2])
+            aadhaar_input = c_ad1.text_input("Aadhaar No. *", value=st.session_state.get('v_aadhaar', ''), key="ad_inp_val")
+            if c_ad2.button("VERIFY AADHAAR"):
+                if aadhaar_input: st.success("✅ Aadhaar Linked & Verified Successfully!")
+                else: st.error("Please enter Aadhaar No.")
+
+            c1, c2, c3 = st.columns(3)
+            ac_year = c1.selectbox("Academic Year", ["2026-27", "2027-28"])
+            dept = c2.selectbox("Department", ["ST&SC and MBC Welfare Depart", "Higher Education"])
+            scheme = c3.selectbox("Scheme", ["Pre Matric", "Post Matric"])
             
-        acc_name = st.text_input("Account Holder Name *", value=st.session_state.get('v_acc_name', ''))
-        re_acc_no = st.text_input("Re-type Account No. *")
-        
-        c_seed, c_pass = st.columns(2)
-        seeded = c_seed.radio("Whether account number seeded with the Aadhaar number?", ["Yes", "No"], index=1, key="sch_seed_radio")
-        passbook = c_pass.file_uploader("Upload Passbook Front Page (JPG/PNG) *", type=['png', 'jpg', 'jpeg'], key="sch_passbook_input")
-        
-        decl = st.checkbox("✅ I declare the above info is true.")
-        if st.button("Proceed to Payment & Submit", type="primary"):
-            if not decl: st.error("Please accept the declaration.")
-            elif not school_code or not sanitize(app_name) or not sanitize(aadhaar_input) or not sanitize(acc_no):
-                st.error("Please fill all mandatory fields (*).")
-            else:
-                photo_b64 = base64.b64encode(photo.read()).decode('utf-8') if photo else ""
-                inc_file_b64 = base64.b64encode(inc_file.read()).decode('utf-8') if inc_file else ""
-                cas_file_b64 = base64.b64encode(cas_file.read()).decode('utf-8') if cas_file else ""
-                passbook_b64 = base64.b64encode(passbook.read()).decode('utf-8') if passbook else ""
+            c4, c5 = st.columns(2)
+            app_name = c4.text_input("Applicant Name *", value=st.session_state.get('v_name', ''))
+            category = c5.selectbox("Category *", SOCIAL_CATEGORIES)
+            
+            c6, c7, c8 = st.columns(3)
+            gender = c6.radio("Applicant Gender:", ["Male", "Female", "Transgender"])
+            religion = c7.selectbox("Religion", ["Select", "Hindu", "Muslim", "Christian", "Other"])
+            photo = c8.file_uploader("Profile Photo (jpg, png)", type=['png', 'jpg', 'jpeg'], key="sch_photo_input")
+            
+            c9, c10 = st.columns(2)
+            dob = c9.date_input("Date of Birth *", min_value=datetime.date(1990, 1, 1), max_value=datetime.date.today())
+            mob_no = c10.text_input("Student/Parent's Mobile No. *")
+            
+            c13, c14 = st.columns(2)
+            f_name = c13.text_input("Father's Name *")
+            m_name = c14.text_input("Mother's Name *")
+            
+            addr = st.text_area("Full Address *", placeholder="Enter your complete address")
+            c_st, c_dt = st.columns(2)
+            state = c_st.selectbox("State *", list(STATE_LANG_MAP.keys()), index=18)
+            dist = c_dt.text_input("District *")
+            c_blk, c_pin = st.columns(2)
+            block = c_blk.text_input("Block/ULB *")
+            pin = c_pin.text_input("Pin Code *", max_chars=6)
+            
+            active_schools = {k: v for k, v in schools_db.items() if v.get("status", "Active") == "Active"}
+            school_options = [f"{k} - {v['name']}" for k, v in active_schools.items()]
+            c24, c25 = st.columns(2)
+            school_sel_str = c24.selectbox("Institute (School) *", ["--Select--"] + school_options) if school_options else "--Select--"
+            sch_class = c25.selectbox("Class *", ["IX", "X", "XI", "XII"])
+            school_code = school_sel_str.split(" - ")[0] if school_sel_str != "--Select--" else None
+            
+            c33, c34 = st.columns(2)
+            with c33:
+                st.markdown("**Income Certificate**")
+                inc_year = st.selectbox("Issuing Year", CERT_YEARS)
+                col_inc1, col_inc2 = st.columns([7, 3])
+                inc_no = col_inc1.text_input("Income Certificate No. *")
+                if col_inc2.button("VERIFY INCOME"):
+                    if inc_no: st.success("Verified")
+                inc_whom = st.selectbox("To Whom Issued", RELATIONSHIPS)
+                inc_auth = st.selectbox("Issuing Authority (Income)", ISSUING_AUTHORITIES)
+                inc_file = st.file_uploader("Upload Income Certificate Photo *", type=['png', 'jpg', 'jpeg'], key="sch_inc_input")
                 
-                app_id = "SCH" + str(random.randint(1000000, 9999999))
-                st.session_state['temp_sch_data'] = {
-                    "app_id": app_id,
-                    "data": {
-                        "academic_year": ac_year, "scheme": scheme, "app_name": sanitize(app_name),
-                        "category": category, "otr": sanitize(otr_input), "gender": gender,
-                        "dob": str(dob), "aadhaar": sanitize(aadhaar_input), "mobile": sanitize(mob_no),
-                        "full_address": sanitize(addr), "state": sanitize(state), "district": sanitize(dist),
-                        "school_code": school_code, "class": sch_class, 
-                        "father_name": sanitize(f_name), "mother_name": sanitize(m_name),
-                        "income_cert": sanitize(inc_no), "inc_auth": inc_auth,
-                        "caste_cert": sanitize(cas_no), "cas_auth": cas_auth, "ifsc": sanitize(ifsc), 
-                        "bank_name": st.session_state.get('v_bank', ''), "branch_name": st.session_state.get('v_branch', ''),
-                        "acc_no": sanitize(acc_no), "acc_name": sanitize(acc_name),
-                        "photo_b64": photo_b64, "inc_file_b64": inc_file_b64,
-                        "cas_file_b64": cas_file_b64, "passbook_b64": passbook_b64,
-                        "status": "Pending_Master", "payment_mode": "Pending", "fee": sch_fee
-                    }
-                }
-                st.session_state['sch_app_step'] = True
-                st.rerun()
-
-    if st.session_state.get('sch_app_step', False):
-        st.markdown("### 💳 Secure Scholarship Payment Gateway")
-        tmp = st.session_state['temp_sch_data']
-        st.info(f"Applicant: **{tmp['data']['app_name']}** | Fee: **₹{sch_fee:.2f}**")
-        pay_mode = st.radio("Select Payment Mode", ["Online Payment (UPI/QR)", "Offline Payment"], key="sch_pay_mode_unique")
-        
-        if pay_mode == "Online Payment (UPI/QR)":
-            master_upi = master_db.get("upi_id", "school@sbi")
-            upi_url = f"upi://pay?pa={master_upi}&pn=ScholarshipFee&am={sch_fee:.2f}&cu=INR"
-            qr_api = f"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={urllib.parse.quote(upi_url)}"
-            st.markdown(f"<img src='{qr_api}' style='border:5px solid #1E3A8A; border-radius:10px;'>", unsafe_allow_html=True)
-            st.markdown(f"**UPI ID:** `{master_upi}`")
-            txn_id = st.text_input("Enter 12-digit Transaction ID / UTR No. *", key="sch_txn_input_unique")
-            if st.button("Verify & Submit Application", type="primary", key="sch_verify_sub_btn_unique"):
-                if not txn_id or len(txn_id) < 8: st.error("Enter valid Transaction ID.")
+            with c34:
+                st.markdown("**Caste Certificate**")
+                cas_year = st.selectbox("Caste Issuing Year", CERT_YEARS)
+                col_cas1, col_cas2 = st.columns([7, 3])
+                cas_no = col_cas1.text_input("Caste Certificate No. *")
+                if col_cas2.button("VERIFY CASTE"):
+                    if cas_no: st.success("Verified")
+                cas_auth = st.selectbox("Issuing Authority (Caste)", ISSUING_AUTHORITIES)
+                cas_file = st.file_uploader("Upload Caste Certificate Photo *", type=['png', 'jpg', 'jpeg'], key="sch_cas_input")
+            
+            st.markdown("### 🏦 Bank Information")
+            st.warning("Please note that your Aadhaar Number will be used for crediting scholarship amount via DBT.")
+            
+            c35, c36 = st.columns([8, 2])
+            ifsc = c35.text_input("IFSC Code *")
+            if c36.button("FIND IFSC"):
+                if ifsc:
+                    try:
+                        url = f"https://ifsc.razorpay.com/{ifsc.strip()}"
+                        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+                        with urllib.request.urlopen(req, timeout=5) as response:
+                            data = json.loads(response.read().decode('utf-8'))
+                            st.session_state['v_bank'] = data.get('BANK', 'Unknown Bank')
+                            st.session_state['v_branch'] = data.get('BRANCH', 'Unknown Branch')
+                            st.success("✅ IFSC Verified & Bank Auto-Fetched!")
+                    except Exception: st.error("❌ Invalid IFSC")
+                
+            c36a, c37a = st.columns(2)
+            b_name = c36a.text_input("Bank Name", value=st.session_state.get('v_bank', ''), disabled=True)
+            b_branch = c37a.text_input("Branch Name", value=st.session_state.get('v_branch', ''), disabled=True)
+            
+            c38, c39 = st.columns([8, 2])
+            acc_no = c38.text_input("Account Number *", type="password")
+            if c39.button("VERIFY ACCOUNT"):
+                if acc_no:
+                    st.session_state['v_acc_name'] = app_name
+                    st.success("✅ Account Verified!")
+                
+            acc_name = st.text_input("Account Holder Name *", value=st.session_state.get('v_acc_name', ''))
+            re_acc_no = st.text_input("Re-type Account No. *")
+            
+            c_seed, c_pass = st.columns(2)
+            seeded = c_seed.radio("Whether account number seeded with the Aadhaar number?", ["Yes", "No"], index=1, key="sch_seed_radio")
+            passbook = c_pass.file_uploader("Upload Passbook Front Page (JPG/PNG) *", type=['png', 'jpg', 'jpeg'], key="sch_passbook_input")
+            
+            decl = st.checkbox("✅ I declare the above info is true.")
+            if st.button("Proceed to Payment & Submit", type="primary"):
+                if not decl: st.error("Please accept the declaration.")
+                elif not school_code or not sanitize(app_name) or not sanitize(aadhaar_input) or not sanitize(acc_no):
+                    st.error("Please fill all mandatory fields (*).")
                 else:
-                    tmp['data']['payment_mode'] = f"Online (₹{sch_fee:.2f} - Txn: {sanitize(txn_id)})"
+                    photo_b64 = base64.b64encode(photo.read()).decode('utf-8') if photo else ""
+                    inc_file_b64 = base64.b64encode(inc_file.read()).decode('utf-8') if inc_file else ""
+                    cas_file_b64 = base64.b64encode(cas_file.read()).decode('utf-8') if cas_file else ""
+                    passbook_b64 = base64.b64encode(passbook.read()).decode('utf-8') if passbook else ""
+                    
+                    app_id = "SCH" + str(random.randint(1000000, 9999999))
+                    st.session_state['temp_sch_data'] = {
+                        "app_id": app_id,
+                        "data": {
+                            "academic_year": ac_year, "scheme": scheme, "app_name": sanitize(app_name),
+                            "category": category, "otr": sanitize(otr_input), "gender": gender,
+                            "dob": str(dob), "aadhaar": sanitize(aadhaar_input), "mobile": sanitize(mob_no),
+                            "full_address": sanitize(addr), "state": sanitize(state), "district": sanitize(dist),
+                            "school_code": school_code, "class": sch_class, 
+                            "father_name": sanitize(f_name), "mother_name": sanitize(m_name),
+                            "income_cert": sanitize(inc_no), "inc_auth": inc_auth,
+                            "caste_cert": sanitize(cas_no), "cas_auth": cas_auth, "ifsc": sanitize(ifsc), 
+                            "bank_name": st.session_state.get('v_bank', ''), "branch_name": st.session_state.get('v_branch', ''),
+                            "acc_no": sanitize(acc_no), "acc_name": sanitize(acc_name),
+                            "photo_b64": photo_b64, "inc_file_b64": inc_file_b64,
+                            "cas_file_b64": cas_file_b64, "passbook_b64": passbook_b64,
+                            "status": "Pending_Master", "payment_mode": "Pending", "fee": sch_fee
+                        }
+                    }
+                    st.session_state['sch_app_step'] = True
+                    st.rerun()
+
+        if st.session_state.get('sch_app_step', False):
+            st.markdown("### 💳 Secure Scholarship Payment Gateway")
+            tmp = st.session_state['temp_sch_data']
+            st.info(f"Applicant: **{tmp['data']['app_name']}** | Fee: **₹{sch_fee:.2f}**")
+            pay_mode = st.radio("Select Payment Mode", ["Online Payment (UPI/QR)", "Offline Payment"], key="sch_pay_mode_unique")
+            
+            if pay_mode == "Online Payment (UPI/QR)":
+                master_upi = master_db.get("upi_id", "school@sbi")
+                upi_url = f"upi://pay?pa={master_upi}&pn=ScholarshipFee&am={sch_fee:.2f}&cu=INR"
+                qr_api = f"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={urllib.parse.quote(upi_url)}"
+                st.markdown(f"<img src='{qr_api}' style='border:5px solid #1E3A8A; border-radius:10px;'>", unsafe_allow_html=True)
+                st.markdown(f"**UPI ID:** `{master_upi}`")
+                txn_id = st.text_input("Enter 12-digit Transaction ID / UTR No. *", key="sch_txn_input_unique")
+                if st.button("Verify & Submit Application", type="primary", key="sch_verify_sub_btn_unique"):
+                    if not txn_id or len(txn_id) < 8: st.error("Enter valid Transaction ID.")
+                    else:
+                        tmp['data']['payment_mode'] = f"Online (₹{sch_fee:.2f} - Txn: {sanitize(txn_id)})"
+                        
+                        folder_path = f"Scholarship_Data/Student_Submissions/{tmp['app_id']}"
+                        os.makedirs(folder_path, exist_ok=True)
+                        pdf_path = f"{folder_path}/Payment_Receipt_Application.pdf"
+                        create_scholarship_pdf(pdf_path, tmp['app_id'], tmp['data'])
+                        
+                        scholarships_db[tmp['app_id']] = tmp['data']
+                        save_scholarships(scholarships_db)
+                        
+                        st.session_state['sch_app_success'] = True
+                        st.session_state['sch_app_id'] = tmp['app_id']
+                        st.session_state['sch_app_data'] = tmp['data']
+                        st.session_state['sch_app_step'] = False; st.rerun()
+            else:
+                if st.button("Complete Payment & Submit Application", type="primary", key="sch_offline_sub_btn_unique"):
+                    tmp['data']['payment_mode'] = f"Offline (₹{sch_fee:.2f})"
+                    
+                    folder_path = f"Scholarship_Data/Student_Submissions/{tmp['app_id']}"
+                    os.makedirs(folder_path, exist_ok=True)
+                    pdf_path = f"{folder_path}/Payment_Receipt_Application.pdf"
+                    create_scholarship_pdf(pdf_path, tmp['app_id'], tmp['data'])
+                    
                     scholarships_db[tmp['app_id']] = tmp['data']
                     save_scholarships(scholarships_db)
+                    
                     st.session_state['sch_app_success'] = True
                     st.session_state['sch_app_id'] = tmp['app_id']
                     st.session_state['sch_app_data'] = tmp['data']
                     st.session_state['sch_app_step'] = False; st.rerun()
-        else:
-            if st.button("Complete Payment & Submit Application", type="primary", key="sch_offline_sub_btn_unique"):
-                tmp['data']['payment_mode'] = f"Offline (₹{sch_fee:.2f})"
-                scholarships_db[tmp['app_id']] = tmp['data']
-                save_scholarships(scholarships_db)
-                st.session_state['sch_app_success'] = True
-                st.session_state['sch_app_id'] = tmp['app_id']
-                st.session_state['sch_app_data'] = tmp['data']
-                st.session_state['sch_app_step'] = False; st.rerun()
+
+    with sch_tab2:
+        st.markdown("### 🔍 Check Application Status")
+        search_app_id = st.text_input("Enter your Scholarship Application No. (e.g., SCH1234567)", key="chk_sch_id")
+        if st.button("View Details", key="chk_sch_btn"):
+            if search_app_id in scholarships_db:
+                app_data = scholarships_db[search_app_id]
+                st.success(f"🎉 Application Found! Status: **{app_data.get('status')}**")
+                st.write(f"**Name:** {app_data.get('app_name')}")
+                
+                pdf_path = f"Scholarship_Data/Student_Submissions/{search_app_id}/Payment_Receipt_Application.pdf"
+                if os.path.exists(pdf_path):
+                    with open(pdf_path, "rb") as f:
+                        st.download_button("📥 Download Application PDF", f, file_name=f"Scholarship_{search_app_id}.pdf", mime="application/pdf", key="chk_dl_pdf_btn")
+            else:
+                st.error("❌ Application not found. Please check your ID.")
 
 # ----------------- NEW STUDENT REGISTRATION -----------------
 elif menu == "New Student Registration":
@@ -1095,7 +1161,7 @@ elif menu == "Master Login":
         if c2.button("🔴 Logout"): st.session_state['master_logged'] = False; st.rerun()
 
         st.markdown("---")
-        t1, t2, t3, t4, t5, t6 = st.tabs(["👁️ Schools", "💳 Payments", "🎓 Scholarships", "🎓 Edit Students", "⚙️ Settings", "🏦 School Gateway Setup"])
+        t1, t2, t3, t4, t5, t6 = st.tabs(["👁️ Schools", "💳 Payments", "🎓 Scholarships Verify", "🎓 Edit Students", "⚙️ Settings", "🏦 School Gateway Setup"])
         
         with t1:
             st.markdown("### 🏫 Manage Schools")
@@ -1129,69 +1195,83 @@ elif menu == "Master Login":
 
         with t3:
             st.markdown("### 🎓 Scholarship Verifications (Master)")
-            pending_sch = {k: v for k, v in scholarships_db.items() if v.get("status") == "Pending_Master"}
-            if pending_sch:
-                app_id = st.selectbox("Select Scholarship", list(pending_sch.keys()), key="m_sch_app_sel")
-                s_data = pending_sch[app_id]
-                
-                c_pdf1, c_pdf2 = st.columns([8,2])
-                with c_pdf1:
-                    st.write(f"**Application ID:** {app_id} | **Status:** {s_data.get('status')}")
-                with c_pdf2:
-                    pdf_m_file = f"Scholarship_{app_id}_Master.pdf"
-                    create_scholarship_pdf(pdf_m_file, app_id, s_data)
-                    with open(pdf_m_file, "rb") as f:
-                        st.download_button("📥 Download Application PDF", f, file_name=pdf_m_file, mime="application/pdf", key=f"m_sch_dl_{app_id}")
+            sch_tab1, sch_tab2 = st.tabs(["⏳ Pending Verification", "📂 Approved Master Folders"])
+            
+            with sch_tab1:
+                pending_sch = {k: v for k, v in scholarships_db.items() if v.get("status") == "Pending_Master"}
+                if pending_sch:
+                    app_id = st.selectbox("Select Scholarship", list(pending_sch.keys()), key="m_sch_app_sel")
+                    s_data = pending_sch[app_id]
+                    
+                    st.write(f"**Application ID:** {app_id} | **Payment:** {s_data.get('payment_mode')}")
+                    
+                    with st.expander("👁️ View & Edit Full Application", expanded=True):
+                        c_e1, c_e2, c_e3 = st.columns(3)
+                        e_name = c_e1.text_input("Applicant Name", s_data.get('app_name', ''), key=f"ms_name_{app_id}")
+                        e_aadhaar = c_e2.text_input("Aadhaar No", s_data.get('aadhaar', ''), key=f"ms_adh_{app_id}")
+                        e_mob = c_e3.text_input("Mobile No", s_data.get('mobile', ''), key=f"ms_mob_{app_id}")
+                        
+                        c_e4, c_e5, c_e6 = st.columns(3)
+                        e_fname = c_e4.text_input("Father Name", s_data.get('father_name', ''), key=f"ms_fname_{app_id}")
+                        e_mname = c_e5.text_input("Mother Name", s_data.get('mother_name', ''), key=f"ms_mname_{app_id}")
+                        e_dob = c_e6.text_input("Date of Birth", s_data.get('dob', ''), key=f"ms_dob_{app_id}")
+                        
+                        c_e7, c_e8, c_e9 = st.columns(3)
+                        e_inc = c_e7.text_input("Income Cert", s_data.get('income_cert', ''), key=f"ms_inc_{app_id}")
+                        e_cas = c_e8.text_input("Caste Cert", s_data.get('caste_cert', ''), key=f"ms_cas_{app_id}")
+                        e_acc = c_e9.text_input("Account No", s_data.get('acc_no', ''), key=f"ms_acc_{app_id}")
+                        
+                        st.markdown("#### 🖼️ Uploaded Documents")
+                        c_doc1, c_doc2, c_doc3, c_doc4 = st.columns(4)
+                        
+                        def render_b64_img(col, title, b64_str, key_suffix):
+                            col.markdown(f"**{title}**")
+                            if b64_str:
+                                img_data = base64.b64decode(b64_str)
+                                col.image(img_data, use_container_width=True)
+                                col.download_button("⬇️ Download", img_data, file_name=f"{title}_{app_id}.jpg", mime="image/jpeg", key=f"dl_{key_suffix}_{app_id}")
+                            else:
+                                col.info("Not Uploaded")
 
-                with st.expander("👁️ View & Edit Full Application", expanded=True):
-                    c_e1, c_e2, c_e3 = st.columns(3)
-                    e_name = c_e1.text_input("Applicant Name", s_data.get('app_name', ''), key=f"ms_name_{app_id}")
-                    e_aadhaar = c_e2.text_input("Aadhaar No", s_data.get('aadhaar', ''), key=f"ms_adh_{app_id}")
-                    e_mob = c_e3.text_input("Mobile No", s_data.get('mobile', ''), key=f"ms_mob_{app_id}")
-                    
-                    c_e4, c_e5, c_e6 = st.columns(3)
-                    e_fname = c_e4.text_input("Father Name", s_data.get('father_name', ''), key=f"ms_fname_{app_id}")
-                    e_mname = c_e5.text_input("Mother Name", s_data.get('mother_name', ''), key=f"ms_mname_{app_id}")
-                    e_dob = c_e6.text_input("Date of Birth", s_data.get('dob', ''), key=f"ms_dob_{app_id}")
-                    
-                    c_e7, c_e8, c_e9 = st.columns(3)
-                    e_inc = c_e7.text_input("Income Cert", s_data.get('income_cert', ''), key=f"ms_inc_{app_id}")
-                    e_cas = c_e8.text_input("Caste Cert", s_data.get('caste_cert', ''), key=f"ms_cas_{app_id}")
-                    e_acc = c_e9.text_input("Account No", s_data.get('acc_no', ''), key=f"ms_acc_{app_id}")
-                    
-                    st.markdown("#### 🖼️ Uploaded Documents (Download from Master ID)")
-                    c_doc1, c_doc2, c_doc3, c_doc4 = st.columns(4)
-                    
-                    def render_b64_img(col, title, b64_str, key_suffix):
-                        col.markdown(f"**{title}**")
-                        if b64_str:
-                            img_data = base64.b64decode(b64_str)
-                            col.image(img_data, use_container_width=True)
-                            col.download_button("⬇️ Download", img_data, file_name=f"{title}_{app_id}.jpg", mime="image/jpeg", key=f"dl_{key_suffix}_{app_id}")
-                        else:
-                            col.info("Not Uploaded")
+                        render_b64_img(c_doc1, "Profile Photo", s_data.get('photo_b64', ''), "photo")
+                        render_b64_img(c_doc2, "Income Cert", s_data.get('inc_file_b64', ''), "inc")
+                        render_b64_img(c_doc3, "Caste Cert", s_data.get('cas_file_b64', ''), "cas")
+                        render_b64_img(c_doc4, "Bank Passbook", s_data.get('passbook_b64', ''), "pass")
 
-                    render_b64_img(c_doc1, "Profile Photo", s_data.get('photo_b64', ''), "photo")
-                    render_b64_img(c_doc2, "Income Cert", s_data.get('inc_file_b64', ''), "inc")
-                    render_b64_img(c_doc3, "Caste Cert", s_data.get('cas_file_b64', ''), "cas")
-                    render_b64_img(c_doc4, "Bank Passbook", s_data.get('passbook_b64', ''), "pass")
-
-                    if st.button("✅ Update Data & Approve Scholarship", type="primary", key=f"m_sch_fwd_btn_{app_id}"):
-                        s_data['app_name'] = sanitize(e_name)
-                        s_data['aadhaar'] = sanitize(e_aadhaar)
-                        s_data['mobile'] = sanitize(e_mob)
-                        s_data['father_name'] = sanitize(e_fname)
-                        s_data['mother_name'] = sanitize(e_mname)
-                        s_data['dob'] = sanitize(e_dob)
-                        s_data['income_cert'] = sanitize(e_inc)
-                        s_data['caste_cert'] = sanitize(e_cas)
-                        s_data['acc_no'] = sanitize(e_acc)
-                        s_data['status'] = "Pending_School"
-                        scholarships_db[app_id] = s_data
-                        save_scholarships(scholarships_db)
-                        st.success(f"Scholarship {app_id} Verified & Approved!")
-                        st.rerun()
-            else: st.success("No pending scholarships.")
+                        if st.button("✅ Update Data & Approve Scholarship (Create Folder)", type="primary", key=f"m_sch_fwd_btn_{app_id}"):
+                            s_data['app_name'] = sanitize(e_name)
+                            s_data['aadhaar'] = sanitize(e_aadhaar)
+                            s_data['mobile'] = sanitize(e_mob)
+                            s_data['father_name'] = sanitize(e_fname)
+                            s_data['mother_name'] = sanitize(e_mname)
+                            s_data['dob'] = sanitize(e_dob)
+                            s_data['income_cert'] = sanitize(e_inc)
+                            s_data['caste_cert'] = sanitize(e_cas)
+                            s_data['acc_no'] = sanitize(e_acc)
+                            s_data['status'] = "Approved" 
+                            
+                            save_master_approved_folder(app_id, s_data)
+                            
+                            scholarships_db[app_id] = s_data
+                            save_scholarships(scholarships_db)
+                            st.success(f"Scholarship {app_id} Verified, Approved, & Saved to Master Folder!")
+                            st.rerun()
+                else: st.success("No pending scholarships.")
+            
+            with sch_tab2:
+                approved_sch = {k: v for k, v in scholarships_db.items() if v.get("status") == "Approved"}
+                if approved_sch:
+                    a_id = st.selectbox("Select Approved Application Folder", list(approved_sch.keys()), key="m_appr_sel")
+                    st.success(f"📂 Folder: Scholarship_Data/Approved_Master/{a_id}")
+                    
+                    pdf_m_file = f"Scholarship_Data/Approved_Master/{a_id}/Application_{a_id}.pdf"
+                    if os.path.exists(pdf_m_file):
+                        with open(pdf_m_file, "rb") as f:
+                            st.download_button("📥 Download Final Application PDF", f, file_name=f"Application_{a_id}.pdf", mime="application/pdf", key=f"m_appr_pdf_{a_id}")
+                            
+                    st.write(approved_sch[a_id])
+                else:
+                    st.info("No approved folders yet.")
 
         with t4: 
             st.markdown("### 🎓 Edit & Delete Students Data (Master)")
@@ -1628,11 +1708,11 @@ elif menu == "Results":
                 if st.button("🖨️ Print Result Card", key="res_print_v2"):
                     components.html("<script>window.parent.print();</script>", height=0)
             elif pending_status:
-                st.warning(f"⚠️ Appananka record milila, kintu status ebe: '{pending_status}' achi. Master ba School ru approve karantu.")
+                st.warning(f"⚠️ ଆପଣଙ୍କ ରେକର୍ଡ ମିଳିଲା, କିନ୍ତୁ ଆପଣଙ୍କ Payment/Approval Status ଏବେ: '{pending_status}' ଅଛି। ଦୟାକରି Master କିମ୍ବା School ରୁ Approve କରନ୍ତୁ।")
             elif dob_mismatch:
-                st.warning("⚠️ Roll No/Name match hela kintu Date of Birth (DOB) match haunahi. Thik DOB diantu.")
+                st.warning("⚠️ ଆପଣ ଦେଇଥିବା ନାମ କିମ୍ବା ରୋଲ୍ ନମ୍ବର ସହ ଜନ୍ମ ତାରିଖ (Date of Birth) ମେଳ ଖାଉନାହିଁ। ଦୟାକରି ଠିକ୍ DOB ଦିଅନ୍ତୁ।")
             else:
-                st.error("❌ Kaunasi record milila nahi! Roll Number au DOB re check karantu.")
+                st.error("❌ କୌଣସି ରେକର୍ଡ ମିଳିଲା ନାହିଁ! ଦୟାକରି ଠିକ୍ Roll Number କିମ୍ବା Name ଦିଅନ୍ତୁ।")
 
 st.markdown("---")
 st.markdown("<div style='text-align: center; padding: 15px; background: linear-gradient(90deg, #1e3a8a, #9333ea); color: white; border-radius: 8px; font-weight: bold;'>👨‍💻 Software Developed by: KULU SUTAR | 📞 Mob: 8910223342 | ✉️ kulusutar123@gmail.com</div>", unsafe_allow_html=True)
