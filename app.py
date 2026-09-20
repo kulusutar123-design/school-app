@@ -16,7 +16,7 @@ import html
 import threading
 
 # ==========================================
-# 🔒 CRASH PROTECTION & DATA SAFETY LOCKS (100% SAFE)
+# 🔒 CRASH PROTECTION & DATA SAFETY LOCKS
 # ==========================================
 file_lock = threading.Lock()
 
@@ -185,7 +185,7 @@ def save_scholarships(sch):
         with open(SCHOLARSHIPS_FILE, "w", encoding="utf-8") as f: json.dump(sch, f, indent=4)
 
 # ==========================================
-# 🎨 PDF GENERATORS
+# 🎨 PDF GENERATORS (FIXED FONT OVERFLOW & RESTORED BARCODES)
 # ==========================================
 def create_student_receipt_pdf(filename, reg_id, s_data):
     c = canvas.Canvas(filename, pagesize=letter)
@@ -198,7 +198,7 @@ def create_student_receipt_pdf(filename, reg_id, s_data):
     c.drawString(50, y, f"Payment Mode: {s_data.get('payment_mode', 'N/A')}"); y -= 25
     c.drawString(50, y, f"Status: {s_data.get('status', 'Pending')}"); y -= 25
     c.line(50, y, 550, y); y -= 20
-    c.setFont("Helvetica-Oblique", 10); c.drawCentredString(300, y, "This is a computer-generated receipt. Please keep it safe.")
+    c.setFont("Helvetica-Oblique", 10); c.drawCentredString(300, y, "Computer-generated receipt.")
     c.save()
 
 def create_scholarship_pdf(filename, app_id, s_data):
@@ -328,14 +328,10 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.setFillColorRGB(0.59, 0.25, 0.60)
     
     school_text = school_name.upper()
-    if len(school_text) > 45:
-        c.setFont("Times-Bold", 12)
-    elif len(school_text) > 35:
-        c.setFont("Times-Bold", 14)
-    elif len(school_text) > 25:
-        c.setFont("Times-Bold", 16)
-    else:
-        c.setFont("Times-Bold", 20)
+    if len(school_text) > 45: c.setFont("Times-Bold", 12)
+    elif len(school_text) > 35: c.setFont("Times-Bold", 14)
+    elif len(school_text) > 25: c.setFont("Times-Bold", 16)
+    else: c.setFont("Times-Bold", 20)
     c.drawCentredString(300, 720, school_text)
     
     c.setFont("Helvetica-Bold", 12)
@@ -467,7 +463,7 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.drawCentredString(300, y-15, f"{st_data.get('grade', '')}")
     
     try:
-        qr_text = f"SCHOOL: {school_name}\nNAME: {st_data.get('name', '')}\nROLL: {roll_no}\nDOB: {disp_dob}\nMARKS: {st_data.get('total_obt')}/{st_data.get('total_full')}\nGRADE: {st_data.get('grade')}"
+        qr_text = f"SCHOOL: {school_name}\nROLL: {roll_no}\nMARKS: {st_data.get('total_obt')}/{st_data.get('total_full')}\nGRADE: {st_data.get('grade')}"
         qr_w = qr.QrCodeWidget(qr_text)
         b = qr_w.getBounds()
         w = b[2]-b[0]
@@ -658,6 +654,7 @@ elif menu == "Scholarship Portal":
     elif not st.session_state['sch_app_step']:
         st.info("Please provide your One Time Registration (OTR) number generated from the National Scholarship Portal.")
         
+        # 📌 OTR & Aadhaar Verification Section
         col_o1, col_o2 = st.columns([8, 2])
         otr_input = col_o1.text_input("OTR No. *", key="otr_inp_val")
         if col_o2.button("VERIFY OTR"):
@@ -757,6 +754,7 @@ elif menu == "Scholarship Portal":
             cas_auth = st.selectbox("Issuing Authority (Caste)", ISSUING_AUTHORITIES)
             cas_file = st.file_uploader("Upload Caste Certificate Photo *")
         
+        # 📌 Bank Verification Section Restored
         st.markdown("### 🏦 Bank Information")
         st.warning("Please note that your Aadhaar Number will be used for crediting scholarship amount via DBT.")
         
@@ -764,9 +762,18 @@ elif menu == "Scholarship Portal":
         ifsc = c35.text_input("IFSC Code *")
         if c36.button("FIND IFSC"):
             if ifsc:
-                st.session_state['v_bank'] = "STATE BANK OF INDIA"
-                st.session_state['v_branch'] = "MAIN BRANCH"
-                st.success("✅ IFSC Verified & Bank Auto-Fetched!")
+                try:
+                    url = f"https://ifsc.razorpay.com/{ifsc.strip()}"
+                    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+                    with urllib.request.urlopen(req, timeout=5) as response:
+                        data = json.loads(response.read().decode('utf-8'))
+                        st.session_state['v_bank'] = data.get('BANK', 'Unknown Bank')
+                        st.session_state['v_branch'] = data.get('BRANCH', 'Unknown Branch')
+                        st.success("✅ IFSC Verified & Bank Auto-Fetched!")
+                except Exception:
+                    st.session_state['v_bank'] = "Bank Not Found"
+                    st.session_state['v_branch'] = "Branch Not Found"
+                    st.error("❌ Invalid IFSC Code or API unavailable.")
             else: 
                 st.error("Enter IFSC Code")
             
@@ -834,7 +841,7 @@ elif menu == "Scholarship Portal":
             st.session_state['temp_sch_data'] = None
             st.rerun()
 
-# ----------------- NEW STUDENT REGISTRATION (FULL RESTORED FORM) -----------------
+# ----------------- NEW STUDENT REGISTRATION (FULL RESTORED) -----------------
 elif menu == "New Student Registration":
     c_home, c_title = st.columns([1, 8])
     with c_home:
