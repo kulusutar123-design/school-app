@@ -1153,17 +1153,29 @@ elif menu == "Master Login":
                     
                     st.markdown("#### 📚 Edit Subjects & Marks")
                     m_subjects = m_curr_st.get('subjects', {})
+                    existing_m_keys = list(m_subjects.keys())
+                    
+                    # 🛠️ DYNAMIC ADD/REMOVE BUTTONS FOR MASTER ID
+                    m_state_key = f"m_edit_sub_cnt_{m_edit_roll}"
+                    if m_state_key not in st.session_state:
+                        st.session_state[m_state_key] = max(5, len(existing_m_keys))
+                    
+                    c_m_btn1, c_m_btn2 = st.columns(2)
+                    if c_m_btn1.button("➕ Add Subject", key=f"m_add_esub_{m_edit_roll}"):
+                        st.session_state[m_state_key] += 1
+                        st.rerun()
+                    if c_m_btn2.button("🗑️ Remove Subject", key=f"m_rem_esub_{m_edit_roll}"):
+                        if st.session_state[m_state_key] > 1:
+                            st.session_state[m_state_key] -= 1
+                            st.rerun()
+
                     new_m_subjects = {}
                     m_tot_full = 0
                     m_tot_obt = 0
                     
-                    # 🛠️ FIXED: Show 6 blank slots if subjects dictionary is empty.
-                    existing_keys = list(m_subjects.keys())
-                    num_rows_to_show = max(6, len(existing_keys) + 2)
-                    
-                    for i in range(num_rows_to_show):
-                        if i < len(existing_keys):
-                            def_name = existing_keys[i]
+                    for i in range(st.session_state[m_state_key]):
+                        if i < len(existing_m_keys):
+                            def_name = existing_m_keys[i]
                             def_fm = float(m_subjects[def_name]['full'])
                             def_om = float(m_subjects[def_name]['obt'])
                         else:
@@ -1336,9 +1348,19 @@ elif menu == "School Login":
             opt_pub_date = st.date_input("Results Publication Date", value=datetime.date.today(), key="s_add_pub_v2")
             
             st.markdown("#### 📚 Add Subjects & Marks")
-            # 🛠️ FIXED: Show 6 blank slots by default to add subjects securely
+            if 's_add_num_subs' not in st.session_state: st.session_state.s_add_num_subs = 5
+            
+            c_ab1, c_ab2 = st.columns(2)
+            if c_ab1.button("➕ Add Subject", key="s_add_sub_btn_v2"):
+                st.session_state.s_add_num_subs += 1
+                st.rerun()
+            if c_ab2.button("🗑️ Remove Subject", key="s_rem_sub_btn_v2"):
+                if st.session_state.s_add_num_subs > 1:
+                    st.session_state.s_add_num_subs -= 1
+                    st.rerun()
+            
             subjects_data = {}; total_full = 0; total_obt = 0
-            for i in range(6):
+            for i in range(st.session_state.s_add_num_subs):
                 c1, c2, c3 = st.columns(3)
                 s_name = c1.text_input(f"Subject {i+1}", key=f"s_as_v2_{i}")
                 f_m = c2.number_input(f"FM {i+1}", value=100.0, key=f"s_af_v2_{i}")
@@ -1395,13 +1417,27 @@ elif menu == "School Login":
                 
                 st.markdown("#### 📚 Edit Subjects & Marks")
                 up_subjects = curr_st.get('subjects', {})
-                new_up_subjects = {}; up_tot_full = 0; up_tot_obt = 0
-                
-                # 🛠️ FIXED: Show 6 blank slots if subjects dictionary is empty.
                 existing_keys = list(up_subjects.keys())
-                num_rows_to_show = max(6, len(existing_keys) + 2)
                 
-                for i in range(num_rows_to_show):
+                # 🛠️ DYNAMIC ADD/REMOVE BUTTONS FOR SCHOOL ID
+                state_key = f"s_edit_sub_cnt_{edit_roll}"
+                if state_key not in st.session_state:
+                    st.session_state[state_key] = max(5, len(existing_keys))
+                
+                c_btn1, c_btn2 = st.columns(2)
+                if c_btn1.button("➕ Add Subject", key=f"s_add_esub_{edit_roll}"):
+                    st.session_state[state_key] += 1
+                    st.rerun()
+                if c_btn2.button("🗑️ Remove Subject", key=f"s_rem_esub_{edit_roll}"):
+                    if st.session_state[state_key] > 1:
+                        st.session_state[state_key] -= 1
+                        st.rerun()
+
+                new_up_subjects = {}
+                up_tot_full = 0
+                up_tot_obt = 0
+                
+                for i in range(st.session_state[state_key]):
                     if i < len(existing_keys):
                         def_name = existing_keys[i]
                         def_fm = float(up_subjects[def_name]['full'])
@@ -1418,7 +1454,8 @@ elif menu == "School Login":
 
                     if u_sub.strip():
                         new_up_subjects[sanitize(u_sub)] = {"full": u_f, "obt": u_o}
-                        up_tot_full += u_f; up_tot_obt += u_o
+                        up_tot_full += u_f
+                        up_tot_obt += u_o
                 
                 if st.button("💾 Save Updated Record", key=f"s_save_edit_btn_v2_{edit_roll}"):
                     new_per = (up_tot_obt / up_tot_full * 100) if up_tot_full > 0 else 0.0
