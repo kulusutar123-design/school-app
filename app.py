@@ -2,10 +2,13 @@ import streamlit as st
 import streamlit.components.v1 as components
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import inch
 from reportlab.graphics.barcode import code128, qr
 from reportlab.graphics.shapes import Drawing
 from reportlab.graphics import renderPDF
-from reportlab.lib import colors
 import json
 import os
 import datetime
@@ -47,7 +50,7 @@ def save_master_approved_folder(app_id, s_data):
     os.makedirs(folder_path, exist_ok=True)
     
     pdf_path = f"{folder_path}/Application_{app_id}.pdf"
-    create_scholarship_pdf(pdf_path, app_id, s_data)
+    create_odisha_scholarship_pdf(pdf_path, app_id, s_data)
     
     if s_data.get('photo_b64'):
         with open(f"{folder_path}/Profile_Photo.jpg", "wb") as f: f.write(base64.b64decode(s_data['photo_b64']))
@@ -232,216 +235,209 @@ def create_student_receipt_pdf(filename, reg_id, s_data):
     c.setFont("Helvetica-Oblique", 10); c.drawCentredString(300, y, "Computer-generated receipt.")
     c.save()
 
-def create_scholarship_pdf(filename, app_id, s_data):
-    c = canvas.Canvas(filename, pagesize=letter)
-    width, height = letter
+# --- NEW ODISHA FORMAT SCHOLARSHIP PDF ---
+def create_odisha_scholarship_pdf(filename, app_id, s_data):
+    doc = SimpleDocTemplate(filename, pagesize=letter, rightMargin=30, leftMargin=30, topMargin=30, bottomMargin=30)
+    elements = []
+    styles = getSampleStyleSheet()
     
-    # Title & Header
-    c.setFont("Helvetica-Bold", 16)
-    c.drawCentredString(width/2, height - 50, "Government of Odisha")
-    c.setFont("Helvetica-Bold", 14)
-    c.drawCentredString(width/2, height - 70, "Scholarship Application Form")
+    # Custom Styles
+    title_style = ParagraphStyle(name='TitleStyle', fontName='Helvetica-Bold', fontSize=14, alignment=1, spaceAfter=5)
+    sub_title_style = ParagraphStyle(name='SubTitleStyle', fontName='Helvetica', fontSize=10, alignment=1, spaceAfter=15)
+    section_header = ParagraphStyle(name='SecHeader', fontName='Helvetica-Bold', fontSize=10, textColor=colors.white, backColor=colors.HexColor('#0b3a5b'), spaceBefore=10, spaceAfter=5, leftIndent=5)
     
-    c.setLineWidth(1)
-    c.line(30, height - 80, width - 30, height - 80)
+    # Title
+    elements.append(Paragraph("<b>Government of Odisha</b>", title_style))
+    elements.append(Paragraph("Scholarship Application Form", title_style))
+    elements.append(Paragraph("ST&SC and MBC Welfare Department", title_style))
+    elements.append(Paragraph(f"Academic Year {s_data.get('academic_year', '2025-26')}", sub_title_style))
     
-    y = height - 100
+    # Basic Info
+    elements.append(Paragraph("Basic Information", section_header))
+    data1 = [
+        ["Department", "Scheme", "Academic Year", "Application Type"],
+        ["ST&SC and MBC Welfare", s_data.get('scheme', ''), s_data.get('academic_year', ''), "New"]
+    ]
+    t1 = Table(data1, colWidths=[130, 130, 130, 130])
+    t1.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#f2f2f2')),
+        ('FONTNAME', (0,0), (-1,-1), 'Helvetica'),
+        ('FONTSIZE', (0,0), (-1,-1), 9),
+        ('GRID', (0,0), (-1,-1), 0.5, colors.lightgrey),
+        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+    ]))
+    elements.append(t1)
     
-    # --- Basic Information ---
-    c.setFillColor(colors.lightgrey)
-    c.rect(30, y-15, width-60, 20, fill=1, stroke=0)
-    c.setFillColor(colors.black)
-    c.setFont("Helvetica-Bold", 12)
-    c.drawString(35, y-10, "Basic Information")
-    y -= 35
+    # Applicant Details
+    elements.append(Paragraph("Applicant Details", section_header))
+    adh = s_data.get('aadhaar', '')
+    masked_adh = f"XXXXXXXX{adh[-4:]}" if len(adh) >= 4 else adh
     
-    c.setFont("Helvetica-Bold", 10)
-    c.drawString(35, y, "Department:")
-    c.setFont("Helvetica", 10)
-    c.drawString(150, y, s_data.get('dept', 'ST&SC and MBC Welfare'))
-    c.setFont("Helvetica-Bold", 10)
-    c.drawString(300, y, "Scheme:")
-    c.setFont("Helvetica", 10)
-    c.drawString(400, y, s_data.get('scheme', ''))
-    y -= 20
+    data2 = [
+        ["Applicant Name", s_data.get('app_name', '').upper(), "Religion", s_data.get('religion', '')],
+        ["Aadhaar No.", masked_adh, "Category", s_data.get('category', '')],
+        ["Date of Birth", s_data.get('dob', ''), "Applicant Gender", s_data.get('gender', '')],
+        ["OTR No.", s_data.get('otr', ''), "Mobile No.", s_data.get('mobile', '')],
+        ["Father's Name", s_data.get('father_name', '').upper(), "Mother's Name", s_data.get('mother_name', '').upper()]
+    ]
+    t2 = Table(data2, colWidths=[130, 130, 130, 130])
+    t2.setStyle(TableStyle([
+        ('FONTNAME', (0,0), (-1,-1), 'Helvetica'),
+        ('FONTSIZE', (0,0), (-1,-1), 9),
+        ('GRID', (0,0), (-1,-1), 0.5, colors.lightgrey),
+        ('BACKGROUND', (0,0), (0,-1), colors.HexColor('#f9f9f9')),
+        ('BACKGROUND', (2,0), (2,-1), colors.HexColor('#f9f9f9')),
+        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+    ]))
+    elements.append(t2)
     
-    c.setFont("Helvetica-Bold", 10)
-    c.drawString(35, y, "Academic Year:")
-    c.setFont("Helvetica", 10)
-    c.drawString(150, y, s_data.get('academic_year', ''))
-    c.setFont("Helvetica-Bold", 10)
-    c.drawString(300, y, "Application Type:")
-    c.setFont("Helvetica", 10)
-    c.drawString(400, y, "New")
-    y -= 30
+    # Address Information
+    elements.append(Paragraph("Address Information", section_header))
+    data3 = [
+        ["Address", s_data.get('full_address', '').upper()],
+        ["State", s_data.get('state', '').upper()],
+        ["District", s_data.get('district', '').upper()]
+    ]
+    t3 = Table(data3, colWidths=[130, 390])
+    t3.setStyle(TableStyle([
+        ('FONTNAME', (0,0), (-1,-1), 'Helvetica'),
+        ('FONTSIZE', (0,0), (-1,-1), 9),
+        ('GRID', (0,0), (-1,-1), 0.5, colors.lightgrey),
+        ('BACKGROUND', (0,0), (0,-1), colors.HexColor('#f9f9f9')),
+    ]))
+    elements.append(t3)
     
-    # --- Applicant Details ---
-    c.setFillColor(colors.lightgrey)
-    c.rect(30, y-15, width-60, 20, fill=1, stroke=0)
-    c.setFillColor(colors.black)
-    c.setFont("Helvetica-Bold", 12)
-    c.drawString(35, y-10, "Applicant Details")
-    y -= 35
+    # Institute Info
+    elements.append(Paragraph("Institute/Course Information", section_header))
+    data4 = [
+        ["Institute Code", s_data.get('school_code', ''), "Course/Class", s_data.get('class', '')]
+    ]
+    t4 = Table(data4, colWidths=[130, 130, 130, 130])
+    t4.setStyle(TableStyle([
+        ('FONTNAME', (0,0), (-1,-1), 'Helvetica'),
+        ('FONTSIZE', (0,0), (-1,-1), 9),
+        ('GRID', (0,0), (-1,-1), 0.5, colors.lightgrey),
+        ('BACKGROUND', (0,0), (0,-1), colors.HexColor('#f9f9f9')),
+        ('BACKGROUND', (2,0), (2,-1), colors.HexColor('#f9f9f9')),
+    ]))
+    elements.append(t4)
     
-    c.setFont("Helvetica-Bold", 10)
-    c.drawString(35, y, "Applicant Name:")
-    c.setFont("Helvetica", 10)
-    c.drawString(150, y, s_data.get('app_name', '').upper())
-    c.setFont("Helvetica-Bold", 10)
-    c.drawString(300, y, "Religion:")
-    c.setFont("Helvetica", 10)
-    c.drawString(400, y, s_data.get('religion', ''))
-    y -= 20
+    # Eligibility Info
+    elements.append(Paragraph("Eligibility Information", section_header))
+    data5 = [
+        ["Income Certificate No.", s_data.get('income_cert', ''), "Income Authority", s_data.get('inc_auth', '')],
+        ["Caste Certificate No.", s_data.get('caste_cert', ''), "Caste Authority", s_data.get('cas_auth', '')]
+    ]
+    t5 = Table(data5, colWidths=[130, 130, 130, 130])
+    t5.setStyle(TableStyle([
+        ('FONTNAME', (0,0), (-1,-1), 'Helvetica'),
+        ('FONTSIZE', (0,0), (-1,-1), 9),
+        ('GRID', (0,0), (-1,-1), 0.5, colors.lightgrey),
+        ('BACKGROUND', (0,0), (0,-1), colors.HexColor('#f9f9f9')),
+        ('BACKGROUND', (2,0), (2,-1), colors.HexColor('#f9f9f9')),
+    ]))
+    elements.append(t5)
     
-    c.setFont("Helvetica-Bold", 10)
-    c.drawString(35, y, "Aadhaar No.:")
-    c.setFont("Helvetica", 10)
-    aadhaar = s_data.get('aadhaar', '')
-    masked_aadhaar = f"XXXXXXXX{aadhaar[-4:]}" if len(aadhaar) >= 4 else aadhaar
-    c.drawString(150, y, masked_aadhaar)
-    c.setFont("Helvetica-Bold", 10)
-    c.drawString(300, y, "Category:")
-    c.setFont("Helvetica", 10)
-    c.drawString(400, y, s_data.get('category', ''))
-    y -= 20
+    # Bank Info
+    elements.append(Paragraph("Bank Information", section_header))
+    data6 = [
+        ["Bank Name", s_data.get('bank_name', ''), "Branch Name", s_data.get('branch_name', '')],
+        ["IFSC Code", s_data.get('ifsc', ''), "Account No.", s_data.get('acc_no', '')],
+        ["Account Holder Name", s_data.get('acc_name', '').upper(), "Aadhaar Seeded", "Yes"]
+    ]
+    t6 = Table(data6, colWidths=[130, 130, 130, 130])
+    t6.setStyle(TableStyle([
+        ('FONTNAME', (0,0), (-1,-1), 'Helvetica'),
+        ('FONTSIZE', (0,0), (-1,-1), 9),
+        ('GRID', (0,0), (-1,-1), 0.5, colors.lightgrey),
+        ('BACKGROUND', (0,0), (0,-1), colors.HexColor('#f9f9f9')),
+        ('BACKGROUND', (2,0), (2,-1), colors.HexColor('#f9f9f9')),
+    ]))
+    elements.append(t6)
     
-    c.setFont("Helvetica-Bold", 10)
-    c.drawString(35, y, "Date of Birth:")
-    c.setFont("Helvetica", 10)
-    c.drawString(150, y, s_data.get('dob', ''))
-    c.setFont("Helvetica-Bold", 10)
-    c.drawString(300, y, "Applicant Gender:")
-    c.setFont("Helvetica", 10)
-    c.drawString(400, y, s_data.get('gender', ''))
-    y -= 20
+    # Status & Declarations
+    elements.append(Paragraph("Application Status & Declarations", section_header))
+    data7 = [
+        ["Application ID", app_id],
+        ["Payment Mode", s_data.get('payment_mode', 'Pending')],
+        ["Current Status", s_data.get('status', 'Pending')]
+    ]
+    t7 = Table(data7, colWidths=[130, 390])
+    t7.setStyle(TableStyle([
+        ('FONTNAME', (0,0), (-1,-1), 'Helvetica-Bold'),
+        ('FONTSIZE', (0,0), (-1,-1), 9),
+        ('GRID', (0,0), (-1,-1), 0.5, colors.lightgrey),
+        ('BACKGROUND', (0,0), (0,-1), colors.HexColor('#f9f9f9')),
+    ]))
+    elements.append(t7)
     
-    c.setFont("Helvetica-Bold", 10)
-    c.drawString(35, y, "OTR No.:")
-    c.setFont("Helvetica", 10)
-    c.drawString(150, y, s_data.get('otr', ''))
-    c.setFont("Helvetica-Bold", 10)
-    c.drawString(300, y, "Mobile No.:")
-    c.setFont("Helvetica", 10)
-    c.drawString(400, y, s_data.get('mobile', ''))
-    y -= 20
+    elements.append(Spacer(1, 20))
+    decl_style = ParagraphStyle(name='Decl', fontName='Helvetica', fontSize=8, leading=10)
+    elements.append(Paragraph("<b>Student Declaration</b>", ParagraphStyle(name='DeclBold', fontName='Helvetica-Bold', fontSize=8)))
+    elements.append(Paragraph("1. I have read and understood the conditions of award of Scholarship.", decl_style))
+    elements.append(Paragraph("2. I am aware that my application is liable to be rejected, if it is found at any stage, that Aadhaar number provided by me is wrong.", decl_style))
+    elements.append(Paragraph("3. I am aware that for any wrong entry or mis-match of the Bank-account details, the State Government will not be responsible.", decl_style))
     
-    c.setFont("Helvetica-Bold", 10)
-    c.drawString(35, y, "Father's Name:")
-    c.setFont("Helvetica", 10)
-    c.drawString(150, y, s_data.get('father_name', '').upper())
-    c.setFont("Helvetica-Bold", 10)
-    c.drawString(300, y, "Mother's Name:")
-    c.setFont("Helvetica", 10)
-    c.drawString(400, y, s_data.get('mother_name', '').upper())
-    y -= 30
+    elements.append(Spacer(1, 30))
+    elements.append(Paragraph("Date: __________________", decl_style))
+    elements.append(Paragraph(f"Place: {s_data.get('district', '')}                                                                                     Full Signature of Applicant", decl_style))
     
-    # --- Address Information ---
-    c.setFillColor(colors.lightgrey)
-    c.rect(30, y-15, width-60, 20, fill=1, stroke=0)
-    c.setFillColor(colors.black)
-    c.setFont("Helvetica-Bold", 12)
-    c.drawString(35, y-10, "Address Information")
-    y -= 35
-    
-    c.setFont("Helvetica-Bold", 10)
-    c.drawString(35, y, "State:")
-    c.setFont("Helvetica", 10)
-    c.drawString(150, y, s_data.get('state', ''))
-    c.setFont("Helvetica-Bold", 10)
-    c.drawString(300, y, "District:")
-    c.setFont("Helvetica", 10)
-    c.drawString(400, y, s_data.get('district', ''))
-    y -= 20
-    
-    c.setFont("Helvetica-Bold", 10)
-    c.drawString(35, y, "Address:")
-    c.setFont("Helvetica", 10)
-    c.drawString(150, y, s_data.get('full_address', '')[:35])
-    y -= 30
-    
-    # --- Institute Information ---
-    c.setFillColor(colors.lightgrey)
-    c.rect(30, y-15, width-60, 20, fill=1, stroke=0)
-    c.setFillColor(colors.black)
-    c.setFont("Helvetica-Bold", 12)
-    c.drawString(35, y-10, "Institute/Course Information")
-    y -= 35
-    
-    c.setFont("Helvetica-Bold", 10)
-    c.drawString(35, y, "Institute Code:")
-    c.setFont("Helvetica", 10)
-    c.drawString(150, y, s_data.get('school_code', ''))
-    c.setFont("Helvetica-Bold", 10)
-    c.drawString(300, y, "Course/Class:")
-    c.setFont("Helvetica", 10)
-    c.drawString(400, y, s_data.get('class', ''))
-    y -= 30
-    
-    # --- Eligibility Information ---
-    c.setFillColor(colors.lightgrey)
-    c.rect(30, y-15, width-60, 20, fill=1, stroke=0)
-    c.setFillColor(colors.black)
-    c.setFont("Helvetica-Bold", 12)
-    c.drawString(35, y-10, "Eligibility Information")
-    y -= 35
-    
-    c.setFont("Helvetica-Bold", 10)
-    c.drawString(35, y, "Income Cert No.:")
-    c.setFont("Helvetica", 10)
-    c.drawString(150, y, s_data.get('income_cert', ''))
-    c.setFont("Helvetica-Bold", 10)
-    c.drawString(300, y, "Caste Cert No.:")
-    c.setFont("Helvetica", 10)
-    c.drawString(400, y, s_data.get('caste_cert', ''))
-    y -= 30
+    doc.build(elements)
 
-    # --- Bank Information ---
-    c.setFillColor(colors.lightgrey)
-    c.rect(30, y-15, width-60, 20, fill=1, stroke=0)
-    c.setFillColor(colors.black)
-    c.setFont("Helvetica-Bold", 12)
-    c.drawString(35, y-10, "Bank Information")
-    y -= 35
-    
-    c.setFont("Helvetica-Bold", 10)
-    c.drawString(35, y, "Account No.:")
-    c.setFont("Helvetica", 10)
-    c.drawString(150, y, s_data.get('acc_no', ''))
-    c.setFont("Helvetica-Bold", 10)
-    c.drawString(300, y, "Bank Name:")
-    c.setFont("Helvetica", 10)
-    c.drawString(400, y, s_data.get('bank_name', ''))
-    y -= 20
-    
-    c.setFont("Helvetica-Bold", 10)
-    c.drawString(35, y, "IFSC Code:")
-    c.setFont("Helvetica", 10)
-    c.drawString(150, y, s_data.get('ifsc', ''))
-    c.setFont("Helvetica-Bold", 10)
-    c.drawString(300, y, "Branch Name:")
-    c.setFont("Helvetica", 10)
-    c.drawString(400, y, s_data.get('branch_name', ''))
-    y -= 40
-    
-    # --- Declarations ---
-    c.setFont("Helvetica-Bold", 10)
-    c.drawString(35, y, "Student Declaration:")
-    y -= 15
-    c.setFont("Helvetica", 8)
-    c.drawString(35, y, "1. I have read and understood the conditions of award of Scholarship.")
-    y -= 15
-    c.drawString(35, y, "2. I am aware that my application is liable to be rejected, if it is found at any stage, that Aadhaar number provided by me is wrong.")
-    y -= 50
-    
-    c.line(30, y, 200, y)
-    c.drawString(70, y-15, "Full Signature of Applicant")
-    
-    try: 
-        bc = code128.Code128(str(app_id), barHeight=30, barWidth=1.2)
-        bc.drawOn(c, width - 180, 50)
-    except: pass
-    
-    c.save()
+def render_odisha_scholarship_html(app_id, s_data):
+    adh = s_data.get('aadhaar', '')
+    masked_adh = f"XXXXXXXX{adh[-4:]}" if len(adh) >= 4 else adh
+    return f"""
+    <div style="font-family: Arial, sans-serif; border: 1px solid #ccc; padding: 20px; max-width: 900px; margin: auto; background-color: #fff;">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <h2 style="margin: 0; color: #0b3a5b;">Government of Odisha</h2>
+            <h3 style="margin: 5px 0;">Scholarship Application Form</h3>
+            <h4 style="margin: 5px 0;">ST&SC and MBC Welfare Department</h4>
+            <p style="margin: 0;">Academic Year: <b>{s_data.get('academic_year', '2025-26')}</b></p>
+        </div>
+        
+        <h4 style="background-color: #0b3a5b; color: white; padding: 5px; margin: 0;">Basic Information</h4>
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 15px;" border="1">
+            <tr style="background-color: #f2f2f2;"><th>Department</th><th>Scheme</th><th>Academic Year</th><th>Application Type</th></tr>
+            <tr style="text-align:center;"><td>ST&SC and MBC Welfare</td><td>{s_data.get('scheme', '')}</td><td>{s_data.get('academic_year', '')}</td><td>New</td></tr>
+        </table>
+        
+        <h4 style="background-color: #0b3a5b; color: white; padding: 5px; margin: 0;">Applicant Details</h4>
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 15px;" border="1">
+            <tr><td style="background-color: #f9f9f9; width: 25%;"><b>Applicant Name</b></td><td style="width: 25%;">{s_data.get('app_name', '').upper()}</td><td style="background-color: #f9f9f9; width: 25%;"><b>Religion</b></td><td style="width: 25%;">{s_data.get('religion', '')}</td></tr>
+            <tr><td style="background-color: #f9f9f9;"><b>Aadhaar No.</b></td><td>{masked_adh}</td><td style="background-color: #f9f9f9;"><b>Category</b></td><td>{s_data.get('category', '')}</td></tr>
+            <tr><td style="background-color: #f9f9f9;"><b>Date of Birth</b></td><td>{s_data.get('dob', '')}</td><td style="background-color: #f9f9f9;"><b>Applicant Gender</b></td><td>{s_data.get('gender', '')}</td></tr>
+            <tr><td style="background-color: #f9f9f9;"><b>OTR No.</b></td><td>{s_data.get('otr', '')}</td><td style="background-color: #f9f9f9;"><b>Mobile No.</b></td><td>{s_data.get('mobile', '')}</td></tr>
+            <tr><td style="background-color: #f9f9f9;"><b>Father's Name</b></td><td>{s_data.get('father_name', '').upper()}</td><td style="background-color: #f9f9f9;"><b>Mother's Name</b></td><td>{s_data.get('mother_name', '').upper()}</td></tr>
+        </table>
+        
+        <h4 style="background-color: #0b3a5b; color: white; padding: 5px; margin: 0;">Address Information</h4>
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 15px;" border="1">
+            <tr><td style="background-color: #f9f9f9; width: 25%;"><b>Address</b></td><td>{s_data.get('full_address', '').upper()}</td></tr>
+            <tr><td style="background-color: #f9f9f9;"><b>State</b></td><td>{s_data.get('state', '').upper()}</td></tr>
+            <tr><td style="background-color: #f9f9f9;"><b>District</b></td><td>{s_data.get('district', '').upper()}</td></tr>
+        </table>
+        
+        <h4 style="background-color: #0b3a5b; color: white; padding: 5px; margin: 0;">Institute/Course Information</h4>
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 15px;" border="1">
+            <tr><td style="background-color: #f9f9f9; width: 25%;"><b>Institute Code</b></td><td style="width: 25%;">{s_data.get('school_code', '')}</td><td style="background-color: #f9f9f9; width: 25%;"><b>Course/Class</b></td><td style="width: 25%;">{s_data.get('class', '')}</td></tr>
+        </table>
+        
+        <h4 style="background-color: #0b3a5b; color: white; padding: 5px; margin: 0;">Bank Information</h4>
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 15px;" border="1">
+            <tr><td style="background-color: #f9f9f9; width: 25%;"><b>Bank Name</b></td><td style="width: 25%;">{s_data.get('bank_name', '')}</td><td style="background-color: #f9f9f9; width: 25%;"><b>Branch Name</b></td><td style="width: 25%;">{s_data.get('branch_name', '')}</td></tr>
+            <tr><td style="background-color: #f9f9f9;"><b>IFSC Code</b></td><td>{s_data.get('ifsc', '')}</td><td style="background-color: #f9f9f9;"><b>Account No.</b></td><td>{s_data.get('acc_no', '')}</td></tr>
+            <tr><td style="background-color: #f9f9f9;"><b>Account Holder</b></td><td>{s_data.get('acc_name', '').upper()}</td><td style="background-color: #f9f9f9;"><b>Aadhaar Seeded</b></td><td>Yes</td></tr>
+        </table>
+        
+        <div style="font-size: 11px; color: #555; margin-top: 20px;">
+            <b>Student Declaration:</b><br>
+            1. I have read and understood the conditions of award of Scholarship.<br>
+            2. I am aware that my application is liable to be rejected, if it is found at any stage, that Aadhaar number provided by me is wrong.<br>
+            3. I am aware that for any wrong entry or mis-match of the Bank-account details, the State Government will not be responsible.
+        </div>
+    </div>
+    """
 
 def create_school_receipt_pdf(filename, sch_id, sch_data):
     c = canvas.Canvas(filename, pagesize=letter)
@@ -763,7 +759,6 @@ elif menu == "Scholarship Portal":
                     else: st.error("Passwords do not match!")
 
     else:
-        # LOGGED IN STUDENT DASHBOARD
         cur_uid = st.session_state['sch_current_user']
         user_profile = sch_users_db[cur_uid]
         draft_data = user_profile.get("draft", {})
@@ -775,7 +770,6 @@ elif menu == "Scholarship Portal":
             del st.session_state['sch_current_user']
             st.rerun()
             
-        # 🛠️ CHECK IF STUDENT HAS ALREADY APPLIED
         existing_app_id = None
         existing_app_data = None
         for a_id, a_data in scholarships_db.items():
@@ -786,29 +780,19 @@ elif menu == "Scholarship Portal":
                 
         if existing_app_id:
             st.error("⚠️ ଆପଣ ପୂର୍ବରୁ ସ୍କଲାରସିପ୍ ଆବେଦନ କରିସାରିଛନ୍ତି (You have already submitted your application). ଆପଣ ପୁନର୍ବାର ଆବେଦନ କରିପାରିବେ ନାହିଁ।")
-            st.markdown("### 📄 My Submitted Application Details")
             
-            c_det1, c_det2 = st.columns(2)
-            c_det1.write(f"**Application ID:** `{existing_app_id}`")
-            c_det1.write(f"**Name:** {existing_app_data.get('app_name', '').upper()}")
-            c_det1.write(f"**Father's Name:** {existing_app_data.get('father_name', '').upper()}")
-            c_det1.write(f"**Mobile:** {existing_app_data.get('mobile', '')}")
+            st.markdown(render_odisha_scholarship_html(existing_app_id, existing_app_data), unsafe_allow_html=True)
             
-            c_det2.write(f"**Status:** `{existing_app_data.get('status')}`")
-            c_det2.write(f"**DOB:** {existing_app_data.get('dob', '')}")
-            c_det2.write(f"**Category:** {existing_app_data.get('category', '')}")
-            c_det2.write(f"**Payment Mode:** {existing_app_data.get('payment_mode', '')}")
-            
-            st.markdown("---")
+            st.markdown("<br>", unsafe_allow_html=True)
             c_btn1, c_btn2 = st.columns(2)
             
             pdf_path = f"Scholarship_Data/Student_Submissions/{existing_app_id}/Payment_Receipt_Application.pdf"
             if not os.path.exists(pdf_path):
                 os.makedirs(f"Scholarship_Data/Student_Submissions/{existing_app_id}", exist_ok=True)
-                create_scholarship_pdf(pdf_path, existing_app_id, existing_app_data)
+                create_odisha_scholarship_pdf(pdf_path, existing_app_id, existing_app_data)
                 
             with open(pdf_path, "rb") as f:
-                c_btn1.download_button("📥 Download Application PDF", f, file_name=f"Scholarship_{existing_app_id}.pdf", mime="application/pdf", key="stu_dash_dl")
+                c_btn1.download_button("📥 Download PDF", f, file_name=f"Scholarship_{existing_app_id}.pdf", mime="application/pdf", key="stu_dash_dl")
             
             if c_btn2.button("🖨️ Print Application", key="stu_dash_print"):
                 components.html("<script>window.parent.print();</script>", height=0)
@@ -964,7 +948,7 @@ elif menu == "Scholarship Portal":
                             folder_path = f"Scholarship_Data/Student_Submissions/{tmp['app_id']}"
                             os.makedirs(folder_path, exist_ok=True)
                             pdf_path = f"{folder_path}/Payment_Receipt_Application.pdf"
-                            create_scholarship_pdf(pdf_path, tmp['app_id'], tmp['data'])
+                            create_odisha_scholarship_pdf(pdf_path, tmp['app_id'], tmp['data'])
                             
                             scholarships_db[tmp['app_id']] = tmp['data']
                             save_scholarships(scholarships_db)
@@ -984,7 +968,7 @@ elif menu == "Scholarship Portal":
                         folder_path = f"Scholarship_Data/Student_Submissions/{tmp['app_id']}"
                         os.makedirs(folder_path, exist_ok=True)
                         pdf_path = f"{folder_path}/Payment_Receipt_Application.pdf"
-                        create_scholarship_pdf(pdf_path, tmp['app_id'], tmp['data'])
+                        create_odisha_scholarship_pdf(pdf_path, tmp['app_id'], tmp['data'])
                         
                         scholarships_db[tmp['app_id']] = tmp['data']
                         save_scholarships(scholarships_db)
@@ -1066,7 +1050,7 @@ elif menu == "New Student Registration":
             declaration = st.checkbox("✅ I declare the above info is true.")
             if st.form_submit_button("Proceed to Payment & Submit"):
                 if not declaration: st.error("⚠️ Please check the declaration box.")
-                elif not school_sel or not sanitize(stu_name_en) or not sanitize(stu_phone) or not sanitize(stu_aadhar) or not sanitize(stu_address_en) or not sanitize(f_name_en) or not sanitize(m_name_en):
+                elif not school_sel or not sanitize(stu_name_en) or not sanitize(stu_phone):
                     st.error("Please fill all mandatory fields (*).")
                 else:
                     temp_reg_id = "REG" + str(random.randint(100000, 999999))
@@ -1366,19 +1350,9 @@ elif menu == "Master Login":
                             st.download_button("📥 Download Final Application PDF", f, file_name=f"Application_{a_id}.pdf", mime="application/pdf", key=f"m_appr_pdf_{a_id}")
                     
                     app_data = approved_sch[a_id]
-                    st.markdown("### 📄 Approved Application Details")
-                    
-                    display_data = {k: v for k, v in app_data.items() if not k.endswith('_b64')}
-                    
-                    c_det1, c_det2 = st.columns(2)
-                    c_det1.write(f"**Name:** {display_data.get('app_name', '')}")
-                    c_det1.write(f"**Father's Name:** {display_data.get('father_name', '')}")
-                    c_det1.write(f"**Gender:** {display_data.get('gender', '')}")
-                    c_det1.write(f"**Mobile:** {display_data.get('mobile', '')}")
-                    c_det2.write(f"**Aadhaar No:** {display_data.get('aadhaar', '')}")
-                    c_det2.write(f"**DOB:** {display_data.get('dob', '')}")
-                    c_det2.write(f"**Status:** {display_data.get('status', '')}")
-                    c_det2.write(f"**Payment Mode:** {display_data.get('payment_mode', '')}")
+                    st.markdown(render_odisha_scholarship_html(a_id, app_data), unsafe_allow_html=True)
+                    if st.button("🖨️ Print Application", key=f"m_print_{a_id}"):
+                        components.html("<script>window.parent.print();</script>", height=0)
 
                 else:
                     st.info("No approved folders yet.")
