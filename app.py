@@ -198,6 +198,7 @@ def create_scholarship_pdf(filename, app_id, s_data):
     c.setFont("Helvetica", 11); y = 640
     c.drawString(50, y, f"Applicant Name: {s_data.get('app_name', '').upper()}"); c.drawString(350, y, f"OTR No: {s_data.get('otr', '')}"); y -= 25
     c.drawString(50, y, f"Aadhaar No: {s_data.get('aadhaar', '')}"); c.drawString(350, y, f"Category: {s_data.get('category', '')}"); y -= 25
+    c.drawString(50, y, f"DOB: {s_data.get('dob', '')}"); c.drawString(350, y, f"Gender: {s_data.get('gender', '')}"); y -= 25
     c.drawString(50, y, f"Phone: {s_data.get('mobile', '')}"); c.drawString(350, y, f"School Code: {s_data.get('school_code', '')}"); y -= 35
     c.setStrokeColorRGB(0.8, 0.8, 0.8); c.line(50, y, 550, y); y -= 20
     c.setFont("Helvetica-Bold", 12); c.drawString(50, y, "Certificate & Institute Info"); c.setFont("Helvetica", 11); y -= 20
@@ -325,7 +326,7 @@ if menu == "Home Page":
     with c3: st.markdown("<a href='?portal=reg_school' target='_self' class='login-card'><div class='login-title'>🏫 New School</div><div class='login-sub'>Register institution</div></a>", unsafe_allow_html=True)
     with c4: st.markdown("<a href='?portal=master' target='_self' class='login-card'><div class='login-title'>🏛️ Master Login</div><div class='login-sub'>Admin Portal</div></a>", unsafe_allow_html=True)
 
-# ----------------- SCHOLARSHIP PORTAL (NEW FEATURES & ADDRESS UPDATES) -----------------
+# ----------------- SCHOLARSHIP PORTAL -----------------
 elif menu == "Scholarship Portal":
     c_h, c_t = st.columns([1, 8])
     with c_h:
@@ -399,39 +400,11 @@ elif menu == "Scholarship Portal":
         f_name = c13.text_input("Father's Name *")
         m_name = c14.text_input("Mother's Name *")
         
-        # 📌 NEW DYNAMIC CASCADING ADDRESS SYSTEM
-        st.markdown("#### 📍 Address Information")
-        addr = st.text_area("Full Address *", placeholder="Enter your complete address")
-        
-        c_st, c_dt = st.columns(2)
-        all_states = list(STATE_LANG_MAP.keys())
-        state_idx = all_states.index("Odisha") if "Odisha" in all_states else 0
-        state = c_st.selectbox("State *", all_states, index=state_idx)
-        
-        ODISHA_DISTRICTS = {
-            "Angul": ["Angul", "Athmallik", "Banarpal", "Chhendipada", "Kishorenagar", "Pallahara", "Talcher"],
-            "Balasore": ["Bahanaga", "Balasore", "Baliapal", "Basta", "Bhograi", "Jaleswar", "Khaira", "Nilagiri", "Oupada", "Remuna", "Simulia", "Soro"],
-            "Cuttack": ["Athagarh", "Banki", "Baramba", "Barang", "Cuttack Sadar", "Dampara", "Kantapada", "Mahanga", "Niali", "Nischintakoili", "Salepur", "Tangi-Choudwar", "Tigiria"],
-            "Jajpur": ["Barchana", "Bari", "Binjharpur", "Danagadi", "Dasarathpur", "Dharmasala", "Jajpur", "Korei", "Rasulpur", "Sukinda"],
-            "Khordha": ["Balianta", "Balipatna", "Banapur", "Begunia", "Bhubaneswar", "Bolagarh", "Chilika", "Jatni", "Khurda", "Tangi"],
-            "Puri": ["Astaranga", "Brahmagiri", "Delanga", "Gop", "Kakatpur", "Kanas", "Krushnaprasad", "Nimapada", "Pipili", "Puri Sadar", "Satyabadi"]
-        }
-        
-        if state == "Odisha":
-            dist_list = ["Angul", "Balasore", "Bargarh", "Bhadrak", "Balangir", "Boudh", "Cuttack", "Deogarh", "Dhenkanal", "Gajapati", "Ganjam", "Jagatsinghpur", "Jajpur", "Jharsuguda", "Kalahandi", "Kandhamal", "Kendrapara", "Kendujhar", "Khordha", "Koraput", "Malkangiri", "Mayurbhanj", "Nabarangpur", "Nayagarh", "Nuapada", "Puri", "Rayagada", "Sambalpur", "Subarnapur", "Sundargarh"]
-            dist = c_dt.selectbox("District *", sorted(dist_list))
-            
-            c_blk, c_pin = st.columns(2)
-            if dist in ODISHA_DISTRICTS:
-                block = c_blk.selectbox("Block/ULB *", sorted(ODISHA_DISTRICTS[dist]))
-            else:
-                block = c_blk.text_input("Block/ULB *", placeholder=f"Enter Block in {dist}")
-        else:
-            dist = c_dt.text_input("District *", placeholder="Enter your District")
-            c_blk, c_pin = st.columns(2)
-            block = c_blk.text_input("Block/ULB *", placeholder="Enter your Block")
-            
-        pin = c_pin.text_input("Pin Code *", max_chars=6)
+        st.markdown("#### Address Information")
+        c19, c20, c21 = st.columns(3)
+        dist = c19.text_input("District")
+        block = c20.text_input("Block/ULB")
+        pin = c21.text_input("Pin Code")
         
         st.markdown("### Institute / Course Information")
         active_schools = {k: v for k, v in schools_db.items() if v.get("status", "Active") == "Active"}
@@ -512,8 +485,8 @@ elif menu == "Scholarship Portal":
         
         if st.button("Proceed to Payment & Submit", type="primary"):
             if not decl: st.error("Please accept the declaration.")
-            elif not school_code or not sanitize(app_name) or not sanitize(aadhaar_input) or not sanitize(acc_no) or not sanitize(inc_no) or not sanitize(cas_no) or not sanitize(addr) or not sanitize(dist) or not sanitize(block) or not sanitize(pin):
-                st.error("Please fill all mandatory fields (*), including Full Address, District, Block, Pin Code, Certificates and School.")
+            elif not school_code or not sanitize(app_name) or not sanitize(aadhaar_input) or not sanitize(acc_no) or not sanitize(inc_no) or not sanitize(cas_no):
+                st.error("Please fill all mandatory fields (*), including Certificates and School.")
             elif acc_no != re_acc_no: st.error("Account Numbers do not match!")
             elif inc_auth == "Select" or cas_auth == "Select": st.error("Please select a valid Issuing Authority for certificates.")
             else:
@@ -525,8 +498,6 @@ elif menu == "Scholarship Portal":
                         "category": category, "otr": sanitize(otr_input), "gender": gender,
                         "dob": str(dob), "aadhaar": sanitize(aadhaar_input), "mobile": sanitize(mob_no),
                         "father_name": sanitize(f_name), "mother_name": sanitize(m_name),
-                        "full_address": sanitize(addr), "state": sanitize(state), "district": sanitize(dist),
-                        "block": sanitize(block), "pin_code": sanitize(pin),
                         "school_code": school_code, "class": sch_class, 
                         "income_cert": sanitize(inc_no), "inc_auth": inc_auth,
                         "caste_cert": sanitize(cas_no), "cas_auth": cas_auth, "ifsc": sanitize(ifsc), 
