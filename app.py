@@ -14,6 +14,7 @@ import urllib.request
 import ssl
 import html
 import threading
+import xml.etree.ElementTree as ET
 
 # ==========================================
 # 🔒 CRASH PROTECTION & DATA SAFETY LOCKS
@@ -80,7 +81,7 @@ RELATIONSHIPS = ["Select", "Father", "Mother", "Legal Guardian"]
 CERT_YEARS = ["Select", "Certificate issued before 1st Feb 2020", "Certificate issued on/after 1st Feb 2020"]
 
 # ==========================================
-# 🤖 AUTO TRANSLATION ENGINE
+# 🤖 AUTO TRANSLATION ENGINE & LIVE NEWS
 # ==========================================
 @st.cache_data(show_spinner=False)
 def auto_translate(text, lang_name):
@@ -96,6 +97,27 @@ def auto_translate(text, lang_name):
         res = urllib.request.urlopen(req, timeout=5, context=ctx)
         return "".join([s[0] for s in json.loads(res.read().decode('utf-8'))[0]])
     except Exception: return text 
+
+@st.cache_data(ttl=3600, show_spinner=False)
+def get_live_india_news():
+    try:
+        url = "https://news.google.com/rss/headlines/section/topic/NATION?hl=en-IN&gl=IN&ceid=IN:en"
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        response = urllib.request.urlopen(req, timeout=5, context=ctx)
+        xml_data = response.read()
+        root = ET.fromstring(xml_data)
+        news_list = []
+        for item in root.findall('./channel/item')[:10]:
+            title = item.find('title').text
+            news_list.append(title)
+        if news_list:
+            return " &nbsp;&nbsp;⭐&nbsp;&nbsp; ".join(news_list)
+    except Exception:
+        pass
+    return "Schools and Colleges across India are successfully adopting Advanced Digital Management Systems to improve education standards."
 
 def t(eng_text, lang):
     translations = {"School Portal": {"Odia": "ସ୍କୁଲ୍ ପୋର୍ଟାଲ୍", "Hindi": "स्कूल पोर्टल"}}
@@ -306,8 +328,20 @@ if menu == "Home Page":
 
     st.markdown(f"<div class='glass-panel'><h2 style='text-align: center; color: #fbbf24; margin-top: 0;'>🏫 {event_title}</h2>", unsafe_allow_html=True)
     components.html(carousel_html, height=360)
+    
+    # 🔴 LIVE INDIA NEWS TICKER (AUTO UPDATED)
+    live_news = get_live_india_news()
+    live_news_html = f"""
+    <div style='background-color: #0f172a; border-radius: 10px; margin-top: 25px; border: 2px solid #38bdf8; overflow: hidden; color: #e2e8f0; font-size: 18px; padding: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.5);'>
+        <marquee direction='left' scrollamount='8' style='font-weight: bold; display: flex; align-items: center;'>
+            <span style='color: #fbbf24; background: #dc2626; color: white; padding: 2px 8px; border-radius: 4px; margin-right: 10px;'>🔴 LIVE NEWS</span> {live_news}
+        </marquee>
+    </div>
+    """
+    st.markdown(live_news_html, unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
+    # Regular Notice Banner
     notice_text_html = """
     <!DOCTYPE html>
     <html><head><meta charset="utf-8"><style>body { margin: 0; background: transparent; color: #fff; font-family: sans-serif; font-size: 18px; display: flex; align-items: center; height: 100%; } .new-badge { background-color: #fbbf24; color: black; font-size: 14px; font-weight: bold; padding: 2px 6px; border-radius: 3px; margin-left: 5px; }</style></head>
@@ -325,7 +359,7 @@ if menu == "Home Page":
     with c3: st.markdown("<a href='?portal=reg_school' target='_self' class='login-card'><div class='login-title'>🏫 New School</div><div class='login-sub'>Register institution</div></a>", unsafe_allow_html=True)
     with c4: st.markdown("<a href='?portal=master' target='_self' class='login-card'><div class='login-title'>🏛️ Master Login</div><div class='login-sub'>Admin Portal</div></a>", unsafe_allow_html=True)
 
-# ----------------- SCHOLARSHIP PORTAL (NEW FEATURES & ADDRESS UPDATES) -----------------
+# ----------------- SCHOLARSHIP PORTAL -----------------
 elif menu == "Scholarship Portal":
     c_h, c_t = st.columns([1, 8])
     with c_h:
@@ -358,8 +392,8 @@ elif menu == "Scholarship Portal":
         if col_o2.button("VERIFY OTR"):
             if otr_input:
                 st.session_state['v_otr'] = otr_input
-                st.session_state['v_name'] = "JYOTI PRAKASH SUTAR" # Auto fetched mock name
-                st.session_state['v_aadhaar'] = "8899-0011-2233" # Auto fetched mock aadhaar
+                st.session_state['v_name'] = "JYOTI PRAKASH SUTAR" 
+                st.session_state['v_aadhaar'] = "8899-0011-2233" 
                 st.success("✅ OTR Verified Successfully! Application Name and Aadhaar Auto-fetched.")
             else:
                 st.error("Please enter OTR No.")
@@ -399,7 +433,6 @@ elif menu == "Scholarship Portal":
         f_name = c13.text_input("Father's Name *")
         m_name = c14.text_input("Mother's Name *")
         
-        # 📌 NEW DYNAMIC CASCADING ADDRESS SYSTEM
         st.markdown("#### 📍 Address Information")
         addr = st.text_area("Full Address *", placeholder="Enter your complete address")
         
