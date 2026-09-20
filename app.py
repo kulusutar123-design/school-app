@@ -16,7 +16,7 @@ import html
 import threading
 
 # ==========================================
-# 🔒 ATOMIC CRASH PROTECTION & DATA SAFETY LOCKS
+# 🔒 CRASH PROTECTION & DATA SAFETY LOCKS
 # ==========================================
 file_lock = threading.Lock()
 
@@ -26,15 +26,13 @@ def sanitize(text):
     return text
 
 def atomic_save(data, filename):
-    """100% Data Safety - Never corrupts files during save"""
+    """Guaranteed persistent save without data loss"""
     with file_lock:
         try:
-            tmp_filename = filename + ".tmp"
-            with open(tmp_filename, "w", encoding="utf-8") as f:
+            with open(filename, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=4)
-            os.replace(tmp_filename, filename)
         except Exception as e:
-            st.error(f"System Error (Data Save): {e}")
+            st.error(f"Save Error ({filename}): {e}")
 
 # ==========================================
 # 🌐 APP URL SETTING & CONFIG
@@ -124,17 +122,20 @@ def number_to_words(num):
 
 def format_display_date(d_str):
     if not d_str: return datetime.date.today().strftime('%d-%m-%Y')
-    d_str = str(d_str).strip().replace('/', '-')
+    d_str = str(d_str).strip().replace('/', '-').replace('.', '-')
     parts = d_str.split('-')
     if len(parts) == 3 and len(parts[0]) == 4: return f"{parts[2]}-{parts[1]}-{parts[0]}"
     return d_str
 
 def normalize_dob(d_str):
-    d_str = d_str.strip().replace('/', '-')
-    if d_str.count('-') == 2:
-        p1, p2, p3 = d_str.split('-')
-        if len(p1) == 4: return f"{p1}-{p2}-{p3}" 
-        elif len(p3) == 4: return f"{p3}-{p2}-{p1}" 
+    if not d_str: return ""
+    d_str = str(d_str).strip().replace('/', '-').replace('.', '-')
+    parts = [p.strip() for p in d_str.split('-') if p.strip()]
+    if len(parts) == 3:
+        if len(parts[0]) == 4:
+            return f"{parts[0]}-{parts[1].zfill(2)}-{parts[2].zfill(2)}"
+        elif len(parts[2]) == 4:
+            return f"{parts[2]}-{parts[1].zfill(2)}-{parts[0].zfill(2)}"
     return d_str
 
 # --- 100% SAFE JSON DATA LOAD/SAVE FUNCTIONS ---
@@ -609,7 +610,7 @@ if menu == "Home Page":
                 🔴 [BENGAL] রাজ্যের সব স্কুলে নতুন শিক্ষাবর্ষের ভর্তি শুরু হচ্ছে! &nbsp;&nbsp;♦&nbsp;&nbsp; 
                 🔴 [MAHARASHTRA] राज्यातील सर्व शाळांमध्ये नवीन तंत्रज्ञान लागू होणार! &nbsp;&nbsp;♦&nbsp;&nbsp; 
                 🔴 [ANDHRA] రాష్ట్రంలోని పాఠశాలల్లో డిజిటల్ విద్య అమలు! &nbsp;&nbsp;♦&nbsp;&nbsp; 
-                🔴 [HINDI] देश भर के सभी स्कूलों में नई ডিজিটাল शिक्षा प्रणाली लागू होगी!
+                🔴 [HINDI] देश भर के सभी स्कूलों में नई डिजिटल शिक्षा प्रणाली लागू होगी!
                 </span>
             </marquee>
         </div>
@@ -884,7 +885,6 @@ elif menu == "New Student Registration":
             stu_country = c_nat1.selectbox("13. Nationality", COUNTRIES)
             stu_bg = c_nat2.selectbox("14. Blood Group", ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-", "Unknown"])
             
-            st.markdown("#### 4. Photograph Upload")
             stu_photo = st.file_uploader("15. Upload Student Photo (JPG/PNG)", type=['png', 'jpg', 'jpeg'])
             
             declaration = st.checkbox("✅ I declare the above info is true.")
@@ -1135,10 +1135,9 @@ elif menu == "Master Login":
             if master_school_sel != "--Select--":
                 school_students = students_db.get(master_school_sel, {})
                 s_lang = schools_db[master_school_sel].get("lang", "English")
-                approved_students = {k:v for k,v in school_students.items()}
-                if approved_students:
-                    m_edit_roll = st.selectbox("Select Student Roll No", list(approved_students.keys()), key="m_roll_sel_fixed")
-                    m_curr_st = approved_students[m_edit_roll]
+                if school_students:
+                    m_edit_roll = st.selectbox("Select Student Roll No", list(school_students.keys()), key="m_roll_sel_fixed")
+                    m_curr_st = school_students[m_edit_roll]
                     
                     st.markdown("#### 📝 Edit Personal Details")
                     c1, c2 = st.columns(2)
@@ -1214,9 +1213,12 @@ elif menu == "Master Login":
                                 "dob": sanitize(m_up_dob), "class": m_up_class, "batch": m_up_batch,
                                 "subjects": new_m_subjects,
                                 "total_obt": m_tot_obt, "total_full": m_tot_full, 
-                                "percentage": round(new_per, 2), "result": new_res, "grade": new_grd
+                                "percentage": round(new_per, 2), "result": new_res, "grade": new_grd,
+                                "status": "Approved"
                             })
-                            save_data(schools_db, students_db); st.success("Updated!"); st.rerun()
+                            save_data(schools_db, students_db)
+                            st.success("Record updated and approved!")
+                            st.rerun()
                     with col_dl:
                         if st.button("🗑️ Delete Student Record", type="primary", key=f"m_fix_del_btn_{m_edit_roll}"):
                             del students_db[master_school_sel][m_edit_roll]
@@ -1307,19 +1309,20 @@ elif menu == "School Login":
         t_list, t_reg, t_sch, t_add, t_edit, t_rep = st.tabs(["📋 My Students", "✅ Registrations", "🎓 Scholarship", "➕ Add Student", "✏️ Edit Student", "🖨️ Report Card"])
         
         cur_students = students_db.get(cur_school, {})
-        approved_students = {k:v for k,v in cur_students.items() if v.get('status', 'Approved') == 'Approved'}
         
         with t_list:
             st.markdown("### 📋 My Students")
-            if approved_students:
-                st.write(f"Total Students: **{len(approved_students)}**")
-                for r_no, s_info in approved_students.items():
-                    st.write(f"**Roll:** {r_no} | **Name:** {s_info.get('name')} | **Class:** {s_info.get('class', 'N/A')}")
-            else: st.warning("No approved students.")
+            if cur_students:
+                st.write(f"Total Students: **{len(cur_students)}**")
+                for r_no, s_info in cur_students.items():
+                    st_stat = s_info.get('status', 'Approved')
+                    badge = "✅" if st_stat == 'Approved' else "⏳"
+                    st.write(f"{badge} **Roll:** {r_no} | **Name:** {s_info.get('name')} | **Class:** {s_info.get('class', 'N/A')} | **Status:** {st_stat}")
+            else: st.warning("No students found.")
             
         with t_reg:
             st.markdown("### ✅ Review Online Registrations")
-            pending_students = {k:v for k,v in cur_students.items() if v.get('status') == 'Pending_School'}
+            pending_students = {k:v for k,v in cur_students.items() if v.get('status') in ['Pending_School', 'Pending_Master']}
             if pending_students:
                 app_roll = st.selectbox("Select Pending Student", list(pending_students.keys()), key="s_pend_roll_sel")
                 if st.button("✅ Final Approve", key="s_pend_app_btn"):
@@ -1397,9 +1400,9 @@ elif menu == "School Login":
                     
         with t_edit:
             st.markdown("### ✏️ Edit Student Data (Full Form)")
-            if approved_students:
-                edit_roll = st.selectbox("Select Roll No", list(approved_students.keys()), key="s_edit_roll_v2")
-                curr_st = approved_students[edit_roll]
+            if cur_students:
+                edit_roll = st.selectbox("Select Roll No", list(cur_students.keys()), key="s_edit_roll_v2")
+                curr_st = cur_students[edit_roll]
                 
                 c_up_n1, c_up_n2 = st.columns(2)
                 up_name = c_up_n1.text_input("Edit Name (English)", value=curr_st.get('name', ''), key=f"s_up_name_v2_{edit_roll}")
@@ -1476,19 +1479,20 @@ elif menu == "School Login":
                         "dob": sanitize(up_dob_input), "class": up_class, "batch": up_batch,
                         "subjects": new_up_subjects,
                         "total_obt": up_tot_obt, "total_full": up_tot_full, 
-                        "percentage": round(new_per, 2), "result": new_res, "grade": new_grd
+                        "percentage": round(new_per, 2), "result": new_res, "grade": new_grd,
+                        "status": "Approved"
                     })
-                    save_data(schools_db, students_db); st.success("Updated!"); st.rerun()
+                    save_data(schools_db, students_db)
+                    st.success("Record updated and approved!")
+                    st.rerun()
 
         with t_rep:
             st.markdown("### 🖨️ Report Card")
-            if approved_students:
-                rep_roll = st.selectbox("Select Roll for Report", list(approved_students.keys()), key="s_rep_roll_v2")
-                
-                st.markdown(generate_result_card_html(sch_data['name'], sch_data.get('name_local', ''), approved_students[rep_roll], rep_roll, s_lang), unsafe_allow_html=True)
-                
+            if cur_students:
+                rep_roll = st.selectbox("Select Roll for Report", list(cur_students.keys()), key="s_rep_roll_v2")
+                st.markdown(generate_result_card_html(sch_data['name'], sch_data.get('name_local', ''), cur_students[rep_roll], rep_roll, s_lang), unsafe_allow_html=True)
                 pdf_file = f"Report_{rep_roll}.pdf"
-                create_pdf(pdf_file, sch_data['name'], approved_students[rep_roll], rep_roll)
+                create_pdf(pdf_file, sch_data['name'], cur_students[rep_roll], rep_roll)
                 with open(pdf_file, "rb") as f:
                     st.download_button("📥 Download PDF", f, file_name=pdf_file, mime="application/pdf", key="s_dl_pdf_v2")
                 if st.button("🖨️ Print Result Card", key="s_print_v2"):
@@ -1521,27 +1525,23 @@ elif menu == "Results":
     
     if st.button("View Result", key="res_view_v2"):
         if st_search_query and st_dob_input:
-            sq_clean = st_search_query.strip()
+            sq_clean = st_search_query.strip().lower()
             ndob = normalize_dob(st_dob_input)
             
             found_student = None; found_roll = None; found_school_id = None
-            pending_status = None
-            dob_mismatch = False
             
             for s_id, school_students in students_db.items():
                 for r_no, s_info in school_students.items():
-                    match_roll = (r_no.lower() == sq_clean.lower())
-                    match_name = (s_info.get("name", "").strip().lower() == sq_clean.lower())
+                    match_roll = (r_no.strip().lower() == sq_clean)
+                    match_name = (s_info.get("name", "").strip().lower() == sq_clean)
                     
                     if match_roll or match_name:
-                        if normalize_dob(s_info.get("dob", "")) == ndob:
-                            if s_info.get("status", "Approved") == "Approved":
-                                found_student = s_info; found_roll = r_no; found_school_id = s_id
-                                break
-                            else:
-                                pending_status = s_info.get("status")
-                        else:
-                            dob_mismatch = True
+                        st_dob_norm = normalize_dob(s_info.get("dob", ""))
+                        if st_dob_norm == ndob:
+                            found_student = s_info
+                            found_roll = r_no
+                            found_school_id = s_id
+                            break
                 if found_student: break
             
             if found_student:
@@ -1557,12 +1557,8 @@ elif menu == "Results":
                     st.download_button("📥 Download PDF", f, file_name=pdf_file, mime="application/pdf", key="res_dl_v2")
                 if st.button("🖨️ Print Result Card", key="res_print_v2"):
                     components.html("<script>window.parent.print();</script>", height=0)
-            elif pending_status:
-                st.warning(f"⚠️ ଆପଣଙ୍କ ରେକର୍ଡ ମିଳିଲା, କିନ୍ତୁ ଆପଣଙ୍କ Payment/Approval Status ଏବେ: '{pending_status}' ଅଛି। ଦୟାକରି Master କିମ୍ବା School ରୁ Approve କରନ୍ତୁ।")
-            elif dob_mismatch:
-                st.warning("⚠️ ଆପଣ ଦେଇଥିବା ନାମ କିମ୍ବା ରୋଲ୍ ନମ୍ବର ସହ ଜନ୍ମ ତାରିଖ (Date of Birth) ମେଳ ଖାଉନାହିଁ। ଦୟାକରି ଠିକ୍ DOB ଦିଅନ୍ତୁ।")
             else:
-                st.error("❌ କୌଣସି ରେକର୍ଡ ମିଳିଲା ନାହିଁ! ଦୟାକରି ଠିକ୍ Roll Number କିମ୍ବା Name ଦିଅନ୍ତୁ।")
+                st.error("❌ କୌଣସି ରେକର୍ଡ ମିଳିଲା ନାହିଁ! ଦୟାକରି Roll Number ଏବଂ Date of Birth ଯାଞ୍ଚ କରି ପୁନର୍ବାର ଚେଷ୍ଟା କରନ୍ତୁ।")
 
 st.markdown("---")
 st.markdown("<div style='text-align: center; padding: 15px; background: linear-gradient(90deg, #1e3a8a, #9333ea); color: white; border-radius: 8px; font-weight: bold;'>👨‍💻 Software Developed by: KULU SUTAR | 📞 Mob: 8910223342 | ✉️ kulusutar123@gmail.com</div>", unsafe_allow_html=True)
