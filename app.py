@@ -478,18 +478,59 @@ elif menu == "Scholarship Portal":
         log_tab, reg_tab = st.tabs(["🔑 Student Login", "📝 New Registration"])
         
         with log_tab:
-            st.info("Enter your 12-digit Aadhaar Number as User ID.")
-            l_uid = st.text_input("User ID (Aadhaar No.) *", key="l_sch_uid")
-            l_pwd = st.text_input("Password *", type="password", key="l_sch_pwd")
-            if st.button("Login", type="primary"):
-                uid_clean = sanitize(l_uid)
-                if uid_clean in sch_users_db and sch_users_db[uid_clean]["password"] == l_pwd:
-                    st.session_state['sch_logged_in'] = True
-                    st.session_state['sch_current_user'] = uid_clean
-                    st.success("Login Successful!")
-                    st.rerun()
-                else:
-                    st.error("❌ Invalid User ID or Password")
+            stu_log_mode = st.radio("Choose Action", ["Login", "Forgot Password"], key="stu_log_mode")
+            if stu_log_mode == "Login":
+                st.info("Enter your 12-digit Aadhaar Number as User ID.")
+                l_uid = st.text_input("User ID (Aadhaar No.) *", key="l_sch_uid")
+                l_pwd = st.text_input("Password *", type="password", key="l_sch_pwd")
+                if st.button("Login", type="primary"):
+                    uid_clean = sanitize(l_uid)
+                    if uid_clean in sch_users_db and sch_users_db[uid_clean]["password"] == l_pwd:
+                        st.session_state['sch_logged_in'] = True
+                        st.session_state['sch_current_user'] = uid_clean
+                        st.success("Login Successful!")
+                        st.rerun()
+                    else:
+                        st.error("❌ Invalid User ID or Password")
+            elif stu_log_mode == "Forgot Password":
+                st.info("Recover your Student Account using Aadhaar No")
+                f_uid = st.text_input("Enter your Aadhaar No (User ID)", key="f_sch_uid")
+                if st.button("Send OTP", key="f_sch_send"):
+                    if sanitize(f_uid) in sch_users_db:
+                        otp_code = str(random.randint(1000, 9999))
+                        st.session_state['sch_f_otp'] = otp_code
+                        st.session_state['sch_f_uid'] = sanitize(f_uid)
+                        st.success("OTP Sent Successfully to registered mobile!")
+                        st.info(f"📲 [DEMO SIMULATION] Your OTP is: **{otp_code}**")
+                    else:
+                        st.error("Aadhaar Number not found in our records!")
+                        
+                if 'sch_f_otp' in st.session_state:
+                    entered_otp = st.text_input("Enter 4-digit OTP", key="f_sch_otp_inp")
+                    if st.button("Verify OTP", key="f_sch_ver"):
+                        if entered_otp == st.session_state['sch_f_otp']:
+                            st.success("OTP Verified! You can now reset your password.")
+                            st.session_state['sch_otp_verified'] = True
+                        else:
+                            st.error("Invalid OTP!")
+                            
+                if st.session_state.get('sch_otp_verified', False):
+                    st.markdown("### 🔄 Reset Password")
+                    new_s_pass = st.text_input("New Password", type="password", key="f_sch_np")
+                    c_s_pass = st.text_input("Confirm New Password", type="password", key="f_sch_cnp")
+                    if st.button("Save New Password", key="f_sch_save"):
+                        if new_s_pass and new_s_pass == c_s_pass:
+                            target_uid = st.session_state['sch_f_uid']
+                            sch_users_db[target_uid]["password"] = new_s_pass
+                            save_sch_users(sch_users_db)
+                            st.success("Password successfully updated! Please switch to 'Login'.")
+                            del st.session_state['sch_f_otp']
+                            del st.session_state['sch_otp_verified']
+                            del st.session_state['sch_f_uid']
+                        elif new_s_pass != c_s_pass:
+                            st.error("Passwords do not match!")
+                        else:
+                            st.warning("Please enter a password.")
                     
         with reg_tab:
             if 'sch_reg_step' not in st.session_state: st.session_state['sch_reg_step'] = 1
@@ -548,9 +589,44 @@ elif menu == "Scholarship Portal":
             del st.session_state['sch_current_user']
             st.rerun()
             
-        dash_tab1, dash_tab2 = st.tabs(["📝 Apply / Draft Form", "🔍 View Application & Status"])
-        
-        with dash_tab1:
+        # 🛠️ CHECK IF STUDENT HAS ALREADY APPLIED
+        existing_app_id = None
+        existing_app_data = None
+        for a_id, a_data in scholarships_db.items():
+            if a_data.get("aadhaar") == cur_uid:
+                existing_app_id = a_id
+                existing_app_data = a_data
+                break
+                
+        if existing_app_id:
+            st.error("⚠️ ଆପଣ ପୂର୍ବରୁ ସ୍କଲାରସିପ୍ ଆବେଦନ କରିସାରିଛନ୍ତି (You have already submitted your application). ଆପଣ ପୁନର୍ବାର ଆବେଦନ କରିପାରିବେ ନାହିଁ।")
+            st.markdown("### 📄 My Submitted Application Details")
+            
+            st.write(f"**Application ID:** `{existing_app_id}`")
+            st.write(f"**Status:** `{existing_app_data.get('status')}`")
+            st.write(f"**Name:** {existing_app_data.get('app_name')}")
+            st.write(f"**Father's Name:** {existing_app_data.get('father_name')}")
+            st.write(f"**DOB:** {existing_app_data.get('dob')}")
+            st.write(f"**Mobile:** {existing_app_data.get('mobile')}")
+            st.write(f"**School Code:** {existing_app_data.get('school_code')}")
+            st.write(f"**Payment Mode:** {existing_app_data.get('payment_mode')}")
+            
+            st.markdown("---")
+            c_btn1, c_btn2 = st.columns(2)
+            
+            pdf_path = f"Scholarship_Data/Student_Submissions/{existing_app_id}/Payment_Receipt_Application.pdf"
+            if not os.path.exists(pdf_path):
+                os.makedirs(f"Scholarship_Data/Student_Submissions/{existing_app_id}", exist_ok=True)
+                create_scholarship_pdf(pdf_path, existing_app_id, existing_app_data)
+                
+            with open(pdf_path, "rb") as f:
+                c_btn1.download_button("📥 Download Application PDF", f, file_name=f"Scholarship_{existing_app_id}.pdf", mime="application/pdf", key="stu_dash_dl")
+            
+            if c_btn2.button("🖨️ Print Application", key="stu_dash_print"):
+                components.html("<script>window.parent.print();</script>", height=0)
+                
+        else:
+            # SHOW THE APPLICATION FORM FOR NEW APPLICANT
             if st.session_state.get('sch_app_success'):
                 st.success("✅ Application & Payment Submitted Successfully!")
                 pdf_path = f"Scholarship_Data/Student_Submissions/{st.session_state['sch_app_id']}/Payment_Receipt_Application.pdf"
@@ -733,22 +809,6 @@ elif menu == "Scholarship Portal":
                         st.session_state['sch_app_data'] = tmp['data']
                         st.session_state['sch_app_step'] = False; st.rerun()
 
-        with dash_tab2:
-            st.markdown("### 🔍 My Application Status")
-            search_app_id = st.text_input("Enter your Scholarship Application No. (e.g., SCH1234567)")
-            if st.button("View Details"):
-                if search_app_id in scholarships_db and scholarships_db[search_app_id]['aadhaar'] == cur_uid:
-                    app_data = scholarships_db[search_app_id]
-                    st.success(f"🎉 Application Found! Status: **{app_data.get('status')}**")
-                    st.write(f"**Name:** {app_data.get('app_name')}")
-                    
-                    pdf_path = f"Scholarship_Data/Student_Submissions/{search_app_id}/Payment_Receipt_Application.pdf"
-                    if os.path.exists(pdf_path):
-                        with open(pdf_path, "rb") as f:
-                            st.download_button("📥 Download Application PDF", f, file_name=f"Scholarship_{search_app_id}.pdf", mime="application/pdf", key="chk_dl_pdf_btn")
-                else:
-                    st.error("❌ Application not found or Aadhaar mismatch.")
-
 # ----------------- NEW STUDENT REGISTRATION -----------------
 elif menu == "New Student Registration":
     c_home, c_title = st.columns([1, 8])
@@ -767,8 +827,8 @@ elif menu == "New Student Registration":
         st.success(f"✅ Application Submitted! Reg ID: **{st.session_state['stu_reg_id']}**.")
         pdf_file = f"Receipt_{st.session_state['stu_reg_id']}.pdf"
         create_student_receipt_pdf(pdf_file, st.session_state['stu_reg_id'], st.session_state['stu_reg_data'])
-        with open(pdf_file, "rb") as f: st.download_button("📥 Download PDF Receipt", f, file_name=pdf_file, mime="application/pdf")
-        if st.button("⬅️ Done"): st.session_state['stu_reg_success'] = False; st.rerun()
+        with open(pdf_file, "rb") as f: st.download_button("📥 Download PDF Receipt", f, file_name=pdf_file, mime="application/pdf", key="stu_dl_btn_unique")
+        if st.button("⬅️ Done", key="stu_done_btn_unique"): st.session_state['stu_reg_success'] = False; st.rerun()
                 
     elif not st.session_state['payment_step']:
         with st.form("student_reg_form"):
@@ -818,7 +878,7 @@ elif menu == "New Student Registration":
             declaration = st.checkbox("✅ I declare the above info is true.")
             if st.form_submit_button("Proceed to Payment & Submit"):
                 if not declaration: st.error("⚠️ Please check the declaration box.")
-                elif not school_sel or not sanitize(stu_name_en) or not sanitize(stu_phone):
+                elif not school_sel or not sanitize(stu_name_en) or not sanitize(stu_phone) or not sanitize(stu_aadhar) or not sanitize(stu_address_en) or not sanitize(f_name_en) or not sanitize(m_name_en):
                     st.error("Please fill all mandatory fields (*).")
                 else:
                     temp_reg_id = "REG" + str(random.randint(100000, 999999))
@@ -844,15 +904,16 @@ elif menu == "New Student Registration":
     if st.session_state.get('payment_step', False):
         temp_obj = st.session_state.get('temp_student_data')
         st.info(f"Total Fee: **₹{total_fee:.2f}**")
-        pay_mode = st.radio("Select Payment Mode", ["Online Payment (UPI/QR)", "Offline Payment"])
+        pay_mode = st.radio("Select Payment Mode", ["Online Payment (UPI/QR)", "Offline Payment"], key="stu_pay_mode_unique")
         
         if pay_mode == "Online Payment (UPI/QR)":
             master_upi = master_db.get("upi_id", "school@sbi")
             upi_url = f"upi://pay?pa={master_upi}&pn=StudentReg&am={total_fee:.2f}&cu=INR"
             qr_api = f"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={urllib.parse.quote(upi_url)}"
             st.markdown(f"<img src='{qr_api}' style='border:5px solid #1E3A8A; border-radius:10px;'>", unsafe_allow_html=True)
-            txn_id = st.text_input("Enter 12-digit Transaction ID / UTR No. *")
-            if st.button("Complete Payment & Submit", type="primary"):
+            st.markdown(f"**UPI ID:** `{master_upi}`")
+            txn_id = st.text_input("Enter 12-digit Transaction ID / UTR No. *", key="stu_txn_input_unique")
+            if st.button("Complete Payment & Submit", type="primary", key="stu_complete_pay_btn_unique"):
                 if not txn_id or len(txn_id) < 8: st.error("Enter valid Transaction ID.")
                 else:
                     temp_obj['data']['payment_mode'] = f"Online (₹{total_fee:.2f} - Txn: {sanitize(txn_id)})"
@@ -865,7 +926,7 @@ elif menu == "New Student Registration":
                     st.session_state['stu_reg_data'] = temp_obj['data']
                     st.session_state['payment_step'] = False; st.rerun()
         else:
-            if st.button("Complete Payment & Submit", type="primary"):
+            if st.button("Complete Payment & Submit", type="primary", key="stu_offline_pay_btn_unique"):
                 temp_obj['data']['payment_mode'] = f"Offline (₹{total_fee:.2f})"
                 sch_id = temp_obj['school_sel']
                 if sch_id not in students_db: students_db[sch_id] = {}
@@ -894,8 +955,8 @@ elif menu == "New School Registration":
         st.success("✅ Registration Successful! PENDING approval from Master Admin.")
         pdf_file = f"School_Receipt_{st.session_state['sch_reg_id']}.pdf"
         create_school_receipt_pdf(pdf_file, st.session_state['sch_reg_id'], st.session_state['sch_reg_data'])
-        with open(pdf_file, "rb") as f: st.download_button("📥 Download PDF Receipt", f, file_name=pdf_file, mime="application/pdf")
-        if st.button("⬅️ Done"): st.session_state['sch_reg_success'] = False; st.rerun()
+        with open(pdf_file, "rb") as f: st.download_button("📥 Download PDF Receipt", f, file_name=pdf_file, mime="application/pdf", key="sch_dl_btn_unique")
+        if st.button("⬅️ Done", key="sch_done_btn_unique"): st.session_state['sch_reg_success'] = False; st.rerun()
 
     elif not st.session_state['school_payment_step']:
         with st.form("school_reg_form"):
@@ -932,14 +993,14 @@ elif menu == "New School Registration":
     if st.session_state.get('school_payment_step', False):
         s_tmp = st.session_state.get('temp_school_data')
         st.info(f"Total Fee: **₹{s_total_fee:.2f}**")
-        s_pay_mode = st.radio("Select Payment Mode", ["Online Payment (UPI/QR)", "Offline Payment"])
+        s_pay_mode = st.radio("Select Payment Mode", ["Online Payment (UPI/QR)", "Offline Payment"], key="sch_pay_mode_unique")
         if s_pay_mode == "Online Payment (UPI/QR)":
             master_upi = master_db.get("upi_id", "school@sbi")
             upi_url = f"upi://pay?pa={master_upi}&pn=SchoolReg&am={s_total_fee:.2f}&cu=INR"
             qr_api = f"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={urllib.parse.quote(upi_url)}"
             st.markdown(f"<img src='{qr_api}' style='border:5px solid #1E3A8A; border-radius:10px;'>", unsafe_allow_html=True)
-            txn_id = st.text_input("Enter Transaction ID / UTR No. *")
-            if st.button("Complete Payment & Submit"):
+            txn_id = st.text_input("Enter Transaction ID / UTR No. *", key="sch_txn_input_unique")
+            if st.button("Complete Payment & Submit", key="sch_online_sub_btn_unique"):
                 if not txn_id or len(txn_id) < 8: st.error("Enter valid Transaction ID.")
                 else:
                     s_tmp['data']['payment_mode'] = f"Online (₹{s_total_fee:.2f} - Txn: {sanitize(txn_id)})"
@@ -950,7 +1011,7 @@ elif menu == "New School Registration":
                     st.session_state['sch_reg_data'] = s_tmp['data']
                     st.session_state['school_payment_step'] = False; st.rerun()
         else:
-            if st.button("Complete Payment & Submit"):
+            if st.button("Complete Payment & Submit", key="sch_offline_sub_btn_unique"):
                 s_tmp['data']['payment_mode'] = f"Offline (₹{s_total_fee:.2f})"
                 schools_db[s_tmp["school_id"]] = s_tmp["data"]
                 save_data(schools_db, students_db)
@@ -1311,9 +1372,10 @@ elif menu == "School Login":
         c1.info(f"🏫 **School Portal** | ID: {cur_school} | {sch_data['name']}")
         if c2.button("🔴 Logout"): del st.session_state['school_logged_id']; st.rerun()
 
-        t_list, t_reg, t_add, t_edit, t_rep = st.tabs(["📋 My Students", "✅ Registrations", "➕ Add Student", "✏️ Edit Student", "🖨️ Report Card"])
+        t_list, t_reg, t_sch, t_add, t_edit, t_rep = st.tabs(["📋 My Students", "✅ Registrations", "🎓 Scholarship", "➕ Add Student", "✏️ Edit Student", "🖨️ Report Card"])
         
         cur_students = students_db.get(cur_school, {})
+        approved_students = {k:v for k,v in cur_students.items() if v.get('status', 'Approved') == 'Approved'}
         
         with t_list:
             st.markdown("### 📋 My Students")
@@ -1493,7 +1555,6 @@ elif menu == "School Login":
 
         with t_rep:
             st.markdown("### 🖨️ Report Card")
-            approved_students = {k:v for k,v in cur_students.items() if v.get('status') == 'Approved'}
             if approved_students:
                 rep_roll = st.selectbox("Select Roll for Report", list(approved_students.keys()), key="s_rep_roll_v2")
                 st.markdown(generate_result_card_html(sch_data['name'], sch_data.get('name_local', ''), approved_students[rep_roll], rep_roll, s_lang), unsafe_allow_html=True)
@@ -1503,6 +1564,21 @@ elif menu == "School Login":
                     st.download_button("📥 Download PDF", f, file_name=pdf_file, mime="application/pdf", key="s_dl_pdf_v2")
                 if st.button("🖨️ Print Result Card", key="s_print_v2"):
                     components.html("<script>window.parent.print();</script>", height=0)
+
+        with t_sch:
+            st.markdown("### 🎓 Scholarship Approvals")
+            sch_list = {k: v for k, v in scholarships_db.items() if v.get("status") == "Pending_School" and v.get("school_code") == cur_school}
+            if sch_list:
+                a_id = st.selectbox("Select Application", list(sch_list.keys()), key="s_sch_app_v2")
+                a_data = sch_list[a_id]
+                st.write(f"Applicant: **{a_data.get('app_name')}** | Class: **{a_data.get('class')}**")
+                if st.button("✅ Final Approve Scholarship", type="primary", key="s_sch_btn_v2"):
+                    a_data["status"] = "Approved"
+                    scholarships_db[a_id] = a_data
+                    save_scholarships(scholarships_db)
+                    st.success("Approved successfully!")
+                    st.rerun()
+            else: st.success("No pending scholarships.")
 
 # ----------------- RESULTS PORTAL -----------------
 elif menu == "Results":
