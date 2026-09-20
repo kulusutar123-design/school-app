@@ -5,6 +5,7 @@ from reportlab.pdfgen import canvas
 from reportlab.graphics.barcode import code128, qr
 from reportlab.graphics.shapes import Drawing
 from reportlab.graphics import renderPDF
+from reportlab.lib import colors
 import json
 import os
 import datetime
@@ -233,28 +234,213 @@ def create_student_receipt_pdf(filename, reg_id, s_data):
 
 def create_scholarship_pdf(filename, app_id, s_data):
     c = canvas.Canvas(filename, pagesize=letter)
-    c.setStrokeColorRGB(0.1, 0.4, 0.2); c.setLineWidth(4); c.rect(30, 30, 552, 732, stroke=1, fill=0)
-    c.setFillColorRGB(0.1, 0.4, 0.2); c.setFont("Times-Bold", 20); c.drawCentredString(300, 710, "SCHOLARSHIP APPLICATION RECEIPT")
-    c.setFillColorRGB(0, 0, 0); c.setFont("Helvetica-Bold", 12); c.drawString(50, 670, f"APPLICATION ID: {app_id}")
-    c.setFont("Helvetica", 11); y = 640
-    c.drawString(50, y, f"Applicant Name: {s_data.get('app_name', '').upper()}"); c.drawString(350, y, f"OTR No: {s_data.get('otr', '')}"); y -= 25
-    c.drawString(50, y, f"Aadhaar No: {s_data.get('aadhaar', '')}"); c.drawString(350, y, f"Category: {s_data.get('category', '')}"); y -= 25
-    c.drawString(50, y, f"Phone: {s_data.get('mobile', '')}"); c.drawString(350, y, f"School Code: {s_data.get('school_code', '')}"); y -= 35
-    c.setStrokeColorRGB(0.8, 0.8, 0.8); c.line(50, y, 550, y); y -= 20
-    c.setFont("Helvetica-Bold", 12); c.drawString(50, y, "Certificate & Institute Info"); c.setFont("Helvetica", 11); y -= 20
-    c.drawString(50, y, f"Class: {s_data.get('class', '')}"); c.drawString(350, y, f"Income Cert: {s_data.get('income_cert', '')}"); y -= 25
-    c.drawString(50, y, f"Caste Cert: {s_data.get('caste_cert', '')}"); y -= 35
-    c.setStrokeColorRGB(0.8, 0.8, 0.8); c.line(50, y, 550, y); y -= 20
-    c.setFont("Helvetica-Bold", 12); c.drawString(50, y, "Bank Information"); c.setFont("Helvetica", 11); y -= 20
-    c.drawString(50, y, f"Account No: {s_data.get('acc_no', '')}"); c.drawString(350, y, f"Bank: {s_data.get('bank_name', '')}"); y -= 25
-    c.setStrokeColorRGB(0.8, 0.8, 0.8); c.line(50, y, 550, y); y -= 20
-    c.setFont("Helvetica-Bold", 12); c.drawString(50, y, "Payment & Status"); c.setFont("Helvetica", 11); y -= 20
-    c.drawString(50, y, f"Payment Mode: {s_data.get('payment_mode', 'N/A')}"); y -= 25
-    c.drawString(50, y, f"Current Status: {s_data.get('status', 'Pending_Master')}"); y -= 40
-    c.line(50, y, 550, y); y -= 20
-    c.setFont("Helvetica-Oblique", 10); c.drawCentredString(300, y, "Computer-generated receipt. Keep for future reference.")
-    try: bc = code128.Code128(str(app_id), barHeight=30, barWidth=1.5); bc.drawOn(c, 50, 40)
+    width, height = letter
+    
+    # Title & Header
+    c.setFont("Helvetica-Bold", 16)
+    c.drawCentredString(width/2, height - 50, "Government of Odisha")
+    c.setFont("Helvetica-Bold", 14)
+    c.drawCentredString(width/2, height - 70, "Scholarship Application Form")
+    
+    c.setLineWidth(1)
+    c.line(30, height - 80, width - 30, height - 80)
+    
+    y = height - 100
+    
+    # --- Basic Information ---
+    c.setFillColor(colors.lightgrey)
+    c.rect(30, y-15, width-60, 20, fill=1, stroke=0)
+    c.setFillColor(colors.black)
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(35, y-10, "Basic Information")
+    y -= 35
+    
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(35, y, "Department:")
+    c.setFont("Helvetica", 10)
+    c.drawString(150, y, s_data.get('dept', 'ST&SC and MBC Welfare'))
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(300, y, "Scheme:")
+    c.setFont("Helvetica", 10)
+    c.drawString(400, y, s_data.get('scheme', ''))
+    y -= 20
+    
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(35, y, "Academic Year:")
+    c.setFont("Helvetica", 10)
+    c.drawString(150, y, s_data.get('academic_year', ''))
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(300, y, "Application Type:")
+    c.setFont("Helvetica", 10)
+    c.drawString(400, y, "New")
+    y -= 30
+    
+    # --- Applicant Details ---
+    c.setFillColor(colors.lightgrey)
+    c.rect(30, y-15, width-60, 20, fill=1, stroke=0)
+    c.setFillColor(colors.black)
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(35, y-10, "Applicant Details")
+    y -= 35
+    
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(35, y, "Applicant Name:")
+    c.setFont("Helvetica", 10)
+    c.drawString(150, y, s_data.get('app_name', '').upper())
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(300, y, "Religion:")
+    c.setFont("Helvetica", 10)
+    c.drawString(400, y, s_data.get('religion', ''))
+    y -= 20
+    
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(35, y, "Aadhaar No.:")
+    c.setFont("Helvetica", 10)
+    aadhaar = s_data.get('aadhaar', '')
+    masked_aadhaar = f"XXXXXXXX{aadhaar[-4:]}" if len(aadhaar) >= 4 else aadhaar
+    c.drawString(150, y, masked_aadhaar)
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(300, y, "Category:")
+    c.setFont("Helvetica", 10)
+    c.drawString(400, y, s_data.get('category', ''))
+    y -= 20
+    
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(35, y, "Date of Birth:")
+    c.setFont("Helvetica", 10)
+    c.drawString(150, y, s_data.get('dob', ''))
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(300, y, "Applicant Gender:")
+    c.setFont("Helvetica", 10)
+    c.drawString(400, y, s_data.get('gender', ''))
+    y -= 20
+    
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(35, y, "OTR No.:")
+    c.setFont("Helvetica", 10)
+    c.drawString(150, y, s_data.get('otr', ''))
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(300, y, "Mobile No.:")
+    c.setFont("Helvetica", 10)
+    c.drawString(400, y, s_data.get('mobile', ''))
+    y -= 20
+    
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(35, y, "Father's Name:")
+    c.setFont("Helvetica", 10)
+    c.drawString(150, y, s_data.get('father_name', '').upper())
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(300, y, "Mother's Name:")
+    c.setFont("Helvetica", 10)
+    c.drawString(400, y, s_data.get('mother_name', '').upper())
+    y -= 30
+    
+    # --- Address Information ---
+    c.setFillColor(colors.lightgrey)
+    c.rect(30, y-15, width-60, 20, fill=1, stroke=0)
+    c.setFillColor(colors.black)
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(35, y-10, "Address Information")
+    y -= 35
+    
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(35, y, "State:")
+    c.setFont("Helvetica", 10)
+    c.drawString(150, y, s_data.get('state', ''))
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(300, y, "District:")
+    c.setFont("Helvetica", 10)
+    c.drawString(400, y, s_data.get('district', ''))
+    y -= 20
+    
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(35, y, "Address:")
+    c.setFont("Helvetica", 10)
+    c.drawString(150, y, s_data.get('full_address', '')[:35])
+    y -= 30
+    
+    # --- Institute Information ---
+    c.setFillColor(colors.lightgrey)
+    c.rect(30, y-15, width-60, 20, fill=1, stroke=0)
+    c.setFillColor(colors.black)
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(35, y-10, "Institute/Course Information")
+    y -= 35
+    
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(35, y, "Institute Code:")
+    c.setFont("Helvetica", 10)
+    c.drawString(150, y, s_data.get('school_code', ''))
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(300, y, "Course/Class:")
+    c.setFont("Helvetica", 10)
+    c.drawString(400, y, s_data.get('class', ''))
+    y -= 30
+    
+    # --- Eligibility Information ---
+    c.setFillColor(colors.lightgrey)
+    c.rect(30, y-15, width-60, 20, fill=1, stroke=0)
+    c.setFillColor(colors.black)
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(35, y-10, "Eligibility Information")
+    y -= 35
+    
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(35, y, "Income Cert No.:")
+    c.setFont("Helvetica", 10)
+    c.drawString(150, y, s_data.get('income_cert', ''))
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(300, y, "Caste Cert No.:")
+    c.setFont("Helvetica", 10)
+    c.drawString(400, y, s_data.get('caste_cert', ''))
+    y -= 30
+
+    # --- Bank Information ---
+    c.setFillColor(colors.lightgrey)
+    c.rect(30, y-15, width-60, 20, fill=1, stroke=0)
+    c.setFillColor(colors.black)
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(35, y-10, "Bank Information")
+    y -= 35
+    
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(35, y, "Account No.:")
+    c.setFont("Helvetica", 10)
+    c.drawString(150, y, s_data.get('acc_no', ''))
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(300, y, "Bank Name:")
+    c.setFont("Helvetica", 10)
+    c.drawString(400, y, s_data.get('bank_name', ''))
+    y -= 20
+    
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(35, y, "IFSC Code:")
+    c.setFont("Helvetica", 10)
+    c.drawString(150, y, s_data.get('ifsc', ''))
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(300, y, "Branch Name:")
+    c.setFont("Helvetica", 10)
+    c.drawString(400, y, s_data.get('branch_name', ''))
+    y -= 40
+    
+    # --- Declarations ---
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(35, y, "Student Declaration:")
+    y -= 15
+    c.setFont("Helvetica", 8)
+    c.drawString(35, y, "1. I have read and understood the conditions of award of Scholarship.")
+    y -= 15
+    c.drawString(35, y, "2. I am aware that my application is liable to be rejected, if it is found at any stage, that Aadhaar number provided by me is wrong.")
+    y -= 50
+    
+    c.line(30, y, 200, y)
+    c.drawString(70, y-15, "Full Signature of Applicant")
+    
+    try: 
+        bc = code128.Code128(str(app_id), barHeight=30, barWidth=1.2)
+        bc.drawOn(c, width - 180, 50)
     except: pass
+    
     c.save()
 
 def create_school_receipt_pdf(filename, sch_id, sch_data):
@@ -602,14 +788,16 @@ elif menu == "Scholarship Portal":
             st.error("⚠️ ଆପଣ ପୂର୍ବରୁ ସ୍କଲାରସିପ୍ ଆବେଦନ କରିସାରିଛନ୍ତି (You have already submitted your application). ଆପଣ ପୁନର୍ବାର ଆବେଦନ କରିପାରିବେ ନାହିଁ।")
             st.markdown("### 📄 My Submitted Application Details")
             
-            st.write(f"**Application ID:** `{existing_app_id}`")
-            st.write(f"**Status:** `{existing_app_data.get('status')}`")
-            st.write(f"**Name:** {existing_app_data.get('app_name')}")
-            st.write(f"**Father's Name:** {existing_app_data.get('father_name')}")
-            st.write(f"**DOB:** {existing_app_data.get('dob')}")
-            st.write(f"**Mobile:** {existing_app_data.get('mobile')}")
-            st.write(f"**School Code:** {existing_app_data.get('school_code')}")
-            st.write(f"**Payment Mode:** {existing_app_data.get('payment_mode')}")
+            c_det1, c_det2 = st.columns(2)
+            c_det1.write(f"**Application ID:** `{existing_app_id}`")
+            c_det1.write(f"**Name:** {existing_app_data.get('app_name', '').upper()}")
+            c_det1.write(f"**Father's Name:** {existing_app_data.get('father_name', '').upper()}")
+            c_det1.write(f"**Mobile:** {existing_app_data.get('mobile', '')}")
+            
+            c_det2.write(f"**Status:** `{existing_app_data.get('status')}`")
+            c_det2.write(f"**DOB:** {existing_app_data.get('dob', '')}")
+            c_det2.write(f"**Category:** {existing_app_data.get('category', '')}")
+            c_det2.write(f"**Payment Mode:** {existing_app_data.get('payment_mode', '')}")
             
             st.markdown("---")
             c_btn1, c_btn2 = st.columns(2)
@@ -1372,10 +1560,9 @@ elif menu == "School Login":
         c1.info(f"🏫 **School Portal** | ID: {cur_school} | {sch_data['name']}")
         if c2.button("🔴 Logout"): del st.session_state['school_logged_id']; st.rerun()
 
-        t_list, t_reg, t_sch, t_add, t_edit, t_rep = st.tabs(["📋 My Students", "✅ Registrations", "🎓 Scholarship", "➕ Add Student", "✏️ Edit Student", "🖨️ Report Card"])
+        t_list, t_reg, t_add, t_edit, t_rep = st.tabs(["📋 My Students", "✅ Registrations", "➕ Add Student", "✏️ Edit Student", "🖨️ Report Card"])
         
         cur_students = students_db.get(cur_school, {})
-        approved_students = {k:v for k,v in cur_students.items() if v.get('status', 'Approved') == 'Approved'}
         
         with t_list:
             st.markdown("### 📋 My Students")
@@ -1555,6 +1742,7 @@ elif menu == "School Login":
 
         with t_rep:
             st.markdown("### 🖨️ Report Card")
+            approved_students = {k:v for k,v in cur_students.items() if v.get('status') == 'Approved'}
             if approved_students:
                 rep_roll = st.selectbox("Select Roll for Report", list(approved_students.keys()), key="s_rep_roll_v2")
                 st.markdown(generate_result_card_html(sch_data['name'], sch_data.get('name_local', ''), approved_students[rep_roll], rep_roll, s_lang), unsafe_allow_html=True)
@@ -1564,21 +1752,6 @@ elif menu == "School Login":
                     st.download_button("📥 Download PDF", f, file_name=pdf_file, mime="application/pdf", key="s_dl_pdf_v2")
                 if st.button("🖨️ Print Result Card", key="s_print_v2"):
                     components.html("<script>window.parent.print();</script>", height=0)
-
-        with t_sch:
-            st.markdown("### 🎓 Scholarship Approvals")
-            sch_list = {k: v for k, v in scholarships_db.items() if v.get("status") == "Pending_School" and v.get("school_code") == cur_school}
-            if sch_list:
-                a_id = st.selectbox("Select Application", list(sch_list.keys()), key="s_sch_app_v2")
-                a_data = sch_list[a_id]
-                st.write(f"Applicant: **{a_data.get('app_name')}** | Class: **{a_data.get('class')}**")
-                if st.button("✅ Final Approve Scholarship", type="primary", key="s_sch_btn_v2"):
-                    a_data["status"] = "Approved"
-                    scholarships_db[a_id] = a_data
-                    save_scholarships(scholarships_db)
-                    st.success("Approved successfully!")
-                    st.rerun()
-            else: st.success("No pending scholarships.")
 
 # ----------------- RESULTS PORTAL -----------------
 elif menu == "Results":
