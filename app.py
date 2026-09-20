@@ -707,7 +707,10 @@ elif menu == "Scholarship Portal":
             inc_no = col_inc1.text_input("Income Certificate No. *")
             if col_inc2.button("VERIFY INCOME"):
                 if inc_no: st.success("Verified")
+            inc_whom = st.selectbox("To Whom Issued", RELATIONSHIPS)
             inc_auth = st.selectbox("Issuing Authority (Income)", ISSUING_AUTHORITIES)
+            inc_file = st.file_uploader("Upload Income Certificate Photo *")
+            
         with c34:
             st.markdown("**Caste Certificate**")
             cas_year = st.selectbox("Caste Issuing Year", CERT_YEARS)
@@ -716,6 +719,7 @@ elif menu == "Scholarship Portal":
             if col_cas2.button("VERIFY CASTE"):
                 if cas_no: st.success("Verified")
             cas_auth = st.selectbox("Issuing Authority (Caste)", ISSUING_AUTHORITIES)
+            cas_file = st.file_uploader("Upload Caste Certificate Photo *")
         
         c35, c36 = st.columns([8, 2])
         ifsc = c35.text_input("IFSC Code *")
@@ -803,7 +807,7 @@ elif menu == "Scholarship Portal":
                 st.session_state['sch_app_data'] = tmp['data']
                 st.session_state['sch_app_step'] = False; st.rerun()
 
-# ----------------- NEW STUDENT REGISTRATION -----------------
+# ----------------- NEW STUDENT REGISTRATION (FULL RESTORED FORM) -----------------
 elif menu == "New Student Registration":
     c_home, c_title = st.columns([1, 8])
     with c_home:
@@ -1128,21 +1132,21 @@ elif menu == "Master Login":
                     st.markdown("#### 📝 Edit Personal Details")
                     c1, c2 = st.columns(2)
                     m_up_name = c1.text_input("Name (English)", value=m_curr_st.get('name',''))
-                    m_up_name_loc = c2.text_input(f"Name ({s_lang})", value=m_curr_st.get('name_local',''))
+                    m_up_name_loc = c2.text_input(f"Name ({s_lang})", value=m_curr_st.get('name_local',''), key="m_up_n_loc_unique")
                     c3, c4 = st.columns(2)
                     m_up_father = c3.text_input("Father's Name (English)", value=m_curr_st.get('father_name', ''))
-                    m_up_father_loc = c4.text_input(f"Father's Name ({s_lang})", value=m_curr_st.get('father_name_local', ''))
+                    m_up_father_loc = c4.text_input(f"Father's Name ({s_lang})", value=m_curr_st.get('father_name_local', ''), key="m_up_f_loc_unique")
                     
                     c_up1, c_up2, c_up3 = st.columns(3)
                     genders = ["Male", "Female", "Other"]
-                    m_up_gender = c_up1.selectbox("Gender", genders, index=genders.index(m_curr_st.get('gender', 'Male')) if m_curr_st.get('gender', 'Male') in genders else 0)
-                    m_up_pen = c_up2.text_input("PEN NO", value=m_curr_st.get('pen_no', ''))
-                    m_up_apaar = c_up3.text_input("APAAR NO", value=m_curr_st.get('apaar_no', ''))
+                    m_up_gender = c_up1.selectbox("Gender", genders, index=genders.index(m_curr_st.get('gender', 'Male')) if m_curr_st.get('gender', 'Male') in genders else 0, key="m_up_gen_unique")
+                    m_up_pen = c_up2.text_input("PEN NO", value=m_curr_st.get('pen_no', ''), key="m_up_pen_unique")
+                    m_up_apaar = c_up3.text_input("APAAR NO", value=m_curr_st.get('apaar_no', ''), key="m_up_apaar_unique")
                     
                     c_d1, c_c1, c_b1 = st.columns(3)
-                    m_up_dob = c_d1.text_input("DOB (DD-MM-YYYY)", value=m_curr_st.get('dob', ''))
-                    m_up_class = c_c1.selectbox("Class", classes_list, index=classes_list.index(m_curr_st.get('class', '1')) if m_curr_st.get('class', '1') in classes_list else 0)
-                    m_up_batch = c_b1.selectbox("Batch", batches_list, index=batches_list.index(m_curr_st.get('batch', '2025-2026')) if m_curr_st.get('batch', '2025-2026') in batches_list else 5)
+                    m_up_dob = c_d1.text_input("DOB (DD-MM-YYYY)", value=m_curr_st.get('dob', ''), key="m_up_d_unique")
+                    m_up_class = c_c1.selectbox("Class", classes_list, index=classes_list.index(m_curr_st.get('class', '1')) if m_curr_st.get('class', '1') in classes_list else 0, key="m_up_c_unique")
+                    m_up_batch = c_b1.selectbox("Batch", batches_list, index=batches_list.index(m_curr_st.get('batch', '2025-2026')) if m_curr_st.get('batch', '2025-2026') in batches_list else 5, key="m_up_batch_unique")
                     
                     st.markdown("#### 📚 Edit Subjects & Marks")
                     m_subjects = m_curr_st.get('subjects', {})
@@ -1150,16 +1154,16 @@ elif menu == "Master Login":
                     
                     for sub_name, sub_info in m_subjects.items():
                         sc1, sc2, sc3 = st.columns(3)
-                        with sc1: u_sub = st.text_input("Subject Name", value=sub_name, key=f"msub_{sub_name}")
-                        with sc2: u_f = st.number_input("Full Mark", value=float(sub_info['full']), key=f"mf_{sub_name}")
-                        with sc3: u_o = st.number_input("Obtained", value=float(sub_info['obt']), key=f"mo_{sub_name}")
+                        with sc1: u_sub = st.text_input("Subject Name", value=sub_name, key=f"msub_unique_{sub_name}")
+                        with sc2: u_f = st.number_input("Full Mark", value=float(sub_info['full']), key=f"mf_unique_{sub_name}")
+                        with sc3: u_o = st.number_input("Obtained", value=float(sub_info['obt']), key=f"mo_unique_{sub_name}")
                         if u_sub:
                             new_m_subjects[sanitize(u_sub)] = {"full": u_f, "obt": u_o}
                             m_tot_full += u_f; m_tot_obt += u_o
                     
                     col_sv, col_dl = st.columns(2)
                     with col_sv:
-                        if st.button("💾 Force Update Record"):
+                        if st.button("💾 Force Update Record", key="btn_force_update_unique"):
                             new_per = (m_tot_obt / m_tot_full * 100) if m_tot_full > 0 else 0.0
                             new_res = "PASS" if new_per >= 33 else "FAIL"
                             new_grd = "A1" if new_per >= 90 else "A2" if new_per >= 80 else "B1" if new_per >= 70 else "B2" if new_per >= 60 else "C1" if new_per >= 50 else "C2" if new_per >= 40 else "D" if new_per >= 33 else "F"
@@ -1175,7 +1179,7 @@ elif menu == "Master Login":
                             })
                             save_data(schools_db, students_db); st.success("Updated!"); st.rerun()
                     with col_dl:
-                        if st.button("🗑️ Delete Student Record", type="primary"):
+                        if st.button("🗑️ Delete Student Record", key="btn_del_student_unique", type="primary"):
                             del students_db[master_school_sel][m_edit_roll]
                             save_data(schools_db, students_db)
                             st.success("Student deleted successfully!")
@@ -1197,7 +1201,7 @@ elif menu == "Master Login":
             up_sch_fee = c_s1.number_input("School Registration Base Fee (₹)", value=float(master_db.get("school_reg_fee", 1000.0)), min_value=0.0)
             up_sch_gst = c_s2.number_input("School GST Percentage (%)", value=float(master_db.get("school_gst_percent", 18.0)), min_value=0.0)
             
-            up_schol_fee = st.number_input("Scholarship Registration Fee (₹)", value=float(master_db.get("scholarship_fee", 50.0)), min_value=0.0)
+            up_schol_fee = master_db.get("scholarship_fee", 50.0)
 
             if st.button("Save Profile & Fee Settings"):
                 master_db["username"] = sanitize(up_m_user); master_db["email"] = sanitize(up_m_email)
@@ -1354,25 +1358,25 @@ elif menu == "School Login":
                 curr_st = approved_students[edit_roll]
                 
                 c_up_n1, c_up_n2 = st.columns(2)
-                up_name = c_up_n1.text_input("Edit Name (English)", value=curr_st.get('name', ''))
-                up_name_loc = c_up_n2.text_input(f"Edit Name ({s_lang})", value=curr_st.get('name_local', ''))
+                up_name = c_up_n1.text_input("Edit Name (English)", value=curr_st.get('name', ''), key="up_name_sch")
+                up_name_loc = c_up_n2.text_input(f"Edit Name ({s_lang})", value=curr_st.get('name_local', ''), key="up_name_loc_sch")
                 
-                up_father = c_up_n1.text_input("Edit Father's Name (English)", value=curr_st.get('father_name', ''))
-                up_father_loc = c_up_n2.text_input(f"Edit Father's Name ({s_lang})", value=curr_st.get('father_name_local', ''))
+                up_father = c_up_n1.text_input("Edit Father's Name (English)", value=curr_st.get('father_name', ''), key="up_father_sch")
+                up_father_loc = c_up_n2.text_input(f"Edit Father's Name ({s_lang})", value=curr_st.get('father_name_local', ''), key="up_father_loc_sch")
                 
-                up_mother = c_up_n1.text_input("Edit Mother's Name (English)", value=curr_st.get('mother_name', ''))
-                up_mother_loc = c_up_n2.text_input(f"Edit Mother's Name ({s_lang})", value=curr_st.get('mother_name_local', ''))
+                up_mother = c_up_n1.text_input("Edit Mother's Name (English)", value=curr_st.get('mother_name', ''), key="up_mother_sch")
+                up_mother_loc = c_up_n2.text_input(f"Edit Mother's Name ({s_lang})", value=curr_st.get('mother_name_local', ''), key="up_mother_loc_sch")
                 
                 c_up1, c_up2, c_up3 = st.columns(3)
                 genders = ["Male", "Female", "Other"]
-                up_gender = c_up1.selectbox("Edit Gender", genders, index=genders.index(curr_st.get('gender', 'Male')) if curr_st.get('gender', 'Male') in genders else 0)
-                up_pen = c_up2.text_input("PEN NO", value=curr_st.get('pen_no', ''))
-                up_apaar = c_up3.text_input("APAAR NO", value=curr_st.get('apaar_no', ''))
+                up_gender = c_up1.selectbox("Edit Gender", genders, index=genders.index(curr_st.get('gender', 'Male')) if curr_st.get('gender', 'Male') in genders else 0, key="up_gender_sch")
+                up_pen = c_up2.text_input("PEN NO", value=curr_st.get('pen_no', ''), key="up_pen_sch")
+                up_apaar = c_up3.text_input("APAAR NO", value=curr_st.get('apaar_no', ''), key="up_apaar_sch")
                 
                 c_d1, c_c1, c_b1 = st.columns(3)
-                up_dob_input = c_d1.text_input("DOB (DD-MM-YYYY)", value=curr_st.get('dob', ''))
-                up_class = c_c1.selectbox("Edit Class", classes_list, index=classes_list.index(curr_st.get('class', '1')) if curr_st.get('class', '1') in classes_list else 0)
-                up_batch = c_b1.selectbox("Edit Batch", batches_list, index=batches_list.index(curr_st.get('batch', '2025-2026')) if curr_st.get('batch', '2025-2026') in batches_list else 5)
+                up_dob_input = c_d1.text_input("DOB (DD-MM-YYYY)", value=curr_st.get('dob', ''), key="up_dob_sch")
+                up_class = c_c1.selectbox("Edit Class", classes_list, index=classes_list.index(curr_st.get('class', '1')) if curr_st.get('class', '1') in classes_list else 0, key="up_class_sch")
+                up_batch = c_b1.selectbox("Edit Batch", batches_list, index=batches_list.index(curr_st.get('batch', '2025-2026')) if curr_st.get('batch', '2025-2026') in batches_list else 5, key="up_batch_sch")
                 
                 st.markdown("#### 📚 Edit Subjects & Marks")
                 up_subjects = curr_st.get('subjects', {})
@@ -1380,14 +1384,14 @@ elif menu == "School Login":
                 
                 for sub_name, sub_info in up_subjects.items():
                     sc1, sc2, sc3 = st.columns(3)
-                    u_sub = sc1.text_input("Subject", value=sub_name, key=f"us_{sub_name}")
-                    u_f = sc2.number_input("Full Mark", value=float(sub_info['full']), key=f"uf_{sub_name}")
-                    u_o = sc3.number_input("Obtained Mark", value=float(sub_info['obt']), key=f"uo_{sub_name}")
+                    u_sub = sc1.text_input("Subject", value=sub_name, key=f"us_sch_{sub_name}")
+                    u_f = sc2.number_input("Full Mark", value=float(sub_info['full']), key=f"uf_sch_{sub_name}")
+                    u_o = sc3.number_input("Obtained Mark", value=float(sub_info['obt']), key=f"uo_sch_{sub_name}")
                     if u_sub:
                         new_up_subjects[sanitize(u_sub)] = {"full": u_f, "obt": u_o}
                         up_tot_full += u_f; up_tot_obt += u_o
                 
-                if st.button("💾 Save Updated Record"):
+                if st.button("💾 Save Updated Record", key="save_up_sch_btn"):
                     new_per = (up_tot_obt / up_tot_full * 100) if up_tot_full > 0 else 0.0
                     new_res = "PASS" if new_per >= 33 else "FAIL"
                     new_grd = "A1" if new_per >= 90 else "A2" if new_per >= 80 else "B1" if new_per >= 70 else "B2" if new_per >= 60 else "C1" if new_per >= 50 else "C2" if new_per >= 40 else "D" if new_per >= 33 else "F"
@@ -1477,7 +1481,7 @@ elif menu == "Results":
                 # PDF Generation (Safeguarded against crashes)
                 pdf_file = f"Result_{found_roll}.pdf"
                 create_pdf(pdf_file, sch.get('name', 'Unknown School'), found_student, found_roll)
-                with open(pdf_file, "rb") as f:
+                with open(pdf_file, "rb`") as f:
                     st.download_button("📥 Download PDF", f, file_name=pdf_file, mime="application/pdf")
                 if st.button("🖨️ Print Result Card"):
                     components.html("<script>window.parent.print();</script>", height=0)
