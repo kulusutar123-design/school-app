@@ -623,7 +623,7 @@ if menu == "Home Page":
         st.markdown("<a href='?portal=reg_school' target='_self' class='login-card'><div class='login-title'>🏫 New School Reg.</div><div class='login-sub'>Register institution</div></a>", unsafe_allow_html=True)
         st.markdown("<a href='?portal=student' target='_self' class='login-card' style='height: 43%; display: flex; flex-direction: column; justify-content: center;'><div class='login-title' style='font-size: 32px;'>🎓 Check Results</div><div class='login-sub'>Download Rank Card</div></a>", unsafe_allow_html=True)
 
-# ----------------- SCHOLARSHIP PORTAL (QR BARCODE & ONLINE UPI INTEGRATED) -----------------
+# ----------------- SCHOLARSHIP PORTAL -----------------
 elif menu == "Scholarship Portal":
     c_h, c_t = st.columns([1, 8])
     with c_h:
@@ -634,6 +634,7 @@ elif menu == "Scholarship Portal":
     
     if 'sch_app_step' not in st.session_state: st.session_state['sch_app_step'] = False
     if 'sch_app_success' not in st.session_state: st.session_state['sch_app_success'] = False
+    if 'otr_verified' not in st.session_state: st.session_state['otr_verified'] = False
 
     if st.session_state['sch_app_success']:
         st.success(f"✅ Application Submitted! Reference ID is **{st.session_state['sch_app_id']}**.")
@@ -803,7 +804,7 @@ elif menu == "Scholarship Portal":
                 st.session_state['sch_app_data'] = tmp['data']
                 st.session_state['sch_app_step'] = False; st.rerun()
 
-# ----------------- NEW STUDENT REGISTRATION (QR BARCODE RESTORED) -----------------
+# ----------------- NEW STUDENT REGISTRATION -----------------
 elif menu == "New Student Registration":
     c_home, c_title = st.columns([1, 8])
     with c_home:
@@ -821,35 +822,62 @@ elif menu == "New Student Registration":
         st.success(f"✅ Application Submitted! Reg ID: **{st.session_state['stu_reg_id']}**.")
         pdf_file = f"Receipt_{st.session_state['stu_reg_id']}.pdf"
         create_student_receipt_pdf(pdf_file, st.session_state['stu_reg_id'], st.session_state['stu_reg_data'])
-        with open(pdf_file, "rb") as f: st.download_button("📥 Download PDF Receipt", f, file_name=pdf_file, mime="application/pdf")
+        with open(pdf_file, "rb"] as f: st.download_button("📥 Download PDF Receipt", f, file_name=pdf_file, mime="application/pdf")
         if st.button("⬅️ Done"): st.session_state['stu_reg_success'] = False; st.rerun()
                 
     elif not st.session_state['payment_step']:
         with st.form("student_reg_form"):
+            st.markdown("#### 1. School Information")
+            c_sc1, c_sc2 = st.columns(2)
             active_schools = {k: v for k, v in schools_db.items() if v.get("status", "Active") == "Active"}
             school_options = [f"{k} - {v['name']}" for k, v in active_schools.items()] if active_schools else []
-            school_sel_str = st.selectbox("Select School Code & Name *", ["--Select--"] + school_options) if school_options else "--Select--"
+            school_sel_str = c_sc1.selectbox("Select School Code & Name *", ["--Select--"] + school_options) if school_options else "--Select--"
             school_sel = school_sel_str.split(" - ")[0] if school_sel_str != "--Select--" else None
             
+            st.markdown("#### 2. Personal Details")
             c_n1, c_n2 = st.columns(2)
-            stu_name_en = c_n1.text_input("Student's Name (English) *")
-            stu_name_loc = c_n2.text_input("Student's Name (Local Language)")
+            stu_name_en = c_n1.text_input("1. Student's Name (English) *")
+            stu_name_loc = c_n2.text_input("1. Student's Name (Local Language)")
             
             c_g1, c_g2, c_g3 = st.columns(3)
-            stu_gender_en = c_g1.selectbox("Gender", ["Male", "Female", "Other"])
-            stu_dob = c_g2.date_input("Date of Birth *", min_value=datetime.date(2000, 1, 1), max_value=datetime.date.today())
-            stu_category = c_g3.selectbox("Category *", SOCIAL_CATEGORIES)
+            stu_gender_en = c_g1.selectbox("2. Gender", ["Male", "Female", "Other"])
+            stu_dob = c_g2.date_input("3. Date of Birth *", min_value=datetime.date(2000, 1, 1), max_value=datetime.date.today())
+            stu_category = c_g3.selectbox("4. Category *", SOCIAL_CATEGORIES)
+            
+            c_d1, c_d2 = st.columns(2)
+            m_name_en = c_d1.text_input("5. Mother's Name (English) *")
+            m_name_loc = c_d2.text_input("Mother's Name (Local)")
             
             c_f1, c_f2 = st.columns(2)
-            f_name_en = c_f1.text_input("Father's Name (English) *")
-            f_name_loc = c_f2.text_input("Father's Name (Local Language)")
+            f_name_en = c_f1.text_input("6. Father's Name (English) *")
+            f_name_loc = c_f2.text_input("Father's Name (Local)")
             
-            stu_phone = st.text_input("Mobile No *", max_chars=10)
+            st.markdown("#### 3. Contact & Identification")
+            c_id1, c_id2 = st.columns(2)
+            stu_aadhar = c_id1.text_input("7. AADHAAR Number *", max_chars=12)
+            stu_phone = c_id2.text_input("8. Mobile No *", max_chars=10)
+            
+            c_ad1, c_ad2 = st.columns(2)
+            stu_address_en = c_ad1.text_area("9. Address (English) *")
+            stu_address_loc = c_ad2.text_area("Address (Local)")
+            
+            c_loc1, c_loc2, c_loc3 = st.columns(3)
+            stu_state = c_loc1.selectbox("10. State", list(STATE_LANG_MAP.keys()), index=18)
+            stu_pin = c_loc2.text_input("11. PIN Code *", max_chars=6)
+            stu_minority = c_loc3.selectbox("12. Minority Group", ["No", "Yes - Muslim", "Yes - Christian", "Yes - Sikh", "Yes - Buddhist", "Yes - Parsi", "Yes - Jain"])
+            
+            c_nat1, c_nat2 = st.columns(2)
+            stu_country = c_nat1.selectbox("13. Nationality", COUNTRIES)
+            stu_bg = c_nat2.selectbox("14. Blood Group", ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-", "Unknown"])
+            
+            st.markdown("#### 4. Photograph Upload")
+            stu_photo = st.file_uploader("15. Upload Student Photo (JPG/PNG)", type=['png', 'jpg', 'jpeg'])
             
             declaration = st.checkbox("✅ I declare the above info is true.")
-            if st.form_submit_button("Proceed to Payment"):
+            if st.form_submit_button("Proceed to Payment & Submit"):
                 if not declaration: st.error("⚠️ Please check the declaration box.")
-                elif not school_sel or not sanitize(stu_name_en) or not sanitize(stu_phone): st.error("Fill mandatory fields (*).")
+                elif not school_sel or not sanitize(stu_name_en) or not sanitize(stu_phone) or not sanitize(stu_aadhar) or not sanitize(stu_address_en) or not sanitize(f_name_en) or not sanitize(m_name_en):
+                    st.error("Please fill all mandatory fields (*).")
                 else:
                     temp_reg_id = "REG" + str(random.randint(100000, 999999))
                     st.session_state['temp_student_data'] = {
@@ -858,7 +886,11 @@ elif menu == "New Student Registration":
                             "name": sanitize(stu_name_en), "name_local": sanitize(stu_name_loc), 
                             "gender": stu_gender_en, "category": stu_category,
                             "father_name": sanitize(f_name_en), "father_name_local": sanitize(f_name_loc),
-                            "dob": str(stu_dob), "phone": sanitize(stu_phone),
+                            "mother_name": sanitize(m_name_en), "mother_name_local": sanitize(m_name_loc),
+                            "dob": str(stu_dob), "aadhaar": sanitize(stu_aadhar), "phone": sanitize(stu_phone),
+                            "address": sanitize(stu_address_en), "address_local": sanitize(stu_address_loc),
+                            "state": stu_state, "pin_code": sanitize(stu_pin), "minority": stu_minority, 
+                            "nationality": stu_country, "blood_group": stu_bg,
                             "school_code": school_sel, "class": "1", "batch": "2025-2026",
                             "subjects": {}, "total_full": 0, "total_obt": 0, "percentage": 0.0,
                             "result": "N/A", "grade": "N/A", "pub_date": str(datetime.date.today()),
