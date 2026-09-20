@@ -567,7 +567,6 @@ if menu == "Home Page":
     </div>
     </body></html>
     """
-
     st.markdown(f"<div class='glass-panel'><h2 style='text-align: center; color: #fbbf24; margin-top: 0; text-shadow: 1px 1px 2px #000;'>🏫 {event_title}</h2>", unsafe_allow_html=True)
     components.html(carousel_html, height=360)
     st.markdown("</div>", unsafe_allow_html=True)
@@ -781,7 +780,7 @@ elif menu == "Scholarship Portal":
         st.markdown("### 💳 Secure Scholarship Payment Gateway")
         tmp = st.session_state['temp_sch_data']
         st.info(f"Applicant: **{tmp['data']['app_name']}** | Fee: **₹{sch_fee:.2f}**")
-        pay_mode = st.radio("Select Payment Mode", ["Online Payment (UPI/QR)", "Offline Payment"], key="sch_pay_mode_safe")
+        pay_mode = st.radio("Select Payment Mode", ["Online Payment (UPI/QR)", "Offline Payment"], key="sch_pay_mode_unique")
         
         if pay_mode == "Online Payment (UPI/QR)":
             master_upi = master_db.get("upi_id", "school@sbi")
@@ -789,8 +788,8 @@ elif menu == "Scholarship Portal":
             qr_api = f"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={urllib.parse.quote(upi_url)}"
             st.markdown(f"<img src='{qr_api}' style='border:5px solid #1E3A8A; border-radius:10px;'>", unsafe_allow_html=True)
             st.markdown(f"**UPI ID:** `{master_upi}`")
-            txn_id = st.text_input("Enter 12-digit Transaction ID / UTR No. *", key="sch_txn_safe")
-            if st.button("Verify & Submit Application", type="primary", key="sch_sub_safe"):
+            txn_id = st.text_input("Enter 12-digit Transaction ID / UTR No. *", key="sch_txn_input_unique")
+            if st.button("Verify & Submit Application", type="primary", key="sch_verify_sub_btn_unique"):
                 if not txn_id or len(txn_id) < 8: st.error("Enter valid Transaction ID.")
                 else:
                     tmp['data']['payment_mode'] = f"Online (₹{sch_fee:.2f} - Txn: {sanitize(txn_id)})"
@@ -801,7 +800,7 @@ elif menu == "Scholarship Portal":
                     st.session_state['sch_app_data'] = tmp['data']
                     st.session_state['sch_app_step'] = False; st.rerun()
         else:
-            if st.button("Complete Payment & Submit Application", type="primary", key="sch_off_safe"):
+            if st.button("Complete Payment & Submit Application", type="primary", key="sch_offline_sub_btn_unique"):
                 tmp['data']['payment_mode'] = f"Offline (₹{sch_fee:.2f})"
                 scholarships_db[tmp['app_id']] = tmp['data']
                 save_scholarships(scholarships_db)
@@ -828,8 +827,8 @@ elif menu == "New Student Registration":
         st.success(f"✅ Application Submitted! Reg ID: **{st.session_state['stu_reg_id']}**.")
         pdf_file = f"Receipt_{st.session_state['stu_reg_id']}.pdf"
         create_student_receipt_pdf(pdf_file, st.session_state['stu_reg_id'], st.session_state['stu_reg_data'])
-        with open(pdf_file, "rb") as f: st.download_button("📥 Download PDF Receipt", f, file_name=pdf_file, mime="application/pdf", key="stu_dl_safe")
-        if st.button("⬅️ Done", key="stu_done_safe"): st.session_state['stu_reg_success'] = False; st.rerun()
+        with open(pdf_file, "rb") as f: st.download_button("📥 Download PDF Receipt", f, file_name=pdf_file, mime="application/pdf", key="stu_dl_btn_unique")
+        if st.button("⬅️ Done", key="stu_done_btn_unique"): st.session_state['stu_reg_success'] = False; st.rerun()
                 
     elif not st.session_state['payment_step']:
         with st.form("student_reg_form"):
@@ -908,7 +907,7 @@ elif menu == "New Student Registration":
     if st.session_state.get('payment_step', False):
         temp_obj = st.session_state.get('temp_student_data')
         st.info(f"Total Fee: **₹{total_fee:.2f}**")
-        pay_mode = st.radio("Select Payment Mode", ["Online Payment (UPI/QR)", "Offline Payment"], key="stu_pay_safe")
+        pay_mode = st.radio("Select Payment Mode", ["Online Payment (UPI/QR)", "Offline Payment"], key="stu_pay_mode_unique")
         
         if pay_mode == "Online Payment (UPI/QR)":
             master_upi = master_db.get("upi_id", "school@sbi")
@@ -916,8 +915,8 @@ elif menu == "New Student Registration":
             qr_api = f"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={urllib.parse.quote(upi_url)}"
             st.markdown(f"<img src='{qr_api}' style='border:5px solid #1E3A8A; border-radius:10px;'>", unsafe_allow_html=True)
             st.markdown(f"**UPI ID:** `{master_upi}`")
-            txn_id = st.text_input("Enter 12-digit Transaction ID / UTR No. *", key="stu_txn_safe")
-            if st.button("Complete Payment & Submit", type="primary", key="stu_sub_safe"):
+            txn_id = st.text_input("Enter 12-digit Transaction ID / UTR No. *", key="stu_txn_input_unique")
+            if st.button("Complete Payment & Submit", type="primary", key="stu_complete_pay_btn_unique"):
                 if not txn_id or len(txn_id) < 8: st.error("Enter valid Transaction ID.")
                 else:
                     temp_obj['data']['payment_mode'] = f"Online (₹{total_fee:.2f} - Txn: {sanitize(txn_id)})"
@@ -930,7 +929,7 @@ elif menu == "New Student Registration":
                     st.session_state['stu_reg_data'] = temp_obj['data']
                     st.session_state['payment_step'] = False; st.rerun()
         else:
-            if st.button("Complete Payment & Submit", type="primary", key="stu_off_safe"):
+            if st.button("Complete Payment & Submit", type="primary", key="stu_offline_pay_btn_unique"):
                 temp_obj['data']['payment_mode'] = f"Offline (₹{total_fee:.2f})"
                 sch_id = temp_obj['school_sel']
                 if sch_id not in students_db: students_db[sch_id] = {}
@@ -959,8 +958,8 @@ elif menu == "New School Registration":
         st.success("✅ Registration Successful! PENDING approval from Master Admin.")
         pdf_file = f"School_Receipt_{st.session_state['sch_reg_id']}.pdf"
         create_school_receipt_pdf(pdf_file, st.session_state['sch_reg_id'], st.session_state['sch_reg_data'])
-        with open(pdf_file, "rb") as f: st.download_button("📥 Download PDF Receipt", f, file_name=pdf_file, mime="application/pdf", key="sch_dl_safe")
-        if st.button("⬅️ Done", key="sch_done_safe"): st.session_state['sch_reg_success'] = False; st.rerun()
+        with open(pdf_file, "rb") as f: st.download_button("📥 Download PDF Receipt", f, file_name=pdf_file, mime="application/pdf", key="sch_dl_btn_unique")
+        if st.button("⬅️ Done", key="sch_done_btn_unique"): st.session_state['sch_reg_success'] = False; st.rerun()
 
     elif not st.session_state['school_payment_step']:
         with st.form("school_reg_form"):
@@ -997,14 +996,14 @@ elif menu == "New School Registration":
     if st.session_state.get('school_payment_step', False):
         s_tmp = st.session_state.get('temp_school_data')
         st.info(f"Total Fee: **₹{s_total_fee:.2f}**")
-        s_pay_mode = st.radio("Select Payment Mode", ["Online Payment (UPI/QR)", "Offline Payment"], key="sch_pay_safe")
+        s_pay_mode = st.radio("Select Payment Mode", ["Online Payment (UPI/QR)", "Offline Payment"], key="sch_pay_mode_unique")
         if s_pay_mode == "Online Payment (UPI/QR)":
             master_upi = master_db.get("upi_id", "school@sbi")
             upi_url = f"upi://pay?pa={master_upi}&pn=SchoolReg&am={s_total_fee:.2f}&cu=INR"
             qr_api = f"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={urllib.parse.quote(upi_url)}"
             st.markdown(f"<img src='{qr_api}' style='border:5px solid #1E3A8A; border-radius:10px;'>", unsafe_allow_html=True)
-            txn_id = st.text_input("Enter Transaction ID / UTR No. *", key="sch_txn_safe")
-            if st.button("Complete Payment & Submit", key="sch_online_safe"):
+            txn_id = st.text_input("Enter Transaction ID / UTR No. *", key="sch_txn_input_unique")
+            if st.button("Complete Payment & Submit", key="sch_online_sub_btn_unique"):
                 if not txn_id or len(txn_id) < 8: st.error("Enter valid Transaction ID.")
                 else:
                     s_tmp['data']['payment_mode'] = f"Online (₹{s_total_fee:.2f} - Txn: {sanitize(txn_id)})"
@@ -1015,7 +1014,7 @@ elif menu == "New School Registration":
                     st.session_state['sch_reg_data'] = s_tmp['data']
                     st.session_state['school_payment_step'] = False; st.rerun()
         else:
-            if st.button("Complete Payment & Submit", key="sch_offline_safe"):
+            if st.button("Complete Payment & Submit", key="sch_offline_sub_btn_unique"):
                 s_tmp['data']['payment_mode'] = f"Offline (₹{s_total_fee:.2f})"
                 schools_db[s_tmp["school_id"]] = s_tmp["data"]
                 save_data(schools_db, students_db)
@@ -1123,33 +1122,33 @@ elif menu == "Master Login":
 
         with t4: 
             st.markdown("### 🎓 Edit & Delete Students Data (Master)")
-            master_school_sel = st.selectbox("Select School", ["--Select--"] + list(schools_db.keys()), key="m_sch_sel_fixed")
+            master_school_sel = st.selectbox("Select School", ["--Select--"] + list(schools_db.keys()), key="m_sch_sel_unique")
             if master_school_sel != "--Select--":
                 school_students = students_db.get(master_school_sel, {})
                 s_lang = schools_db[master_school_sel].get("lang", "English")
                 approved_students = {k:v for k,v in school_students.items() if v.get('status', 'Approved') == 'Approved'}
                 if approved_students:
-                    m_edit_roll = st.selectbox("Select Student Roll No", list(approved_students.keys()), key="m_roll_sel_fixed")
+                    m_edit_roll = st.selectbox("Select Student Roll No", list(approved_students.keys()), key="m_roll_sel_unique")
                     m_curr_st = approved_students[m_edit_roll]
                     
                     st.markdown("#### 📝 Edit Personal Details")
                     c1, c2 = st.columns(2)
-                    m_up_name = c1.text_input("Name (English)", value=m_curr_st.get('name',''), key="m_name_fix")
-                    m_up_name_loc = c2.text_input(f"Name ({s_lang})", value=m_curr_st.get('name_local',''), key="m_nameloc_fix")
+                    m_up_name = c1.text_input("Name (English)", value=m_curr_st.get('name',''), key="m_up_name_unique")
+                    m_up_name_loc = c2.text_input(f"Name ({s_lang})", value=m_curr_st.get('name_local',''), key="m_up_nameloc_unique")
                     c3, c4 = st.columns(2)
-                    m_up_father = c3.text_input("Father's Name (English)", value=m_curr_st.get('father_name', ''), key="m_fat_fix")
-                    m_up_father_loc = c4.text_input(f"Father's Name ({s_lang})", value=m_curr_st.get('father_name_local', ''), key="m_fatloc_fix")
+                    m_up_father = c3.text_input("Father's Name (English)", value=m_curr_st.get('father_name', ''), key="m_up_fat_unique")
+                    m_up_father_loc = c4.text_input(f"Father's Name ({s_lang})", value=m_curr_st.get('father_name_local', ''), key="m_up_fatloc_unique")
                     
                     c_up1, c_up2, c_up3 = st.columns(3)
                     genders = ["Male", "Female", "Other"]
-                    m_up_gender = c_up1.selectbox("Gender", genders, index=genders.index(m_curr_st.get('gender', 'Male')) if m_curr_st.get('gender', 'Male') in genders else 0, key="m_gen_fix")
-                    m_up_pen = c_up2.text_input("PEN NO", value=m_curr_st.get('pen_no', ''), key="m_pen_fix")
-                    m_up_apaar = c_up3.text_input("APAAR NO", value=m_curr_st.get('apaar_no', ''), key="m_apaar_fix")
+                    m_up_gender = c_up1.selectbox("Gender", genders, index=genders.index(m_curr_st.get('gender', 'Male')) if m_curr_st.get('gender', 'Male') in genders else 0, key="m_up_gen_unique")
+                    m_up_pen = c_up2.text_input("PEN NO", value=m_curr_st.get('pen_no', ''), key="m_up_pen_unique")
+                    m_up_apaar = c_up3.text_input("APAAR NO", value=m_curr_st.get('apaar_no', ''), key="m_up_apaar_unique")
                     
                     c_d1, c_c1, c_b1 = st.columns(3)
-                    m_up_dob = c_d1.text_input("DOB (DD-MM-YYYY)", value=m_curr_st.get('dob', ''), key="m_dob_fix")
-                    m_up_class = c_c1.selectbox("Class", classes_list, index=classes_list.index(m_curr_st.get('class', '1')) if m_curr_st.get('class', '1') in classes_list else 0, key="m_cls_fix")
-                    m_up_batch = c_b1.selectbox("Batch", batches_list, index=batches_list.index(m_curr_st.get('batch', '2025-2026')) if m_curr_st.get('batch', '2025-2026') in batches_list else 5, key="m_bat_fix")
+                    m_up_dob = c_d1.text_input("DOB (DD-MM-YYYY)", value=m_curr_st.get('dob', ''), key="m_up_dob_unique")
+                    m_up_class = c_c1.selectbox("Class", classes_list, index=classes_list.index(m_curr_st.get('class', '1')) if m_curr_st.get('class', '1') in classes_list else 0, key="m_up_cls_unique")
+                    m_up_batch = c_b1.selectbox("Batch", batches_list, index=batches_list.index(m_curr_st.get('batch', '2025-2026')) if m_curr_st.get('batch', '2025-2026') in batches_list else 5, key="m_up_bat_unique")
                     
                     st.markdown("#### 📚 Edit Subjects & Marks")
                     m_subjects = m_curr_st.get('subjects', {})
@@ -1157,16 +1156,16 @@ elif menu == "Master Login":
                     
                     for sub_name, sub_info in m_subjects.items():
                         sc1, sc2, sc3 = st.columns(3)
-                        with sc1: u_sub = st.text_input("Subject Name", value=sub_name, key=f"m_fix_sub_{sub_name}")
-                        with sc2: u_f = st.number_input("Full Mark", value=float(sub_info['full']), key=f"m_fix_fm_{sub_name}")
-                        with sc3: u_o = st.number_input("Obtained", value=float(sub_info['obt']), key=f"m_fix_om_{sub_name}")
+                        with sc1: u_sub = st.text_input("Subject Name", value=sub_name, key=f"m_msub_{sub_name}")
+                        with sc2: u_f = st.number_input("Full Mark", value=float(sub_info['full']), key=f"m_mf_{sub_name}")
+                        with sc3: u_o = st.number_input("Obtained", value=float(sub_info['obt']), key=f"m_mo_{sub_name}")
                         if u_sub:
                             new_m_subjects[sanitize(u_sub)] = {"full": u_f, "obt": u_o}
                             m_tot_full += u_f; m_tot_obt += u_o
                     
                     col_sv, col_dl = st.columns(2)
                     with col_sv:
-                        if st.button("💾 Force Update Record", key="m_fix_upd_btn"):
+                        if st.button("💾 Force Update Record", key="m_force_update_btn"):
                             new_per = (m_tot_obt / m_tot_full * 100) if m_tot_full > 0 else 0.0
                             new_res = "PASS" if new_per >= 33 else "FAIL"
                             new_grd = "A1" if new_per >= 90 else "A2" if new_per >= 80 else "B1" if new_per >= 70 else "B2" if new_per >= 60 else "C1" if new_per >= 50 else "C2" if new_per >= 40 else "D" if new_per >= 33 else "F"
@@ -1182,7 +1181,7 @@ elif menu == "Master Login":
                             })
                             save_data(schools_db, students_db); st.success("Updated!"); st.rerun()
                     with col_dl:
-                        if st.button("🗑️ Delete Student Record", type="primary", key="m_fix_del_btn"):
+                        if st.button("🗑️ Delete Student Record", type="primary", key="m_delete_stud_btn"):
                             del students_db[master_school_sel][m_edit_roll]
                             save_data(schools_db, students_db)
                             st.success("Student deleted successfully!")
@@ -1190,21 +1189,21 @@ elif menu == "Master Login":
 
         with t5: 
             st.markdown("### ⚙️ Update Master Profile, Payment & Fees")
-            up_m_user = st.text_input("Master Username", value=master_db.get("username", ""), key="m_set_usr")
-            up_m_pass = st.text_input("New Master Password", type="password", key="m_set_pas")
-            up_m_email = st.text_input("Recovery Email", value=master_db.get("email", ""), key="m_set_eml")
-            up_m_phone = st.text_input("Recovery Phone Number", value=master_db.get("phone", ""), key="m_set_phn")
-            up_m_upi = st.text_input("Online Payment UPI ID (e.g. school@sbi)", value=master_db.get("upi_id", ""), key="m_set_upi")
+            up_m_user = st.text_input("Master Username", value=master_db.get("username", ""), key="m_prof_usr")
+            up_m_pass = st.text_input("New Master Password", type="password", key="m_prof_pas")
+            up_m_email = st.text_input("Recovery Email", value=master_db.get("email", ""), key="m_prof_eml")
+            up_m_phone = st.text_input("Recovery Phone Number", value=master_db.get("phone", ""), key="m_prof_phn")
+            up_m_upi = st.text_input("Online Payment UPI ID (e.g. school@sbi)", value=master_db.get("upi_id", ""), key="m_prof_upi")
             
             c_f1, c_f2 = st.columns(2)
-            up_base_fee = c_f1.number_input("Student Registration Base Fee (₹)", value=float(master_db.get("reg_fee", 150.0)), min_value=0.0, key="m_set_fee")
-            up_gst_pct = c_f2.number_input("Student GST Percentage (%)", value=float(master_db.get("gst_percent", 18.0)), min_value=0.0, key="m_set_gst")
+            up_base_fee = c_f1.number_input("Student Registration Base Fee (₹)", value=float(master_db.get("reg_fee", 150.0)), min_value=0.0, key="m_prof_fee")
+            up_gst_pct = c_f2.number_input("Student GST Percentage (%)", value=float(master_db.get("gst_percent", 18.0)), min_value=0.0, key="m_prof_gst")
             
             c_s1, c_s2 = st.columns(2)
-            up_sch_fee = c_s1.number_input("School Registration Base Fee (₹)", value=float(master_db.get("school_reg_fee", 1000.0)), min_value=0.0, key="m_set_sfee")
-            up_sch_gst = c_s2.number_input("School GST Percentage (%)", value=float(master_db.get("school_gst_percent", 18.0)), min_value=0.0, key="m_set_sgst")
+            up_sch_fee = c_s1.number_input("School Registration Base Fee (₹)", value=float(master_db.get("school_reg_fee", 1000.0)), min_value=0.0, key="m_prof_schfee")
+            up_sch_gst = c_s2.number_input("School GST Percentage (%)", value=float(master_db.get("school_gst_percent", 18.0)), min_value=0.0, key="m_prof_schgst")
 
-            if st.button("Save Profile & Fee Settings", key="m_set_save"):
+            if st.button("Save Profile & Fee Settings", key="m_save_prof_btn"):
                 master_db["username"] = sanitize(up_m_user); master_db["email"] = sanitize(up_m_email)
                 master_db["phone"] = sanitize(up_m_phone); master_db["upi_id"] = sanitize(up_m_upi)
                 master_db["reg_fee"] = float(up_base_fee); master_db["gst_percent"] = float(up_gst_pct)
@@ -1216,14 +1215,14 @@ elif menu == "Master Login":
             st.markdown("### 🏦 School Payment Gateway Setup (Master Control)")
             st.info("Set up individual Payment Gateways for Schools. Students will pay using these details, and ₹100 will auto-route to Master Account.")
             if schools_db:
-                pg_school = st.selectbox("Select School to configure Gateway", list(schools_db.keys()), key="m_gw_sch_sel")
+                pg_school = st.selectbox("Select School to configure Gateway", list(schools_db.keys()), key="m_pg_sch_sel")
                 curr_sch = schools_db[pg_school]
                 
-                sch_upi = st.text_input(f"School UPI ID (for {curr_sch['name']})", value=curr_sch.get('pg_upi', ''), key="m_gw_upi")
-                sch_merch = st.text_input("Payment Gateway Merchant ID (Credit/Debit Card)", value=curr_sch.get('pg_merchant', ''), key="m_gw_merch")
-                sch_key = st.text_input("Payment Gateway Secret Key (Hidden)", value=curr_sch.get('pg_key', ''), type="password", key="m_gw_key")
+                sch_upi = st.text_input(f"School UPI ID (for {curr_sch['name']})", value=curr_sch.get('pg_upi', ''), key="m_pg_upi")
+                sch_merch = st.text_input("Payment Gateway Merchant ID (Credit/Debit Card)", value=curr_sch.get('pg_merchant', ''), key="m_pg_merch")
+                sch_key = st.text_input("Payment Gateway Secret Key (Hidden)", value=curr_sch.get('pg_key', ''), type="password", key="m_pg_key")
                 
-                if st.button("💾 Save School Gateway Settings", key="m_gw_save"):
+                if st.button("💾 Save School Gateway Settings", key="m_pg_save_btn"):
                     schools_db[pg_school]['pg_upi'] = sanitize(sch_upi)
                     schools_db[pg_school]['pg_merchant'] = sanitize(sch_merch)
                     schools_db[pg_school]['pg_key'] = sanitize(sch_key)
