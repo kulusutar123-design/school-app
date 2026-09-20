@@ -81,7 +81,7 @@ RELATIONSHIPS = ["Select", "Father", "Mother", "Legal Guardian"]
 CERT_YEARS = ["Select", "Certificate issued before 1st Feb 2020", "Certificate issued on/after 1st Feb 2020"]
 
 # ==========================================
-# 🤖 AUTO TRANSLATION ENGINE & LIVE NEWS
+# 🤖 AUTO TRANSLATION & LIVE NEWS ENGINE
 # ==========================================
 @st.cache_data(show_spinner=False)
 def auto_translate(text, lang_name):
@@ -98,26 +98,19 @@ def auto_translate(text, lang_name):
         return "".join([s[0] for s in json.loads(res.read().decode('utf-8'))[0]])
     except Exception: return text 
 
-@st.cache_data(ttl=3600, show_spinner=False)
-def get_live_india_news():
+@st.cache_data(ttl=1800, show_spinner=False)
+def fetch_live_news():
     try:
-        url = "https://news.google.com/rss/headlines/section/topic/NATION?hl=en-IN&gl=IN&ceid=IN:en"
-        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         ctx = ssl.create_default_context()
         ctx.check_hostname = False
         ctx.verify_mode = ssl.CERT_NONE
-        response = urllib.request.urlopen(req, timeout=5, context=ctx)
-        xml_data = response.read()
-        root = ET.fromstring(xml_data)
-        news_list = []
-        for item in root.findall('./channel/item')[:10]:
-            title = item.find('title').text
-            news_list.append(title)
-        if news_list:
-            return " &nbsp;&nbsp;⭐&nbsp;&nbsp; ".join(news_list)
+        req = urllib.request.Request("https://news.google.com/rss?hl=en-IN&gl=IN&ceid=IN:en", headers={'User-Agent': 'Mozilla/5.0'})
+        res = urllib.request.urlopen(req, timeout=4, context=ctx)
+        root = ET.fromstring(res.read())
+        headlines = [item.find('title').text for item in root.findall('./channel/item')[:5]]
+        return " 🔴 ".join(headlines)
     except Exception:
-        pass
-    return "Schools and Colleges across India are successfully adopting Advanced Digital Management Systems to improve education standards."
+        return "Schools across India to integrate modern digital classrooms 🔴 Government announces fresh guidelines for national scholarship portals."
 
 def t(eng_text, lang):
     translations = {"School Portal": {"Odia": "ସ୍କୁଲ୍ ପୋର୍ଟାଲ୍", "Hindi": "स्कूल पोर्टल"}}
@@ -220,6 +213,7 @@ def create_scholarship_pdf(filename, app_id, s_data):
     c.setFont("Helvetica", 11); y = 640
     c.drawString(50, y, f"Applicant Name: {s_data.get('app_name', '').upper()}"); c.drawString(350, y, f"OTR No: {s_data.get('otr', '')}"); y -= 25
     c.drawString(50, y, f"Aadhaar No: {s_data.get('aadhaar', '')}"); c.drawString(350, y, f"Category: {s_data.get('category', '')}"); y -= 25
+    c.drawString(50, y, f"DOB: {s_data.get('dob', '')}"); c.drawString(350, y, f"Gender: {s_data.get('gender', '')}"); y -= 25
     c.drawString(50, y, f"Phone: {s_data.get('mobile', '')}"); c.drawString(350, y, f"School Code: {s_data.get('school_code', '')}"); y -= 35
     c.setStrokeColorRGB(0.8, 0.8, 0.8); c.line(50, y, 550, y); y -= 20
     c.setFont("Helvetica-Bold", 12); c.drawString(50, y, "Certificate & Institute Info"); c.setFont("Helvetica", 11); y -= 20
@@ -296,6 +290,21 @@ if menu == "Home Page":
     elif mm_dd == "08-15":
         event_images += "<img class='marquee-img' src='https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg&w=400' alt='Independence Day'>"
         event_title = "🇮🇳 Happy Independence Day 🇮🇳"
+    elif mm_dd == "01-26":
+        event_images += "<img class='marquee-img' src='https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg&w=400' alt='Republic Day'>"
+        event_title = "🇮🇳 Happy Republic Day 🇮🇳"
+    elif mm_dd == "09-05":
+        event_images += "<img class='marquee-img' src='https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/d/d1/Dr_Sarvepalli_Radhakrishnan.jpg&w=400' alt='Teachers Day'>"
+        event_title = "📚 Happy Teachers' Day 📚"
+    elif mm_dd == "04-14":
+        event_images += "<img class='marquee-img' src='https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/c/c3/Dr._Bhimrao_Ambedkar.jpg&w=400' alt='Ambedkar Jayanti'>"
+        event_title = "🙏 Happy Ambedkar Jayanti 🙏"
+    elif mm_dd == "11-14":
+        event_images += "<img class='marquee-img' src='https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/5/5f/Jawaharlal_Nehru_1946.jpg&w=400' alt='Childrens Day'>"
+        event_title = "🌹 Happy Children's Day 🌹"
+    elif mm_dd == "04-01":
+        event_images += "<img class='marquee-img' src='https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/f/fe/Seal_of_Odisha.png&w=400' alt='Utkal Divas'>"
+        event_title = "🔴 ଉତ୍କଳ ଦିବସର ହାର୍ଦ୍ଦିକ ଶୁଭେଚ୍ଛା 🔴"
 
     base_images = (
         "<img class='marquee-img' src='https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=600&q=80' alt='School Building'>"
@@ -328,25 +337,22 @@ if menu == "Home Page":
 
     st.markdown(f"<div class='glass-panel'><h2 style='text-align: center; color: #fbbf24; margin-top: 0;'>🏫 {event_title}</h2>", unsafe_allow_html=True)
     components.html(carousel_html, height=360)
-    
-    # 🔴 LIVE INDIA NEWS TICKER (AUTO UPDATED)
-    live_news = get_live_india_news()
-    live_news_html = f"""
-    <div style='background-color: #0f172a; border-radius: 10px; margin-top: 25px; border: 2px solid #38bdf8; overflow: hidden; color: #e2e8f0; font-size: 18px; padding: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.5);'>
-        <marquee direction='left' scrollamount='8' style='font-weight: bold; display: flex; align-items: center;'>
-            <span style='color: #fbbf24; background: #dc2626; color: white; padding: 2px 8px; border-radius: 4px; margin-right: 10px;'>🔴 LIVE NEWS</span> {live_news}
-        </marquee>
-    </div>
-    """
-    st.markdown(live_news_html, unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # Regular Notice Banner
-    notice_text_html = """
+    # DYNAMIC LIVE NEWS TICKER WITH LANGUAGES
+    live_news_eng = fetch_live_news()
+    
+    notice_text_html = f"""
     <!DOCTYPE html>
-    <html><head><meta charset="utf-8"><style>body { margin: 0; background: transparent; color: #fff; font-family: sans-serif; font-size: 18px; display: flex; align-items: center; height: 100%; } .new-badge { background-color: #fbbf24; color: black; font-size: 14px; font-weight: bold; padding: 2px 6px; border-radius: 3px; margin-left: 5px; }</style></head>
-    <body><marquee direction='left' scrollamount='8' style='padding: 5px; font-weight: bold;'>
-    <span style='color: #fbbf24;'>📢 ନୂଆ ଅପଡେଟ୍: ଛାତ୍ରଛାତ୍ରୀମାନେ ଏବେ ଅନଲାଇନ୍ ସ୍କଲାରସିପ୍ ଏବଂ ପେମେଣ୍ଟ କରିପାରିବେ! <span class='new-badge'>NEW</span> &nbsp;&nbsp;|&nbsp;&nbsp; 👨‍💻 Software Developed by: KULU SUTAR &nbsp;&nbsp;|&nbsp;&nbsp; 📞 Helpdesk No: 8910223342 &nbsp;&nbsp;|&nbsp;&nbsp; ✉️ Mail ID: kulusutar123@gmail.com </span>
+    <html><head><meta charset="utf-8"><style>body {{ margin: 0; background: transparent; color: #fff; font-family: sans-serif; font-size: 18px; display: flex; align-items: center; height: 100%; }} .new-badge {{ background-color: #ef4444; color: white; font-size: 14px; font-weight: bold; padding: 2px 6px; border-radius: 3px; margin-left: 5px; margin-right: 5px; }} .dev-badge {{ background-color: #fbbf24; color: black; font-size: 14px; font-weight: bold; padding: 2px 6px; border-radius: 3px; }}</style></head>
+    <body><marquee direction='left' scrollamount='8' style='padding: 5px; font-weight: bold; text-shadow: 1px 1px 2px #000;'>
+    <span style='color: #fbbf24;'>
+    <span class='new-badge'>LATEST NEWS</span> {live_news_eng} &nbsp;&nbsp;&nbsp;&nbsp; 
+    <span class='new-badge'>ତାଜା ଖବର</span> ସମଗ୍ର ଭାରତରେ ନୂତନ ଶିକ୍ଷା ନୀତି ଏବଂ ସ୍କଲାରସିପ୍ ଯୋଜନା ଲାଗୁ। &nbsp;&nbsp;&nbsp;&nbsp; 
+    <span class='new-badge'>ताज़ा खबर</span> पूरे भारत के स्कूलों में नई छात्रवृत्ति और शिक्षा योजनाएं लागू की गई हैं। &nbsp;&nbsp;&nbsp;&nbsp; 
+    <span class='new-badge'>তাজা খবর</span> সারা ভারতের স্কুলে নতুন শিক্ষানীতি ও স্কলারশিপ চালু হয়েছে। &nbsp;&nbsp;&nbsp;&nbsp; 
+    <span class='dev-badge'>👨‍💻 Developed by: KULU SUTAR</span> &nbsp;|&nbsp; 📞 8910223342 &nbsp;|&nbsp; ✉️ kulusutar123@gmail.com 
+    </span>
     </marquee></body></html>
     """
     st.markdown("<div class='glass-panel' style='padding: 10px;'>", unsafe_allow_html=True)
@@ -359,7 +365,7 @@ if menu == "Home Page":
     with c3: st.markdown("<a href='?portal=reg_school' target='_self' class='login-card'><div class='login-title'>🏫 New School</div><div class='login-sub'>Register institution</div></a>", unsafe_allow_html=True)
     with c4: st.markdown("<a href='?portal=master' target='_self' class='login-card'><div class='login-title'>🏛️ Master Login</div><div class='login-sub'>Admin Portal</div></a>", unsafe_allow_html=True)
 
-# ----------------- SCHOLARSHIP PORTAL -----------------
+# ----------------- SCHOLARSHIP PORTAL (ADDRESS & AUTH UPDATES) -----------------
 elif menu == "Scholarship Portal":
     c_h, c_t = st.columns([1, 8])
     with c_h:
@@ -392,8 +398,8 @@ elif menu == "Scholarship Portal":
         if col_o2.button("VERIFY OTR"):
             if otr_input:
                 st.session_state['v_otr'] = otr_input
-                st.session_state['v_name'] = "JYOTI PRAKASH SUTAR" 
-                st.session_state['v_aadhaar'] = "8899-0011-2233" 
+                st.session_state['v_name'] = "JYOTI PRAKASH SUTAR" # Auto fetched mock name
+                st.session_state['v_aadhaar'] = "8899-0011-2233" # Auto fetched mock aadhaar
                 st.success("✅ OTR Verified Successfully! Application Name and Aadhaar Auto-fetched.")
             else:
                 st.error("Please enter OTR No.")
@@ -433,6 +439,7 @@ elif menu == "Scholarship Portal":
         f_name = c13.text_input("Father's Name *")
         m_name = c14.text_input("Mother's Name *")
         
+        # 📌 NEW DYNAMIC CASCADING ADDRESS SYSTEM
         st.markdown("#### 📍 Address Information")
         addr = st.text_area("Full Address *", placeholder="Enter your complete address")
         
@@ -590,6 +597,402 @@ elif menu == "Scholarship Portal":
             st.rerun()
         if st.button("Cancel"):
             st.session_state['sch_app_step'] = False; st.rerun()
+
+# ----------------- NEW STUDENT REGISTRATION WITH DYNAMIC FEES & GST -----------------
+elif menu == "New Student Registration":
+    c_home, c_title = st.columns([1, 8])
+    with c_home:
+        if st.button("🏠 Home", key="reg_stu_home"):
+            st.query_params["portal"] = "home"
+            st.rerun()
+    with c_title:
+        st.subheader("👨‍🎓 New Student Registration & Payment Portal")
+
+    base_fee = float(master_db.get("reg_fee", 150.0))
+    gst_pct = float(master_db.get("gst_percent", 18.0))
+    gst_amt = round(base_fee * (gst_pct / 100.0), 2)
+    total_fee = round(base_fee + gst_amt, 2)
+
+    if 'payment_step' not in st.session_state:
+        st.session_state['payment_step'] = False
+        st.session_state['temp_student_data'] = None
+    if 'stu_reg_success' not in st.session_state:
+        st.session_state['stu_reg_success'] = False
+
+    if st.session_state['stu_reg_success']:
+        st.success(f"✅ Application Submitted Successfully! Your Registration ID is **{st.session_state['stu_reg_id']}**.")
+        st.info("Your application is now pending verification from the Admin/School. Please download your receipt below.")
+        
+        pdf_file = f"Receipt_{st.session_state['stu_reg_id']}.pdf"
+        create_student_receipt_pdf(pdf_file, st.session_state['stu_reg_id'], st.session_state['stu_reg_data'])
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            with open(pdf_file, "rb") as f:
+                st.download_button("📥 Download PDF Receipt", f, file_name=pdf_file, mime="application/pdf")
+        with col2:
+            if st.button("🖨️ Print Receipt"):
+                components.html("<script>window.parent.print();</script>", height=0)
+        with col3:
+            if st.button("⬅️ Done / Go Back"):
+                st.session_state['stu_reg_success'] = False
+                st.session_state['stu_reg_id'] = None
+                st.session_state['stu_reg_data'] = None
+                st.rerun()
+                
+    elif not st.session_state['payment_step']:
+        st.info("Fill your registration details carefully. Verify with the declaration checkbox to proceed to payment.")
+        with st.form("student_reg_form"):
+            st.markdown("#### 1. School Information")
+            c_sc1, c_sc2 = st.columns(2)
+            
+            active_schools = {k: v for k, v in schools_db.items() if v.get("status", "Active") == "Active"}
+            
+            if not active_schools:
+                st.error("No active schools available for registration.")
+                school_sel = None
+            else:
+                school_options = [f"{k} - {v['name']}" for k, v in active_schools.items()]
+                school_sel_str = c_sc1.selectbox("14. Select School Code & Name *", ["--Select--"] + school_options)
+                school_sel = school_sel_str.split(" - ")[0] if school_sel_str != "--Select--" else None
+                
+            st.markdown("#### 2. Personal Details")
+            c_n1, c_n2 = st.columns(2)
+            stu_name_en = c_n1.text_input("1. Student's Name (English) *")
+            stu_name_loc = c_n2.text_input("1. Student's Name (Local Language)")
+            
+            c_g1, c_g2, c_g3 = st.columns(3)
+            stu_gender_en = c_g1.selectbox("2. Gender (English)", ["Male", "Female", "Other"])
+            stu_gender_loc = c_g2.text_input("2. Gender (Local Language)")
+            stu_category = c_g3.selectbox("Social Category *", SOCIAL_CATEGORIES)
+            
+            c_d1, c_d2 = st.columns(2)
+            stu_dob = c_d1.date_input("3. Date of Birth *", min_value=datetime.date(2000, 1, 1), max_value=datetime.date.today())
+            stu_state = c_d2.selectbox("4. State (All India)", list(STATE_LANG_MAP.keys()), index=18)
+            
+            c_m1, c_m2 = st.columns(2)
+            m_name_en = c_m1.text_input("5. Mother's Name (English) *")
+            m_name_loc = c_m2.text_input("5. Mother's Name (Local Language)")
+            
+            c_f1, c_f2 = st.columns(2)
+            f_name_en = c_f1.text_input("6. Father's Name (English) *")
+            f_name_loc = c_f2.text_input("6. Father's Name (Local Language)")
+            
+            st.markdown("#### 3. Contact & Identification")
+            c_id1, c_id2 = st.columns(2)
+            stu_aadhar = c_id1.text_input("7. AADHAAR Number of Student *", max_chars=12)
+            stu_phone = c_id2.text_input("10. Mobile No *", max_chars=10)
+            
+            c_ad1, c_ad2 = st.columns(2)
+            stu_address_en = c_ad1.text_area("8. Address (English) *")
+            stu_address_loc = c_ad2.text_area("8. Address (Local Language)")
+            
+            c_loc1, c_loc2 = st.columns(2)
+            stu_pin = c_loc1.text_input("9. PIN Code *", max_chars=6)
+            stu_minority = c_loc2.selectbox("11. Minority Group", ["No", "Yes - Muslim", "Yes - Christian", "Yes - Sikh", "Yes - Buddhist", "Yes - Parsi", "Yes - Jain"])
+            
+            c_nat1, c_nat2 = st.columns(2)
+            stu_country = c_nat1.selectbox("12. Whether the Student is Indian National?", COUNTRIES)
+            stu_bg = c_nat2.selectbox("13. Blood Group", ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-", "Unknown"])
+            
+            st.markdown("#### 4. Photograph Upload")
+            stu_photo = st.file_uploader("16. Upload Student Photo (JPG/PNG)", type=['png', 'jpg', 'jpeg'])
+            
+            st.markdown("#### 5. Declaration")
+            declaration = st.checkbox("✅ I hereby declare that all the information provided above is true and correct to the best of my knowledge.")
+            
+            submitted_stu = st.form_submit_button("Proceed to Payment & Submit")
+            
+            if submitted_stu:
+                if not declaration:
+                    st.error("⚠️ Please check the declaration box to confirm your details are correct.")
+                elif not school_sel or not sanitize(stu_name_en) or not sanitize(f_name_en) or not sanitize(m_name_en) or not sanitize(stu_aadhar) or not sanitize(stu_phone) or not sanitize(stu_address_en) or not sanitize(stu_pin):
+                    st.error("Please fill all the mandatory fields (*).")
+                else:
+                    temp_reg_id = "REG" + str(random.randint(100000, 999999))
+                    has_photo = True if stu_photo else False
+                    
+                    st.session_state['temp_student_data'] = {
+                        "reg_id": temp_reg_id,
+                        "school_sel": school_sel,
+                        "data": {
+                            "name": sanitize(stu_name_en), 
+                            "name_local": sanitize(stu_name_loc),
+                            "gender": stu_gender_en, 
+                            "gender_local": sanitize(stu_gender_loc),
+                            "category": stu_category,
+                            "father_name": sanitize(f_name_en), 
+                            "father_name_local": sanitize(f_name_loc),
+                            "mother_name": sanitize(m_name_en), 
+                            "mother_name_local": sanitize(m_name_loc),
+                            "dob": str(stu_dob), 
+                            "blood_group": stu_bg,
+                            "aadhaar": sanitize(stu_aadhar),
+                            "phone": sanitize(stu_phone),
+                            "address": sanitize(stu_address_en),
+                            "address_local": sanitize(stu_address_loc),
+                            "state": stu_state,
+                            "pin_code": sanitize(stu_pin),
+                            "nationality": stu_country,
+                            "minority": stu_minority,
+                            "has_photo": has_photo,
+                            "school_code": school_sel,
+                            "class": "1", 
+                            "batch": "2025-2026",
+                            "subjects": {},
+                            "total_full": 0, "total_obt": 0, "percentage": 0.0,
+                            "result": "N/A", "grade": "N/A", "pub_date": str(datetime.date.today()),
+                            "pen_no": "", "apaar_no": "",
+                            "payment_mode": "Pending",
+                            "base_fee": base_fee,
+                            "gst_amt": gst_amt,
+                            "total_fee": total_fee,
+                            "status": "Pending_Master"
+                        }
+                    }
+                    st.session_state['payment_step'] = True
+                    st.rerun()
+
+    if st.session_state.get('payment_step', False):
+        st.markdown("### 💳 Secure Payment Gateway")
+        temp_obj = st.session_state.get('temp_student_data')
+        if temp_obj:
+            st.markdown(f"""
+            <div style='background-color:#eff6ff; border:1px solid #bfdbfe; padding:15px; border-radius:8px; margin-bottom:15px;'>
+                <b>Student Name:</b> {temp_obj['data']['name'].upper()}<br>
+                <b>Registration Base Fee:</b> ₹{base_fee:.2f}<br>
+                <b>GST ({gst_pct}%):</b> ₹{gst_amt:.2f}<br>
+                <hr style='margin:8px 0;'>
+                <b style='color:#1e3a8a; font-size:18px;'>Total Payable Amount: ₹{total_fee:.2f}</b>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            pay_mode = st.radio("Select Payment Mode", ["Online Payment (UPI/QR)", "Offline Payment (School Counter)"])
+            
+            if pay_mode == "Online Payment (UPI/QR)":
+                master_upi = master_db.get("upi_id", "school@sbi")
+                upi_url = f"upi://pay?pa={master_upi}&pn=SchoolRegistration&am={total_fee:.2f}&cu=INR"
+                qr_api = f"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={urllib.parse.quote(upi_url)}"
+                
+                col_qr, col_form = st.columns([1, 2])
+                with col_qr:
+                    st.markdown(f"<img src='{qr_api}' style='border:5px solid #1E3A8A; border-radius:10px;'>", unsafe_allow_html=True)
+                    st.markdown(f"**UPI ID:** `{master_upi}`")
+                    
+                with col_form:
+                    st.warning(f"Scan the QR code with PhonePe, GPay, or Paytm to pay ₹{total_fee:.2f}.")
+                    txn_id = st.text_input("Enter 12-digit Transaction ID / UTR No. *")
+                    if st.button("Verify & Submit Final Application", type="primary"):
+                        if not txn_id or len(txn_id) < 8:
+                            st.error("Please enter a valid Transaction ID to complete registration.")
+                        else:
+                            reg_data = st.session_state['temp_student_data']
+                            reg_data['data']['payment_mode'] = f"Online (₹{total_fee:.2f} - Txn: {sanitize(txn_id)})"
+                            reg_data['data']['status'] = "Pending_Master"
+                            
+                            sch_id = reg_data['school_sel']
+                            if sch_id not in students_db:
+                                students_db[sch_id] = {}
+                            students_db[sch_id][reg_data['reg_id']] = reg_data['data']
+                            save_data(schools_db, students_db)
+                            
+                            st.session_state['stu_reg_success'] = True
+                            st.session_state['stu_reg_id'] = reg_data['reg_id']
+                            st.session_state['stu_reg_data'] = reg_data['data']
+                            st.session_state['payment_step'] = False
+                            st.session_state['temp_student_data'] = None
+                            st.rerun()
+
+            elif pay_mode == "Offline Payment (School Counter)":
+                st.info(f"You have selected Offline Payment. Please pay ₹{total_fee:.2f} at your School Counter.")
+                if st.button("Submit Final Application", type="primary"):
+                    reg_data = st.session_state['temp_student_data']
+                    reg_data['data']['payment_mode'] = f"Offline (₹{total_fee:.2f} - Pending at Counter)"
+                    reg_data['data']['status'] = "Pending_Master"
+                    
+                    sch_id = reg_data['school_sel']
+                    if sch_id not in students_db:
+                        students_db[sch_id] = {}
+                    students_db[sch_id][reg_data['reg_id']] = reg_data['data']
+                    save_data(schools_db, students_db)
+                    
+                    st.session_state['stu_reg_success'] = True
+                    st.session_state['stu_reg_id'] = reg_data['reg_id']
+                    st.session_state['stu_reg_data'] = reg_data['data']
+                    st.session_state['payment_step'] = False
+                    st.session_state['temp_student_data'] = None
+                    st.rerun()
+                    
+            if st.button("⬅️ Back to Form"):
+                st.session_state['payment_step'] = False
+                st.rerun()
+
+# ----------------- NEW SCHOOL REGISTRATION -----------------
+elif menu == "New School Registration":
+    st.query_params["portal"] = "reg_school"
+    c_home, c_title = st.columns([1, 8])
+    with c_home:
+        if st.button("🏠 Home", key="reg_sch_home"):
+            st.query_params["portal"] = "home"
+            st.rerun()
+    with c_title:
+        st.subheader("📝 New School Registration & Payment")
+
+    s_base_fee = float(master_db.get("school_reg_fee", 1000.0))
+    s_gst_pct = float(master_db.get("school_gst_percent", 18.0))
+    s_gst_amt = round(s_base_fee * (s_gst_pct / 100.0), 2)
+    s_total_fee = round(s_base_fee + s_gst_amt, 2)
+
+    if 'school_payment_step' not in st.session_state:
+        st.session_state['school_payment_step'] = False
+        st.session_state['temp_school_data'] = None
+    if 'sch_reg_success' not in st.session_state:
+        st.session_state['sch_reg_success'] = False
+
+    if st.session_state['sch_reg_success']:
+        st.success("✅ Registration Successful! Your account is PENDING approval from the Master Admin.")
+        st.info("Please download your registration receipt below.")
+        
+        pdf_file = f"School_Receipt_{st.session_state['sch_reg_id']}.pdf"
+        create_school_receipt_pdf(pdf_file, st.session_state['sch_reg_id'], st.session_state['sch_reg_data'])
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            with open(pdf_file, "rb") as f:
+                st.download_button("📥 Download PDF Receipt", f, file_name=pdf_file, mime="application/pdf")
+        with col2:
+            if st.button("🖨️ Print Receipt"):
+                components.html("<script>window.parent.print();</script>", height=0)
+        with col3:
+            if st.button("⬅️ Done / Go Back"):
+                st.session_state['sch_reg_success'] = False
+                st.session_state['sch_reg_id'] = None
+                st.session_state['sch_reg_data'] = None
+                st.rerun()
+
+    elif not st.session_state['school_payment_step']:
+        st.info("Submit your school details. Wait for the Master Admin to approve and ACTIVATE your account after payment.")
+        
+        with st.form("school_reg_form"):
+            r_id = st.text_input("School ID (Create a Unique ID) *")
+            
+            c_n1, c_n2 = st.columns(2)
+            r_name_en = c_n1.text_input("School Name (English) *")
+            r_name_loc = c_n2.text_input("School Name (Local Language) [Optional]")
+            
+            indian_states = list(STATE_LANG_MAP.keys())
+            r_state = st.selectbox("Select State", indian_states, index=18)
+            
+            c_a1, c_a2 = st.columns(2)
+            r_address_en = c_a1.text_area("School Address (English)")
+            r_address_loc = c_a2.text_area("School Address (Local Language) [Optional]")
+            
+            c_h1, c_h2 = st.columns(2)
+            r_hm_name = c_h1.text_input("Head Master Name")
+            r_hm_phone = c_h2.text_input("Head Master Mobile No.")
+            
+            c_p1, c_p2 = st.columns(2)
+            r_pass = c_p1.text_input("New Password *", type="password")
+            r_cpass = c_p2.text_input("Confirm Password *", type="password")
+            
+            st.markdown("#### 5. Declaration")
+            s_declaration = st.checkbox("✅ I hereby declare that all the information provided above is true and correct.")
+            
+            submitted = st.form_submit_button("Proceed to Payment & Submit")
+            if submitted:
+                s_id_clean = sanitize(r_id)
+                if not s_declaration:
+                    st.error("⚠️ Please check the declaration box.")
+                elif not s_id_clean or not sanitize(r_name_en) or not r_pass:
+                    st.error("Please fill all the mandatory fields (*) including School ID, Name, and Password.")
+                elif r_pass != r_cpass:
+                    st.error("Passwords do not match!")
+                elif s_id_clean in schools_db:
+                    st.error("This School ID already exists. Please choose a different ID.")
+                else:
+                    st.session_state['temp_school_data'] = {
+                        "school_id": s_id_clean,
+                        "data": {
+                            "name": sanitize(r_name_en), 
+                            "name_local": sanitize(r_name_loc),
+                            "address": sanitize(r_address_en),
+                            "address_local": sanitize(r_address_loc),
+                            "hm_name": sanitize(r_hm_name),
+                            "hm_name_local": "",
+                            "hm_phone": sanitize(r_hm_phone),
+                            "hm_email": "",
+                            "pass": r_pass, 
+                            "state": r_state, 
+                            "lang": STATE_LANG_MAP[r_state],
+                            "status": "Pending_Master_Approval"
+                        }
+                    }
+                    st.session_state['school_payment_step'] = True
+                    st.rerun()
+
+    if st.session_state.get('school_payment_step', False):
+        st.markdown("### 💳 Secure Payment Gateway for School")
+        s_temp_obj = st.session_state.get('temp_school_data')
+        if s_temp_obj:
+            st.markdown(f"""
+            <div style='background-color:#eff6ff; border:1px solid #bfdbfe; padding:15px; border-radius:8px; margin-bottom:15px;'>
+                <b>School Name:</b> {s_temp_obj['data']['name'].upper()}<br>
+                <b>School Registration Base Fee:</b> ₹{s_base_fee:.2f}<br>
+                <b>GST ({s_gst_pct}%):</b> ₹{s_gst_amt:.2f}<br>
+                <hr style='margin:8px 0;'>
+                <b style='color:#1e3a8a; font-size:18px;'>Total Payable Amount: ₹{s_total_fee:.2f}</b>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            s_pay_mode = st.radio("Select Payment Mode", ["Online Payment (UPI/QR)", "Offline Payment (Direct)"])
+            
+            if s_pay_mode == "Online Payment (UPI/QR)":
+                master_upi = master_db.get("upi_id", "school@sbi")
+                upi_url = f"upi://pay?pa={master_upi}&pn=SchoolReg&am={s_total_fee:.2f}&cu=INR"
+                qr_api = f"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={urllib.parse.quote(upi_url)}"
+                
+                col_qr, col_form = st.columns([1, 2])
+                with col_qr:
+                    st.markdown(f"<img src='{qr_api}' style='border:5px solid #1E3A8A; border-radius:10px;'>", unsafe_allow_html=True)
+                    st.markdown(f"**UPI ID:** `{master_upi}`")
+                    
+                with col_form:
+                    st.warning(f"Scan the QR code to pay ₹{s_total_fee:.2f}.")
+                    txn_id = st.text_input("Enter 12-digit Transaction ID / UTR No. *")
+                    if st.button("Verify & Submit School Registration", type="primary"):
+                        if not txn_id or len(txn_id) < 8:
+                            st.error("Please enter a valid Transaction ID.")
+                        else:
+                            reg_data = st.session_state['temp_school_data']
+                            reg_data['data']['payment_mode'] = f"Online (₹{s_total_fee:.2f} - Txn: {sanitize(txn_id)})"
+                            schools_db[reg_data["school_id"]] = reg_data["data"]
+                            save_data(schools_db, students_db)
+                            
+                            st.session_state['sch_reg_success'] = True
+                            st.session_state['sch_reg_id'] = reg_data['school_id']
+                            st.session_state['sch_reg_data'] = reg_data['data']
+                            st.session_state['school_payment_step'] = False
+                            st.session_state['temp_school_data'] = None
+                            st.rerun()
+
+            elif s_pay_mode == "Offline Payment (Direct)":
+                st.info(f"Offline Payment: Please pay ₹{s_total_fee:.2f} to the authorities.")
+                if st.button("Submit School Registration", type="primary"):
+                    reg_data = st.session_state['temp_school_data']
+                    reg_data['data']['payment_mode'] = f"Offline (₹{s_total_fee:.2f} - Pending)"
+                    schools_db[reg_data["school_id"]] = reg_data["data"]
+                    save_data(schools_db, students_db)
+                    
+                    st.session_state['sch_reg_success'] = True
+                    st.session_state['sch_reg_id'] = reg_data['school_id']
+                    st.session_state['sch_reg_data'] = reg_data['data']
+                    st.session_state['school_payment_step'] = False
+                    st.session_state['temp_school_data'] = None
+                    st.rerun()
+                    
+            if st.button("⬅️ Back to Form"):
+                st.session_state['school_payment_step'] = False
+                st.rerun()
 
 # ----------------- MASTER LOGIN -----------------
 elif menu == "Master Login":
