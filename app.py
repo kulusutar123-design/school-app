@@ -684,7 +684,7 @@ elif menu == "Scholarship Portal":
         c6, c7, c8 = st.columns(3)
         gender = c6.radio("Applicant Gender:", ["Male", "Female", "Transgender"])
         religion = c7.selectbox("Religion", ["Select", "Hindu", "Muslim", "Christian", "Other"])
-        photo = c8.file_uploader("Profile Photo (jpg, png)")
+        photo = c8.file_uploader("Profile Photo (jpg, png)", type=['png', 'jpg', 'jpeg'], key="sch_photo_input")
         
         c9, c10 = st.columns(2)
         dob = c9.date_input("Date of Birth *", min_value=datetime.date(1990, 1, 1), max_value=datetime.date.today())
@@ -719,7 +719,7 @@ elif menu == "Scholarship Portal":
                 if inc_no: st.success("Verified")
             inc_whom = st.selectbox("To Whom Issued", RELATIONSHIPS)
             inc_auth = st.selectbox("Issuing Authority (Income)", ISSUING_AUTHORITIES)
-            inc_file = st.file_uploader("Upload Income Certificate Photo *")
+            inc_file = st.file_uploader("Upload Income Certificate Photo *", type=['png', 'jpg', 'jpeg'], key="sch_inc_input")
             
         with c34:
             st.markdown("**Caste Certificate**")
@@ -729,7 +729,7 @@ elif menu == "Scholarship Portal":
             if col_cas2.button("VERIFY CASTE"):
                 if cas_no: st.success("Verified")
             cas_auth = st.selectbox("Issuing Authority (Caste)", ISSUING_AUTHORITIES)
-            cas_file = st.file_uploader("Upload Caste Certificate Photo *")
+            cas_file = st.file_uploader("Upload Caste Certificate Photo *", type=['png', 'jpg', 'jpeg'], key="sch_cas_input")
         
         st.markdown("### 🏦 Bank Information")
         st.warning("Please note that your Aadhaar Number will be used for crediting scholarship amount via DBT.")
@@ -761,6 +761,10 @@ elif menu == "Scholarship Portal":
             
         acc_name = st.text_input("Account Holder Name *", value=st.session_state.get('v_acc_name', ''))
         re_acc_no = st.text_input("Re-type Account No. *")
+        
+        c_seed, c_pass = st.columns(2)
+        seeded = c_seed.radio("Whether account number seeded with the Aadhaar number?", ["Yes", "No"], index=1, key="sch_seed_radio")
+        passbook = c_pass.file_uploader("Upload Passbook Front Page (JPG/PNG) *", type=['png', 'jpg', 'jpeg'], key="sch_passbook_input")
         
         decl = st.checkbox("✅ I declare the above info is true.")
         if st.button("Proceed to Payment & Submit", type="primary"):
