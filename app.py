@@ -3,9 +3,8 @@ import streamlit.components.v1 as components
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.units import inch
 from reportlab.graphics.barcode import code128, qr
 from reportlab.graphics.shapes import Drawing
 from reportlab.graphics import renderPDF
@@ -235,24 +234,69 @@ def create_student_receipt_pdf(filename, reg_id, s_data):
     c.setFont("Helvetica-Oblique", 10); c.drawCentredString(300, y, "Computer-generated receipt.")
     c.save()
 
-# --- NEW ODISHA FORMAT SCHOLARSHIP PDF ---
+# --- FIXED ODISHA FORMAT SCHOLARSHIP HTML (NO INDENTATION FOR STREAMLIT COMPATIBILITY) ---
+def render_odisha_scholarship_html(app_id, s_data):
+    adh = s_data.get('aadhaar', '')
+    masked_adh = f"XXXXXXXX{adh[-4:]}" if len(adh) >= 4 else adh
+    html_str = f"""<div style="font-family: Arial, sans-serif; border: 1px solid #ccc; padding: 20px; max-width: 900px; margin: auto; background-color: #fff;">
+<div style="text-align: center; margin-bottom: 20px;">
+<h2 style="margin: 0; color: #0b3a5b;">Government of Odisha</h2>
+<h3 style="margin: 5px 0;">Scholarship Application Form</h3>
+<h4 style="margin: 5px 0;">ST&SC and MBC Welfare Department</h4>
+<p style="margin: 0;">Academic Year: <b>{s_data.get('academic_year', '2025-26')}</b></p>
+</div>
+<h4 style="background-color: #0b3a5b; color: white; padding: 5px; margin: 0;">Basic Information</h4>
+<table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 15px;" border="1">
+<tr style="background-color: #f2f2f2;"><th>Department</th><th>Scheme</th><th>Academic Year</th><th>Application Type</th></tr>
+<tr style="text-align:center;"><td>ST&SC and MBC Welfare</td><td>{s_data.get('scheme', '')}</td><td>{s_data.get('academic_year', '')}</td><td>New</td></tr>
+</table>
+<h4 style="background-color: #0b3a5b; color: white; padding: 5px; margin: 0;">Applicant Details</h4>
+<table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 15px;" border="1">
+<tr><td style="background-color: #f9f9f9; width: 25%;"><b>Applicant Name</b></td><td style="width: 25%;">{s_data.get('app_name', '').upper()}</td><td style="background-color: #f9f9f9; width: 25%;"><b>Religion</b></td><td style="width: 25%;">{s_data.get('religion', '')}</td></tr>
+<tr><td style="background-color: #f9f9f9;"><b>Aadhaar No.</b></td><td>{masked_adh}</td><td style="background-color: #f9f9f9;"><b>Category</b></td><td>{s_data.get('category', '')}</td></tr>
+<tr><td style="background-color: #f9f9f9;"><b>Date of Birth</b></td><td>{s_data.get('dob', '')}</td><td style="background-color: #f9f9f9;"><b>Applicant Gender</b></td><td>{s_data.get('gender', '')}</td></tr>
+<tr><td style="background-color: #f9f9f9;"><b>OTR No.</b></td><td>{s_data.get('otr', '')}</td><td style="background-color: #f9f9f9;"><b>Mobile No.</b></td><td>{s_data.get('mobile', '')}</td></tr>
+<tr><td style="background-color: #f9f9f9;"><b>Father's Name</b></td><td>{s_data.get('father_name', '').upper()}</td><td style="background-color: #f9f9f9;"><b>Mother's Name</b></td><td>{s_data.get('mother_name', '').upper()}</td></tr>
+</table>
+<h4 style="background-color: #0b3a5b; color: white; padding: 5px; margin: 0;">Address Information</h4>
+<table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 15px;" border="1">
+<tr><td style="background-color: #f9f9f9; width: 25%;"><b>Address</b></td><td>{s_data.get('full_address', '').upper()}</td></tr>
+<tr><td style="background-color: #f9f9f9;"><b>State</b></td><td>{s_data.get('state', '').upper()}</td></tr>
+<tr><td style="background-color: #f9f9f9;"><b>District</b></td><td>{s_data.get('district', '').upper()}</td></tr>
+</table>
+<h4 style="background-color: #0b3a5b; color: white; padding: 5px; margin: 0;">Institute/Course Information</h4>
+<table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 15px;" border="1">
+<tr><td style="background-color: #f9f9f9; width: 25%;"><b>Institute Code</b></td><td style="width: 25%;">{s_data.get('school_code', '')}</td><td style="background-color: #f9f9f9; width: 25%;"><b>Course/Class</b></td><td style="width: 25%;">{s_data.get('class', '')}</td></tr>
+</table>
+<h4 style="background-color: #0b3a5b; color: white; padding: 5px; margin: 0;">Bank Information</h4>
+<table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 15px;" border="1">
+<tr><td style="background-color: #f9f9f9; width: 25%;"><b>Bank Name</b></td><td style="width: 25%;">{s_data.get('bank_name', '')}</td><td style="background-color: #f9f9f9; width: 25%;"><b>Branch Name</b></td><td style="width: 25%;">{s_data.get('branch_name', '')}</td></tr>
+<tr><td style="background-color: #f9f9f9;"><b>IFSC Code</b></td><td>{s_data.get('ifsc', '')}</td><td style="background-color: #f9f9f9;"><b>Account No.</b></td><td>{s_data.get('acc_no', '')}</td></tr>
+<tr><td style="background-color: #f9f9f9;"><b>Account Holder</b></td><td>{s_data.get('acc_name', '').upper()}</td><td style="background-color: #f9f9f9;"><b>Aadhaar Seeded</b></td><td>Yes</td></tr>
+</table>
+<div style="font-size: 11px; color: #555; margin-top: 20px;">
+<b>Student Declaration:</b><br>
+1. I have read and understood the conditions of award of Scholarship.<br>
+2. I am aware that my application is liable to be rejected, if it is found at any stage, that Aadhaar number provided by me is wrong.<br>
+3. I am aware that for any wrong entry or mis-match of the Bank-account details, the State Government will not be responsible.
+</div>
+</div>"""
+    return html_str
+
 def create_odisha_scholarship_pdf(filename, app_id, s_data):
     doc = SimpleDocTemplate(filename, pagesize=letter, rightMargin=30, leftMargin=30, topMargin=30, bottomMargin=30)
     elements = []
     styles = getSampleStyleSheet()
     
-    # Custom Styles
     title_style = ParagraphStyle(name='TitleStyle', fontName='Helvetica-Bold', fontSize=14, alignment=1, spaceAfter=5)
     sub_title_style = ParagraphStyle(name='SubTitleStyle', fontName='Helvetica', fontSize=10, alignment=1, spaceAfter=15)
     section_header = ParagraphStyle(name='SecHeader', fontName='Helvetica-Bold', fontSize=10, textColor=colors.white, backColor=colors.HexColor('#0b3a5b'), spaceBefore=10, spaceAfter=5, leftIndent=5)
     
-    # Title
     elements.append(Paragraph("<b>Government of Odisha</b>", title_style))
     elements.append(Paragraph("Scholarship Application Form", title_style))
     elements.append(Paragraph("ST&SC and MBC Welfare Department", title_style))
     elements.append(Paragraph(f"Academic Year {s_data.get('academic_year', '2025-26')}", sub_title_style))
     
-    # Basic Info
     elements.append(Paragraph("Basic Information", section_header))
     data1 = [
         ["Department", "Scheme", "Academic Year", "Application Type"],
@@ -268,7 +312,6 @@ def create_odisha_scholarship_pdf(filename, app_id, s_data):
     ]))
     elements.append(t1)
     
-    # Applicant Details
     elements.append(Paragraph("Applicant Details", section_header))
     adh = s_data.get('aadhaar', '')
     masked_adh = f"XXXXXXXX{adh[-4:]}" if len(adh) >= 4 else adh
@@ -291,7 +334,6 @@ def create_odisha_scholarship_pdf(filename, app_id, s_data):
     ]))
     elements.append(t2)
     
-    # Address Information
     elements.append(Paragraph("Address Information", section_header))
     data3 = [
         ["Address", s_data.get('full_address', '').upper()],
@@ -307,7 +349,6 @@ def create_odisha_scholarship_pdf(filename, app_id, s_data):
     ]))
     elements.append(t3)
     
-    # Institute Info
     elements.append(Paragraph("Institute/Course Information", section_header))
     data4 = [
         ["Institute Code", s_data.get('school_code', ''), "Course/Class", s_data.get('class', '')]
@@ -322,7 +363,6 @@ def create_odisha_scholarship_pdf(filename, app_id, s_data):
     ]))
     elements.append(t4)
     
-    # Eligibility Info
     elements.append(Paragraph("Eligibility Information", section_header))
     data5 = [
         ["Income Certificate No.", s_data.get('income_cert', ''), "Income Authority", s_data.get('inc_auth', '')],
@@ -338,7 +378,6 @@ def create_odisha_scholarship_pdf(filename, app_id, s_data):
     ]))
     elements.append(t5)
     
-    # Bank Info
     elements.append(Paragraph("Bank Information", section_header))
     data6 = [
         ["Bank Name", s_data.get('bank_name', ''), "Branch Name", s_data.get('branch_name', '')],
@@ -355,7 +394,6 @@ def create_odisha_scholarship_pdf(filename, app_id, s_data):
     ]))
     elements.append(t6)
     
-    # Status & Declarations
     elements.append(Paragraph("Application Status & Declarations", section_header))
     data7 = [
         ["Application ID", app_id],
@@ -384,61 +422,6 @@ def create_odisha_scholarship_pdf(filename, app_id, s_data):
     
     doc.build(elements)
 
-def render_odisha_scholarship_html(app_id, s_data):
-    adh = s_data.get('aadhaar', '')
-    masked_adh = f"XXXXXXXX{adh[-4:]}" if len(adh) >= 4 else adh
-    return f"""
-    <div style="font-family: Arial, sans-serif; border: 1px solid #ccc; padding: 20px; max-width: 900px; margin: auto; background-color: #fff;">
-        <div style="text-align: center; margin-bottom: 20px;">
-            <h2 style="margin: 0; color: #0b3a5b;">Government of Odisha</h2>
-            <h3 style="margin: 5px 0;">Scholarship Application Form</h3>
-            <h4 style="margin: 5px 0;">ST&SC and MBC Welfare Department</h4>
-            <p style="margin: 0;">Academic Year: <b>{s_data.get('academic_year', '2025-26')}</b></p>
-        </div>
-        
-        <h4 style="background-color: #0b3a5b; color: white; padding: 5px; margin: 0;">Basic Information</h4>
-        <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 15px;" border="1">
-            <tr style="background-color: #f2f2f2;"><th>Department</th><th>Scheme</th><th>Academic Year</th><th>Application Type</th></tr>
-            <tr style="text-align:center;"><td>ST&SC and MBC Welfare</td><td>{s_data.get('scheme', '')}</td><td>{s_data.get('academic_year', '')}</td><td>New</td></tr>
-        </table>
-        
-        <h4 style="background-color: #0b3a5b; color: white; padding: 5px; margin: 0;">Applicant Details</h4>
-        <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 15px;" border="1">
-            <tr><td style="background-color: #f9f9f9; width: 25%;"><b>Applicant Name</b></td><td style="width: 25%;">{s_data.get('app_name', '').upper()}</td><td style="background-color: #f9f9f9; width: 25%;"><b>Religion</b></td><td style="width: 25%;">{s_data.get('religion', '')}</td></tr>
-            <tr><td style="background-color: #f9f9f9;"><b>Aadhaar No.</b></td><td>{masked_adh}</td><td style="background-color: #f9f9f9;"><b>Category</b></td><td>{s_data.get('category', '')}</td></tr>
-            <tr><td style="background-color: #f9f9f9;"><b>Date of Birth</b></td><td>{s_data.get('dob', '')}</td><td style="background-color: #f9f9f9;"><b>Applicant Gender</b></td><td>{s_data.get('gender', '')}</td></tr>
-            <tr><td style="background-color: #f9f9f9;"><b>OTR No.</b></td><td>{s_data.get('otr', '')}</td><td style="background-color: #f9f9f9;"><b>Mobile No.</b></td><td>{s_data.get('mobile', '')}</td></tr>
-            <tr><td style="background-color: #f9f9f9;"><b>Father's Name</b></td><td>{s_data.get('father_name', '').upper()}</td><td style="background-color: #f9f9f9;"><b>Mother's Name</b></td><td>{s_data.get('mother_name', '').upper()}</td></tr>
-        </table>
-        
-        <h4 style="background-color: #0b3a5b; color: white; padding: 5px; margin: 0;">Address Information</h4>
-        <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 15px;" border="1">
-            <tr><td style="background-color: #f9f9f9; width: 25%;"><b>Address</b></td><td>{s_data.get('full_address', '').upper()}</td></tr>
-            <tr><td style="background-color: #f9f9f9;"><b>State</b></td><td>{s_data.get('state', '').upper()}</td></tr>
-            <tr><td style="background-color: #f9f9f9;"><b>District</b></td><td>{s_data.get('district', '').upper()}</td></tr>
-        </table>
-        
-        <h4 style="background-color: #0b3a5b; color: white; padding: 5px; margin: 0;">Institute/Course Information</h4>
-        <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 15px;" border="1">
-            <tr><td style="background-color: #f9f9f9; width: 25%;"><b>Institute Code</b></td><td style="width: 25%;">{s_data.get('school_code', '')}</td><td style="background-color: #f9f9f9; width: 25%;"><b>Course/Class</b></td><td style="width: 25%;">{s_data.get('class', '')}</td></tr>
-        </table>
-        
-        <h4 style="background-color: #0b3a5b; color: white; padding: 5px; margin: 0;">Bank Information</h4>
-        <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 15px;" border="1">
-            <tr><td style="background-color: #f9f9f9; width: 25%;"><b>Bank Name</b></td><td style="width: 25%;">{s_data.get('bank_name', '')}</td><td style="background-color: #f9f9f9; width: 25%;"><b>Branch Name</b></td><td style="width: 25%;">{s_data.get('branch_name', '')}</td></tr>
-            <tr><td style="background-color: #f9f9f9;"><b>IFSC Code</b></td><td>{s_data.get('ifsc', '')}</td><td style="background-color: #f9f9f9;"><b>Account No.</b></td><td>{s_data.get('acc_no', '')}</td></tr>
-            <tr><td style="background-color: #f9f9f9;"><b>Account Holder</b></td><td>{s_data.get('acc_name', '').upper()}</td><td style="background-color: #f9f9f9;"><b>Aadhaar Seeded</b></td><td>Yes</td></tr>
-        </table>
-        
-        <div style="font-size: 11px; color: #555; margin-top: 20px;">
-            <b>Student Declaration:</b><br>
-            1. I have read and understood the conditions of award of Scholarship.<br>
-            2. I am aware that my application is liable to be rejected, if it is found at any stage, that Aadhaar number provided by me is wrong.<br>
-            3. I am aware that for any wrong entry or mis-match of the Bank-account details, the State Government will not be responsible.
-        </div>
-    </div>
-    """
-
 def create_school_receipt_pdf(filename, sch_id, sch_data):
     c = canvas.Canvas(filename, pagesize=letter)
     c.setStrokeColorRGB(0.1, 0.5, 0.2); c.setLineWidth(4); c.rect(30, 30, 552, 732, stroke=1, fill=0)
@@ -456,6 +439,7 @@ def create_school_receipt_pdf(filename, sch_id, sch_data):
     c.setFont("Helvetica-Oblique", 10); c.drawCentredString(300, y, "Computer-generated receipt.")
     c.save()
 
+# --- FIXED RESULTS HTML (NO INDENTATION FOR STREAMLIT COMPATIBILITY) ---
 def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no, s_lang):
     disp_dob = format_display_date(st_data.get('dob', ''))
     raw_pub = st_data.get('pub_date', '')
@@ -468,45 +452,45 @@ def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no,
     qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={urllib.parse.quote(qr_text)}"
     bc_url = f"https://barcode.tec-it.com/barcode.ashx?data={roll_no}&code=Code128&dpi=96"
     rows_html = "".join([f"<tr style='border-bottom: 1px solid {b_col};'><td style='padding: 8px; border-right: 1px solid {b_col}; text-align: left; font-weight: bold; color: #000;'>{sub.upper()}</td><td style='padding: 8px; border-right: 1px solid {b_col}; color: #000;'>{m['full']}</td><td style='padding: 8px; font-weight: bold; color: #000;'>{m['obt']}</td></tr>" for sub, m in st_data.get('subjects', {}).items()])
-    return f"""
-    <div style='font-family: "Times New Roman", serif; border: 15px solid {ob}; padding: 4px; max-width: 800px; margin: auto; background-color: #fff;'>
-        <div style='border: 2px solid {b_col}; padding: 25px; background-color: {bc}; position: relative;'>
-            <div style='text-align: center; color: {b_col}; margin-bottom: 20px;'>
-                <h1 style='margin: 0; font-size: 24px; text-transform: uppercase;'>{school_name_en}</h1>
-                <h3 style='margin: 5px 0; font-size: 16px;'>ANNUAL EXAMINATION - {st_data.get('batch', '2025-2026')}</h3>
-                <p style='margin: 5px 0; font-weight: bold; font-size: 17px; text-decoration: underline;'>CERTIFICATE-CUM-MARK SHEET</p>
-            </div>
-            <table style='width: 100%; font-size: 13px; margin-bottom: 20px; font-weight: bold;'>
-                <tr><td><span style='color:{b_col};'>ROLL NO:</span> <span style='color:#000;'>{roll_no}</span></td><td style='text-align: right;'><span style='color:{b_col};'>CLASS:</span> <span style='color:#000;'>{st_data.get('class', '')}</span></td></tr>
-                <tr><td><span style='color:{b_col};'>PEN NO:</span> <span style='color:#000;'>{st_data.get('pen_no', '')}</span></td><td style='text-align: right;'><span style='color:{b_col};'>APAAR NO:</span> <span style='color:#000;'>{st_data.get('apaar_no', '')}</span></td></tr>
-            </table>
-            <table style='width: 100%; font-size: 14px; margin-bottom: 15px; text-transform: uppercase; line-height: 1.8;'>
-                <tr><td style='width: 250px; color: {b_col}; font-weight: bold;'>Certify that</td><td><b style='color:#000;'>{s_name_en}</b></td></tr>
-                <tr><td style='color: {b_col}; font-weight: bold;'>Mother's Name</td><td><b style='color:#000;'>{st_data.get('mother_name', '').upper()}</b></td></tr>
-                <tr><td style='color: {b_col}; font-weight: bold;'>Father's Name</td><td><b style='color:#000;'>{st_data.get('father_name', '').upper()}</b></td></tr>
-                <tr><td style='color: {b_col}; font-weight: bold;'>Date of Birth</td><td><b style='color:#000;'>{disp_dob}</b></td></tr>
-                <tr><td style='color: {b_col}; font-weight: bold;'>Category</td><td><b style='color:#000;'>{st_data.get('category', 'General')}</b></td></tr>
-            </table>
-            <table style='width: 100%; border-collapse: collapse; border: 2px solid {b_col}; text-align: center; font-size: 13px;'>
-                <tr style='color: {b_col}; background-color: {t_bg}; border-bottom: 2px solid {b_col};'>
-                    <th style='padding: 8px; border-right: 1px solid {b_col};'>SUBJECT</th><th style='padding: 8px; border-right: 1px solid {b_col};'>FULL MARKS</th><th style='padding: 8px;'>MARKS SECURED</th>
-                </tr>
-                {rows_html}
-                <tr style='color: {b_col}; font-weight: bold; background-color: {t_bg}; border-top: 2px solid {b_col};'>
-                    <td style='padding: 10px; border-right: 1px solid {b_col}; text-align: right;'>TOTAL MARKS</td><td style='padding: 10px; border-right: 1px solid {b_col}; color:#000;'>{st_data.get('total_full', 0)}</td><td style='padding: 10px; color:#000;'>{tot_obt}</td>
-                </tr>
-            </table>
-            <div style='text-align: center; font-weight: bold; font-size: 14px; margin-top: 20px; color:#000;'>( {w_tot_en} )</div>
-            <table style='width: 100%; margin-top: 20px; text-align: center; color: {b_col};'>
-                <tr>
-                    <td style='width: 33%; vertical-align: bottom;'><img src='{bc_url}' style='height: 35px; margin-bottom: 10px;'/><br><div style='font-size: 11px;'>DATE OF PUBLICATION</div><div style='font-weight: bold; font-size: 14px; margin-bottom: 30px; color:#000;'>{disp_pub_date}</div><div style='border-bottom: 1px solid {b_col}; width: 80%; margin: auto;'></div><div style='font-size: 11px; font-weight: bold; margin-top:5px;'>HM SIGNATURE</div></td>
-                    <td style='width: 34%; vertical-align: top;'><div style='font-size: 12px; margin-bottom: 5px;'>GRADE</div><div style='border: 2px solid {b_col}; padding: 10px 25px; display: inline-block; background-color: {t_bg};'><div style='font-weight: bold; font-size: 22px; color: #000;'>{st_data.get('grade', '')}</div></div></td>
-                    <td style='width: 33%; vertical-align: bottom;'><img src='{qr_url}' style='height: 65px; margin-bottom: 10px;'/><div style='height: 15px; margin-bottom: 30px;'></div><div style='border-bottom: 1px solid {b_col}; width: 80%; margin: auto;'></div><div style='font-size: 11px; font-weight: bold; margin-top:5px;'>CLASS TEACHER SIGNATURE</div></td>
-                </tr>
-            </table>
-        </div>
-    </div>
-    """
+    
+    html_str = f"""<div style='font-family: "Times New Roman", serif; border: 15px solid {ob}; padding: 4px; max-width: 800px; margin: auto; background-color: #fff;'>
+<div style='border: 2px solid {b_col}; padding: 25px; background-color: {bc}; position: relative;'>
+<div style='text-align: center; color: {b_col}; margin-bottom: 20px;'>
+<h1 style='margin: 0; font-size: 24px; text-transform: uppercase;'>{school_name_en}</h1>
+<h3 style='margin: 5px 0; font-size: 16px;'>ANNUAL EXAMINATION - {st_data.get('batch', '2025-2026')}</h3>
+<p style='margin: 5px 0; font-weight: bold; font-size: 17px; text-decoration: underline;'>CERTIFICATE-CUM-MARK SHEET</p>
+</div>
+<table style='width: 100%; font-size: 13px; margin-bottom: 20px; font-weight: bold;'>
+<tr><td><span style='color:{b_col};'>ROLL NO:</span> <span style='color:#000;'>{roll_no}</span></td><td style='text-align: right;'><span style='color:{b_col};'>CLASS:</span> <span style='color:#000;'>{st_data.get('class', '')}</span></td></tr>
+<tr><td><span style='color:{b_col};'>PEN NO:</span> <span style='color:#000;'>{st_data.get('pen_no', '')}</span></td><td style='text-align: right;'><span style='color:{b_col};'>APAAR NO:</span> <span style='color:#000;'>{st_data.get('apaar_no', '')}</span></td></tr>
+</table>
+<table style='width: 100%; font-size: 14px; margin-bottom: 15px; text-transform: uppercase; line-height: 1.8;'>
+<tr><td style='width: 250px; color: {b_col}; font-weight: bold;'>Certify that</td><td><b style='color:#000;'>{s_name_en}</b></td></tr>
+<tr><td style='color: {b_col}; font-weight: bold;'>Mother's Name</td><td><b style='color:#000;'>{st_data.get('mother_name', '').upper()}</b></td></tr>
+<tr><td style='color: {b_col}; font-weight: bold;'>Father's Name</td><td><b style='color:#000;'>{st_data.get('father_name', '').upper()}</b></td></tr>
+<tr><td style='color: {b_col}; font-weight: bold;'>Date of Birth</td><td><b style='color:#000;'>{disp_dob}</b></td></tr>
+<tr><td style='color: {b_col}; font-weight: bold;'>Category</td><td><b style='color:#000;'>{st_data.get('category', 'General')}</b></td></tr>
+</table>
+<table style='width: 100%; border-collapse: collapse; border: 2px solid {b_col}; text-align: center; font-size: 13px;'>
+<tr style='color: {b_col}; background-color: {t_bg}; border-bottom: 2px solid {b_col};'>
+<th style='padding: 8px; border-right: 1px solid {b_col};'>SUBJECT</th><th style='padding: 8px; border-right: 1px solid {b_col};'>FULL MARKS</th><th style='padding: 8px;'>MARKS SECURED</th>
+</tr>
+{rows_html}
+<tr style='color: {b_col}; font-weight: bold; background-color: {t_bg}; border-top: 2px solid {b_col};'>
+<td style='padding: 10px; border-right: 1px solid {b_col}; text-align: right;'>TOTAL MARKS</td><td style='padding: 10px; border-right: 1px solid {b_col}; color:#000;'>{st_data.get('total_full', 0)}</td><td style='padding: 10px; color:#000;'>{tot_obt}</td>
+</tr>
+</table>
+<div style='text-align: center; font-weight: bold; font-size: 14px; margin-top: 20px; color:#000;'>( {w_tot_en} )</div>
+<table style='width: 100%; margin-top: 20px; text-align: center; color: {b_col};'>
+<tr>
+<td style='width: 33%; vertical-align: bottom;'><img src='{bc_url}' style='height: 35px; margin-bottom: 10px;'/><br><div style='font-size: 11px;'>DATE OF PUBLICATION</div><div style='font-weight: bold; font-size: 14px; margin-bottom: 30px; color:#000;'>{disp_pub_date}</div><div style='border-bottom: 1px solid {b_col}; width: 80%; margin: auto;'></div><div style='font-size: 11px; font-weight: bold; margin-top:5px;'>HM SIGNATURE</div></td>
+<td style='width: 34%; vertical-align: top;'><div style='font-size: 12px; margin-bottom: 5px;'>GRADE</div><div style='border: 2px solid {b_col}; padding: 10px 25px; display: inline-block; background-color: {t_bg};'><div style='font-weight: bold; font-size: 22px; color: #000;'>{st_data.get('grade', '')}</div></div></td>
+<td style='width: 33%; vertical-align: bottom;'><img src='{qr_url}' style='height: 65px; margin-bottom: 10px;'/><div style='height: 15px; margin-bottom: 30px;'></div><div style='border-bottom: 1px solid {b_col}; width: 80%; margin: auto;'></div><div style='font-size: 11px; font-weight: bold; margin-top:5px;'>CLASS TEACHER SIGNATURE</div></td>
+</tr>
+</table>
+</div>
+</div>"""
+    return html_str
 
 def create_pdf(filename, school_name, st_data, roll_no):
     disp_dob = format_display_date(st_data.get('dob', ''))
@@ -792,13 +776,12 @@ elif menu == "Scholarship Portal":
                 create_odisha_scholarship_pdf(pdf_path, existing_app_id, existing_app_data)
                 
             with open(pdf_path, "rb") as f:
-                c_btn1.download_button("📥 Download PDF", f, file_name=f"Scholarship_{existing_app_id}.pdf", mime="application/pdf", key="stu_dash_dl")
+                c_btn1.download_button("📥 Download Application PDF", f, file_name=f"Scholarship_{existing_app_id}.pdf", mime="application/pdf", key="stu_dash_dl")
             
             if c_btn2.button("🖨️ Print Application", key="stu_dash_print"):
                 components.html("<script>window.parent.print();</script>", height=0)
                 
         else:
-            # SHOW THE APPLICATION FORM FOR NEW APPLICANT
             if st.session_state.get('sch_app_success'):
                 st.success("✅ Application & Payment Submitted Successfully!")
                 pdf_path = f"Scholarship_Data/Student_Submissions/{st.session_state['sch_app_id']}/Payment_Receipt_Application.pdf"
