@@ -1268,8 +1268,22 @@ elif menu == "Master Login":
                     if os.path.exists(pdf_m_file):
                         with open(pdf_m_file, "rb") as f:
                             st.download_button("📥 Download Final Application PDF", f, file_name=f"Application_{a_id}.pdf", mime="application/pdf", key=f"m_appr_pdf_{a_id}")
-                            
-                    st.write(approved_sch[a_id])
+                    
+                    app_data = approved_sch[a_id]
+                    st.markdown("### 📄 Approved Application Details")
+                    
+                    display_data = {k: v for k, v in app_data.items() if not k.endswith('_b64')}
+                    
+                    c_det1, c_det2 = st.columns(2)
+                    c_det1.write(f"**Name:** {display_data.get('app_name', '')}")
+                    c_det1.write(f"**Father's Name:** {display_data.get('father_name', '')}")
+                    c_det1.write(f"**Gender:** {display_data.get('gender', '')}")
+                    c_det1.write(f"**Mobile:** {display_data.get('mobile', '')}")
+                    c_det2.write(f"**Aadhaar:** {display_data.get('aadhaar', '')}")
+                    c_det2.write(f"**DOB:** {display_data.get('dob', '')}")
+                    c_det2.write(f"**Status:** {display_data.get('status', '')}")
+                    c_det2.write(f"**Payment Mode:** {display_data.get('payment_mode', '')}")
+
                 else:
                     st.info("No approved folders yet.")
 
@@ -1603,7 +1617,7 @@ elif menu == "School Login":
                     sc1, sc2, sc3 = st.columns(3)
                     u_sub = sc1.text_input(f"Subject {i+1}", value=def_name, key=f"s_esub_{i}_{edit_roll}")
                     u_f = sc2.number_input(f"Full Mark {i+1}", value=def_fm, key=f"s_efm_{i}_{edit_roll}")
-                    u_o = sc3.number_input(f"Obtained {i+1}", value=def_om, key=f"s_eom_{i}_{edit_roll}")
+                    u_o = sc3.number_input(f"Obtained Mark {i+1}", value=def_om, key=f"s_eom_{i}_{edit_roll}")
 
                     if u_sub.strip():
                         new_up_subjects[sanitize(u_sub)] = {"full": u_f, "obt": u_o}
@@ -1708,11 +1722,11 @@ elif menu == "Results":
                 if st.button("🖨️ Print Result Card", key="res_print_v2"):
                     components.html("<script>window.parent.print();</script>", height=0)
             elif pending_status:
-                st.warning(f"⚠️ ଆପଣଙ୍କ ରେକର୍ଡ ମିଳିଲା, କିନ୍ତୁ ଆପଣଙ୍କ Payment/Approval Status ଏବେ: '{pending_status}' ଅଛି। ଦୟାକରି Master କିମ୍ବା School ରୁ Approve କରନ୍ତୁ।")
+                st.warning(f"⚠️ Appananka record milila, kintu status ebe: '{pending_status}' achi. Master ba School ru approve karantu.")
             elif dob_mismatch:
-                st.warning("⚠️ ଆପଣ ଦେଇଥିବା ନାମ କିମ୍ବା ରୋଲ୍ ନମ୍ବର ସହ ଜନ୍ମ ତାରିଖ (Date of Birth) ମେଳ ଖାଉନାହିଁ। ଦୟାକରି ଠିକ୍ DOB ଦିଅନ୍ତୁ।")
+                st.warning("⚠️ Roll No/Name match hela kintu Date of Birth (DOB) match haunahi. Thik DOB diantu.")
             else:
-                st.error("❌ କୌଣସି ରେକର୍ଡ ମିଳିଲା ନାହିଁ! ଦୟାକରି ଠିକ୍ Roll Number କିମ୍ବା Name ଦିଅନ୍ତୁ।")
+                st.error("❌ Kaunasi record milila nahi! Roll Number au DOB re check karantu.")
 
 st.markdown("---")
 st.markdown("<div style='text-align: center; padding: 15px; background: linear-gradient(90deg, #1e3a8a, #9333ea); color: white; border-radius: 8px; font-weight: bold;'>👨‍💻 Software Developed by: KULU SUTAR | 📞 Mob: 8910223342 | ✉️ kulusutar123@gmail.com</div>", unsafe_allow_html=True)
