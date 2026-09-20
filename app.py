@@ -244,7 +244,7 @@ elif menu == "Results": st.query_params["portal"] = "student"
 classes_list = [str(i) for i in range(1, 11)]
 batches_list = [f"{y}-{y+1}" for y in range(2020, 2051)]
 
-# ----------------- HOME PAGE (DYNAMIC UI WITH GUARANTEED PHOTO RUNNING & NEWS TICKER) -----------------
+# ----------------- HOME PAGE (DYNAMIC UI WITH NEWS & GUARANTEED PHOTO RUNNING) -----------------
 if menu == "Home Page":
     bg_images = [
         "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1920",
@@ -294,8 +294,8 @@ if menu == "Home Page":
     <style>
     html, body {{ margin: 0; padding: 0; background: transparent; font-family: sans-serif; overflow: hidden; height: 100%; }}
     .carousel-container {{ width: 100%; height: 350px; overflow: hidden; border-radius: 10px; position: relative; border: 2px solid #38bdf8; box-sizing: border-box; background: rgba(15, 23, 42, 0.6); }}
-    .marquee-img {{ height: 260px; border-radius: 10px; margin-right: 20px; object-fit: contain; display: inline-block; vertical-align: middle; margin-top: 15px; border: 2px solid #fbbf24; background-color: #fff; padding: 5px; box-shadow: 2px 2px 10px rgba(0,0,0,0.5); }}
-    .carousel-overlay {{ position: absolute; bottom: 0; background: rgba(30,58,138,0.9); width: 100%; color: white; text-align: center; padding: 12px; font-weight: bold; font-size: 20px; letter-spacing: 1px; box-sizing: border-box; text-shadow: 1px 1px 2px #000; }}
+    .marquee-img {{ height: 260px; border-radius: 10px; margin-right: 20px; object-fit: contain; display: inline-block; vertical-align: middle; margin-top: 15px; border: 2px solid #fbbf24; background-color: #fff; padding: 5px; }}
+    .carousel-overlay {{ position: absolute; bottom: 0; background: rgba(30,58,138,0.9); width: 100%; color: white; text-align: center; padding: 12px; font-weight: bold; font-size: 20px; letter-spacing: 1px; box-sizing: border-box; }}
     </style></head>
     <body>
     <div class="carousel-container">
@@ -307,11 +307,11 @@ if menu == "Home Page":
     </body></html>
     """
 
-    st.markdown(f"<div class='glass-panel'><h2 style='text-align: center; color: #fbbf24; margin-top: 0; text-shadow: 1px 1px 2px #000;'>🏫 {event_title}</h2>", unsafe_allow_html=True)
+    st.markdown(f"<div class='glass-panel'><h2 style='text-align: center; color: #fbbf24; margin-top: 0;'>🏫 {event_title}</h2>", unsafe_allow_html=True)
     components.html(carousel_html, height=360)
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # 🌟 SEPARATE NOTIFICATION & NEWS TICKERS
+    # 🌟 SEPARATE NOTIFICATION & DAILY NEWS BANNERS
     notice_and_news_html = """
     <!DOCTYPE html>
     <html>
@@ -319,21 +319,21 @@ if menu == "Home Page":
     <meta charset="utf-8">
     <style>
     body { margin: 0; padding: 0; font-family: sans-serif; background: transparent; }
-    .notice-box { background-color: #1e293b; border-radius: 5px; border: 1px solid #475569; overflow: hidden; color: #e2e8f0; font-size: 18px; padding: 10px; margin-bottom: 15px; }
-    .news-box { background-color: #7f1d1d; border-radius: 5px; border: 1px solid #ef4444; overflow: hidden; color: #ffffff; font-size: 18px; padding: 10px; }
-    .label { font-size:12px; font-weight:bold; margin-bottom:4px; letter-spacing: 1px; }
+    .notice-box { background-color: rgba(30, 41, 59, 0.9); border-radius: 5px; border: 1px solid #38bdf8; overflow: hidden; color: #e2e8f0; font-size: 18px; padding: 10px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+    .news-box { background-color: rgba(127, 29, 29, 0.9); border-radius: 5px; border: 1px solid #ef4444; overflow: hidden; color: #ffffff; font-size: 18px; padding: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+    .label { font-size:13px; font-weight:bold; margin-bottom:6px; letter-spacing: 1px; }
     .new-badge { background-color: #fbbf24; color: black; font-size: 14px; font-weight: bold; padding: 2px 6px; border-radius: 3px; margin-left: 5px; }
     </style>
     </head>
     <body>
         <div class="notice-box">
-            <div class="label" style="color:#94a3b8;">📌 OFFICIAL NOTIFICATIONS & UPDATES</div>
+            <div class="label" style="color:#93c5fd;">📌 OFFICIAL NOTIFICATIONS & SOFTWARE UPDATES</div>
             <marquee direction='left' scrollamount='8' style='font-weight: bold;'>
-                <span style='color: #fbbf24;'>📢 ନୂଆ ଅପଡେଟ୍: ଛାତ୍ରଛାତ୍ରୀମାନେ ଏବେ ଅନଲାଇନ୍ ରେଜିଷ୍ଟ୍ରେସନ୍, ସ୍କଲାରସିପ୍ ଏବଂ ପେମେଣ୍ଟ କରିପାରିବେ! <span class='new-badge'>NEW</span> &nbsp;&nbsp;|&nbsp;&nbsp; 👨‍💻 Software Developed by: KULU SUTAR &nbsp;&nbsp;|&nbsp;&nbsp; 📞 Helpdesk No: 8910223342 &nbsp;&nbsp;|&nbsp;&nbsp; ✉️ Mail ID: kulusutar123@gmail.com </span>
+                <span style='color: #fbbf24;'>📢 ନୂଆ ଅପଡେଟ୍: ଛାତ୍ରଛାତ୍ରୀମାନେ ଏବେ ଅନଲାଇନ୍ ସ୍କଲାରସିପ୍ ଏବଂ ପେମେଣ୍ଟ କରିପାରିବେ! <span class='new-badge'>NEW</span> &nbsp;&nbsp;|&nbsp;&nbsp; 👨‍💻 Software Developed by: KULU SUTAR &nbsp;&nbsp;|&nbsp;&nbsp; 📞 Helpdesk No: 8910223342 &nbsp;&nbsp;|&nbsp;&nbsp; ✉️ Mail ID: kulusutar123@gmail.com </span>
             </marquee>
         </div>
         <div class="news-box">
-            <div class="label" style="color:#fca5a5;">📰 ALL INDIA DAILY BREAKING NEWS</div>
+            <div class="label" style="color:#fca5a5;">📰 ALL INDIA LATEST NEWS (LIVE UPDATES)</div>
             <marquee direction='left' scrollamount='6' style='font-weight: bold;'>
                 <span>
                 🔴 [ODISHA] ନୂଆ ଶିକ୍ଷା ନୀତି ଅନୁଯାୟୀ ସମସ୍ତ ସ୍କୁଲରେ ଡିଜିଟାଲ୍ କ୍ଲାସରୁମ୍ ଆରମ୍ଭ ହେବ! &nbsp;&nbsp;♦&nbsp;&nbsp; 
@@ -348,15 +348,19 @@ if menu == "Home Page":
     </body>
     </html>
     """
-    st.markdown("<div class='glass-panel' style='padding: 10px;'>", unsafe_allow_html=True)
-    components.html(notice_and_news_html, height=180)
-    st.markdown("</div>", unsafe_allow_html=True)
+    components.html(notice_and_news_html, height=190)
 
-    c1, c2, c3, c4 = st.columns(4)
-    with c1: st.markdown("<a href='?portal=scholarship' target='_self' class='login-card' style='border-bottom: 5px solid #10b981;'><div class='login-title'>💰 Scholarship</div><div class='login-sub'>Apply Now</div></a>", unsafe_allow_html=True)
-    with c2: st.markdown("<a href='?portal=reg_student' target='_self' class='login-card'><div class='login-title'>👨‍🎓 New Student</div><div class='login-sub'>Apply for admission</div></a>", unsafe_allow_html=True)
-    with c3: st.markdown("<a href='?portal=reg_school' target='_self' class='login-card'><div class='login-title'>🏫 New School</div><div class='login-sub'>Register institution</div></a>", unsafe_allow_html=True)
-    with c4: st.markdown("<a href='?portal=master' target='_self' class='login-card'><div class='login-title'>🏛️ Master Login</div><div class='login-sub'>Admin Portal</div></a>", unsafe_allow_html=True)
+    # ALL 6 BUTTONS DISPLAYED ON HOME PAGE
+    c1, c2, c3 = st.columns(3)
+    with c1: 
+        st.markdown("<a href='?portal=scholarship' target='_self' class='login-card' style='border-bottom: 5px solid #10b981;'><div class='login-title'>💰 Scholarship</div><div class='login-sub'>Apply Now</div></a>", unsafe_allow_html=True)
+        st.markdown("<a href='?portal=master' target='_self' class='login-card'><div class='login-title'>🏛️ Master Login</div><div class='login-sub'>Admin Portal</div></a>", unsafe_allow_html=True)
+    with c2: 
+        st.markdown("<a href='?portal=reg_student' target='_self' class='login-card'><div class='login-title'>👨‍🎓 New Student</div><div class='login-sub'>Apply for admission</div></a>", unsafe_allow_html=True)
+        st.markdown("<a href='?portal=school' target='_self' class='login-card'><div class='login-title'>🏫 School Login</div><div class='login-sub'>School / College Portal</div></a>", unsafe_allow_html=True)
+    with c3: 
+        st.markdown("<a href='?portal=reg_school' target='_self' class='login-card'><div class='login-title'>🏫 New School</div><div class='login-sub'>Register institution</div></a>", unsafe_allow_html=True)
+        st.markdown("<a href='?portal=student' target='_self' class='login-card' style='border-bottom: 5px solid #ec4899;'><div class='login-title'>🎓 Check Results</div><div class='login-sub'>Download Student Rank Card</div></a>", unsafe_allow_html=True)
 
 # ----------------- SCHOLARSHIP PORTAL -----------------
 elif menu == "Scholarship Portal":
@@ -729,9 +733,8 @@ elif menu == "New Student Registration":
             if st.button("Cancel"):
                 st.session_state['payment_step'] = False; st.rerun()
 
-# ----------------- NEW SCHOOL REGISTRATION WITH DYNAMIC FEES -----------------
+# ----------------- NEW SCHOOL REGISTRATION -----------------
 elif menu == "New School Registration":
-    st.query_params["portal"] = "reg_school"
     c_home, c_title = st.columns([1, 8])
     with c_home:
         if st.button("🏠 Home", key="reg_sch_home"):
@@ -836,64 +839,18 @@ elif menu == "New School Registration":
         st.markdown("### 💳 Secure Payment Gateway for School")
         s_temp_obj = st.session_state.get('temp_school_data')
         if s_temp_obj:
-            st.markdown(f"""
-            <div style='background-color:#eff6ff; border:1px solid #bfdbfe; padding:15px; border-radius:8px; margin-bottom:15px;'>
-                <b>School Name:</b> {s_temp_obj['data']['name'].upper()}<br>
-                <b>School Registration Base Fee:</b> ₹{s_base_fee:.2f}<br>
-                <b>GST ({s_gst_pct}%):</b> ₹{s_gst_amt:.2f}<br>
-                <hr style='margin:8px 0;'>
-                <b style='color:#1e3a8a; font-size:18px;'>Total Payable Amount: ₹{s_total_fee:.2f}</b>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            s_pay_mode = st.radio("Select Payment Mode", ["Online Payment (UPI/QR)", "Offline Payment (Direct)"])
-            
-            if s_pay_mode == "Online Payment (UPI/QR)":
-                master_upi = master_db.get("upi_id", "school@sbi")
-                upi_url = f"upi://pay?pa={master_upi}&pn=SchoolReg&am={s_total_fee:.2f}&cu=INR"
-                qr_api = f"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={urllib.parse.quote(upi_url)}"
-                
-                col_qr, col_form = st.columns([1, 2])
-                with col_qr:
-                    st.markdown(f"<img src='{qr_api}' style='border:5px solid #1E3A8A; border-radius:10px;'>", unsafe_allow_html=True)
-                    st.markdown(f"**UPI ID:** `{master_upi}`")
-                    
-                with col_form:
-                    st.warning(f"Scan the QR code to pay ₹{s_total_fee:.2f}.")
-                    txn_id = st.text_input("Enter 12-digit Transaction ID / UTR No. *")
-                    if st.button("Verify & Submit School Registration", type="primary"):
-                        if not txn_id or len(txn_id) < 8:
-                            st.error("Please enter a valid Transaction ID.")
-                        else:
-                            reg_data = st.session_state['temp_school_data']
-                            reg_data['data']['payment_mode'] = f"Online (₹{s_total_fee:.2f} - Txn: {sanitize(txn_id)})"
-                            schools_db[reg_data["school_id"]] = reg_data["data"]
-                            save_data(schools_db, students_db)
-                            
-                            st.session_state['sch_reg_success'] = True
-                            st.session_state['sch_reg_id'] = reg_data['school_id']
-                            st.session_state['sch_reg_data'] = reg_data['data']
-                            st.session_state['school_payment_step'] = False
-                            st.session_state['temp_school_data'] = None
-                            st.rerun()
-
-            elif s_pay_mode == "Offline Payment (Direct)":
-                st.info(f"Offline Payment: Please pay ₹{s_total_fee:.2f} to the authorities.")
-                if st.button("Submit School Registration", type="primary"):
-                    reg_data = st.session_state['temp_school_data']
-                    reg_data['data']['payment_mode'] = f"Offline (₹{s_total_fee:.2f} - Pending)"
-                    schools_db[reg_data["school_id"]] = reg_data["data"]
-                    save_data(schools_db, students_db)
-                    
-                    st.session_state['sch_reg_success'] = True
-                    st.session_state['sch_reg_id'] = reg_data['school_id']
-                    st.session_state['sch_reg_data'] = reg_data['data']
-                    st.session_state['school_payment_step'] = False
-                    st.session_state['temp_school_data'] = None
-                    st.rerun()
-                    
-            if st.button("⬅️ Back to Form"):
+            st.info(f"School Name: **{s_temp_obj['data']['name'].upper()}** | Total Amount: **₹{s_total_fee:.2f}**")
+            s_pay_mode = st.radio("Select Payment Mode", ["Online Payment (UPI/QR)", "Offline Payment"])
+            if st.button("Verify & Submit School Registration", type="primary"):
+                reg_data = st.session_state['temp_school_data']
+                reg_data['data']['payment_mode'] = f"{s_pay_mode.split(' ')[0]} (₹{s_total_fee:.2f})"
+                schools_db[reg_data["school_id"]] = reg_data["data"]
+                save_data(schools_db, students_db)
+                st.session_state['sch_reg_success'] = True
+                st.session_state['sch_reg_id'] = reg_data['school_id']
+                st.session_state['sch_reg_data'] = reg_data['data']
                 st.session_state['school_payment_step'] = False
+                st.session_state['temp_school_data'] = None
                 st.rerun()
 
 # ----------------- MASTER LOGIN -----------------
