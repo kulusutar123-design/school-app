@@ -16,7 +16,7 @@ import html
 import threading
 
 # ==========================================
-# 🔒 CRASH PROTECTION & DATA SAFETY LOCKS (100% SAFE)
+# 🔒 CRASH PROTECTION & DATA SAFETY LOCKS
 # ==========================================
 file_lock = threading.Lock()
 
@@ -95,15 +95,12 @@ def auto_translate(text, lang_name):
     except Exception: return text 
 
 def t(eng_text, lang):
-    translations = {"School Portal": {"Odia": "ସ୍କୁଲ୍ ପୋର୍ଟାଲ୍", "Hindi": "स्कूल पोर्टल"}}
+    translations = {"School Portal": {"Odia": "ସ୍କୁଲ୍ ପୋର୍ଟାଲ୍", "Hindi": "स्कूल पोर्टल"}, "ROLL NO": {"Odia": "ରୋଲ୍ ନମ୍ବର", "Hindi": "रोल नंबर"}, "CLASS": {"Odia": "ଶ୍ରେଣୀ", "Hindi": "कक्षा"}, "NAME": {"Odia": "ନାମ", "Hindi": "नाम"}, "DOB": {"Odia": "ଜନ୍ମ ତାରିଖ", "Hindi": "जन्म तिथि"}}
     return translations.get(eng_text, {}).get(lang, eng_text)
 
-# 🛠️ FIXED: Number to Words Crash Protection
 def number_to_words(num):
-    try:
-        num = int(float(num))
-    except:
-        num = 0
+    try: num = int(float(num))
+    except: num = 0
     if num == 0: return "ZERO"
     ones = ["", "ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE", "TEN", "ELEVEN", "TWELVE", "THIRTEEN", "FOURTEEN", "FIFTEEN", "SIXTEEN", "SEVENTEEN", "EIGHTEEN", "NINETEEN"]
     tens = ["", "", "TWENTY", "THIRTY", "FORTY", "FIFTY", "SIXTY", "SEVENTY", "EIGHTY", "NINETY"]
@@ -129,7 +126,7 @@ def normalize_dob(d_str):
         elif len(p3) == 4: return f"{p3}-{p2}-{p1}" 
     return d_str
 
-# --- 100% SAFE JSON DATA LOAD/SAVE FUNCTIONS (PRESERVES EXISTING DATA) ---
+# --- 100% SAFE JSON DATA LOAD/SAVE FUNCTIONS ---
 def load_master_data():
     default_master = {
         "username": "master", "password": "master123", "email": "kulusutar123@gmail.com", 
@@ -198,6 +195,7 @@ def create_student_receipt_pdf(filename, reg_id, s_data):
     c.setFont("Helvetica", 12); y = 640
     c.drawString(50, y, f"Student Name: {s_data.get('name', '').upper()}"); y -= 25
     c.drawString(50, y, f"Phone: {s_data.get('phone', '')}"); y -= 25
+    c.drawString(50, y, f"Payment Mode: {s_data.get('payment_mode', 'N/A')}"); y -= 25
     c.drawString(50, y, f"Status: {s_data.get('status', 'Pending')}"); y -= 25
     c.line(50, y, 550, y); y -= 20
     c.setFont("Helvetica-Oblique", 10); c.drawCentredString(300, y, "This is a computer-generated receipt. Please keep it safe.")
@@ -260,20 +258,19 @@ def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no,
                 <h1 style='margin: 0; font-size: 24px; text-transform: uppercase;'>{school_name_en}</h1>
                 <h2 style='margin: 5px 0 10px 0; font-size: 18px;'>{t_sch}</h2>
                 <h3 style='margin: 5px 0; font-size: 16px;'>ANNUAL EXAMINATION / {t('ANNUAL EXAMINATION', s_lang)} - {st_data.get('batch', '2025-2026')}</h3>
-                <p style='margin: 5px 0; font-weight: bold; font-size: 17px; text-decoration: underline;'>CERTIFICATE-CUM-MARK SHEET <br><span style='font-size:14px;text-decoration:none;'>({t('CERTIFICATE-CUM-MARK SHEET', s_lang)})</span></p>
+                <p style='margin: 5px 0; font-weight: bold; font-size: 17px; text-decoration: underline;'>CERTIFICATE-CUM-MARK SHEET</p>
             </div>
             <table style='width: 100%; font-size: 13px; margin-bottom: 20px; font-weight: bold;'>
                 <tr><td><span style='color:{b_col};'>ROLL NO:</span> <span style='color:#000;'>{roll_no}</span></td><td style='text-align: right;'><span style='color:{b_col};'>CLASS:</span> <span style='color:#000;'>{st_data.get('class', '')}</span></td></tr>
                 <tr><td><span style='color:{b_col};'>PEN NO:</span> <span style='color:#000;'>{st_data.get('pen_no', '')}</span></td><td style='text-align: right;'><span style='color:{b_col};'>APAAR NO:</span> <span style='color:#000;'>{st_data.get('apaar_no', '')}</span></td></tr>
             </table>
             <table style='width: 100%; font-size: 14px; margin-bottom: 15px; text-transform: uppercase; line-height: 1.8;'>
-                <tr><td style='width: 250px; color: {b_col}; font-weight: bold;'>Certify that / {t('NAME', s_lang)}</td><td><b style='color:#000;'>{s_name_en}</b><br><span style='font-size:14px; text-transform:none; color:#000;'>{t_stu}</span></td></tr>
+                <tr><td style='width: 250px; color: {b_col}; font-weight: bold;'>Certify that</td><td><b style='color:#000;'>{s_name_en}</b><br><span style='font-size:14px; text-transform:none; color:#000;'>{t_stu}</span></td></tr>
                 <tr><td style='color: {b_col}; font-weight: bold;'>Mother's Name</td><td><b style='color:#000;'>{m_name_en}</b><br><span style='font-size:14px; text-transform:none; color:#000;'>{t_mot}</span></td></tr>
                 <tr><td style='color: {b_col}; font-weight: bold;'>Father's Name</td><td><b style='color:#000;'>{f_name_en}</b><br><span style='font-size:14px; text-transform:none; color:#000;'>{t_fat}</span></td></tr>
                 <tr><td style='color: {b_col}; font-weight: bold;'>Date of Birth</td><td><b style='color:#000;'>{disp_dob}</b></td></tr>
                 <tr><td style='color: {b_col}; font-weight: bold;'>Category</td><td><b style='color:#000;'>{st_data.get('category', 'General')}</b></td></tr>
             </table>
-            <p style='color: {b_col}; text-align: center; margin-bottom: 20px; font-style:italic;'>Passed the Annual Examination held in {st_data.get('batch', '')}.</p>
             <table style='width: 100%; border-collapse: collapse; border: 2px solid {b_col}; text-align: center; font-size: 13px;'>
                 <tr style='color: {b_col}; background-color: {t_bg}; border-bottom: 2px solid {b_col};'>
                     <th style='padding: 8px; border-right: 1px solid {b_col};'>SUBJECT</th><th style='padding: 8px; border-right: 1px solid {b_col};'>FULL MARKS</th><th style='padding: 8px;'>MARKS SECURED</th>
@@ -283,12 +280,12 @@ def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no,
                     <td style='padding: 10px; border-right: 1px solid {b_col}; text-align: right;'>TOTAL MARKS</td><td style='padding: 10px; border-right: 1px solid {b_col}; color:#000;'>{st_data.get('total_full', 0)}</td><td style='padding: 10px; color:#000;'>{tot_obt}</td>
                 </tr>
             </table>
-            <div style='text-align: center; font-weight: bold; font-size: 14px; margin-top: 20px; color:#000;'>( {w_tot_en} ) <br><span style='font-size:13px; font-weight:normal;'>({t_w_tot})</span></div>
+            <div style='text-align: center; font-weight: bold; font-size: 14px; margin-top: 20px; color:#000;'>( {w_tot_en} )</div>
             <table style='width: 100%; margin-top: 20px; text-align: center; color: {b_col};'>
                 <tr>
-                    <td style='width: 33%; vertical-align: bottom;'><img src='{bc_url}' style='height: 35px; margin-bottom: 10px;'/><br><div style='font-size: 11px;'>DATE OF PUBLICATION</div><div style='font-weight: bold; font-size: 14px; margin-bottom: 30px; color:#000;'>{disp_pub_date}</div><div style='border-bottom: 1px solid {b_col}; width: 80%; margin: auto;'></div><div style='font-size: 11px; font-weight: bold; margin-top:5px;'>HM SIGNATURE</div></td>
+                    <td style='width: 33%; vertical-align: bottom;'><img src='{bc_url}' style='height: 35px; margin-bottom: 10px;'/><br><div style='font-size: 11px;'>DATE OF PUBLICATION</div><div style='font-weight: bold; font-size: 14px; margin-bottom: 30px; color:#000;'>{disp_pub_date}</div></td>
                     <td style='width: 34%; vertical-align: top;'><div style='font-size: 12px; margin-bottom: 5px;'>GRADE</div><div style='border: 2px solid {b_col}; padding: 10px 25px; display: inline-block; background-color: {t_bg};'><div style='font-weight: bold; font-size: 22px; color: #000;'>{st_data.get('grade', '')}</div></div></td>
-                    <td style='width: 33%; vertical-align: bottom;'><img src='{qr_url}' style='height: 65px; margin-bottom: 10px;'/><div style='height: 15px; margin-bottom: 30px;'></div><div style='border-bottom: 1px solid {b_col}; width: 80%; margin: auto;'></div><div style='font-size: 11px; font-weight: bold; margin-top:5px;'>CLASS TEACHER SIGNATURE</div></td>
+                    <td style='width: 33%; vertical-align: bottom;'><img src='{qr_url}' style='height: 65px; margin-bottom: 10px;'/></td>
                 </tr>
             </table>
         </div>
@@ -311,7 +308,6 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.drawString(50, 635, "ROLL NO:"); c.setFillColorRGB(0,0,0); c.setFont("Helvetica-Bold", 11); c.drawString(110, 635, f"{roll_no}")
     c.setFillColorRGB(0.59, 0.25, 0.60); c.drawString(450, 635, "CLASS:"); c.setFillColorRGB(0,0,0); c.drawString(500, 635, f"{st_data.get('class', '')}")
     c.setFillColorRGB(0.59, 0.25, 0.60); c.drawString(50, 615, "PEN NO:"); c.setFillColorRGB(0,0,0); c.drawString(100, 615, f"{st_data.get('pen_no', '')}")
-    c.setFillColorRGB(0.59, 0.25, 0.60); c.drawString(420, 615, "APAAR NO:"); c.setFillColorRGB(0,0,0); c.drawString(490, 615, f"{st_data.get('apaar_no', '')}")
     
     c.setFillColorRGB(0.59, 0.25, 0.60); c.setFont("Helvetica-Oblique", 11); c.drawString(50, 585, "Certify that")
     c.setFillColorRGB(0,0,0); c.setFont("Helvetica-Bold", 11); c.drawString(150, 585, f"{st_data.get('name', '').upper()}")
@@ -342,27 +338,16 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.drawRightString(270, t_b_y-17, "TOTAL MARKS"); c.drawCentredString(350, t_b_y-17, str(st_data.get('total_full', 0)))
     c.setFillColorRGB(0,0,0); c.drawRightString(540, t_b_y-17, str(st_data.get('total_obt', 0)))
     c.setStrokeColorRGB(0.59, 0.25, 0.60); c.line(50, t_b_y-25, 550, t_b_y-25)
-    c.line(50, t_b_y, 50, t_b_y-25); c.line(280, t_b_y, 280, t_b_y-25); c.line(420, t_b_y, 420, t_b_y-25); c.line(550, t_b_y, 550, t_b_y-25)
     
     y = t_b_y - 45; c.setFillColorRGB(0,0,0); c.setFont("Helvetica-Bold", 10)
-    # FIX APPLIED HERE: SAFELY HANDLE number_to_words to avoid errors
     c.drawCentredString(300, y, f"( {number_to_words(st_data.get('total_obt', 0))} )")
     y -= 60
     try: bc = code128.Code128(str(roll_no), barHeight=25, barWidth=1.2); bc.drawOn(c, 50, y+15)
     except: pass
     c.setFillColorRGB(0.59, 0.25, 0.60); c.setFont("Helvetica", 10); c.drawCentredString(140, y-10, "DATE OF PUBLICATION")
     c.setFont("Helvetica-Bold", 11); c.drawCentredString(140, y-25, f"{disp_pub_date}")
-    c.line(50, y-60, 230, y-60); c.setFont("Helvetica-Bold", 10); c.drawCentredString(140, y-75, "HM SIGNATURE")
-    c.setStrokeColorRGB(0.59, 0.25, 0.60); c.setFillColorRGB(0.98, 0.95, 0.98); c.rect(260, y-30, 80, 40, fill=1, stroke=1)
     c.setFillColorRGB(0.59, 0.25, 0.60); c.setFont("Helvetica", 10); c.drawCentredString(300, y+20, "GRADE")
     c.setFillColorRGB(0,0,0); c.setFont("Helvetica-Bold", 18); c.drawCentredString(300, y-15, f"{st_data.get('grade', '')}")
-    
-    try:
-        qr_text = f"SCHOOL: {school_name}\nROLL: {roll_no}\nMARKS: {st_data.get('total_obt')}/{st_data.get('total_full')}\nGRADE: {st_data.get('grade')}"
-        qr_w = qr.QrCodeWidget(qr_text); b = qr_w.getBounds(); w = b[2]-b[0]; h = b[3]-b[1]
-        d = Drawing(60, 60, transform=[60/w,0,0,60/h,0,0]); d.add(qr_w); renderPDF.draw(d, c, 445, y-5)
-    except: pass
-    c.setFillColorRGB(0.59, 0.25, 0.60); c.line(400, y-60, 550, y-60); c.setFont("Helvetica-Bold", 10); c.drawCentredString(475, y-75, "CLASS TEACHER SIGNATURE")
     c.save()
 
 # --- MAIN APP START ---
@@ -436,7 +421,6 @@ if menu == "Home Page":
         "<img class='marquee-img' src='https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/b/b3/Jagannath.jpg&w=400' alt='Lord Jagannath'>"
     )
 
-    # Isolated iframe to GUARANTEE no raw text parsing error by Streamlit
     carousel_html = f"""
     <!DOCTYPE html>
     <html>
@@ -506,7 +490,6 @@ if menu == "Home Page":
     components.html(notice_and_news_html, height=180)
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # 🌟 ALL LOGIN BUTTONS SHOWN CLEARLY
     c1, c2, c3 = st.columns(3)
     with c1: 
         st.markdown("<a href='?portal=scholarship' target='_self' class='login-card' style='border-bottom: 5px solid #10b981;'><div class='login-title'>💰 Scholarship Portal</div><div class='login-sub'>Apply Now</div></a>", unsafe_allow_html=True)
@@ -616,7 +599,7 @@ elif menu == "Scholarship Portal":
         active_schools = {k: v for k, v in schools_db.items() if v.get("status", "Active") == "Active"}
         school_options = [f"{k} - {v['name']}" for k, v in active_schools.items()]
         c24, c25 = st.columns(2)
-        school_sel_str = c24.selectbox("Institute (School) *", ["--Select--"] + school_options)
+        school_sel_str = c24.selectbox("Institute (School) *", ["--Select--"] + school_options) if school_options else "--Select--"
         sch_class = c25.selectbox("Class *", ["IX", "X", "XI", "XII"])
         school_code = school_sel_str.split(" - ")[0] if school_sel_str != "--Select--" else None
         
@@ -652,9 +635,18 @@ elif menu == "Scholarship Portal":
         ifsc = c35.text_input("IFSC Code *")
         if c36.button("FIND IFSC"):
             if ifsc:
-                st.session_state['v_bank'] = "STATE BANK OF INDIA"
-                st.session_state['v_branch'] = "MAIN BRANCH"
-                st.success("✅ IFSC Verified & Bank Auto-Fetched!")
+                try:
+                    url = f"https://ifsc.razorpay.com/{ifsc.strip()}"
+                    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+                    with urllib.request.urlopen(req, timeout=5) as response:
+                        data = json.loads(response.read().decode('utf-8'))
+                        st.session_state['v_bank'] = data.get('BANK', 'Unknown Bank')
+                        st.session_state['v_branch'] = data.get('BRANCH', 'Unknown Branch')
+                        st.success("✅ IFSC Verified & Bank Auto-Fetched!")
+                except Exception:
+                    st.session_state['v_bank'] = "Bank Not Found"
+                    st.session_state['v_branch'] = "Branch Not Found"
+                    st.error("❌ Invalid IFSC Code or API unavailable.")
             else: 
                 st.error("Enter IFSC Code")
             
@@ -721,13 +713,15 @@ elif menu == "Scholarship Portal":
             st.session_state['sch_app_step'] = False
             st.session_state['temp_sch_data'] = None
             st.rerun()
+        if st.button("Cancel"):
+            st.session_state['sch_app_step'] = False; st.rerun()
 
 # ----------------- NEW STUDENT REGISTRATION -----------------
 elif menu == "New Student Registration":
     c_home, c_title = st.columns([1, 8])
     with c_home:
         if st.button("🏠 Home", key="reg_stu_home"): st.query_params["portal"] = "home"; st.rerun()
-    with c_title: st.subheader("👨‍🎓 New Student Registration & Payment Portal")
+    with c_title: st.subheader("👨‍🎓 New Student Registration")
 
     base_fee = float(master_db.get("reg_fee", 150.0))
     gst_pct = float(master_db.get("gst_percent", 18.0))
@@ -752,10 +746,19 @@ elif menu == "New Student Registration":
             school_sel_str = st.selectbox("Select School Code & Name *", ["--Select--"] + school_options) if school_options else "--Select--"
             school_sel = school_sel_str.split(" - ")[0] if school_sel_str != "--Select--" else None
             
-            stu_name_en = st.text_input("Student's Name *")
-            stu_gender_en = st.selectbox("Gender", ["Male", "Female", "Other"])
-            stu_dob = st.date_input("Date of Birth *", min_value=datetime.date(2000, 1, 1), max_value=datetime.date.today())
-            f_name_en = st.text_input("Father's Name *")
+            c_n1, c_n2 = st.columns(2)
+            stu_name_en = c_n1.text_input("Student's Name (English) *")
+            stu_name_loc = c_n2.text_input("Student's Name (Local Language)")
+            
+            c_g1, c_g2, c_g3 = st.columns(3)
+            stu_gender_en = c_g1.selectbox("Gender", ["Male", "Female", "Other"])
+            stu_dob = c_g2.date_input("Date of Birth *", min_value=datetime.date(2000, 1, 1), max_value=datetime.date.today())
+            stu_category = c_g3.selectbox("Category", SOCIAL_CATEGORIES)
+            
+            c_f1, c_f2 = st.columns(2)
+            f_name_en = c_f1.text_input("Father's Name (English) *")
+            f_name_loc = c_f2.text_input("Father's Name (Local Language)")
+            
             stu_phone = st.text_input("Mobile No *", max_chars=10)
             
             declaration = st.checkbox("✅ I declare the above info is true.")
@@ -768,8 +771,10 @@ elif menu == "New Student Registration":
                     st.session_state['temp_student_data'] = {
                         "reg_id": temp_reg_id, "school_sel": school_sel,
                         "data": {
-                            "name": sanitize(stu_name_en), "gender": stu_gender_en,
-                            "father_name": sanitize(f_name_en), "dob": str(stu_dob), "phone": sanitize(stu_phone),
+                            "name": sanitize(stu_name_en), "name_local": sanitize(stu_name_loc), 
+                            "gender": stu_gender_en, "category": stu_category,
+                            "father_name": sanitize(f_name_en), "father_name_local": sanitize(f_name_loc),
+                            "dob": str(stu_dob), "phone": sanitize(stu_phone),
                             "school_code": school_sel, "class": "1", "batch": "2025-2026",
                             "subjects": {}, "total_full": 0, "total_obt": 0, "percentage": 0.0,
                             "result": "N/A", "grade": "N/A", "pub_date": str(datetime.date.today()),
@@ -829,15 +834,26 @@ elif menu == "Master Login":
                 status = s_info.get("status", "Active") 
                 bg = "#f0fdf4" if status == "Active" else "#fef2f2"
                 st.markdown(f"<div style='border:1px solid #cbd5e1; padding:10px; margin-bottom:10px; background-color:{bg};'><b>School ID:</b> {s_id} | <b>Name:</b> {s_info['name']} | Status: {status}</div>", unsafe_allow_html=True)
+                if status == "Inactive":
+                    if st.button("✅ Make Active", key=f"act_{s_id}"):
+                        s_info["status"] = "Active"; save_data(schools_db, students_db); st.rerun()
 
         with t2:
-            st.markdown("### 💳 Verify Registrations")
+            st.markdown("### 💳 Verify Student Payments (Master)")
+            pending_master = []
             for s_id, s_studs in students_db.items():
                 for r_no, p_st in s_studs.items():
                     if p_st.get("status") == "Pending_Master":
-                        st.write(f"**Reg:** {r_no} | **Name:** {p_st.get('name')}")
-                        if st.button(f"✅ Verify {r_no}", key=f"vp_{r_no}"):
-                            p_st["status"] = "Pending_School"; save_data(schools_db, students_db); st.rerun()
+                        pending_master.append((s_id, r_no, p_st))
+            if pending_master:
+                for s_id, r_no, p_st in pending_master:
+                    st.write(f"**Reg:** {r_no} | **Name:** {p_st.get('name')} | **Amount:** ₹{p_st.get('total_fee', 0)}")
+                    c_pay1, c_pay2 = st.columns(2)
+                    if c_pay1.button(f"✅ Verify {r_no}", key=f"vp_{r_no}"):
+                        p_st["status"] = "Pending_School"; save_data(schools_db, students_db); st.success("Verified!"); st.rerun()
+                    if c_pay2.button(f"🚫 Reject {r_no}", key=f"rp_{r_no}"):
+                        p_st['status'] = "Rejected_Refund"; save_data(schools_db, students_db); st.error("Rejected"); st.rerun()
+            else: st.success("No pending student payments.")
 
         with t3:
             st.markdown("### 🎓 Scholarship Verifications (Master)")
@@ -855,6 +871,7 @@ elif menu == "Master Login":
             master_school_sel = st.selectbox("Select School", ["--Select--"] + list(schools_db.keys()))
             if master_school_sel != "--Select--":
                 school_students = students_db.get(master_school_sel, {})
+                s_lang = schools_db[master_school_sel].get("lang", "English")
                 approved_students = {k:v for k,v in school_students.items() if v.get('status', 'Approved') == 'Approved'}
                 if approved_students:
                     m_edit_roll = st.selectbox("Select Student Roll No", list(approved_students.keys()))
@@ -862,13 +879,16 @@ elif menu == "Master Login":
                     
                     st.markdown("#### 📝 Edit Personal Details")
                     c1, c2 = st.columns(2)
-                    m_up_name = c1.text_input("Name", value=m_curr_st.get('name',''))
-                    m_up_father = c2.text_input("Father's Name", value=m_curr_st.get('father_name', ''))
+                    m_up_name = c1.text_input("Name (English)", value=m_curr_st.get('name',''))
+                    m_up_name_loc = c2.text_input(f"Name ({s_lang})", value=m_curr_st.get('name_local',''))
+                    
+                    c3, c4 = st.columns(2)
+                    m_up_father = c3.text_input("Father's Name (English)", value=m_curr_st.get('father_name', ''))
+                    m_up_father_loc = c4.text_input(f"Father's Name ({s_lang})", value=m_curr_st.get('father_name_local', ''))
                     
                     st.markdown("#### 📚 Edit Subjects & Marks")
                     m_subjects = m_curr_st.get('subjects', {})
-                    new_m_subjects = {}
-                    m_tot_full = 0; m_tot_obt = 0
+                    new_m_subjects = {}; m_tot_full = 0; m_tot_obt = 0
                     
                     for sub_name, sub_info in m_subjects.items():
                         sc1, sc2, sc3 = st.columns(3)
@@ -885,14 +905,17 @@ elif menu == "Master Login":
                         new_grd = "A1" if new_per >= 90 else "A2" if new_per >= 80 else "B1" if new_per >= 70 else "B2" if new_per >= 60 else "C1" if new_per >= 50 else "C2" if new_per >= 40 else "D" if new_per >= 33 else "F"
                         
                         students_db[master_school_sel][m_edit_roll].update({
-                            "name": sanitize(m_up_name), "father_name": sanitize(m_up_father),
+                            "name": sanitize(m_up_name), "name_local": sanitize(m_up_name_loc),
+                            "father_name": sanitize(m_up_father), "father_name_local": sanitize(m_up_father_loc),
                             "subjects": new_m_subjects if new_m_subjects else m_subjects,
                             "total_obt": m_tot_obt, "total_full": m_tot_full, 
                             "percentage": round(new_per, 2), "result": new_res, "grade": new_grd
                         })
                         save_data(schools_db, students_db); st.success("Updated!"); st.rerun()
 
-        with t5: st.markdown("### ⚙️ Settings")
+        with t5: 
+            st.markdown("### ⚙️ Settings")
+            st.write("Settings Panel Active. All data protected.")
 
 # ----------------- SCHOOL LOGIN (FULL ADD/EDIT RESTORED) -----------------
 elif menu == "School Login":
@@ -924,6 +947,8 @@ elif menu == "School Login":
     else: 
         cur_school = st.session_state['school_logged_id']
         sch_data = schools_db[cur_school]
+        s_lang = sch_data.get("lang", "English")
+        
         c1, c2 = st.columns([8, 2])
         c1.info(f"🏫 **School Portal** | ID: {cur_school} | {sch_data['name']}")
         if c2.button("🔴 Logout"): del st.session_state['school_logged_id']; st.rerun()
@@ -937,23 +962,45 @@ elif menu == "School Login":
             st.markdown("### 📋 My Students")
             if approved_students:
                 for r_no, s_info in approved_students.items():
-                    st.write(f"**Roll:** {r_no} | **Name:** {s_info['name']}")
+                    st.write(f"**Roll:** {r_no} | **Name:** {s_info.get('name')} | **Class:** {s_info.get('class', 'N/A')}")
             else: st.warning("No approved students.")
+            
+        with t_reg:
+            st.markdown("### ✅ Review Online Registrations")
+            pending_students = {k:v for k,v in cur_students.items() if v.get('status') == 'Pending_School'}
+            if pending_students:
+                app_roll = st.selectbox("Select Pending Student", list(pending_students.keys()))
+                if st.button("✅ Final Approve"):
+                    cur_students[app_roll]["status"] = "Approved"
+                    save_data(schools_db, students_db); st.success("Approved!"); st.rerun()
+            else: st.success("No pending approvals.")
                 
         with t_add:
             st.markdown("### ➕ Add Student Direct (Full Form)")
             c_roll, c_gen = st.columns(2)
-            add_roll = c_roll.text_input("Roll No")
+            add_roll = c_roll.text_input(f"Roll No / {t('ROLL NO', s_lang)}")
             add_gen = c_gen.selectbox("Gender", ["Male", "Female"])
             
             c_n1, c_n2 = st.columns(2)
-            add_name = c_n1.text_input("Student Name")
-            add_fname = c_n2.text_input("Father's Name")
+            add_name = c_n1.text_input("Student Name (English)")
+            add_name_loc = c_n2.text_input(f"Student Name ({s_lang}) [Optional]")
             
-            add_pen = st.text_input("PEN NO")
-            add_apaar = st.text_input("APAAR NO")
-            add_dob = st.date_input("DOB")
-            add_class = st.selectbox("Class", classes_list)
+            add_fname = c_n1.text_input("Father's Name (English)")
+            add_fname_loc = c_n2.text_input(f"Father's Name ({s_lang}) [Optional]")
+            
+            add_mname = c_n1.text_input("Mother's Name (English)")
+            add_mname_loc = c_n2.text_input(f"Mother's Name ({s_lang}) [Optional]")
+            
+            c_p1, c_p2 = st.columns(2)
+            add_pen = c_p1.text_input("PEN NO")
+            add_apaar = c_p2.text_input("APAAR NO")
+            
+            c_d1, c_c1 = st.columns(2)
+            add_dob = c_d1.date_input("DOB", min_value=datetime.date(2000, 1, 1))
+            add_class = c_c1.selectbox("Class", classes_list)
+            
+            add_batch = st.selectbox("Batch", batches_list, index=5)
+            opt_pub_date = st.date_input("Results Publication Date", value=datetime.date.today())
             
             st.markdown("#### 📚 Add Subjects & Marks")
             if 'num_subjects' not in st.session_state: st.session_state.num_subjects = 3
@@ -976,8 +1023,11 @@ elif menu == "School Login":
                     grd = "A1" if per >= 90 else "A2" if per >= 80 else "B1" if per >= 70 else "B2" if per >= 60 else "C1" if per >= 50 else "C2" if per >= 40 else "D" if per >= 33 else "F"
                     
                     new_data = {
-                        "name": sanitize(add_name), "gender": add_gen, "pen_no": sanitize(add_pen), "apaar_no": sanitize(add_apaar),
-                        "father_name": sanitize(add_fname), "dob": str(add_dob), "class": add_class,
+                        "name": sanitize(add_name), "name_local": sanitize(add_name_loc), 
+                        "gender": add_gen, "pen_no": sanitize(add_pen), "apaar_no": sanitize(add_apaar),
+                        "father_name": sanitize(add_fname), "father_name_local": sanitize(add_fname_loc),
+                        "mother_name": sanitize(add_mname), "mother_name_local": sanitize(add_mname_loc),
+                        "dob": str(add_dob), "class": add_class, "batch": add_batch, "pub_date": str(opt_pub_date),
                         "subjects": subjects_data, "total_full": total_full, "total_obt": total_obt,
                         "percentage": round(per, 2), "result": res, "grade": grd, "status": "Approved"
                     }
@@ -992,8 +1042,14 @@ elif menu == "School Login":
                 curr_st = approved_students[edit_roll]
                 
                 c_up_n1, c_up_n2 = st.columns(2)
-                up_name = c_up_n1.text_input("Edit Name", value=curr_st.get('name', ''))
-                up_father = c_up_n2.text_input("Edit Father's Name", value=curr_st.get('father_name', ''))
+                up_name = c_up_n1.text_input("Edit Name (English)", value=curr_st.get('name', ''))
+                up_name_loc = c_up_n2.text_input(f"Edit Name ({s_lang})", value=curr_st.get('name_local', ''))
+                
+                up_father = c_up_n1.text_input("Edit Father's Name (English)", value=curr_st.get('father_name', ''))
+                up_father_loc = c_up_n2.text_input(f"Edit Father's Name ({s_lang})", value=curr_st.get('father_name_local', ''))
+                
+                up_mother = c_up_n1.text_input("Edit Mother's Name (English)", value=curr_st.get('mother_name', ''))
+                up_mother_loc = c_up_n2.text_input(f"Edit Mother's Name ({s_lang})", value=curr_st.get('mother_name_local', ''))
                 
                 c_up1, c_up2, c_up3 = st.columns(3)
                 up_gender = c_up1.selectbox("Gender", ["Male", "Female", "Other"], index=0)
@@ -1019,7 +1075,9 @@ elif menu == "School Login":
                     new_grd = "A1" if new_per >= 90 else "A2" if new_per >= 80 else "B1" if new_per >= 70 else "B2" if new_per >= 60 else "C1" if new_per >= 50 else "C2" if new_per >= 40 else "D" if new_per >= 33 else "F"
                     
                     students_db[cur_school][edit_roll].update({
-                        "name": sanitize(up_name), "father_name": sanitize(up_father), 
+                        "name": sanitize(up_name), "name_local": sanitize(up_name_loc), 
+                        "father_name": sanitize(up_father), "father_name_local": sanitize(up_father_loc),
+                        "mother_name": sanitize(up_mother), "mother_name_local": sanitize(up_mother_loc),
                         "gender": up_gender, "pen_no": sanitize(up_pen), "apaar_no": sanitize(up_apaar),
                         "subjects": new_up_subjects if new_up_subjects else up_subjects,
                         "total_obt": up_tot_obt, "total_full": up_tot_full, 
@@ -1031,10 +1089,30 @@ elif menu == "School Login":
             st.markdown("### 🖨️ Report Card")
             if approved_students:
                 rep_roll = st.selectbox("Select Roll for Report", list(approved_students.keys()))
+                
+                st.markdown(generate_result_card_html(sch_data['name'], sch_data.get('name_local', ''), approved_students[rep_roll], rep_roll, s_lang), unsafe_allow_html=True)
+                
                 pdf_file = f"Report_{rep_roll}.pdf"
                 create_pdf(pdf_file, sch_data['name'], approved_students[rep_roll], rep_roll)
                 with open(pdf_file, "rb") as f:
                     st.download_button("📥 Download PDF", f, file_name=pdf_file, mime="application/pdf")
+                if st.button("🖨️ Print Result Card"):
+                    components.html("<script>window.parent.print();</script>", height=0)
+
+        with t_sch:
+            st.markdown("### 🎓 Scholarship Approvals")
+            sch_list = {k: v for k, v in scholarships_db.items() if v.get("status") == "Pending_School" and v.get("school_code") == cur_school}
+            if sch_list:
+                a_id = st.selectbox("Select Application", list(sch_list.keys()))
+                a_data = sch_list[a_id]
+                st.write(f"Applicant: **{a_data.get('app_name')}** | Class: **{a_data.get('class')}**")
+                if st.button("✅ Final Approve Scholarship", type="primary"):
+                    a_data["status"] = "Approved"
+                    scholarships_db[a_id] = a_data
+                    save_scholarships(scholarships_db)
+                    st.success("Approved successfully!")
+                    st.rerun()
+            else: st.success("No pending scholarships.")
 
 # ----------------- RESULTS PORTAL (CRASH PROOF) -----------------
 elif menu == "Results":
@@ -1074,12 +1152,16 @@ elif menu == "Results":
                 s_lang = sch.get("lang", "English")
                 st.success(f"🎉 **Welcome {found_student.get('name', '').upper()}!**")
                 
+                # HTML Display
                 st.markdown(generate_result_card_html(sch.get('name', 'Unknown School'), sch.get('name_local', ''), found_student, found_roll, s_lang), unsafe_allow_html=True)
                 
+                # PDF Generation (Safeguarded against crashes)
                 pdf_file = f"Result_{found_roll}.pdf"
                 create_pdf(pdf_file, sch.get('name', 'Unknown School'), found_student, found_roll)
                 with open(pdf_file, "rb") as f:
                     st.download_button("📥 Download PDF", f, file_name=pdf_file, mime="application/pdf")
+                if st.button("🖨️ Print Result Card"):
+                    components.html("<script>window.parent.print();</script>", height=0)
             else:
                 st.error("❌ କୌଣସି ରେକର୍ଡ ମିଳିଲା ନାହିଁ! ଭୁଲ୍ ତଥ୍ୟ ଦେଇଛନ୍ତି।")
 
