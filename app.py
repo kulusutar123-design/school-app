@@ -14,9 +14,10 @@ import urllib.request
 import ssl
 import html
 import threading
+import base64
 
 # ==========================================
-# 🔒 CRASH PROTECTION & DATA SAFETY LOCKS
+# 🔒 ATOMIC CRASH PROTECTION & DATA SAFETY LOCKS
 # ==========================================
 file_lock = threading.Lock()
 
@@ -229,7 +230,7 @@ def create_scholarship_pdf(filename, app_id, s_data):
     c.setStrokeColorRGB(0.8, 0.8, 0.8); c.line(50, y, 550, y); y -= 20
     c.setFont("Helvetica-Bold", 12); c.drawString(50, y, "Payment & Status"); c.setFont("Helvetica", 11); y -= 20
     c.drawString(50, y, f"Payment Mode: {s_data.get('payment_mode', 'N/A')}"); y -= 25
-    c.drawString(50, y, f"Current Status: {s_data.get('status', 'Pending_Master')}"); y -= 40
+    c.drawString(50, y, f"Current Status: {s_data.get('status', 'Pending')}"); y -= 40
     c.line(50, y, 550, y); y -= 20
     c.setFont("Helvetica-Oblique", 10); c.drawCentredString(300, y, "Computer-generated receipt. Keep for future reference.")
     try: bc = code128.Code128(str(app_id), barHeight=30, barWidth=1.5); bc.drawOn(c, 50, 40)
@@ -767,6 +768,11 @@ elif menu == "Scholarship Portal":
             elif not school_code or not sanitize(app_name) or not sanitize(aadhaar_input) or not sanitize(acc_no):
                 st.error("Please fill all mandatory fields (*).")
             else:
+                photo_b64 = base64.b64encode(photo.read()).decode('utf-8') if photo else ""
+                inc_file_b64 = base64.b64encode(inc_file.read()).decode('utf-8') if inc_file else ""
+                cas_file_b64 = base64.b64encode(cas_file.read()).decode('utf-8') if cas_file else ""
+                passbook_b64 = base64.b64encode(passbook.read()).decode('utf-8') if passbook else ""
+                
                 app_id = "SCH" + str(random.randint(1000000, 9999999))
                 st.session_state['temp_sch_data'] = {
                     "app_id": app_id,
@@ -776,10 +782,13 @@ elif menu == "Scholarship Portal":
                         "dob": str(dob), "aadhaar": sanitize(aadhaar_input), "mobile": sanitize(mob_no),
                         "full_address": sanitize(addr), "state": sanitize(state), "district": sanitize(dist),
                         "school_code": school_code, "class": sch_class, 
+                        "father_name": sanitize(f_name), "mother_name": sanitize(m_name),
                         "income_cert": sanitize(inc_no), "inc_auth": inc_auth,
                         "caste_cert": sanitize(cas_no), "cas_auth": cas_auth, "ifsc": sanitize(ifsc), 
                         "bank_name": st.session_state.get('v_bank', ''), "branch_name": st.session_state.get('v_branch', ''),
                         "acc_no": sanitize(acc_no), "acc_name": sanitize(acc_name),
+                        "photo_b64": photo_b64, "inc_file_b64": inc_file_b64,
+                        "cas_file_b64": cas_file_b64, "passbook_b64": passbook_b64,
                         "status": "Pending_Master", "payment_mode": "Pending", "fee": sch_fee
                     }
                 }
@@ -885,6 +894,7 @@ elif menu == "New Student Registration":
             stu_country = c_nat1.selectbox("13. Nationality", COUNTRIES)
             stu_bg = c_nat2.selectbox("14. Blood Group", ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-", "Unknown"])
             
+            st.markdown("#### 4. Photograph Upload")
             stu_photo = st.file_uploader("15. Upload Student Photo (JPG/PNG)", type=['png', 'jpg', 'jpeg'])
             
             declaration = st.checkbox("✅ I declare the above info is true.")
@@ -1119,14 +1129,64 @@ elif menu == "Master Login":
             if pending_sch:
                 app_id = st.selectbox("Select Scholarship", list(pending_sch.keys()), key="m_sch_app_sel")
                 s_data = pending_sch[app_id]
-                with st.expander("Edit & Verify Data"):
-                    e_name = st.text_input("Applicant Name", s_data.get('app_name', ''), key="m_sch_ename")
-                    e_aadhaar = st.text_input("Aadhaar No", s_data.get('aadhaar', ''), key="m_sch_eadh")
-                    if st.button("✅ Update & Forward to School", type="primary", key="m_sch_fwd_btn"):
-                        s_data['app_name'] = sanitize(e_name); s_data['aadhaar'] = sanitize(e_aadhaar)
+                
+                c_pdf1, c_pdf2 = st.columns([8,2])
+                with c_pdf1:
+                    st.write(f"**Application ID:** {app_id} | **Status:** {s_data.get('status')}")
+                with c_pdf2:
+                    pdf_m_file = f"Scholarship_{app_id}_Master.pdf"
+                    create_scholarship_pdf(pdf_m_file, app_id, s_data)
+                    with open(pdf_m_file, "rb") as f:
+                        st.download_button("📥 Download Application PDF", f, file_name=pdf_m_file, mime="application/pdf", key=f"m_sch_dl_{app_id}")
+
+                with st.expander("👁️ View & Edit Full Application", expanded=True):
+                    c_e1, c_e2, c_e3 = st.columns(3)
+                    e_name = c_e1.text_input("Applicant Name", s_data.get('app_name', ''), key=f"ms_name_{app_id}")
+                    e_aadhaar = c_e2.text_input("Aadhaar No", s_data.get('aadhaar', ''), key=f"ms_adh_{app_id}")
+                    e_mob = c_e3.text_input("Mobile No", s_data.get('mobile', ''), key=f"ms_mob_{app_id}")
+                    
+                    c_e4, c_e5, c_e6 = st.columns(3)
+                    e_fname = c_e4.text_input("Father Name", s_data.get('father_name', ''), key=f"ms_fname_{app_id}")
+                    e_mname = c_e5.text_input("Mother Name", s_data.get('mother_name', ''), key=f"ms_mname_{app_id}")
+                    e_dob = c_e6.text_input("Date of Birth", s_data.get('dob', ''), key=f"ms_dob_{app_id}")
+                    
+                    c_e7, c_e8, c_e9 = st.columns(3)
+                    e_inc = c_e7.text_input("Income Cert", s_data.get('income_cert', ''), key=f"ms_inc_{app_id}")
+                    e_cas = c_e8.text_input("Caste Cert", s_data.get('caste_cert', ''), key=f"ms_cas_{app_id}")
+                    e_acc = c_e9.text_input("Account No", s_data.get('acc_no', ''), key=f"ms_acc_{app_id}")
+                    
+                    st.markdown("#### 🖼️ Uploaded Documents (Download from Master ID)")
+                    c_doc1, c_doc2, c_doc3, c_doc4 = st.columns(4)
+                    
+                    def render_b64_img(col, title, b64_str, key_suffix):
+                        col.markdown(f"**{title}**")
+                        if b64_str:
+                            img_data = base64.b64decode(b64_str)
+                            col.image(img_data, use_container_width=True)
+                            col.download_button("⬇️ Download", img_data, file_name=f"{title}_{app_id}.jpg", mime="image/jpeg", key=f"dl_{key_suffix}_{app_id}")
+                        else:
+                            col.info("Not Uploaded")
+
+                    render_b64_img(c_doc1, "Profile Photo", s_data.get('photo_b64', ''), "photo")
+                    render_b64_img(c_doc2, "Income Cert", s_data.get('inc_file_b64', ''), "inc")
+                    render_b64_img(c_doc3, "Caste Cert", s_data.get('cas_file_b64', ''), "cas")
+                    render_b64_img(c_doc4, "Bank Passbook", s_data.get('passbook_b64', ''), "pass")
+
+                    if st.button("✅ Update Data & Approve Scholarship", type="primary", key=f"m_sch_fwd_btn_{app_id}"):
+                        s_data['app_name'] = sanitize(e_name)
+                        s_data['aadhaar'] = sanitize(e_aadhaar)
+                        s_data['mobile'] = sanitize(e_mob)
+                        s_data['father_name'] = sanitize(e_fname)
+                        s_data['mother_name'] = sanitize(e_mname)
+                        s_data['dob'] = sanitize(e_dob)
+                        s_data['income_cert'] = sanitize(e_inc)
+                        s_data['caste_cert'] = sanitize(e_cas)
+                        s_data['acc_no'] = sanitize(e_acc)
                         s_data['status'] = "Pending_School"
-                        scholarships_db[app_id] = s_data; save_scholarships(scholarships_db)
-                        st.success(f"Scholarship {app_id} verified!"); st.rerun()
+                        scholarships_db[app_id] = s_data
+                        save_scholarships(scholarships_db)
+                        st.success(f"Scholarship {app_id} Verified & Approved!")
+                        st.rerun()
             else: st.success("No pending scholarships.")
 
         with t4: 
@@ -1488,11 +1548,12 @@ elif menu == "School Login":
 
         with t_rep:
             st.markdown("### 🖨️ Report Card")
-            if cur_students:
-                rep_roll = st.selectbox("Select Roll for Report", list(cur_students.keys()), key="s_rep_roll_v2")
-                st.markdown(generate_result_card_html(sch_data['name'], sch_data.get('name_local', ''), cur_students[rep_roll], rep_roll, s_lang), unsafe_allow_html=True)
+            approved_students = {k:v for k,v in cur_students.items() if v.get('status') == 'Approved'}
+            if approved_students:
+                rep_roll = st.selectbox("Select Roll for Report", list(approved_students.keys()), key="s_rep_roll_v2")
+                st.markdown(generate_result_card_html(sch_data['name'], sch_data.get('name_local', ''), approved_students[rep_roll], rep_roll, s_lang), unsafe_allow_html=True)
                 pdf_file = f"Report_{rep_roll}.pdf"
-                create_pdf(pdf_file, sch_data['name'], cur_students[rep_roll], rep_roll)
+                create_pdf(pdf_file, sch_data['name'], approved_students[rep_roll], rep_roll)
                 with open(pdf_file, "rb") as f:
                     st.download_button("📥 Download PDF", f, file_name=pdf_file, mime="application/pdf", key="s_dl_pdf_v2")
                 if st.button("🖨️ Print Result Card", key="s_print_v2"):
@@ -1529,6 +1590,8 @@ elif menu == "Results":
             ndob = normalize_dob(st_dob_input)
             
             found_student = None; found_roll = None; found_school_id = None
+            pending_status = None
+            dob_mismatch = False
             
             for s_id, school_students in students_db.items():
                 for r_no, s_info in school_students.items():
@@ -1538,10 +1601,13 @@ elif menu == "Results":
                     if match_roll or match_name:
                         st_dob_norm = normalize_dob(s_info.get("dob", ""))
                         if st_dob_norm == ndob:
-                            found_student = s_info
-                            found_roll = r_no
-                            found_school_id = s_id
-                            break
+                            if s_info.get("status", "Approved") == "Approved":
+                                found_student = s_info
+                                found_roll = r_no
+                                found_school_id = s_id
+                                break
+                            else: pending_status = s_info.get("status")
+                        else: dob_mismatch = True
                 if found_student: break
             
             if found_student:
@@ -1557,8 +1623,12 @@ elif menu == "Results":
                     st.download_button("📥 Download PDF", f, file_name=pdf_file, mime="application/pdf", key="res_dl_v2")
                 if st.button("🖨️ Print Result Card", key="res_print_v2"):
                     components.html("<script>window.parent.print();</script>", height=0)
+            elif pending_status:
+                st.warning(f"⚠️ Appananka record milila, kintu status ebe: '{pending_status}' achi. Master ba School ru approve karantu.")
+            elif dob_mismatch:
+                st.warning("⚠️ Roll No/Name match hela kintu Date of Birth (DOB) match haunahi. Thik DOB diantu.")
             else:
-                st.error("❌ କୌଣସି ରେକର୍ଡ ମିଳିଲା ନାହିଁ! ଦୟାକରି Roll Number ଏବଂ Date of Birth ଯାଞ୍ଚ କରି ପୁନର୍ବାର ଚେଷ୍ଟା କରନ୍ତୁ।")
+                st.error("❌ Kaunasi record milila nahi! Roll Number au DOB re check karantu.")
 
 st.markdown("---")
 st.markdown("<div style='text-align: center; padding: 15px; background: linear-gradient(90deg, #1e3a8a, #9333ea); color: white; border-radius: 8px; font-weight: bold;'>👨‍💻 Software Developed by: KULU SUTAR | 📞 Mob: 8910223342 | ✉️ kulusutar123@gmail.com</div>", unsafe_allow_html=True)
