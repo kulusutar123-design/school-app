@@ -244,7 +244,7 @@ elif menu == "Results": st.query_params["portal"] = "student"
 classes_list = [str(i) for i in range(1, 11)]
 batches_list = [f"{y}-{y+1}" for y in range(2020, 2051)]
 
-# ----------------- HOME PAGE (DYNAMIC UI WITH NEWS & GUARANTEED PHOTO RUNNING) -----------------
+# ----------------- HOME PAGE (DYNAMIC UI WITH GUARANTEED PHOTO RUNNING) -----------------
 if menu == "Home Page":
     bg_images = [
         "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1920",
@@ -274,9 +274,6 @@ if menu == "Home Page":
     elif mm_dd == "08-15":
         event_images += "<img class='marquee-img' src='https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg&w=400' alt='Independence Day'>"
         event_title = "🇮🇳 Happy Independence Day 🇮🇳"
-    elif mm_dd == "01-26":
-        event_images += "<img class='marquee-img' src='https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg&w=400' alt='Republic Day'>"
-        event_title = "🇮🇳 Happy Republic Day 🇮🇳"
 
     base_images = (
         "<img class='marquee-img' src='https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=600&q=80' alt='School Building'>"
@@ -311,58 +308,24 @@ if menu == "Home Page":
     components.html(carousel_html, height=360)
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # 🌟 SEPARATE NOTIFICATION & DAILY NEWS BANNERS
-    notice_and_news_html = """
+    notice_text_html = """
     <!DOCTYPE html>
-    <html>
-    <head>
-    <meta charset="utf-8">
-    <style>
-    body { margin: 0; padding: 0; font-family: sans-serif; background: transparent; }
-    .notice-box { background-color: rgba(30, 41, 59, 0.9); border-radius: 5px; border: 1px solid #38bdf8; overflow: hidden; color: #e2e8f0; font-size: 18px; padding: 10px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-    .news-box { background-color: rgba(127, 29, 29, 0.9); border-radius: 5px; border: 1px solid #ef4444; overflow: hidden; color: #ffffff; font-size: 18px; padding: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-    .label { font-size:13px; font-weight:bold; margin-bottom:6px; letter-spacing: 1px; }
-    .new-badge { background-color: #fbbf24; color: black; font-size: 14px; font-weight: bold; padding: 2px 6px; border-radius: 3px; margin-left: 5px; }
-    </style>
-    </head>
-    <body>
-        <div class="notice-box">
-            <div class="label" style="color:#93c5fd;">📌 OFFICIAL NOTIFICATIONS & SOFTWARE UPDATES</div>
-            <marquee direction='left' scrollamount='8' style='font-weight: bold;'>
-                <span style='color: #fbbf24;'>📢 ନୂଆ ଅପଡେଟ୍: ଛାତ୍ରଛାତ୍ରୀମାନେ ଏବେ ଅନଲାଇନ୍ ସ୍କଲାରସିପ୍ ଏବଂ ପେମେଣ୍ଟ କରିପାରିବେ! <span class='new-badge'>NEW</span> &nbsp;&nbsp;|&nbsp;&nbsp; 👨‍💻 Software Developed by: KULU SUTAR &nbsp;&nbsp;|&nbsp;&nbsp; 📞 Helpdesk No: 8910223342 &nbsp;&nbsp;|&nbsp;&nbsp; ✉️ Mail ID: kulusutar123@gmail.com </span>
-            </marquee>
-        </div>
-        <div class="news-box">
-            <div class="label" style="color:#fca5a5;">📰 ALL INDIA LATEST NEWS (LIVE UPDATES)</div>
-            <marquee direction='left' scrollamount='6' style='font-weight: bold;'>
-                <span>
-                🔴 [ODISHA] ନୂଆ ଶିକ୍ଷା ନୀତି ଅନୁଯାୟୀ ସମସ୍ତ ସ୍କୁଲରେ ଡିଜିଟାଲ୍ କ୍ଲାସରୁମ୍ ଆରମ୍ଭ ହେବ! &nbsp;&nbsp;♦&nbsp;&nbsp; 
-                🔴 [DELHI] Central Government announces new scholarship schemes for brilliant students across India! &nbsp;&nbsp;♦&nbsp;&nbsp; 
-                🔴 [BENGAL] রাজ্যের সব স্কুলে নতুন শিক্ষাবর্ষের ভর্তি শুরু হচ্ছে! &nbsp;&nbsp;♦&nbsp;&nbsp; 
-                🔴 [MAHARASHTRA] राज्यातील सर्व शाळांमध्ये नवीन तंत्रज्ञान लागू होणार! &nbsp;&nbsp;♦&nbsp;&nbsp; 
-                🔴 [ANDHRA] రాష్ట్రంలోని పాఠశాలల్లో డిజిటల్ విద్య అమలు! &nbsp;&nbsp;♦&nbsp;&nbsp; 
-                🔴 [HINDI] देश भर के सभी स्कूलों में नई डिजिटल शिक्षा प्रणाली लागू होगी!
-                </span>
-            </marquee>
-        </div>
-    </body>
-    </html>
+    <html><head><meta charset="utf-8"><style>body { margin: 0; background: transparent; color: #fff; font-family: sans-serif; font-size: 18px; display: flex; align-items: center; height: 100%; } .new-badge { background-color: #fbbf24; color: black; font-size: 14px; font-weight: bold; padding: 2px 6px; border-radius: 3px; margin-left: 5px; }</style></head>
+    <body><marquee direction='left' scrollamount='8' style='padding: 5px; font-weight: bold;'>
+    <span style='color: #fbbf24;'>📢 ନୂଆ ଅପଡେଟ୍: ଛାତ୍ରଛାତ୍ରୀମାନେ ଏବେ ଅନଲାଇନ୍ ସ୍କଲାରସିପ୍ ଏବଂ ପେମେଣ୍ଟ କରିପାରିବେ! <span class='new-badge'>NEW</span> &nbsp;&nbsp;|&nbsp;&nbsp; 👨‍💻 Software Developed by: KULU SUTAR &nbsp;&nbsp;|&nbsp;&nbsp; 📞 Helpdesk No: 8910223342 &nbsp;&nbsp;|&nbsp;&nbsp; ✉️ Mail ID: kulusutar123@gmail.com </span>
+    </marquee></body></html>
     """
-    components.html(notice_and_news_html, height=190)
+    st.markdown("<div class='glass-panel' style='padding: 10px;'>", unsafe_allow_html=True)
+    components.html(notice_text_html, height=45)
+    st.markdown("</div>", unsafe_allow_html=True)
 
-    # ALL 6 BUTTONS DISPLAYED ON HOME PAGE
-    c1, c2, c3 = st.columns(3)
-    with c1: 
-        st.markdown("<a href='?portal=scholarship' target='_self' class='login-card' style='border-bottom: 5px solid #10b981;'><div class='login-title'>💰 Scholarship</div><div class='login-sub'>Apply Now</div></a>", unsafe_allow_html=True)
-        st.markdown("<a href='?portal=master' target='_self' class='login-card'><div class='login-title'>🏛️ Master Login</div><div class='login-sub'>Admin Portal</div></a>", unsafe_allow_html=True)
-    with c2: 
-        st.markdown("<a href='?portal=reg_student' target='_self' class='login-card'><div class='login-title'>👨‍🎓 New Student</div><div class='login-sub'>Apply for admission</div></a>", unsafe_allow_html=True)
-        st.markdown("<a href='?portal=school' target='_self' class='login-card'><div class='login-title'>🏫 School Login</div><div class='login-sub'>School / College Portal</div></a>", unsafe_allow_html=True)
-    with c3: 
-        st.markdown("<a href='?portal=reg_school' target='_self' class='login-card'><div class='login-title'>🏫 New School</div><div class='login-sub'>Register institution</div></a>", unsafe_allow_html=True)
-        st.markdown("<a href='?portal=student' target='_self' class='login-card' style='border-bottom: 5px solid #ec4899;'><div class='login-title'>🎓 Check Results</div><div class='login-sub'>Download Student Rank Card</div></a>", unsafe_allow_html=True)
+    c1, c2, c3, c4 = st.columns(4)
+    with c1: st.markdown("<a href='?portal=scholarship' target='_self' class='login-card' style='border-bottom: 5px solid #10b981;'><div class='login-title'>💰 Scholarship</div><div class='login-sub'>Apply Now</div></a>", unsafe_allow_html=True)
+    with c2: st.markdown("<a href='?portal=reg_student' target='_self' class='login-card'><div class='login-title'>👨‍🎓 New Student</div><div class='login-sub'>Apply for admission</div></a>", unsafe_allow_html=True)
+    with c3: st.markdown("<a href='?portal=reg_school' target='_self' class='login-card'><div class='login-title'>🏫 New School</div><div class='login-sub'>Register institution</div></a>", unsafe_allow_html=True)
+    with c4: st.markdown("<a href='?portal=master' target='_self' class='login-card'><div class='login-title'>🏛️ Master Login</div><div class='login-sub'>Admin Portal</div></a>", unsafe_allow_html=True)
 
-# ----------------- SCHOLARSHIP PORTAL -----------------
+# ----------------- SCHOLARSHIP PORTAL (NEW FEATURES & ADDRESS UPDATES) -----------------
 elif menu == "Scholarship Portal":
     c_h, c_t = st.columns([1, 8])
     with c_h:
@@ -436,6 +399,7 @@ elif menu == "Scholarship Portal":
         f_name = c13.text_input("Father's Name *")
         m_name = c14.text_input("Mother's Name *")
         
+        # 📌 NEW DYNAMIC CASCADING ADDRESS SYSTEM
         st.markdown("#### 📍 Address Information")
         addr = st.text_area("Full Address *", placeholder="Enter your complete address")
         
@@ -593,265 +557,6 @@ elif menu == "Scholarship Portal":
             st.rerun()
         if st.button("Cancel"):
             st.session_state['sch_app_step'] = False; st.rerun()
-
-# ----------------- NEW STUDENT REGISTRATION -----------------
-elif menu == "New Student Registration":
-    c_home, c_title = st.columns([1, 8])
-    with c_home:
-        if st.button("🏠 Home", key="reg_stu_home"):
-            st.query_params["portal"] = "home"
-            st.rerun()
-    with c_title:
-        st.subheader("👨‍🎓 New Student Registration & Payment Portal")
-
-    base_fee = float(master_db.get("reg_fee", 150.0))
-    gst_pct = float(master_db.get("gst_percent", 18.0))
-    gst_amt = round(base_fee * (gst_pct / 100.0), 2)
-    total_fee = round(base_fee + gst_amt, 2)
-
-    if 'payment_step' not in st.session_state:
-        st.session_state['payment_step'] = False
-        st.session_state['temp_student_data'] = None
-    if 'stu_reg_success' not in st.session_state:
-        st.session_state['stu_reg_success'] = False
-
-    if st.session_state['stu_reg_success']:
-        st.success(f"✅ Application Submitted Successfully! Your Registration ID is **{st.session_state['stu_reg_id']}**.")
-        st.info("Your application is now pending verification from the Admin/School. Please download your receipt below.")
-        
-        pdf_file = f"Receipt_{st.session_state['stu_reg_id']}.pdf"
-        create_student_receipt_pdf(pdf_file, st.session_state['stu_reg_id'], st.session_state['stu_reg_data'])
-        
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            with open(pdf_file, "rb") as f:
-                st.download_button("📥 Download PDF Receipt", f, file_name=pdf_file, mime="application/pdf")
-        with col2:
-            if st.button("🖨️ Print Receipt"):
-                components.html("<script>window.parent.print();</script>", height=0)
-        with col3:
-            if st.button("⬅️ Done / Go Back"):
-                st.session_state['stu_reg_success'] = False
-                st.session_state['stu_reg_id'] = None
-                st.session_state['stu_reg_data'] = None
-                st.rerun()
-                
-    elif not st.session_state['payment_step']:
-        st.info("Fill your registration details carefully. Verify with the declaration checkbox to proceed to payment.")
-        with st.form("student_reg_form"):
-            st.markdown("#### 1. School Information")
-            c_sc1, c_sc2 = st.columns(2)
-            active_schools = {k: v for k, v in schools_db.items() if v.get("status", "Active") == "Active"}
-            school_options = [f"{k} - {v['name']}" for k, v in active_schools.items()] if active_schools else []
-            school_sel_str = c_sc1.selectbox("14. Select School Code & Name *", ["--Select--"] + school_options)
-            school_sel = school_sel_str.split(" - ")[0] if school_sel_str != "--Select--" else None
-            
-            st.markdown("#### 2. Personal Details")
-            c_n1, c_n2 = st.columns(2)
-            stu_name_en = c_n1.text_input("1. Student's Name (English) *")
-            stu_name_loc = c_n2.text_input("1. Student's Name (Local Language)")
-            
-            c_g1, c_g2, c_g3 = st.columns(3)
-            stu_gender_en = c_g1.selectbox("2. Gender (English)", ["Male", "Female", "Other"])
-            stu_gender_loc = c_g2.text_input("2. Gender (Local Language)")
-            stu_category = c_g3.selectbox("Social Category *", SOCIAL_CATEGORIES)
-            
-            c_d1, c_d2 = st.columns(2)
-            stu_dob = c_d1.date_input("3. Date of Birth *", min_value=datetime.date(2000, 1, 1), max_value=datetime.date.today())
-            stu_state = c_d2.selectbox("4. State (All India)", list(STATE_LANG_MAP.keys()), index=18)
-            
-            c_m1, c_m2 = st.columns(2)
-            m_name_en = c_m1.text_input("5. Mother's Name (English) *")
-            m_name_loc = c_m2.text_input("5. Mother's Name (Local Language)")
-            
-            c_f1, c_f2 = st.columns(2)
-            f_name_en = c_f1.text_input("6. Father's Name (English) *")
-            f_name_loc = c_f2.text_input("6. Father's Name (Local Language)")
-            
-            st.markdown("#### 3. Contact & Identification")
-            c_id1, c_id2 = st.columns(2)
-            stu_aadhar = c_id1.text_input("7. AADHAAR Number of Student *", max_chars=12)
-            stu_phone = c_id2.text_input("10. Mobile No *", max_chars=10)
-            
-            c_ad1, c_ad2 = st.columns(2)
-            stu_address_en = c_ad1.text_area("8. Address (English) *")
-            stu_address_loc = c_ad2.text_area("8. Address (Local Language)")
-            
-            c_loc1, c_loc2 = st.columns(2)
-            stu_pin = c_loc1.text_input("9. PIN Code *", max_chars=6)
-            stu_minority = c_loc2.selectbox("11. Minority Group", ["No", "Yes - Muslim", "Yes - Christian", "Yes - Sikh", "Yes - Buddhist", "Yes - Parsi", "Yes - Jain"])
-            
-            st.markdown("#### 4. Photograph Upload")
-            stu_photo = st.file_uploader("16. Upload Student Photo (JPG/PNG)", type=['png', 'jpg', 'jpeg'])
-            
-            declaration = st.checkbox("✅ I hereby declare that all the information provided above is true and correct.")
-            
-            if st.form_submit_button("Proceed to Payment & Submit"):
-                if not declaration: st.error("⚠️ Please check the declaration box.")
-                elif not school_sel or not sanitize(stu_name_en) or not sanitize(stu_aadhar) or not sanitize(stu_phone):
-                    st.error("Please fill all the mandatory fields (*).")
-                else:
-                    temp_reg_id = "REG" + str(random.randint(100000, 999999))
-                    st.session_state['temp_student_data'] = {
-                        "reg_id": temp_reg_id,
-                        "school_sel": school_sel,
-                        "data": {
-                            "name": sanitize(stu_name_en), 
-                            "name_local": sanitize(stu_name_loc),
-                            "gender": stu_gender_en, "category": stu_category,
-                            "father_name": sanitize(f_name_en), "mother_name": sanitize(m_name_en), 
-                            "dob": str(stu_dob), "aadhaar": sanitize(stu_aadhar), "phone": sanitize(stu_phone),
-                            "address": sanitize(stu_address_en), "state": stu_state, "pin_code": sanitize(stu_pin),
-                            "school_code": school_sel, "class": "1", "batch": "2025-2026",
-                            "subjects": {}, "total_full": 0, "total_obt": 0, "percentage": 0.0,
-                            "result": "N/A", "grade": "N/A", "pub_date": str(datetime.date.today()),
-                            "payment_mode": "Pending", "status": "Pending_Master", "total_fee": total_fee
-                        }
-                    }
-                    st.session_state['payment_step'] = True
-                    st.rerun()
-
-    if st.session_state.get('payment_step', False):
-        st.markdown("### 💳 Secure Payment Gateway")
-        temp_obj = st.session_state.get('temp_student_data')
-        if temp_obj:
-            st.info(f"Applicant: **{temp_obj['data']['name'].upper()}** | Total Fee: **₹{total_fee:.2f}**")
-            pay_mode = st.radio("Select Payment Mode", ["Online Payment (UPI/QR)", "Offline Payment"])
-            if st.button("Complete Payment & Submit", type="primary"):
-                temp_obj['data']['payment_mode'] = f"{pay_mode.split(' ')[0]} (₹{total_fee:.2f})"
-                sch_id = temp_obj['school_sel']
-                if sch_id not in students_db: students_db[sch_id] = {}
-                students_db[sch_id][temp_obj['reg_id']] = temp_obj['data']
-                save_data(schools_db, students_db)
-                
-                st.session_state['stu_reg_success'] = True
-                st.session_state['stu_reg_id'] = temp_obj['reg_id']
-                st.session_state['stu_reg_data'] = temp_obj['data']
-                st.session_state['payment_step'] = False
-                st.session_state['temp_student_data'] = None
-                st.rerun()
-            if st.button("Cancel"):
-                st.session_state['payment_step'] = False; st.rerun()
-
-# ----------------- NEW SCHOOL REGISTRATION -----------------
-elif menu == "New School Registration":
-    c_home, c_title = st.columns([1, 8])
-    with c_home:
-        if st.button("🏠 Home", key="reg_sch_home"):
-            st.query_params["portal"] = "home"
-            st.rerun()
-    with c_title:
-        st.subheader("📝 New School Registration & Payment")
-
-    s_base_fee = float(master_db.get("school_reg_fee", 1000.0))
-    s_gst_pct = float(master_db.get("school_gst_percent", 18.0))
-    s_gst_amt = round(s_base_fee * (s_gst_pct / 100.0), 2)
-    s_total_fee = round(s_base_fee + s_gst_amt, 2)
-
-    if 'school_payment_step' not in st.session_state:
-        st.session_state['school_payment_step'] = False
-        st.session_state['temp_school_data'] = None
-    if 'sch_reg_success' not in st.session_state:
-        st.session_state['sch_reg_success'] = False
-
-    if st.session_state['sch_reg_success']:
-        st.success("✅ Registration Successful! Your account is PENDING approval from the Master Admin.")
-        st.info("Please download your registration receipt below.")
-        
-        pdf_file = f"School_Receipt_{st.session_state['sch_reg_id']}.pdf"
-        create_school_receipt_pdf(pdf_file, st.session_state['sch_reg_id'], st.session_state['sch_reg_data'])
-        
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            with open(pdf_file, "rb") as f:
-                st.download_button("📥 Download PDF Receipt", f, file_name=pdf_file, mime="application/pdf")
-        with col2:
-            if st.button("🖨️ Print Receipt"):
-                components.html("<script>window.parent.print();</script>", height=0)
-        with col3:
-            if st.button("⬅️ Done / Go Back"):
-                st.session_state['sch_reg_success'] = False
-                st.session_state['sch_reg_id'] = None
-                st.session_state['sch_reg_data'] = None
-                st.rerun()
-
-    elif not st.session_state['school_payment_step']:
-        st.info("Submit your school details. Wait for the Master Admin to approve and ACTIVATE your account after payment.")
-        
-        with st.form("school_reg_form"):
-            r_id = st.text_input("School ID (Create a Unique ID) *")
-            
-            c_n1, c_n2 = st.columns(2)
-            r_name_en = c_n1.text_input("School Name (English) *")
-            r_name_loc = c_n2.text_input("School Name (Local Language) [Optional]")
-            
-            indian_states = list(STATE_LANG_MAP.keys())
-            r_state = st.selectbox("Select State", indian_states, index=18)
-            
-            c_a1, c_a2 = st.columns(2)
-            r_address_en = c_a1.text_area("School Address (English)")
-            r_address_loc = c_a2.text_area("School Address (Local Language) [Optional]")
-            
-            c_h1, c_h2 = st.columns(2)
-            r_hm_name = c_h1.text_input("Head Master Name")
-            r_hm_phone = c_h2.text_input("Head Master Mobile No.")
-            
-            c_p1, c_p2 = st.columns(2)
-            r_pass = c_p1.text_input("New Password *", type="password")
-            r_cpass = c_p2.text_input("Confirm Password *", type="password")
-            
-            st.markdown("#### 5. Declaration")
-            s_declaration = st.checkbox("✅ I hereby declare that all the information provided above is true and correct.")
-            
-            submitted = st.form_submit_button("Proceed to Payment & Submit")
-            if submitted:
-                s_id_clean = sanitize(r_id)
-                if not s_declaration:
-                    st.error("⚠️ Please check the declaration box.")
-                elif not s_id_clean or not sanitize(r_name_en) or not r_pass:
-                    st.error("Please fill all the mandatory fields (*) including School ID, Name, and Password.")
-                elif r_pass != r_cpass:
-                    st.error("Passwords do not match!")
-                elif s_id_clean in schools_db:
-                    st.error("This School ID already exists. Please choose a different ID.")
-                else:
-                    st.session_state['temp_school_data'] = {
-                        "school_id": s_id_clean,
-                        "data": {
-                            "name": sanitize(r_name_en), 
-                            "name_local": sanitize(r_name_loc),
-                            "address": sanitize(r_address_en),
-                            "address_local": sanitize(r_address_loc),
-                            "hm_name": sanitize(r_hm_name),
-                            "hm_name_local": "",
-                            "hm_phone": sanitize(r_hm_phone),
-                            "hm_email": "",
-                            "pass": r_pass, 
-                            "state": r_state, 
-                            "lang": STATE_LANG_MAP[r_state],
-                            "status": "Pending_Master_Approval"
-                        }
-                    }
-                    st.session_state['school_payment_step'] = True
-                    st.rerun()
-
-    if st.session_state.get('school_payment_step', False):
-        st.markdown("### 💳 Secure Payment Gateway for School")
-        s_temp_obj = st.session_state.get('temp_school_data')
-        if s_temp_obj:
-            st.info(f"School Name: **{s_temp_obj['data']['name'].upper()}** | Total Amount: **₹{s_total_fee:.2f}**")
-            s_pay_mode = st.radio("Select Payment Mode", ["Online Payment (UPI/QR)", "Offline Payment"])
-            if st.button("Verify & Submit School Registration", type="primary"):
-                reg_data = st.session_state['temp_school_data']
-                reg_data['data']['payment_mode'] = f"{s_pay_mode.split(' ')[0]} (₹{s_total_fee:.2f})"
-                schools_db[reg_data["school_id"]] = reg_data["data"]
-                save_data(schools_db, students_db)
-                st.session_state['sch_reg_success'] = True
-                st.session_state['sch_reg_id'] = reg_data['school_id']
-                st.session_state['sch_reg_data'] = reg_data['data']
-                st.session_state['school_payment_step'] = False
-                st.session_state['temp_school_data'] = None
-                st.rerun()
 
 # ----------------- MASTER LOGIN -----------------
 elif menu == "Master Login":
