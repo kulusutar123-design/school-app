@@ -25,6 +25,13 @@ def sanitize(text):
         return html.escape(text.strip())
     return text
 
+def safe_num(val):
+    try:
+        if not val: return 0
+        return int(float(val))
+    except:
+        return 0
+
 # ==========================================
 # 🌐 APP URL SETTING & CONFIG
 # ==========================================
@@ -68,8 +75,11 @@ COUNTRIES = ["Yes - Indian National", "No - Other Country"]
 SOCIAL_CATEGORIES = ["General", "SC", "ST", "OBC", "SEBC", "Minority", "Others"]
 
 ISSUING_AUTHORITIES = [
-    "Select", "District Magistrate / Collector", "Additional District Magistrate",
-    "Sub-divisional Magistrate / Sub-divisional Officer", "Executive Magistrates",
+    "Select",
+    "District Magistrate / Collector",
+    "Additional District Magistrate",
+    "Sub-divisional Magistrate / Sub-divisional Officer",
+    "Executive Magistrates",
     "Revenue Officers not below the rank of Tahasildar / Additional Tahasildar"
 ]
 
@@ -97,6 +107,17 @@ def auto_translate(text, lang_name):
 def t(eng_text, lang):
     translations = {"School Portal": {"Odia": "ସ୍କୁଲ୍ ପୋର୍ଟାଲ୍", "Hindi": "स्कूल पोर्टल"}}
     return translations.get(eng_text, {}).get(lang, eng_text)
+
+def number_to_words(num):
+    if num == 0: return "ZERO"
+    ones = ["", "ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE", "TEN", "ELEVEN", "TWELVE", "THIRTEEN", "FOURTEEN", "FIFTEEN", "SIXTEEN", "SEVENTEEN", "EIGHTEEN", "NINETEEN"]
+    tens = ["", "", "TWENTY", "THIRTY", "FORTY", "FIFTY", "SIXTY", "SEVENTY", "EIGHTY", "NINETY"]
+    def words(n):
+        if n < 20: return ones[int(n)]
+        elif n < 100: return tens[int(n // 10)] + ("-" + ones[int(n % 10)] if n % 10 != 0 else "")
+        elif n < 1000: return ones[int(n // 100)] + " HUNDRED" + (" AND " + words(n % 100) if n % 100 != 0 else "")
+        else: return str(n)
+    return words(num)
 
 def format_display_date(d_str):
     if not d_str: return datetime.date.today().strftime('%d-%m-%Y')
@@ -172,7 +193,7 @@ def save_scholarships(sch):
         with open(SCHOLARSHIPS_FILE, "w", encoding="utf-8") as f: json.dump(sch, f, indent=4)
 
 # ==========================================
-# 🎨 PDF GENERATORS
+# 🎨 PDF GENERATORS (FIXED NAMERROR)
 # ==========================================
 def create_student_receipt_pdf(filename, reg_id, s_data):
     c = canvas.Canvas(filename, pagesize=letter)
@@ -219,7 +240,8 @@ def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no,
     disp_pub_date = format_display_date(raw_pub) if raw_pub else datetime.date.today().strftime('%d-%m-%Y')
 
     bc, b_col, ob, t_bg = "#fef9f7", "#963f98", "#ce9bd0", "#fcf4fc"
-    tot_obt = st_data.get('total_obt', 0)
+    tot_obt = safe_num(st_data.get('total_obt', 0))
+    tot_ful = safe_num(st_data.get('total_full', 0))
     w_tot_en = number_to_words(tot_obt)
     s_name_en = st_data.get('name', 'N/A').upper()
     m_name_en = st_data.get('mother_name', 'N/A').upper()
@@ -231,7 +253,7 @@ def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no,
     t_fat = st_data.get('father_name_local', '').strip() or auto_translate(f_name_en, s_lang)
     t_w_tot = auto_translate(w_tot_en, s_lang)
 
-    qr_text = f"SCHOOL: {school_name_en} | NAME: {s_name_en} | ROLL: {roll_no} | DOB: {disp_dob} | MARKS: {tot_obt}/{st_data.get('total_full', 0)} | GRADE: {st_data.get('grade', '')}"
+    qr_text = f"SCHOOL: {school_name_en} | NAME: {s_name_en} | ROLL: {roll_no} | DOB: {disp_dob} | MARKS: {tot_obt}/{tot_ful} | GRADE: {st_data.get('grade', '')}"
     qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={urllib.parse.quote(qr_text)}"
     bc_url = f"https://barcode.tec-it.com/barcode.ashx?data={roll_no}&code=Code128&dpi=96"
 
@@ -264,7 +286,7 @@ def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no,
                 </tr>
                 {rows_html}
                 <tr style='color: {b_col}; font-weight: bold; background-color: {t_bg}; border-top: 2px solid {b_col};'>
-                    <td style='padding: 10px; border-right: 1px solid {b_col}; text-align: right;'>TOTAL MARKS</td><td style='padding: 10px; border-right: 1px solid {b_col}; color:#000;'>{st_data.get('total_full', 0)}</td><td style='padding: 10px; color:#000;'>{tot_obt}</td>
+                    <td style='padding: 10px; border-right: 1px solid {b_col}; text-align: right;'>TOTAL MARKS</td><td style='padding: 10px; border-right: 1px solid {b_col}; color:#000;'>{tot_ful}</td><td style='padding: 10px; color:#000;'>{tot_obt}</td>
                 </tr>
             </table>
             <div style='text-align: center; font-weight: bold; font-size: 14px; margin-top: 20px; color:#000;'>( {w_tot_en} ) <br><span style='font-size:13px; font-weight:normal;'>({t_w_tot})</span></div>
@@ -283,6 +305,10 @@ def create_pdf(filename, school_name, st_data, roll_no):
     disp_dob = format_display_date(st_data.get('dob', ''))
     raw_pub = st_data.get('pub_date', '')
     disp_pub_date = format_display_date(raw_pub) if raw_pub else datetime.date.today().strftime('%d-%m-%Y')
+    
+    t_obt = safe_num(st_data.get('total_obt', 0))
+    t_ful = safe_num(st_data.get('total_full', 0))
+
     c = canvas.Canvas(filename, pagesize=letter)
     c.setFillColorRGB(0.99, 0.98, 0.97); c.rect(30, 30, 552, 732, fill=1, stroke=0)
     c.setStrokeColorRGB(0.82, 0.60, 0.83); c.setLineWidth(15); c.rect(15, 15, 582, 762, fill=0, stroke=1)
@@ -323,12 +349,12 @@ def create_pdf(filename, school_name, st_data, roll_no):
     
     c.setFillColorRGB(0.98, 0.95, 0.98); c.rect(50, t_b_y-25, 500, 25, fill=1, stroke=0)
     c.setFillColorRGB(0.59, 0.25, 0.60); c.setFont("Helvetica-Bold", 11)
-    c.drawRightString(270, t_b_y-17, "TOTAL MARKS"); c.drawCentredString(350, t_b_y-17, str(st_data.get('total_full', 0)))
-    c.setFillColorRGB(0,0,0); c.drawRightString(540, t_b_y-17, str(st_data.get('total_obt', 0)))
+    c.drawRightString(270, t_b_y-17, "TOTAL MARKS"); c.drawCentredString(350, t_b_y-17, str(t_ful))
+    c.setFillColorRGB(0,0,0); c.drawRightString(540, t_b_y-17, str(t_obt))
     c.setStrokeColorRGB(0.59, 0.25, 0.60); c.line(50, t_b_y-25, 550, t_b_y-25)
     c.line(50, t_b_y, 50, t_b_y-25); c.line(280, t_b_y, 280, t_b_y-25); c.line(420, t_b_y, 420, t_b_y-25); c.line(550, t_b_y, 550, t_b_y-25)
     
-    y = t_b_y - 45; c.setFillColorRGB(0,0,0); c.setFont("Helvetica-Bold", 10); c.drawCentredString(300, y, f"( {number_to_words(st_data.get('total_obt', 0))} )")
+    y = t_b_y - 45; c.setFillColorRGB(0,0,0); c.setFont("Helvetica-Bold", 10); c.drawCentredString(300, y, f"( {number_to_words(t_obt)} )")
     y -= 60
     try: bc = code128.Code128(str(roll_no), barHeight=25, barWidth=1.2); bc.drawOn(c, 50, y+15)
     except: pass
@@ -340,7 +366,7 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.setFillColorRGB(0,0,0); c.setFont("Helvetica-Bold", 18); c.drawCentredString(300, y-15, f"{st_data.get('grade', '')}")
     
     try:
-        qr_text = f"SCHOOL: {school_name}\nROLL: {roll_no}\nMARKS: {st_data.get('total_obt')}/{st_data.get('total_full')}\nGRADE: {st_data.get('grade')}"
+        qr_text = f"SCHOOL: {school_name}\nROLL: {roll_no}\nMARKS: {t_obt}/{t_ful}\nGRADE: {st_data.get('grade')}"
         qr_w = qr.QrCodeWidget(qr_text); b = qr_w.getBounds(); w = b[2]-b[0]; h = b[3]-b[1]
         d = Drawing(60, 60, transform=[60/w,0,0,60/h,0,0]); d.add(qr_w); renderPDF.draw(d, c, 445, y-5)
     except: pass
@@ -375,7 +401,7 @@ elif menu == "Results": st.query_params["portal"] = "student"
 classes_list = [str(i) for i in range(1, 11)]
 batches_list = [f"{y}-{y+1}" for y in range(2020, 2051)]
 
-# ----------------- HOME PAGE (BEAUTIFUL DYNAMIC UI WITH NOTIFICATION & NEWS) -----------------
+# ----------------- HOME PAGE (DYNAMIC UI WITH GUARANTEED PHOTO RUNNING & NEWS TICKER) -----------------
 if menu == "Home Page":
     bg_images = [
         "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1920",
@@ -408,12 +434,6 @@ if menu == "Home Page":
     elif mm_dd == "01-26":
         event_images += "<img class='marquee-img' src='https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg&w=400' alt='Republic Day'>"
         event_title = "🇮🇳 Happy Republic Day 🇮🇳"
-    elif mm_dd == "09-05":
-        event_images += "<img class='marquee-img' src='https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/d/d1/Dr_Sarvepalli_Radhakrishnan.jpg&w=400' alt='Teachers Day'>"
-        event_title = "📚 Happy Teachers' Day 📚"
-    elif mm_dd == "04-14":
-        event_images += "<img class='marquee-img' src='https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/c/c3/Dr._Bhimrao_Ambedkar.jpg&w=400' alt='Ambedkar Jayanti'>"
-        event_title = "🙏 Happy Ambedkar Jayanti 🙏"
 
     base_images = (
         "<img class='marquee-img' src='https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=600&q=80' alt='School Building'>"
@@ -431,7 +451,7 @@ if menu == "Home Page":
     <style>
     html, body {{ margin: 0; padding: 0; background: transparent; font-family: sans-serif; overflow: hidden; height: 100%; }}
     .carousel-container {{ width: 100%; height: 350px; overflow: hidden; border-radius: 10px; position: relative; border: 2px solid #38bdf8; box-sizing: border-box; background: rgba(15, 23, 42, 0.6); }}
-    .marquee-img {{ height: 260px; border-radius: 10px; margin-right: 20px; object-fit: contain; display: inline-block; vertical-align: middle; margin-top: 15px; border: 2px solid #fbbf24; background-color: #fff; padding: 5px; }}
+    .marquee-img {{ height: 260px; border-radius: 10px; margin-right: 20px; object-fit: contain; display: inline-block; vertical-align: middle; margin-top: 15px; border: 2px solid #fbbf24; background-color: #fff; padding: 5px; box-shadow: 2px 2px 10px rgba(0,0,0,0.5); }}
     .carousel-overlay {{ position: absolute; bottom: 0; background: rgba(30,58,138,0.9); width: 100%; color: white; text-align: center; padding: 12px; font-weight: bold; font-size: 20px; letter-spacing: 1px; box-sizing: border-box; text-shadow: 1px 1px 2px #000; }}
     </style></head>
     <body>
@@ -448,7 +468,7 @@ if menu == "Home Page":
     components.html(carousel_html, height=360)
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # TWO SEPARATE NOTIFICATION BANNERS
+    # 🌟 SEPARATE NOTIFICATION & NEWS TICKERS
     notice_and_news_html = """
     <!DOCTYPE html>
     <html>
@@ -611,7 +631,7 @@ elif menu == "Scholarship Portal":
         active_schools = {k: v for k, v in schools_db.items() if v.get("status", "Active") == "Active"}
         school_options = [f"{k} - {v['name']}" for k, v in active_schools.items()]
         c24, c25 = st.columns(2)
-        school_sel_str = c24.selectbox("Institute (School) *", ["--Select--"] + school_options)
+        school_sel_str = c24.selectbox("Institute (School) *", ["--Select--"] + school_options) if school_options else "--Select--"
         sch_class = c25.selectbox("Class *", ["IX", "X", "XI", "XII"])
         school_code = school_sel_str.split(" - ")[0] if school_sel_str != "--Select--" else None
         
@@ -1118,7 +1138,7 @@ elif menu == "Master Login":
         with t4: st.markdown("### 🎓 Edit Students Data")
         with t5: st.markdown("### ⚙️ Settings")
 
-# ----------------- SCHOOL LOGIN -----------------
+# ----------------- SCHOOL LOGIN (100% RESTORED FROM BEFORE) -----------------
 elif menu == "School Login":
     c_home, c_title = st.columns([1, 8])
     with c_home:
@@ -1139,12 +1159,14 @@ elif menu == "School Login":
         c1.info(f"🏫 **School Portal** | ID: {cur_school} | {schools_db[cur_school]['name']}")
         if c2.button("🔴 Logout"): del st.session_state['school_logged_id']; st.rerun()
 
-        t1, t2, t3, t4 = st.tabs(["📋 My Students", "✅ Registrations", "🎓 Scholarship Approvals", "🖨️ Report Card"])
+        # ALL TABS RESTORED
+        t1, t2, t3, t4, t5, t6 = st.tabs(["📋 My Students", "✅ Registrations", "🎓 Scholarship Approvals", "➕ Add Student", "✏️ Edit Student", "🖨️ Report Card"])
+        
+        cur_students = students_db.get(cur_school, {})
+        approved_students = {k:v for k,v in cur_students.items() if v.get('status', 'Approved') == 'Approved'}
         
         with t1:
             st.markdown("### 📋 My Students")
-            cur_students = students_db.get(cur_school, {})
-            approved_students = {k:v for k,v in cur_students.items() if v.get('status', 'Approved') == 'Approved'}
             if approved_students:
                 st.write(f"Total Registered: **{len(approved_students)}**")
                 search_query = st.text_input("🔍 Search Roll No or Name")
@@ -1171,7 +1193,49 @@ elif menu == "School Login":
             else:
                 st.success("No pending scholarships for your school.")
 
-# ----------------- RESULTS PORTAL -----------------
+        with t4:
+            st.markdown("### ➕ Add Student")
+            c_roll, c_gen = st.columns(2)
+            add_roll = c_roll.text_input("Roll No", key="add_r_new")
+            add_name = c_gen.text_input("Name", key="add_n_new")
+            if st.button("Save New Student"):
+                if add_roll and add_name:
+                    students_db[cur_school][add_roll] = {"name": sanitize(add_name), "status": "Approved"}
+                    save_data(schools_db, students_db)
+                    st.success("Saved!")
+                    st.rerun()
+                else: st.error("Fill Roll and Name")
+
+        with t5:
+            st.markdown("### ✏️ Edit Student")
+            if approved_students:
+                edit_roll = st.selectbox("Select Roll No to Edit", list(approved_students.keys()))
+                curr_st = approved_students[edit_roll]
+                
+                up_name = st.text_input("Edit Name", value=curr_st.get('name', ''))
+                up_obt = st.number_input("Total Secured Marks", value=float(curr_st.get('total_obt', 0)))
+                up_ful = st.number_input("Full Marks", value=float(curr_st.get('total_full', 600)))
+                
+                if st.button("💾 Update Record"):
+                    curr_st.update({"name": sanitize(up_name), "total_obt": up_obt, "total_full": up_ful})
+                    save_data(schools_db, students_db)
+                    st.success("Updated successfully!")
+            else: st.warning("No students available to edit.")
+
+        with t6:
+            st.markdown("### 🖨️ Report Card Generator")
+            if approved_students:
+                rep_roll = st.selectbox("Select Student for Report Card", list(approved_students.keys()), key="rep_sel_s")
+                st_data = approved_students[rep_roll]
+                school_name_en = schools_db[cur_school]['name']
+                
+                pdf_file = f"Report_{rep_roll}.pdf"
+                create_pdf(pdf_file, school_name_en, st_data, rep_roll)
+                with open(pdf_file, "rb") as f:
+                    st.download_button("📥 Download PDF Report Card", f, file_name=pdf_file, mime="application/pdf")
+            else: st.warning("No students available.")
+
+# ----------------- RESULTS PORTAL (HTML RENDER RESTORED) -----------------
 elif menu == "Results":
     c_home, c_title = st.columns([1, 8])
     with c_home:
@@ -1208,12 +1272,23 @@ elif menu == "Results":
             if found_student:
                 sch = schools_db.get(found_school_id, {})
                 s_lang = sch.get("lang", "English")
-                st.success(f"🎉 **Welcome {found_student.get('name', '').upper()}!**")
+                school_name_en = sch.get('name', 'Unknown School')
+                school_name_loc = sch.get('name_local', '')
                 
-                pdf_file = f"Result_{found_roll}.pdf"
-                create_pdf(pdf_file, sch.get('name', 'Unknown School'), found_student, found_roll)
-                with open(pdf_file, "rb") as f:
-                    st.download_button("📥 Download PDF", f, file_name=pdf_file, mime="application/pdf")
+                st.success(f"🎉 **Welcome {found_student.get('name', '').upper()}!** Here is your result:")
+                
+                # HTML DISPLAY RESTORED HERE
+                st.markdown(generate_result_card_html(school_name_en, school_name_loc, found_student, found_roll, s_lang), unsafe_allow_html=True)
+                
+                col1, col2 = st.columns(2)
+                with col1:
+                    pdf_file = f"Result_{found_roll}.pdf"
+                    create_pdf(pdf_file, school_name_en, found_student, found_roll)
+                    with open(pdf_file, "rb") as f:
+                        st.download_button("📥 Download PDF Copy", f, file_name=pdf_file, mime="application/pdf")
+                with col2:
+                    if st.button("🖨️ Print Document"):
+                        components.html("<script>window.parent.print();</script>", height=0)
             else:
                 st.error("❌ କୌଣସି ରେକର୍ଡ ମିଳିଲା ନାହିଁ! ଭୁଲ୍ ତଥ୍ୟ ଦେଇଛନ୍ତି।")
 
