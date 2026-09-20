@@ -634,7 +634,6 @@ elif menu == "Scholarship Portal":
     
     if 'sch_app_step' not in st.session_state: st.session_state['sch_app_step'] = False
     if 'sch_app_success' not in st.session_state: st.session_state['sch_app_success'] = False
-    if 'otr_verified' not in st.session_state: st.session_state['otr_verified'] = False
 
     if st.session_state['sch_app_success']:
         st.success(f"✅ Application Submitted! Reference ID is **{st.session_state['sch_app_id']}**.")
@@ -822,7 +821,7 @@ elif menu == "New Student Registration":
         st.success(f"✅ Application Submitted! Reg ID: **{st.session_state['stu_reg_id']}**.")
         pdf_file = f"Receipt_{st.session_state['stu_reg_id']}.pdf"
         create_student_receipt_pdf(pdf_file, st.session_state['stu_reg_id'], st.session_state['stu_reg_data'])
-        with open(pdf_file, "rb"] as f: st.download_button("📥 Download PDF Receipt", f, file_name=pdf_file, mime="application/pdf")
+        with open(pdf_file, "rb") as f: st.download_button("📥 Download PDF Receipt", f, file_name=pdf_file, mime="application/pdf")
         if st.button("⬅️ Done"): st.session_state['stu_reg_success'] = False; st.rerun()
                 
     elif not st.session_state['payment_step']:
