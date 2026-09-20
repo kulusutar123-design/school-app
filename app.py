@@ -16,7 +16,7 @@ import html
 import threading
 
 # ==========================================
-# 🔒 CRASH PROTECTION & DATA SAFETY LOCKS
+# 🔒 ATOMIC CRASH PROTECTION & DATA SAFETY LOCKS
 # ==========================================
 file_lock = threading.Lock()
 
@@ -24,6 +24,17 @@ def sanitize(text):
     if isinstance(text, str):
         return html.escape(text.strip())
     return text
+
+def atomic_save(data, filename):
+    """100% Data Safety - Never corrupts files during save"""
+    with file_lock:
+        try:
+            tmp_filename = filename + ".tmp"
+            with open(tmp_filename, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=4)
+            os.replace(tmp_filename, filename)
+        except Exception as e:
+            st.error(f"System Error (Data Save): {e}")
 
 # ==========================================
 # 🌐 APP URL SETTING & CONFIG
@@ -146,8 +157,7 @@ def load_master_data():
     return default_master
 
 def save_master_data(data):
-    with file_lock:
-        with open(MASTER_FILE, "w", encoding="utf-8") as f: json.dump(data, f, indent=4)
+    atomic_save(data, MASTER_FILE)
 
 def load_data():
     schools = {}; students = {}
@@ -166,9 +176,8 @@ def load_data():
     return schools, students
 
 def save_data(schools, students):
-    with file_lock:
-        with open(SCHOOLS_FILE, "w", encoding="utf-8") as f: json.dump(schools, f, indent=4)
-        with open(STUDENTS_FILE, "w", encoding="utf-8") as f: json.dump(students, f, indent=4)
+    atomic_save(schools, SCHOOLS_FILE)
+    atomic_save(students, STUDENTS_FILE)
 
 def load_scholarships():
     sch = {}
@@ -181,8 +190,7 @@ def load_scholarships():
     return sch
 
 def save_scholarships(sch):
-    with file_lock:
-        with open(SCHOLARSHIPS_FILE, "w", encoding="utf-8") as f: json.dump(sch, f, indent=4)
+    atomic_save(sch, SCHOLARSHIPS_FILE)
 
 # ==========================================
 # 🎨 PDF GENERATORS
@@ -601,7 +609,7 @@ if menu == "Home Page":
                 🔴 [BENGAL] রাজ্যের সব স্কুলে নতুন শিক্ষাবর্ষের ভর্তি শুরু হচ্ছে! &nbsp;&nbsp;♦&nbsp;&nbsp; 
                 🔴 [MAHARASHTRA] राज्यातील सर्व शाळांमध्ये नवीन तंत्रज्ञान लागू होणार! &nbsp;&nbsp;♦&nbsp;&nbsp; 
                 🔴 [ANDHRA] రాష్ట్రంలోని పాఠశాలల్లో డిజిటల్ విద్య అమలు! &nbsp;&nbsp;♦&nbsp;&nbsp; 
-                🔴 [HINDI] देश भर के सभी स्कूलों में नई डिजिटल शिक्षा प्रणाली लागू होगी!
+                🔴 [HINDI] देश भर के सभी स्कूलों में नई ডিজিটাল शिक्षा प्रणाली लागू होगी!
                 </span>
             </marquee>
         </div>
@@ -1127,7 +1135,7 @@ elif menu == "Master Login":
             if master_school_sel != "--Select--":
                 school_students = students_db.get(master_school_sel, {})
                 s_lang = schools_db[master_school_sel].get("lang", "English")
-                approved_students = {k:v for k,v in school_students.items() if v.get('status', 'Approved') == 'Approved'}
+                approved_students = {k:v for k,v in school_students.items()}
                 if approved_students:
                     m_edit_roll = st.selectbox("Select Student Roll No", list(approved_students.keys()), key="m_roll_sel_fixed")
                     m_curr_st = approved_students[m_edit_roll]
@@ -1155,7 +1163,6 @@ elif menu == "Master Login":
                     m_subjects = m_curr_st.get('subjects', {})
                     existing_m_keys = list(m_subjects.keys())
                     
-                    # 🛠️ DYNAMIC ADD/REMOVE BUTTONS FOR MASTER ID
                     m_state_key = f"m_edit_sub_cnt_{m_edit_roll}"
                     if m_state_key not in st.session_state:
                         st.session_state[m_state_key] = max(5, len(existing_m_keys))
@@ -1419,7 +1426,6 @@ elif menu == "School Login":
                 up_subjects = curr_st.get('subjects', {})
                 existing_keys = list(up_subjects.keys())
                 
-                # 🛠️ DYNAMIC ADD/REMOVE BUTTONS FOR SCHOOL ID
                 state_key = f"s_edit_sub_cnt_{edit_roll}"
                 if state_key not in st.session_state:
                     st.session_state[state_key] = max(5, len(existing_keys))
@@ -1515,25 +1521,27 @@ elif menu == "Results":
     
     if st.button("View Result", key="res_view_v2"):
         if st_search_query and st_dob_input:
-            sq_low = sanitize(st_search_query.strip().lower())
+            sq_clean = st_search_query.strip()
             ndob = normalize_dob(st_dob_input)
             
             found_student = None; found_roll = None; found_school_id = None
+            pending_status = None
+            dob_mismatch = False
             
             for s_id, school_students in students_db.items():
-                if st_search_query in school_students:
-                    potential_student = school_students[st_search_query]
-                    if normalize_dob(potential_student.get("dob", "")) == ndob and potential_student.get("status", "Approved") == "Approved":
-                        found_student = potential_student; found_roll = st_search_query; found_school_id = s_id
-                        break
-                
-                if not found_student:
-                    for r_no, s_info in school_students.items():
-                        if s_info.get("name", "").strip().lower() == sq_low:
-                            if normalize_dob(s_info.get("dob", "")) == ndob:
-                                if s_info.get("status", "Approved") == "Approved":
-                                    found_student = s_info; found_roll = r_no; found_school_id = s_id
-                                    break
+                for r_no, s_info in school_students.items():
+                    match_roll = (r_no.lower() == sq_clean.lower())
+                    match_name = (s_info.get("name", "").strip().lower() == sq_clean.lower())
+                    
+                    if match_roll or match_name:
+                        if normalize_dob(s_info.get("dob", "")) == ndob:
+                            if s_info.get("status", "Approved") == "Approved":
+                                found_student = s_info; found_roll = r_no; found_school_id = s_id
+                                break
+                            else:
+                                pending_status = s_info.get("status")
+                        else:
+                            dob_mismatch = True
                 if found_student: break
             
             if found_student:
@@ -1549,8 +1557,12 @@ elif menu == "Results":
                     st.download_button("📥 Download PDF", f, file_name=pdf_file, mime="application/pdf", key="res_dl_v2")
                 if st.button("🖨️ Print Result Card", key="res_print_v2"):
                     components.html("<script>window.parent.print();</script>", height=0)
+            elif pending_status:
+                st.warning(f"⚠️ ଆପଣଙ୍କ ରେକର୍ଡ ମିଳିଲା, କିନ୍ତୁ ଆପଣଙ୍କ Payment/Approval Status ଏବେ: '{pending_status}' ଅଛି। ଦୟାକରି Master କିମ୍ବା School ରୁ Approve କରନ୍ତୁ।")
+            elif dob_mismatch:
+                st.warning("⚠️ ଆପଣ ଦେଇଥିବା ନାମ କିମ୍ବା ରୋଲ୍ ନମ୍ବର ସହ ଜନ୍ମ ତାରିଖ (Date of Birth) ମେଳ ଖାଉନାହିଁ। ଦୟାକରି ଠିକ୍ DOB ଦିଅନ୍ତୁ।")
             else:
-                st.error("❌ କୌଣସି ରେକର୍ଡ ମିଳିଲା ନାହିଁ! ଭୁଲ୍ ତଥ୍ୟ ଦେଇଛନ୍ତି।")
+                st.error("❌ କୌଣସି ରେକର୍ଡ ମିଳିଲା ନାହିଁ! ଦୟାକରି ଠିକ୍ Roll Number କିମ୍ବା Name ଦିଅନ୍ତୁ।")
 
 st.markdown("---")
 st.markdown("<div style='text-align: center; padding: 15px; background: linear-gradient(90deg, #1e3a8a, #9333ea); color: white; border-radius: 8px; font-weight: bold;'>👨‍💻 Software Developed by: KULU SUTAR | 📞 Mob: 8910223342 | ✉️ kulusutar123@gmail.com</div>", unsafe_allow_html=True)
