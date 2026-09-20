@@ -103,7 +103,7 @@ def number_to_words(num):
     except: num = 0
     if num == 0: return "ZERO"
     ones = ["", "ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE", "TEN", "ELEVEN", "TWELVE", "THIRTEEN", "FOURTEEN", "FIFTEEN", "SIXTEEN", "SEVENTEEN", "EIGHTEEN", "NINETEEN"]
-    tens = ["", "", "TWENTY", "THIRTY", "FORTY", "FIFTY", "SIXTY", "SEVENTY", "EIGHTY", "NINETY"]
+    tens = ["", "", "TWENTY", "THIRty", "FORTY", "FIFTY", "SIXTY", "SEVENTY", "EIGHTY", "NINETY"]
     def words(n):
         if n < 20: return ones[int(n)]
         elif n < 100: return tens[int(n // 10)] + ("-" + ones[int(n % 10)] if n % 10 != 0 else "")
@@ -839,40 +839,40 @@ elif menu == "New Student Registration":
             stu_name_loc = c_n2.text_input("1. Student's Name (Local Language)")
             
             c_g1, c_g2, c_g3 = st.columns(3)
-            stu_gender_en = c_g1.selectbox("2. Gender", ["Male", "Female", "Other"])
-            stu_dob = c_g2.date_input("3. Date of Birth *", min_value=datetime.date(2000, 1, 1), max_value=datetime.date.today())
-            stu_category = c_g3.selectbox("4. Category *", SOCIAL_CATEGORIES)
+            stu_gender_en = c_g1.selectbox("2. Gender", ["Male", "Female", "Other"], key="reg_gender")
+            stu_dob = c_g2.date_input("3. Date of Birth *", min_value=datetime.date(2000, 1, 1), max_value=datetime.date.today(), key="reg_dob")
+            stu_category = c_g3.selectbox("4. Category *", SOCIAL_CATEGORIES, key="reg_cat")
             
             c_d1, c_d2 = st.columns(2)
-            m_name_en = c_d1.text_input("5. Mother's Name (English) *")
-            m_name_loc = c_d2.text_input("Mother's Name (Local)")
+            m_name_en = c_d1.text_input("5. Mother's Name (English) *", key="reg_mname")
+            m_name_loc = c_d2.text_input("Mother's Name (Local)", key="reg_mnameloc")
             
             c_f1, c_f2 = st.columns(2)
-            f_name_en = c_f1.text_input("6. Father's Name (English) *")
-            f_name_loc = c_f2.text_input("Father's Name (Local)")
+            f_name_en = c_f1.text_input("6. Father's Name (English) *", key="reg_fname")
+            f_name_loc = c_f2.text_input("Father's Name (Local)", key="reg_fnameloc")
             
             st.markdown("#### 3. Contact & Identification")
             c_id1, c_id2 = st.columns(2)
-            stu_aadhar = c_id1.text_input("7. AADHAAR Number *", max_chars=12)
-            stu_phone = c_id2.text_input("8. Mobile No *", max_chars=10)
+            stu_aadhar = c_id1.text_input("7. AADHAAR Number *", max_chars=12, key="reg_aadhaar")
+            stu_phone = c_id2.text_input("8. Mobile No *", max_chars=10, key="reg_phone")
             
             c_ad1, c_ad2 = st.columns(2)
-            stu_address_en = c_ad1.text_area("9. Address (English) *")
-            stu_address_loc = c_ad2.text_area("Address (Local)")
+            stu_address_en = c_ad1.text_area("9. Address (English) *", key="reg_addr")
+            stu_address_loc = c_ad2.text_area("Address (Local)", key="reg_addrd")
             
             c_loc1, c_loc2, c_loc3 = st.columns(3)
-            stu_state = c_loc1.selectbox("10. State", list(STATE_LANG_MAP.keys()), index=18)
-            stu_pin = c_loc2.text_input("11. PIN Code *", max_chars=6)
-            stu_minority = c_loc3.selectbox("12. Minority Group", ["No", "Yes - Muslim", "Yes - Christian", "Yes - Sikh", "Yes - Buddhist", "Yes - Parsi", "Yes - Jain"])
+            stu_state = c_loc1.selectbox("10. State", list(STATE_LANG_MAP.keys()), index=18, key="reg_state")
+            stu_pin = c_loc2.text_input("11. PIN Code *", max_chars=6, key="reg_pin")
+            stu_minority = c_loc3.selectbox("12. Minority Group", ["No", "Yes - Muslim", "Yes - Christian", "Yes - Sikh", "Yes - Buddhist", "Yes - Parsi", "Yes - Jain"], key="reg_min")
             
             c_nat1, c_nat2 = st.columns(2)
-            stu_country = c_nat1.selectbox("13. Nationality", COUNTRIES)
-            stu_bg = c_nat2.selectbox("14. Blood Group", ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-", "Unknown"])
+            stu_country = c_nat1.selectbox("13. Nationality", COUNTRIES, key="reg_nat")
+            stu_bg = c_nat2.selectbox("14. Blood Group", ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-", "Unknown"], key="reg_bg")
             
             st.markdown("#### 4. Photograph Upload")
-            stu_photo = st.file_uploader("15. Upload Student Photo (JPG/PNG)", type=['png', 'jpg', 'jpeg'])
+            stu_photo = st.file_uploader("15. Upload Student Photo (JPG/PNG)", type=['png', 'jpg', 'jpeg'], key="reg_photo")
             
-            declaration = st.checkbox("✅ I declare the above info is true.")
+            declaration = st.checkbox("✅ I declare the above info is true.", key="reg_decl")
             if st.form_submit_button("Proceed to Payment & Submit"):
                 if not declaration: st.error("⚠️ Please check the declaration box.")
                 elif not school_sel or not sanitize(stu_name_en) or not sanitize(stu_phone) or not sanitize(stu_aadhar) or not sanitize(stu_address_en) or not sanitize(f_name_en) or not sanitize(m_name_en):
@@ -1290,33 +1290,33 @@ elif menu == "School Login":
         with t_add:
             st.markdown("### ➕ Add Student Direct (Full Form)")
             c_roll, c_gen = st.columns(2)
-            add_roll = c_roll.text_input(f"Roll No / {t('ROLL NO', s_lang)}")
-            add_gen = c_gen.selectbox("Gender", ["Male", "Female", "Other"])
+            add_roll = c_roll.text_input(f"Roll No / {t('ROLL NO', s_lang)}", key="add_stu_roll")
+            add_gen = c_gen.selectbox("Gender", ["Male", "Female", "Other"], key="add_stu_gen")
             
             c_n1, c_n2 = st.columns(2)
-            add_name = c_n1.text_input("Student Name (English)")
-            add_name_loc = c_n2.text_input(f"Student Name ({s_lang}) [Optional]")
+            add_name = c_n1.text_input("Student Name (English)", key="add_stu_name")
+            add_name_loc = c_n2.text_input(f"Student Name ({s_lang}) [Optional]", key="add_stu_nameloc")
             
-            add_fname = c_n1.text_input("Father's Name (English)")
-            add_fname_loc = c_n2.text_input(f"Father's Name ({s_lang}) [Optional]")
+            add_fname = c_n1.text_input("Father's Name (English)", key="add_stu_fname")
+            add_fname_loc = c_n2.text_input(f"Father's Name ({s_lang}) [Optional]", key="add_stu_fnameloc")
             
-            add_mname = c_n1.text_input("Mother's Name (English)")
-            add_mname_loc = c_n2.text_input(f"Mother's Name ({s_lang}) [Optional]")
+            add_mname = c_n1.text_input("Mother's Name (English)", key="add_stu_mname")
+            add_mname_loc = c_n2.text_input(f"Mother's Name ({s_lang}) [Optional]", key="add_stu_mnameloc")
             
             c_p1, c_p2 = st.columns(2)
-            add_pen = c_p1.text_input("PEN NO")
-            add_apaar = c_p2.text_input("APAAR NO")
+            add_pen = c_p1.text_input("PEN NO", key="add_stu_pen")
+            add_apaar = c_p2.text_input("APAAR NO", key="add_stu_apaar")
             
             c_d1, c_c1 = st.columns(2)
-            add_dob = c_d1.date_input("DOB", min_value=datetime.date(2000, 1, 1))
-            add_class = c_c1.selectbox("Class", classes_list)
+            add_dob = c_d1.date_input("DOB", min_value=datetime.date(2000, 1, 1), key="add_stu_dob")
+            add_class = c_c1.selectbox("Class", classes_list, key="add_stu_class")
             
-            add_batch = st.selectbox("Batch", batches_list, index=5)
-            opt_pub_date = st.date_input("Results Publication Date", value=datetime.date.today())
+            add_batch = st.selectbox("Batch", batches_list, index=5, key="add_stu_batch")
+            opt_pub_date = st.date_input("Results Publication Date", value=datetime.date.today(), key="add_stu_pubdate")
             
             st.markdown("#### 📚 Add Subjects & Marks")
             if 'num_subjects' not in st.session_state: st.session_state.num_subjects = 3
-            if st.button("➕ Add Sub"): st.session_state.num_subjects += 1
+            if st.button("➕ Add Sub", key="add_sub_btn"): st.session_state.num_subjects += 1
             
             subjects_data = {}; total_full = 0; total_obt = 0
             for i in range(st.session_state.num_subjects):
@@ -1328,7 +1328,7 @@ elif menu == "School Login":
                     subjects_data[sanitize(s_name)] = {"full": f_m, "obt": o_m}
                     total_full += f_m; total_obt += o_m
 
-            if st.button("💾 Save Student Data"):
+            if st.button("💾 Save Student Data", key="save_stu_btn"):
                 if add_roll and add_name:
                     per = (total_obt / total_full * 100) if total_full > 0 else 0.0
                     res = "PASS" if per >= 33 else "FAIL"
@@ -1350,29 +1350,29 @@ elif menu == "School Login":
         with t_edit:
             st.markdown("### ✏️ Edit Student Data (Full Form)")
             if approved_students:
-                edit_roll = st.selectbox("Select Roll No", list(approved_students.keys()))
+                edit_roll = st.selectbox("Select Roll No", list(approved_students.keys()), key="edit_stu_roll")
                 curr_st = approved_students[edit_roll]
                 
                 c_up_n1, c_up_n2 = st.columns(2)
-                up_name = c_up_n1.text_input("Edit Name (English)", value=curr_st.get('name', ''))
-                up_name_loc = c_up_n2.text_input(f"Edit Name ({s_lang})", value=curr_st.get('name_local', ''))
+                up_name = c_up_n1.text_input("Edit Name (English)", value=curr_st.get('name', ''), key="edit_stu_name")
+                up_name_loc = c_up_n2.text_input(f"Edit Name ({s_lang})", value=curr_st.get('name_local', ''), key="edit_stu_nameloc")
                 
-                up_father = c_up_n1.text_input("Edit Father's Name (English)", value=curr_st.get('father_name', ''))
-                up_father_loc = c_up_n2.text_input(f"Edit Father's Name ({s_lang})", value=curr_st.get('father_name_local', ''))
+                up_father = c_up_n1.text_input("Edit Father's Name (English)", value=curr_st.get('father_name', ''), key="edit_stu_fname")
+                up_father_loc = c_up_n2.text_input(f"Edit Father's Name ({s_lang})", value=curr_st.get('father_name_local', ''), key="edit_stu_fnameloc")
                 
-                up_mother = c_up_n1.text_input("Edit Mother's Name (English)", value=curr_st.get('mother_name', ''))
-                up_mother_loc = c_up_n2.text_input(f"Edit Mother's Name ({s_lang})", value=curr_st.get('mother_name_local', ''))
+                up_mother = c_up_n1.text_input("Edit Mother's Name (English)", value=curr_st.get('mother_name', ''), key="edit_stu_mname")
+                up_mother_loc = c_up_n2.text_input(f"Edit Mother's Name ({s_lang})", value=curr_st.get('mother_name_local', ''), key="edit_stu_mnameloc")
                 
                 c_up1, c_up2, c_up3 = st.columns(3)
                 genders = ["Male", "Female", "Other"]
-                up_gender = c_up1.selectbox("Edit Gender", genders, index=genders.index(curr_st.get('gender', 'Male')) if curr_st.get('gender', 'Male') in genders else 0)
-                up_pen = c_up2.text_input("PEN NO", value=curr_st.get('pen_no', ''))
-                up_apaar = c_up3.text_input("APAAR NO", value=curr_st.get('apaar_no', ''))
+                up_gender = c_up1.selectbox("Edit Gender", genders, index=genders.index(curr_st.get('gender', 'Male')) if curr_st.get('gender', 'Male') in genders else 0, key="edit_stu_gen")
+                up_pen = c_up2.text_input("PEN NO", value=curr_st.get('pen_no', ''), key="edit_stu_pen")
+                up_apaar = c_up3.text_input("APAAR NO", value=curr_st.get('apaar_no', ''), key="edit_stu_apaar")
                 
                 c_d1, c_c1, c_b1 = st.columns(3)
-                up_dob_input = c_d1.text_input("DOB (DD-MM-YYYY)", value=curr_st.get('dob', ''))
-                up_class = c_c1.selectbox("Edit Class", classes_list, index=classes_list.index(curr_st.get('class', '1')) if curr_st.get('class', '1') in classes_list else 0)
-                up_batch = c_b1.selectbox("Edit Batch", batches_list, index=batches_list.index(curr_st.get('batch', '2025-2026')) if curr_st.get('batch', '2025-2026') in batches_list else 5)
+                up_dob_input = c_d1.text_input("DOB (DD-MM-YYYY)", value=curr_st.get('dob', ''), key="edit_stu_dob")
+                up_class = c_c1.selectbox("Edit Class", classes_list, index=classes_list.index(curr_st.get('class', '1')) if curr_st.get('class', '1') in classes_list else 0, key="edit_stu_class")
+                up_batch = c_b1.selectbox("Edit Batch", batches_list, index=batches_list.index(curr_st.get('batch', '2025-2026')) if curr_st.get('batch', '2025-2026') in batches_list else 5, key="edit_stu_batch")
                 
                 st.markdown("#### 📚 Edit Subjects & Marks")
                 up_subjects = curr_st.get('subjects', {})
@@ -1387,7 +1387,7 @@ elif menu == "School Login":
                         new_up_subjects[sanitize(u_sub)] = {"full": u_f, "obt": u_o}
                         up_tot_full += u_f; up_tot_obt += u_o
                 
-                if st.button("💾 Save Updated Record"):
+                if st.button("💾 Save Updated Record", key="edit_stu_save"):
                     new_per = (up_tot_obt / up_tot_full * 100) if up_tot_full > 0 else 0.0
                     new_res = "PASS" if new_per >= 33 else "FAIL"
                     new_grd = "A1" if new_per >= 90 else "A2" if new_per >= 80 else "B1" if new_per >= 70 else "B2" if new_per >= 60 else "C1" if new_per >= 50 else "C2" if new_per >= 40 else "D" if new_per >= 33 else "F"
@@ -1407,15 +1407,15 @@ elif menu == "School Login":
         with t_rep:
             st.markdown("### 🖨️ Report Card")
             if approved_students:
-                rep_roll = st.selectbox("Select Roll for Report", list(approved_students.keys()))
+                rep_roll = st.selectbox("Select Roll for Report", list(approved_students.keys()), key="rep_stu_roll")
                 
                 st.markdown(generate_result_card_html(sch_data['name'], sch_data.get('name_local', ''), approved_students[rep_roll], rep_roll, s_lang), unsafe_allow_html=True)
                 
                 pdf_file = f"Report_{rep_roll}.pdf"
                 create_pdf(pdf_file, sch_data['name'], approved_students[rep_roll], rep_roll)
                 with open(pdf_file, "rb") as f:
-                    st.download_button("📥 Download PDF", f, file_name=pdf_file, mime="application/pdf")
-                if st.button("🖨️ Print Result Card"):
+                    st.download_button("📥 Download PDF", f, file_name=pdf_file, mime="application/pdf", key="dl_rep_pdf")
+                if st.button("🖨️ Print Result Card", key="print_rep_btn"):
                     components.html("<script>window.parent.print();</script>", height=0)
 
         with t_sch:
@@ -1478,8 +1478,8 @@ elif menu == "Results":
                 pdf_file = f"Result_{found_roll}.pdf"
                 create_pdf(pdf_file, sch.get('name', 'Unknown School'), found_student, found_roll)
                 with open(pdf_file, "rb") as f:
-                    st.download_button("📥 Download PDF", f, file_name=pdf_file, mime="application/pdf")
-                if st.button("🖨️ Print Result Card"):
+                    st.download_button("📥 Download PDF", f, file_name=pdf_file, mime="application/pdf", key="dl_res_pdf")
+                if st.button("🖨️ Print Result Card", key="print_res_btn"):
                     components.html("<script>window.parent.print();</script>", height=0)
             else:
                 st.error("❌ କୌଣସି ରେକର୍ଡ ମିଳିଲା ନାହିଁ! ଭୁଲ୍ ତଥ୍ୟ ଦେଇଛନ୍ତି।")
