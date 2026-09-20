@@ -16,7 +16,7 @@ import html
 import threading
 
 # ==========================================
-# 🔒 CRASH PROTECTION & DATA SAFETY LOCKS (1 Crore+ Users Support)
+# 🔒 CRASH PROTECTION & DATA SAFETY LOCKS
 # ==========================================
 file_lock = threading.Lock()
 
@@ -198,17 +198,23 @@ def create_scholarship_pdf(filename, app_id, s_data):
     c.setFont("Helvetica", 11); y = 640
     c.drawString(50, y, f"Applicant Name: {s_data.get('app_name', '').upper()}"); c.drawString(350, y, f"OTR No: {s_data.get('otr', '')}"); y -= 25
     c.drawString(50, y, f"Aadhaar No: {s_data.get('aadhaar', '')}"); c.drawString(350, y, f"Category: {s_data.get('category', '')}"); y -= 25
+    c.drawString(50, y, f"DOB: {s_data.get('dob', '')}"); c.drawString(350, y, f"Gender: {s_data.get('gender', '')}"); y -= 25
     c.drawString(50, y, f"Phone: {s_data.get('mobile', '')}"); c.drawString(350, y, f"School Code: {s_data.get('school_code', '')}"); y -= 35
     c.setStrokeColorRGB(0.8, 0.8, 0.8); c.line(50, y, 550, y); y -= 20
     c.setFont("Helvetica-Bold", 12); c.drawString(50, y, "Certificate & Institute Info"); c.setFont("Helvetica", 11); y -= 20
     c.drawString(50, y, f"Class: {s_data.get('class', '')}"); c.drawString(350, y, f"Income Cert: {s_data.get('income_cert', '')}"); y -= 25
     c.drawString(50, y, f"Caste Cert: {s_data.get('caste_cert', '')}"); y -= 35
     c.setStrokeColorRGB(0.8, 0.8, 0.8); c.line(50, y, 550, y); y -= 20
+    c.setFont("Helvetica-Bold", 12); c.drawString(50, y, "Bank Information"); c.setFont("Helvetica", 11); y -= 20
+    c.drawString(50, y, f"Account No: {s_data.get('acc_no', '')}"); c.drawString(350, y, f"Bank: {s_data.get('bank_name', '')}"); y -= 25
+    c.setStrokeColorRGB(0.8, 0.8, 0.8); c.line(50, y, 550, y); y -= 20
     c.setFont("Helvetica-Bold", 12); c.drawString(50, y, "Payment & Status"); c.setFont("Helvetica", 11); y -= 20
     c.drawString(50, y, f"Payment Mode: {s_data.get('payment_mode', 'N/A')}"); y -= 25
     c.drawString(50, y, f"Current Status: {s_data.get('status', 'Pending_Master')}"); y -= 40
     c.line(50, y, 550, y); y -= 20
     c.setFont("Helvetica-Oblique", 10); c.drawCentredString(300, y, "Computer-generated receipt. Keep for future reference.")
+    try: bc = code128.Code128(str(app_id), barHeight=30, barWidth=1.5); bc.drawOn(c, 50, 40)
+    except: pass
     c.save()
 
 # --- MAIN APP START ---
@@ -320,7 +326,7 @@ if menu == "Home Page":
     with c3: st.markdown("<a href='?portal=reg_school' target='_self' class='login-card'><div class='login-title'>🏫 New School</div><div class='login-sub'>Register institution</div></a>", unsafe_allow_html=True)
     with c4: st.markdown("<a href='?portal=master' target='_self' class='login-card'><div class='login-title'>🏛️ Master Login</div><div class='login-sub'>Admin Portal</div></a>", unsafe_allow_html=True)
 
-# ----------------- SCHOLARSHIP PORTAL (NEW FEATURES) -----------------
+# ----------------- SCHOLARSHIP PORTAL -----------------
 elif menu == "Scholarship Portal":
     c_h, c_t = st.columns([1, 8])
     with c_h:
@@ -331,6 +337,7 @@ elif menu == "Scholarship Portal":
     
     if 'sch_app_step' not in st.session_state: st.session_state['sch_app_step'] = False
     if 'sch_app_success' not in st.session_state: st.session_state['sch_app_success'] = False
+    if 'otr_verified' not in st.session_state: st.session_state['otr_verified'] = False
 
     if st.session_state['sch_app_success']:
         st.success(f"✅ Application Submitted! Reference ID is **{st.session_state['sch_app_id']}**.")
@@ -345,12 +352,11 @@ elif menu == "Scholarship Portal":
                 st.session_state['sch_app_success'] = False; st.rerun()
 
     elif not st.session_state['sch_app_step']:
+        st.info("Please provide your One Time Registration (OTR) number generated from the National Scholarship Portal.")
         
-        # 1. OUTSIDE FORM VERIFICATIONS
-        st.markdown("### 🎓 OTR & Aadhaar Verification")
-        c_otr1, c_otr2 = st.columns([7, 3])
-        otr_input = c_otr1.text_input("OTR No. *", key="otr_inp_val")
-        if c_otr2.button("VERIFY OTR"):
+        col_o1, col_o2 = st.columns([8, 2])
+        otr_input = col_o1.text_input("OTR No. *", key="otr_inp_val")
+        if col_o2.button("VERIFY OTR"):
             if otr_input:
                 st.session_state['v_otr'] = otr_input
                 st.session_state['v_name'] = "JYOTI PRAKASH SUTAR" # Auto fetched mock name
@@ -359,7 +365,7 @@ elif menu == "Scholarship Portal":
             else:
                 st.error("Please enter OTR No.")
 
-        c_ad1, c_ad2 = st.columns([7, 3])
+        c_ad1, c_ad2 = st.columns([8, 2])
         aadhaar_input = c_ad1.text_input("Aadhaar No. *", value=st.session_state.get('v_aadhaar', ''), key="ad_inp_val")
         if c_ad2.button("VERIFY AADHAAR"):
             if aadhaar_input:
@@ -371,7 +377,6 @@ elif menu == "Scholarship Portal":
         st.markdown("---")
         st.markdown("### 📝 Application Details")
         
-        # Form details collection
         c1, c2, c3 = st.columns(3)
         ac_year = c1.selectbox("Academic Year", ["2026-27", "2027-28"])
         dept = c2.selectbox("Department", ["ST&SC and MBC Welfare Depart", "Higher Education"])
@@ -414,14 +419,11 @@ elif menu == "Scholarship Portal":
         with c33:
             st.markdown("**Income Certificate**")
             inc_year = st.selectbox("Issuing Year", CERT_YEARS)
-            
-            # Interactive Verification for Income
             col_inc1, col_inc2 = st.columns([7, 3])
             inc_no = col_inc1.text_input("Income Certificate No. *")
             if col_inc2.button("VERIFY INCOME"):
                 if inc_no: st.success(f"Income Certificate Verified for {app_name}")
                 else: st.error("Enter Income Cert No")
-                
             inc_whom = st.selectbox("To Whom Issued", RELATIONSHIPS)
             inc_auth = st.selectbox("Issuing Authority (Income)", ISSUING_AUTHORITIES)
             inc_file = st.file_uploader("Upload Income Certificate Photo *")
@@ -429,40 +431,55 @@ elif menu == "Scholarship Portal":
         with c34:
             st.markdown("**Caste Certificate**")
             cas_year = st.selectbox("Caste Issuing Year", CERT_YEARS)
-            
-            # Interactive Verification for Caste
             col_cas1, col_cas2 = st.columns([7, 3])
             cas_no = col_cas1.text_input("Caste Certificate No. *")
             if col_cas2.button("VERIFY CASTE"):
                 if cas_no: st.success(f"Caste Certificate Verified for {app_name}")
                 else: st.error("Enter Caste Cert No")
-            
             cas_auth = st.selectbox("Issuing Authority (Caste)", ISSUING_AUTHORITIES)
             cas_file = st.file_uploader("Upload Caste Certificate Photo *")
         
         st.markdown("### 🏦 Bank Information")
-        c35, c36 = st.columns([7, 3])
+        st.warning("Please note that your Aadhaar Number will be used for crediting scholarship amount via DBT.")
+        
+        c35, c36 = st.columns([8, 2])
         ifsc = c35.text_input("IFSC Code *")
         if c36.button("FIND IFSC"):
             if ifsc:
-                st.session_state['v_bank'] = "STATE BANK OF INDIA" # Dynamic Mock
-                st.session_state['v_branch'] = "MAIN BRANCH"
-                st.success("IFSC Verified & Bank Auto-Fetched!")
-            else: st.error("Enter IFSC Code")
+                try:
+                    url = f"https://ifsc.razorpay.com/{ifsc.strip()}"
+                    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+                    with urllib.request.urlopen(req, timeout=5) as response:
+                        data = json.loads(response.read().decode('utf-8'))
+                        st.session_state['v_bank'] = data.get('BANK', 'Unknown Bank')
+                        st.session_state['v_branch'] = data.get('BRANCH', 'Unknown Branch')
+                        st.success("✅ IFSC Verified & Bank Auto-Fetched!")
+                except Exception:
+                    st.session_state['v_bank'] = "Bank Not Found"
+                    st.session_state['v_branch'] = "Branch Not Found"
+                    st.error("❌ Invalid IFSC Code or API unavailable.")
+            else: 
+                st.error("Enter IFSC Code")
             
         c36a, c37a = st.columns(2)
         b_name = c36a.text_input("Bank Name", value=st.session_state.get('v_bank', ''), disabled=True)
         b_branch = c37a.text_input("Branch Name", value=st.session_state.get('v_branch', ''), disabled=True)
         
-        c38, c39 = st.columns([7, 3])
+        c38, c39 = st.columns([8, 2])
         acc_no = c38.text_input("Account Number *", type="password")
         if c39.button("VERIFY ACCOUNT"):
             if acc_no:
                 st.session_state['v_acc_name'] = app_name
-                st.success("Account Verified!")
+                st.success("✅ Account Verified!")
             else: st.error("Enter Account Number")
             
         acc_name = st.text_input("Account Holder Name *", value=st.session_state.get('v_acc_name', ''))
+        re_acc_no = st.text_input("Re-type Account No. *")
+        
+        st.markdown("---")
+        c_seed, c_pass = st.columns(2)
+        seeded = c_seed.radio("Whether account number seeded with the Aadhaar number?", ["Yes", "No"], index=1)
+        passbook = c_pass.file_uploader("Upload Passbook Front Page (max 1MB)")
         
         decl = st.checkbox("✅ I declare the above info is true.")
         
@@ -470,6 +487,7 @@ elif menu == "Scholarship Portal":
             if not decl: st.error("Please accept the declaration.")
             elif not school_code or not sanitize(app_name) or not sanitize(aadhaar_input) or not sanitize(acc_no) or not sanitize(inc_no) or not sanitize(cas_no):
                 st.error("Please fill all mandatory fields (*), including Certificates and School.")
+            elif acc_no != re_acc_no: st.error("Account Numbers do not match!")
             elif inc_auth == "Select" or cas_auth == "Select": st.error("Please select a valid Issuing Authority for certificates.")
             else:
                 app_id = "SCH" + str(random.randint(1000000, 9999999))
@@ -483,7 +501,10 @@ elif menu == "Scholarship Portal":
                         "school_code": school_code, "class": sch_class, 
                         "income_cert": sanitize(inc_no), "inc_auth": inc_auth,
                         "caste_cert": sanitize(cas_no), "cas_auth": cas_auth, "ifsc": sanitize(ifsc), 
-                        "acc_no": sanitize(acc_no), "status": "Pending_Master", "payment_mode": "Pending", "fee": sch_fee
+                        "bank_name": st.session_state.get('v_bank', ''), "branch_name": st.session_state.get('v_branch', ''),
+                        "acc_no": sanitize(acc_no), "acc_name": sanitize(acc_name), "aadhaar_seeded": seeded,
+                        "has_passbook": True if passbook else False,
+                        "status": "Pending_Master", "payment_mode": "Pending", "fee": sch_fee
                     }
                 }
                 st.session_state['sch_app_step'] = True
