@@ -39,7 +39,7 @@ def atomic_save(data, filename):
             st.error(f"Save Error ({filename}): {e}")
 
 # ==========================================
-# 📂 DIRECTORY CREATION 
+# 📂 DIRECTORY CREATION FOR SCHOLARSHIPS
 # ==========================================
 os.makedirs("Scholarship_Data/Student_Submissions", exist_ok=True)
 os.makedirs("Scholarship_Data/Approved_Master", exist_ok=True)
@@ -126,7 +126,10 @@ def load_master_data():
         "school_reg_fee": 1000.0, "school_gst_percent": 18.0, "scholarship_fee": 50.0,
         "notice_text": "📢 ନୂଆ ଅପଡେଟ୍: ଛାତ୍ରଛାତ୍ରୀମାନେ ଏବେ ଅନଲାଇନ୍ ରେଜିଷ୍ଟ୍ରେସନ୍, ସ୍କଲାରସିପ୍ ଏବଂ ପେମେଣ୍ଟ କରିପାରିବେ! <span class='new-badge'>NEW</span> &nbsp;&nbsp;|&nbsp;&nbsp; 👨‍💻 Software Developed by: KULU SUTAR &nbsp;&nbsp;|&nbsp;&nbsp; 📞 Helpdesk No: 8910223342 &nbsp;&nbsp;|&nbsp;&nbsp; ✉️ Mail ID: kulusutar123@gmail.com",
         "news_text": "🔴 [ODISHA] ନୂଆ ଶିକ୍ଷା ନୀତି ଅନୁଯାୟୀ ସମସ୍ତ ସ୍କୁଲରେ ଡିଜିଟାଲ୍ କ୍ଲାସରୁମ୍ ଆରମ୍ଭ ହେବ! &nbsp;&nbsp;♦&nbsp;&nbsp; 🔴 [DELHI] Central Government announces new scholarship schemes for brilliant students across India! &nbsp;&nbsp;♦&nbsp;&nbsp; 🔴 [BENGAL] রাজ্যের সব স্কুলে নতুন শিক্ষাবর্ষের ভর্তি শুরু হচ্ছে! &nbsp;&nbsp;♦&nbsp;&nbsp; 🔴 [MAHARASHTRA] राज्यातील सर्व शाळांमध्ये नवीन तंत्रज्ञान लागू होणार! &nbsp;&nbsp;♦&nbsp;&nbsp; 🔴 [ANDHRA] రాష్ట్రంలోని పాఠశాలల్లో డిజిటల్ విద్య అమలు! &nbsp;&nbsp;♦&nbsp;&nbsp; 🔴 [HINDI] देश भर के सभी स्कूलों में नई डिजिटल शिक्षा प्रणाली लागू होगी!",
-        "bg_b64": ""
+        "bg_b64": "",
+        "sch_bg_b64": "",
+        "school_bg_b64": "",
+        "reg_bg_b64": ""
     }
     if os.path.exists(MASTER_FILE):
         try:
@@ -192,6 +195,19 @@ def save_sch_users(users):
 # ==========================================
 # 🎨 PDF GENERATORS & HELPERS
 # ==========================================
+def inject_custom_bg(b64_str):
+    if b64_str:
+        st.markdown(f"""
+        <style>
+        .stApp {{
+            background-image: url('data:image/jpeg;base64,{b64_str}');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }}
+        </style>
+        """, unsafe_allow_html=True)
+
 def number_to_words(num):
     try: num = int(float(num))
     except: num = 0
@@ -238,7 +254,6 @@ def create_student_receipt_pdf(filename, reg_id, s_data):
     c.setFont("Helvetica-Oblique", 10); c.drawCentredString(300, y, "Computer-generated receipt.")
     c.save()
 
-# --- ODISHA FORMAT SCHOLARSHIP HTML ---
 def render_odisha_scholarship_html(app_id, s_data):
     adh = s_data.get('aadhaar', '')
     masked_adh = f"XXXXXXXX{adh[-4:]}" if len(adh) >= 4 else adh
@@ -553,45 +568,71 @@ portal_map = {"home": 0, "scholarship": 1, "reg_student": 2, "reg_school": 3, "m
 portal_param = st.query_params.get("portal", "home")
 default_idx = portal_map.get(portal_param, 0)
 
-if portal_param != "home":
-    st.sidebar.markdown("---")
-    user_bg_color = st.sidebar.color_picker("🎨 Custom Background Color", "#ffffff")
-    st.markdown(f"<style>.stApp {{ background-color: {user_bg_color} !important; }}</style>", unsafe_allow_html=True)
-
 menu = st.sidebar.selectbox("🎯 Navigation Menu", menu_items, index=default_idx)
 
-if menu == "Home Page": st.query_params["portal"] = "home"
-elif menu == "Scholarship Portal": st.query_params["portal"] = "scholarship"
-elif menu == "New Student Registration": st.query_params["portal"] = "reg_student"
-elif menu == "New School Registration": st.query_params["portal"] = "reg_school"
-elif menu == "Master Login": st.query_params["portal"] = "master"
-elif menu == "School Login": st.query_params["portal"] = "school"
-elif menu == "Results": st.query_params["portal"] = "student"
+# CSS BACKGROUND INJECTION
+def inject_custom_bg(b64_str):
+    if b64_str:
+        st.markdown(f"""
+        <style>
+        .stApp {{
+            background-image: url('data:image/jpeg;base64,{b64_str}');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }}
+        </style>
+        """, unsafe_allow_html=True)
+
+if menu == "Home Page":
+    st.query_params["portal"] = "home"
+    bg_b64 = master_db.get("bg_b64", "")
+    if bg_b64: inject_custom_bg(bg_b64)
+elif menu == "Scholarship Portal":
+    st.query_params["portal"] = "scholarship"
+    bg_b64 = master_db.get("sch_bg_b64", "")
+    if bg_b64: inject_custom_bg(bg_b64)
+elif menu == "New Student Registration":
+    st.query_params["portal"] = "reg_student"
+    bg_b64 = master_db.get("reg_bg_b64", "")
+    if bg_b64: inject_custom_bg(bg_b64)
+elif menu == "New School Registration":
+    st.query_params["portal"] = "reg_school"
+    bg_b64 = master_db.get("reg_bg_b64", "")
+    if bg_b64: inject_custom_bg(bg_b64)
+elif menu == "School Login":
+    st.query_params["portal"] = "school"
+    bg_b64 = master_db.get("school_bg_b64", "")
+    if bg_b64: inject_custom_bg(bg_b64)
+elif menu == "Master Login":
+    st.query_params["portal"] = "master"
+elif menu == "Results":
+    st.query_params["portal"] = "student"
 
 classes_list = [str(i) for i in range(1, 11)]
 batches_list = [f"{y}-{y+1}" for y in range(2020, 2051)]
 
 # ----------------- HOME PAGE -----------------
 if menu == "Home Page":
-    bg_b64 = master_db.get("bg_b64", "")
-    if bg_b64:
-        bg_css = f"background-image: url('data:image/gif;base64,{bg_b64}');"
-    else:
+    if not master_db.get("bg_b64", ""):
         bg_images = [
             "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1920",
             "https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?q=80&w=1920"
         ]
         selected_bg = random.choice(bg_images)
-        bg_css = f"background-image: url('{selected_bg}');"
-    
-    st.markdown(f"""
+        st.markdown(f"""
+        <style>
+        .stApp {{ background-image: url("{selected_bg}"); background-size: cover; background-position: center; background-attachment: fixed; }}
+        </style>
+        """, unsafe_allow_html=True)
+        
+    st.markdown("""
     <style>
-    .stApp {{ {bg_css} background-size: cover; background-position: center; background-attachment: fixed; }}
-    .glass-panel {{ background: rgba(15, 23, 42, 0.85); padding: 20px; border-radius: 15px; border: 2px solid #38bdf8; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); backdrop-filter: blur(4px); margin-bottom: 25px; }}
-    .login-card {{ background: rgba(255, 255, 255, 0.95) !important; border: 1px solid #cbd5e1; border-bottom: 5px solid #fbbf24; border-radius: 8px; padding: 20px; margin-bottom: 20px; text-align: center; text-decoration: none; display: block; color: #1e3a8a !important; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.3s; }}
-    .login-card:hover {{ background: #ffffff !important; border-bottom: 5px solid #1e3a8a; transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.2); }}
-    .login-title {{ font-size: 20px; font-weight: bold; margin-bottom: 8px; color: #1e3a8a !important;}}
-    .login-sub {{ font-size: 14px; color: #64748b !important;}}
+    .glass-panel { background: rgba(15, 23, 42, 0.85); padding: 20px; border-radius: 15px; border: 2px solid #38bdf8; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); backdrop-filter: blur(4px); margin-bottom: 25px; }
+    .login-card { background: rgba(255, 255, 255, 0.95) !important; border: 1px solid #cbd5e1; border-bottom: 5px solid #fbbf24; border-radius: 8px; padding: 20px; margin-bottom: 20px; text-align: center; text-decoration: none; display: block; color: #1e3a8a !important; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.3s; }
+    .login-card:hover { background: #ffffff !important; border-bottom: 5px solid #1e3a8a; transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.2); }
+    .login-title { font-size: 20px; font-weight: bold; margin-bottom: 8px; color: #1e3a8a !important;}
+    .login-sub { font-size: 14px; color: #64748b !important;}
     </style>
     """, unsafe_allow_html=True)
 
@@ -1285,7 +1326,7 @@ elif menu == "Master Login":
         if c2.button("🔴 Logout"): st.session_state['master_logged'] = False; st.rerun()
 
         st.markdown("---")
-        t1, t2, t3, t4, t5, t6, t7 = st.tabs(["👁️ Schools", "💳 Payments", "🎓 Scholarships Verify", "🎓 Edit Students", "⚙️ Settings", "🏦 Gateway", "🖼️ Home Display"])
+        t1, t2, t3, t4, t5, t6, t7 = st.tabs(["👁️ Schools", "💳 Payments", "🎓 Scholarships Verify", "🎓 Edit Students", "⚙️ Settings", "🏦 Gateway", "🖼️ Display & Backgrounds"])
         
         with t1:
             st.markdown("### 🏫 Manage Schools")
@@ -1518,11 +1559,7 @@ elif menu == "Master Login":
             up_sch_fee = c_s1.number_input("School Registration Base Fee (₹)", value=float(master_db.get("school_reg_fee", 1000.0)), min_value=0.0, key="m_set_sfee")
             up_sch_gst = c_s2.number_input("School GST Percentage (%)", value=float(master_db.get("school_gst_percent", 18.0)), min_value=0.0, key="m_set_sgst")
 
-            st.markdown("#### 🌌 Custom Background Animation/Image")
-            bg_upload = st.file_uploader("Upload App Background (GIF/JPG/PNG)", type=['gif', 'png', 'jpg', 'jpeg'], key="m_bg_up")
-            
-            c_save1, c_save2 = st.columns(2)
-            if c_save1.button("💾 Save Profile, Notifications & Background", key="m_set_save_all"):
+            if st.button("Save Profile & Settings", key="m_set_save_all"):
                 master_db["username"] = sanitize(up_m_user); master_db["email"] = sanitize(up_m_email)
                 master_db["phone"] = sanitize(up_m_phone); master_db["upi_id"] = sanitize(up_m_upi)
                 master_db["reg_fee"] = float(up_base_fee); master_db["gst_percent"] = float(up_gst_pct)
@@ -1530,15 +1567,7 @@ elif menu == "Master Login":
                 master_db["notice_text"] = up_notice
                 master_db["news_text"] = up_news
                 if up_m_pass: master_db["password"] = up_m_pass
-                if bg_upload:
-                    master_db["bg_b64"] = base64.b64encode(bg_upload.read()).decode('utf-8')
-                save_master_data(master_db); st.success("Master settings & Background successfully updated!")
-                st.rerun()
-                
-            if c_save2.button("🗑️ Remove Custom Background", key="m_bg_rem"):
-                master_db["bg_b64"] = ""
-                save_master_data(master_db)
-                st.success("Background reset to default!")
+                save_master_data(master_db); st.success("Master settings successfully updated!")
                 st.rerun()
 
         with t6:
@@ -1562,9 +1591,36 @@ elif menu == "Master Login":
                 st.warning("No schools registered yet.")
                 
         with t7:
-            st.markdown("### 🖼️ Home Page Carousel Image Management")
-            st.info("Upload photos here to show them in the big scrolling display on the Home Page.")
+            st.markdown("### 🖼️ Portal Backgrounds & Home Display")
+            st.info("Upload different background photos for different portals.")
             
+            c_bg1, c_bg2 = st.columns(2)
+            up_h_bg = c_bg1.file_uploader("Home Page Background", type=['png', 'jpg', 'jpeg'], key="h_bg")
+            up_sch_bg = c_bg2.file_uploader("Scholarship Portal Background", type=['png', 'jpg', 'jpeg'], key="sch_bg")
+            up_scl_bg = c_bg1.file_uploader("School Login Background", type=['png', 'jpg', 'jpeg'], key="scl_bg")
+            up_reg_bg = c_bg2.file_uploader("Registration Portal Background", type=['png', 'jpg', 'jpeg'], key="reg_bg")
+            
+            if st.button("💾 Save All Backgrounds", key="save_bgs"):
+                if up_h_bg: master_db["bg_b64"] = base64.b64encode(up_h_bg.read()).decode('utf-8')
+                if up_sch_bg: master_db["sch_bg_b64"] = base64.b64encode(up_sch_bg.read()).decode('utf-8')
+                if up_scl_bg: master_db["school_bg_b64"] = base64.b64encode(up_scl_bg.read()).decode('utf-8')
+                if up_reg_bg: master_db["reg_bg_b64"] = base64.b64encode(up_reg_bg.read()).decode('utf-8')
+                save_master_data(master_db)
+                st.success("Backgrounds Updated Successfully!")
+                st.rerun()
+                
+            if st.button("🗑️ Reset All Backgrounds", key="reset_bgs"):
+                master_db["bg_b64"] = ""
+                master_db["sch_bg_b64"] = ""
+                master_db["school_bg_b64"] = ""
+                master_db["reg_bg_b64"] = ""
+                save_master_data(master_db)
+                st.success("Backgrounds reset to default!")
+                st.rerun()
+                
+            st.markdown("---")
+            st.markdown("#### 🖼️ Home Page Carousel Image Management")
+            st.info("Upload photos here to show them in the big scrolling display on the Home Page.")
             uploaded_carousel = st.file_uploader("Upload Custom Display Image (JPG/PNG)", type=['png', 'jpg', 'jpeg'], accept_multiple_files=True, key="m_carousel_up")
             if st.button("📤 Upload to Home Display", key="m_carousel_btn"):
                 if uploaded_carousel:
@@ -1867,11 +1923,11 @@ elif menu == "Results":
                 if st.button("🖨️ Print Result Card", key="res_print_v2"):
                     components.html("<script>window.parent.print();</script>", height=0)
             elif pending_status:
-                st.warning(f"⚠️ Appananka record milila, kintu status ebe: '{pending_status}' achi. Master ba School ru approve karantu.")
+                st.warning(f"⚠️ ଆପଣଙ୍କ ରେକର୍ଡ ମିଳିଲା, କିନ୍ତୁ ଆପଣଙ୍କ Payment/Approval Status ଏବେ: '{pending_status}' ଅଛି। ଦୟାକରି Master କିମ୍ବା School ରୁ Approve କରନ୍ତୁ।")
             elif dob_mismatch:
-                st.warning("⚠️ Roll No/Name match hela kintu Date of Birth (DOB) match haunahi. Thik DOB diantu.")
+                st.warning("⚠️ ଆପଣ ଦେଇଥିବା ନାମ କିମ୍ବା ରୋଲ୍ ନମ୍ବର ସହ ଜନ୍ମ ତାରିଖ (Date of Birth) ମେଳ ଖାଉନାହିଁ। ଦୟାକରି ଠିକ୍ DOB ଦିଅନ୍ତୁ।")
             else:
-                st.error("❌ Kaunasi record milila nahi! Roll Number au DOB re check karantu.")
+                st.error("❌ କୌଣସି ରେକର୍ଡ ମିଳିଲା ନାହିଁ! ଦୟାକରି ଠିକ୍ Roll Number କିମ୍ବା Name ଦିଅନ୍ତୁ।")
 
 st.markdown("---")
 st.markdown("<div style='text-align: center; padding: 15px; background: linear-gradient(90deg, #1e3a8a, #9333ea); color: white; border-radius: 8px; font-weight: bold;'>👨‍💻 Software Developed by: KULU SUTAR | 📞 Mob: 8910223342 | ✉️ kulusutar123@gmail.com</div>", unsafe_allow_html=True)
