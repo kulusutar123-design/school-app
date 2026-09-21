@@ -126,10 +126,8 @@ def load_master_data():
         "school_reg_fee": 1000.0, "school_gst_percent": 18.0, "scholarship_fee": 50.0,
         "notice_text": "📢 ନୂଆ ଅପଡେଟ୍: ଛାତ୍ରଛାତ୍ରୀମାନେ ଏବେ ଅନଲାଇନ୍ ରେଜିଷ୍ଟ୍ରେସନ୍, ସ୍କଲାରସିପ୍ ଏବଂ ପେମେଣ୍ଟ କରିପାରିବେ! <span class='new-badge'>NEW</span> &nbsp;&nbsp;|&nbsp;&nbsp; 👨‍💻 Software Developed by: KULU SUTAR &nbsp;&nbsp;|&nbsp;&nbsp; 📞 Helpdesk No: 8910223342 &nbsp;&nbsp;|&nbsp;&nbsp; ✉️ Mail ID: kulusutar123@gmail.com",
         "news_text": "🔴 [ODISHA] ନୂଆ ଶିକ୍ଷା ନୀତି ଅନୁଯାୟୀ ସମସ୍ତ ସ୍କୁଲରେ ଡିଜିଟାଲ୍ କ୍ଲାସରୁମ୍ ଆରମ୍ଭ ହେବ! &nbsp;&nbsp;♦&nbsp;&nbsp; 🔴 [DELHI] Central Government announces new scholarship schemes for brilliant students across India! &nbsp;&nbsp;♦&nbsp;&nbsp; 🔴 [BENGAL] রাজ্যের সব স্কুলে নতুন শিক্ষাবর্ষের ভর্তি শুরু হচ্ছে! &nbsp;&nbsp;♦&nbsp;&nbsp; 🔴 [MAHARASHTRA] राज्यातील सर्व शाळांमध्ये नवीन तंत्रज्ञान लागू होणार! &nbsp;&nbsp;♦&nbsp;&nbsp; 🔴 [ANDHRA] రాష్ట్రంలోని పాఠశాలల్లో డిజిటల్ విద్య అమలు! &nbsp;&nbsp;♦&nbsp;&nbsp; 🔴 [HINDI] देश भर के सभी स्कूलों में नई डिजिटल शिक्षा प्रणाली लागू होगी!",
-        "bg_b64": "",
-        "sch_bg_b64": "",
-        "school_bg_b64": "",
-        "reg_bg_b64": ""
+        "bg_b64": "", "sch_bg_b64": "", "school_bg_b64": "", "reg_bg_b64": "",
+        "font_family": "sans-serif", "font_size": "16", "text_color": "#000000", "theme_color": "#1e3a8a"
     }
     if os.path.exists(MASTER_FILE):
         try:
@@ -208,6 +206,30 @@ def inject_custom_bg(b64_str):
         </style>
         """, unsafe_allow_html=True)
 
+def inject_custom_styles(m_data):
+    ff = m_data.get("font_family", "sans-serif")
+    fs = m_data.get("font_size", "16")
+    tc = m_data.get("text_color", "#000000")
+    thc = m_data.get("theme_color", "#1e3a8a")
+    
+    st.markdown(f"""
+    <style>
+    html, body, [class*="st-"] {{
+        font-family: "{ff}", sans-serif !important;
+        font-size: {fs}px !important;
+        color: {tc} !important;
+    }}
+    .login-card {{ border-bottom: 5px solid {thc} !important; }}
+    .login-title {{ color: {thc} !important; }}
+    div.stButton > button:first-child {{
+        background-color: {thc} !important;
+        color: white !important;
+        border: none !important;
+        font-family: "{ff}", sans-serif !important;
+    }}
+    </style>
+    """, unsafe_allow_html=True)
+
 def number_to_words(num):
     try: num = int(float(num))
     except: num = 0
@@ -254,6 +276,7 @@ def create_student_receipt_pdf(filename, reg_id, s_data):
     c.setFont("Helvetica-Oblique", 10); c.drawCentredString(300, y, "Computer-generated receipt.")
     c.save()
 
+# --- FIXED ODISHA FORMAT SCHOLARSHIP HTML (NO INDENTATION FOR STREAMLIT COMPATIBILITY) ---
 def render_odisha_scholarship_html(app_id, s_data):
     adh = s_data.get('aadhaar', '')
     masked_adh = f"XXXXXXXX{adh[-4:]}" if len(adh) >= 4 else adh
@@ -458,6 +481,7 @@ def create_school_receipt_pdf(filename, sch_id, sch_data):
     c.setFont("Helvetica-Oblique", 10); c.drawCentredString(300, y, "Computer-generated receipt.")
     c.save()
 
+# --- FIXED RESULTS HTML (NO INDENTATION FOR STREAMLIT COMPATIBILITY) ---
 def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no, s_lang):
     disp_dob = format_display_date(st_data.get('dob', ''))
     raw_pub = st_data.get('pub_date', '')
@@ -563,26 +587,14 @@ master_db = load_master_data()
 scholarships_db = load_scholarships()
 sch_users_db = load_sch_users()
 
+inject_custom_styles(master_db)
+
 menu_items = ["Home Page", "Scholarship Portal", "New Student Registration", "New School Registration", "Master Login", "School Login", "Results"]
 portal_map = {"home": 0, "scholarship": 1, "reg_student": 2, "reg_school": 3, "master": 4, "school": 5, "student": 6}
 portal_param = st.query_params.get("portal", "home")
 default_idx = portal_map.get(portal_param, 0)
 
 menu = st.sidebar.selectbox("🎯 Navigation Menu", menu_items, index=default_idx)
-
-# CSS BACKGROUND INJECTION
-def inject_custom_bg(b64_str):
-    if b64_str:
-        st.markdown(f"""
-        <style>
-        .stApp {{
-            background-image: url('data:image/jpeg;base64,{b64_str}');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-        }}
-        </style>
-        """, unsafe_allow_html=True)
 
 if menu == "Home Page":
     st.query_params["portal"] = "home"
@@ -629,9 +641,9 @@ if menu == "Home Page":
     st.markdown("""
     <style>
     .glass-panel { background: rgba(15, 23, 42, 0.85); padding: 20px; border-radius: 15px; border: 2px solid #38bdf8; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); backdrop-filter: blur(4px); margin-bottom: 25px; }
-    .login-card { background: rgba(255, 255, 255, 0.95) !important; border: 1px solid #cbd5e1; border-bottom: 5px solid #fbbf24; border-radius: 8px; padding: 20px; margin-bottom: 20px; text-align: center; text-decoration: none; display: block; color: #1e3a8a !important; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.3s; }
-    .login-card:hover { background: #ffffff !important; border-bottom: 5px solid #1e3a8a; transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.2); }
-    .login-title { font-size: 20px; font-weight: bold; margin-bottom: 8px; color: #1e3a8a !important;}
+    .login-card { background: rgba(255, 255, 255, 0.95) !important; border: 1px solid #cbd5e1; border-radius: 8px; padding: 20px; margin-bottom: 20px; text-align: center; text-decoration: none; display: block; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.3s; }
+    .login-card:hover { background: #ffffff !important; transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.2); }
+    .login-title { font-weight: bold; margin-bottom: 8px; }
     .login-sub { font-size: 14px; color: #64748b !important;}
     </style>
     """, unsafe_allow_html=True)
@@ -724,7 +736,7 @@ if menu == "Home Page":
 
     c1, c2, c3 = st.columns(3)
     with c1: 
-        st.markdown("<a href='?portal=scholarship' target='_self' class='login-card' style='border-bottom: 5px solid #10b981;'><div class='login-title'>💰 Scholarship Portal</div><div class='login-sub'>Apply Now</div></a>", unsafe_allow_html=True)
+        st.markdown("<a href='?portal=scholarship' target='_self' class='login-card'><div class='login-title'>💰 Scholarship Portal</div><div class='login-sub'>Apply Now</div></a>", unsafe_allow_html=True)
         st.markdown("<a href='?portal=master' target='_self' class='login-card'><div class='login-title'>🏛️ Master Login</div><div class='login-sub'>Admin Portal</div></a>", unsafe_allow_html=True)
     with c2: 
         st.markdown("<a href='?portal=reg_student' target='_self' class='login-card'><div class='login-title'>👨‍🎓 New Student Reg.</div><div class='login-sub'>Apply for admission</div></a>", unsafe_allow_html=True)
@@ -1038,7 +1050,6 @@ elif menu == "Scholarship Portal":
                             scholarships_db[tmp['app_id']] = tmp['data']
                             save_scholarships(scholarships_db)
                             
-                            # Clear Draft after success
                             sch_users_db[cur_uid]["draft"] = {}
                             save_sch_users(sch_users_db)
                             
@@ -1545,6 +1556,19 @@ elif menu == "Master Login":
             up_news = st.text_area("Breaking News Text", value=master_db.get("news_text", ""), height=100, key="m_set_new")
             
             st.markdown("---")
+            st.markdown("#### 🎨 Font & Theme Customization")
+            fonts = ["sans-serif", "Arial", "Times New Roman", "Courier New", "Verdana", "Georgia", "Tahoma", "Calibri", "Algerian", "Impact"]
+            sizes = [str(i) for i in range(12, 32, 2)]
+            
+            c_font1, c_font2 = st.columns(2)
+            up_ff = c_font1.selectbox("Font Style", fonts, index=fonts.index(master_db.get("font_family", "sans-serif")) if master_db.get("font_family", "sans-serif") in fonts else 0)
+            up_fs = c_font2.selectbox("Font Size", sizes, index=sizes.index(master_db.get("font_size", "16")) if master_db.get("font_size", "16") in sizes else 2)
+            
+            c_col1, c_col2 = st.columns(2)
+            up_tc = c_col1.color_picker("Text Color", value=master_db.get("text_color", "#000000"))
+            up_thc = c_col2.color_picker("Theme/Button Color", value=master_db.get("theme_color", "#1e3a8a"))
+            
+            st.markdown("---")
             up_m_user = st.text_input("Master Username", value=master_db.get("username", ""), key="m_set_usr")
             up_m_pass = st.text_input("New Master Password", type="password", key="m_set_pas")
             up_m_email = st.text_input("Recovery Email", value=master_db.get("email", ""), key="m_set_eml")
@@ -1566,6 +1590,11 @@ elif menu == "Master Login":
                 master_db["school_reg_fee"] = float(up_sch_fee); master_db["school_gst_percent"] = float(up_sch_gst)
                 master_db["notice_text"] = up_notice
                 master_db["news_text"] = up_news
+                master_db["font_family"] = up_ff
+                master_db["font_size"] = up_fs
+                master_db["text_color"] = up_tc
+                master_db["theme_color"] = up_thc
+                
                 if up_m_pass: master_db["password"] = up_m_pass
                 save_master_data(master_db); st.success("Master settings successfully updated!")
                 st.rerun()
@@ -1658,7 +1687,7 @@ elif menu == "School Login":
         if 'school_captcha' not in st.session_state:
             st.session_state['school_captcha'] = str(random.randint(10000, 99999))
         
-        st.markdown(f"<div style='background:#f1f5f9; padding:5px 20px; font-size:22px; font-weight:bold; letter-spacing:6px; border:1px solid #cbd5e1; border-radius:5px; display:inline-block;'>{st.session_state['school_captcha']}</div>", unsafe_allow_html=True)
+        st.markdown(f"<div style='background:#f1f5f9; padding:5px 20px; font-size:22px; font-weight:bold; letter-spacing:6px; border:1px solid #cbd5e1; border-radius:5px; display:inline-block; color:#000;'>{st.session_state['school_captcha']}</div>", unsafe_allow_html=True)
         entered_captcha = st.text_input("Enter the CAPTCHA code")
         
         if st.button("Login as School"):
@@ -1923,11 +1952,11 @@ elif menu == "Results":
                 if st.button("🖨️ Print Result Card", key="res_print_v2"):
                     components.html("<script>window.parent.print();</script>", height=0)
             elif pending_status:
-                st.warning(f"⚠️ ଆପଣଙ୍କ ରେକର୍ଡ ମିଳିଲା, କିନ୍ତୁ ଆପଣଙ୍କ Payment/Approval Status ଏବେ: '{pending_status}' ଅଛି। ଦୟାକରି Master କିମ୍ବା School ରୁ Approve କରନ୍ତୁ।")
+                st.warning(f"⚠️ Appananka record milila, kintu status ebe: '{pending_status}' achi. Master ba School ru approve karantu.")
             elif dob_mismatch:
-                st.warning("⚠️ ଆପଣ ଦେଇଥିବା ନାମ କିମ୍ବା ରୋଲ୍ ନମ୍ବର ସହ ଜନ୍ମ ତାରିଖ (Date of Birth) ମେଳ ଖାଉନାହିଁ। ଦୟାକରି ଠିକ୍ DOB ଦିଅନ୍ତୁ।")
+                st.warning("⚠️ Roll No/Name match hela kintu Date of Birth (DOB) match haunahi. Thik DOB diantu.")
             else:
-                st.error("❌ କୌଣସି ରେକର୍ଡ ମିଳିଲା ନାହିଁ! ଦୟାକରି ଠିକ୍ Roll Number କିମ୍ବା Name ଦିଅନ୍ତୁ।")
+                st.error("❌ Kaunasi record milila nahi! Roll Number au DOB re check karantu.")
 
 st.markdown("---")
 st.markdown("<div style='text-align: center; padding: 15px; background: linear-gradient(90deg, #1e3a8a, #9333ea); color: white; border-radius: 8px; font-weight: bold;'>👨‍💻 Software Developed by: KULU SUTAR | 📞 Mob: 8910223342 | ✉️ kulusutar123@gmail.com</div>", unsafe_allow_html=True)
