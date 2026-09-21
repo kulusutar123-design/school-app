@@ -18,9 +18,10 @@ import ssl
 import html
 import threading
 import base64
+import time
 
 # ==========================================
-# 🔒 ATOMIC CRASH PROTECTION & DATA SAFETY LOCKS
+# 🔒 HIGH-SECURITY ATOMIC CRASH PROTECTION
 # ==========================================
 file_lock = threading.Lock()
 
@@ -30,13 +31,26 @@ def sanitize(text):
     return text
 
 def atomic_save(data, filename):
-    """Guaranteed persistent save without data loss"""
+    """Guaranteed persistent save without data loss under heavy load"""
     with file_lock:
         try:
-            with open(filename, "w", encoding="utf-8") as f:
+            temp_filename = filename + ".tmp"
+            with open(temp_filename, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=4)
+            os.replace(temp_filename, filename)
         except Exception as e:
-            st.error(f"Save Error ({filename}): {e}")
+            st.error(f"🚨 Security Alert: Failed to save {filename}. Data prevented from corruption. Error: {e}")
+
+# ==========================================
+# 🛡️ ANTI-HACKING BRUTE FORCE PROTECTION
+# ==========================================
+if 'failed_logins' not in st.session_state:
+    st.session_state.failed_logins = 0
+
+def check_brute_force():
+    if st.session_state.failed_logins >= 5:
+        st.error("🚨 ସୁରକ୍ଷା କାରଣରୁ ଆପଣଙ୍କୁ ବ୍ଲକ୍ କରାଯାଇଛି (Blocked due to repeated failed attempts). ବହୁତ ଥର ଭୁଲ୍ ପାସୱାର୍ଡ ଦିଆଯାଇଛି।")
+        st.stop()
 
 # ==========================================
 # 📂 DIRECTORY CREATION FOR SCHOLARSHIPS
@@ -86,9 +100,6 @@ MASTER_FILE = "master.json"
 SCHOLARSHIPS_FILE = "scholarships.json"
 SCH_USERS_FILE = "sch_users.json"
 
-# ==========================================
-# 🗺️ ALL INDIAN STATES & LOCAL LANGUAGE MAPPING
-# ==========================================
 STATE_LANG_MAP = {
     "Andhra Pradesh": "Telugu", "Arunachal Pradesh": "English", "Assam": "Assamese",
     "Bihar": "Hindi", "Chhattisgarh": "Hindi", "Goa": "Konkani",
@@ -117,7 +128,7 @@ RELATIONSHIPS = ["Select", "Father", "Mother", "Legal Guardian"]
 CERT_YEARS = ["Select", "Certificate issued before 1st Feb 2020", "Certificate issued on/after 1st Feb 2020"]
 
 # ==========================================
-# 🤖 DATA LOADERS
+# 🤖 SECURE DATA LOADERS
 # ==========================================
 def load_master_data():
     default_master = {
@@ -125,7 +136,7 @@ def load_master_data():
         "phone": "8910223342", "upi_id": "school@sbi", "reg_fee": 150.0, "gst_percent": 18.0,
         "school_reg_fee": 1000.0, "school_gst_percent": 18.0, "scholarship_fee": 50.0,
         "notice_text": "📢 ନୂଆ ଅପଡେଟ୍: ଛାତ୍ରଛାତ୍ରୀମାନେ ଏବେ ଅନଲାଇନ୍ ରେଜିଷ୍ଟ୍ରେସନ୍, ସ୍କଲାରସିପ୍ ଏବଂ ପେମେଣ୍ଟ କରିପାରିବେ! <span class='new-badge'>NEW</span> &nbsp;&nbsp;|&nbsp;&nbsp; 👨‍💻 Software Developed by: KULU SUTAR &nbsp;&nbsp;|&nbsp;&nbsp; 📞 Helpdesk No: 8910223342 &nbsp;&nbsp;|&nbsp;&nbsp; ✉️ Mail ID: kulusutar123@gmail.com",
-        "news_text": "🔴 [ODISHA] ନୂଆ ଶିକ୍ଷା ନୀତି ଅନୁଯାୟୀ ସମସ୍ତ ସ୍କୁଲରେ ଡିଜିଟାଲ୍ କ୍ଲାସରୁମ୍ ଆରମ୍ଭ ହେବ! &nbsp;&nbsp;♦&nbsp;&nbsp; 🔴 [DELHI] Central Government announces new scholarship schemes for brilliant students across India! &nbsp;&nbsp;♦&nbsp;&nbsp; 🔴 [BENGAL] রাজ্যের সব স্কুলে নতুন শিক্ষাবর্ষের ভর্তি শুরু হচ্ছে! &nbsp;&nbsp;♦&nbsp;&nbsp; 🔴 [MAHARASHTRA] राज्यातील सर्व शाळांमध्ये नवीन तंत्रज्ञान लागू होणार! &nbsp;&nbsp;♦&nbsp;&nbsp; 🔴 [ANDHRA] రాష్ట్రంలోని పాఠశాలల్లో డిజిటల్ విద్య అమలు! &nbsp;&nbsp;♦&nbsp;&nbsp; 🔴 [HINDI] देश भर के सभी स्कूलों में नई डिजिटल शिक्षा प्रणाली लागू होगी!",
+        "news_text": "🔴 [ODISHA] ନୂଆ ଶିକ୍ଷା ନୀତି ଅନୁଯାୟୀ ସମସ୍ତ ସ୍କୁଲରେ ଡିଜିଟାଲ୍ କ୍ଲାସରୁମ୍ ଆରମ୍ଭ ହେବ! &nbsp;&nbsp;♦&nbsp;&nbsp; 🔴 [DELHI] Central Government announces new scholarship schemes for brilliant students across India! &nbsp;&nbsp;♦&nbsp;&nbsp; 🔴 [BENGAL] রাজ্যের সব স্কুলে নতুন শিক্ষাবর্ষের ভর্তি শুরু হচ্ছে!",
         "bg_b64": "", "sch_bg_b64": "", "school_bg_b64": "", "reg_bg_b64": "",
         "font_family": "sans-serif", "font_size": "16", "text_color": "#000000", "theme_color": "#1e3a8a"
     }
@@ -138,7 +149,9 @@ def load_master_data():
                     for k,v in default_master.items():
                         if k not in m: m[k] = v
                     return m
-        except Exception: pass
+        except Exception as e:
+            st.error("CRITICAL ERROR: Master File is corrupted. System halted to prevent data loss.")
+            st.stop()
     return default_master
 
 def save_master_data(data):
@@ -151,13 +164,17 @@ def load_data():
             with open(SCHOOLS_FILE, "r", encoding="utf-8") as f:
                 content = f.read()
                 if content.strip(): schools = json.loads(content)
-        except: pass
+        except Exception as e:
+            st.error("CRITICAL ERROR: schools.json is corrupted. System halted to prevent data loss.")
+            st.stop()
     if os.path.exists(STUDENTS_FILE):
         try:
             with open(STUDENTS_FILE, "r", encoding="utf-8") as f:
                 content = f.read()
                 if content.strip(): students = json.loads(content)
-        except: pass
+        except Exception as e:
+            st.error("CRITICAL ERROR: students.txt is corrupted. System halted to prevent data loss.")
+            st.stop()
     return schools, students
 
 def save_data(schools, students):
@@ -171,7 +188,9 @@ def load_scholarships():
             with open(SCHOLARSHIPS_FILE, "r", encoding="utf-8") as f:
                 content = f.read()
                 if content.strip(): sch = json.loads(content)
-        except: pass
+        except Exception:
+            st.error("CRITICAL ERROR: scholarships.json is corrupted. System halted to prevent data loss.")
+            st.stop()
     return sch
 
 def save_scholarships(sch):
@@ -184,14 +203,16 @@ def load_sch_users():
             with open(SCH_USERS_FILE, "r", encoding="utf-8") as f:
                 content = f.read()
                 if content.strip(): users = json.loads(content)
-        except: pass
+        except Exception:
+            st.error("CRITICAL ERROR: sch_users.json is corrupted. System halted to prevent data loss.")
+            st.stop()
     return users
 
 def save_sch_users(users):
     atomic_save(users, SCH_USERS_FILE)
 
 # ==========================================
-# 🎨 PDF GENERATORS & HELPERS
+# 🎨 UI INJECTIONS
 # ==========================================
 def inject_custom_bg(b64_str):
     if b64_str:
@@ -276,7 +297,6 @@ def create_student_receipt_pdf(filename, reg_id, s_data):
     c.setFont("Helvetica-Oblique", 10); c.drawCentredString(300, y, "Computer-generated receipt.")
     c.save()
 
-# --- FIXED ODISHA FORMAT SCHOLARSHIP HTML (NO INDENTATION FOR STREAMLIT COMPATIBILITY) ---
 def render_odisha_scholarship_html(app_id, s_data):
     adh = s_data.get('aadhaar', '')
     masked_adh = f"XXXXXXXX{adh[-4:]}" if len(adh) >= 4 else adh
@@ -481,7 +501,6 @@ def create_school_receipt_pdf(filename, sch_id, sch_data):
     c.setFont("Helvetica-Oblique", 10); c.drawCentredString(300, y, "Computer-generated receipt.")
     c.save()
 
-# --- FIXED RESULTS HTML (NO INDENTATION FOR STREAMLIT COMPATIBILITY) ---
 def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no, s_lang):
     disp_dob = format_display_date(st_data.get('dob', ''))
     raw_pub = st_data.get('pub_date', '')
@@ -760,17 +779,20 @@ elif menu == "Scholarship Portal":
         with log_tab:
             stu_log_mode = st.radio("Choose Action", ["Login", "Forgot Password"], key="stu_log_mode")
             if stu_log_mode == "Login":
+                check_brute_force()
                 st.info("Enter your 12-digit Aadhaar Number as User ID.")
                 l_uid = st.text_input("User ID (Aadhaar No.) *", key="l_sch_uid")
                 l_pwd = st.text_input("Password *", type="password", key="l_sch_pwd")
                 if st.button("Login", type="primary"):
                     uid_clean = sanitize(l_uid)
                     if uid_clean in sch_users_db and sch_users_db[uid_clean]["password"] == l_pwd:
+                        st.session_state.failed_logins = 0
                         st.session_state['sch_logged_in'] = True
                         st.session_state['sch_current_user'] = uid_clean
                         st.success("Login Successful!")
                         st.rerun()
                     else:
+                        st.session_state.failed_logins += 1
                         st.error("❌ Invalid User ID or Password")
             elif stu_log_mode == "Forgot Password":
                 st.info("Recover your Student Account using Aadhaar No")
@@ -1298,12 +1320,16 @@ elif menu == "Master Login":
     if not st.session_state.get('master_logged', False):
         login_mode = st.radio("Choose Action", ["Login", "Forgot Password"])
         if login_mode == "Login":
+            check_brute_force()
             m_user = st.text_input("Master Username")
             m_pass = st.text_input("Master Password", type="password")
             if st.button("Login"):
                 if sanitize(m_user) == master_db.get("username") and m_pass == master_db.get("password"):
+                    st.session_state.failed_logins = 0
                     st.session_state['master_logged'] = True; st.rerun()
-                else: st.error("ଭୁଲ୍ Master ID କିମ୍ବା Password!")
+                else: 
+                    st.session_state.failed_logins += 1
+                    st.error("ଭୁଲ୍ Master ID କିମ୍ବା Password!")
         elif login_mode == "Forgot Password":
             st.info("Recover your Master Account using Mobile or Email OTP")
             verify_contact = st.text_input("Enter Registered Mobile No or Email")
@@ -1681,6 +1707,7 @@ elif menu == "School Login":
     with c_title: st.subheader("🏫 School Portal")
     
     if 'school_logged_id' not in st.session_state:
+        check_brute_force()
         s_id = st.text_input("School ID")
         s_pass = st.text_input("School Password", type="password")
         
@@ -1697,8 +1724,10 @@ elif menu == "School Login":
             else:
                 s_id_clean = sanitize(s_id)
                 if s_id_clean in schools_db and schools_db[s_id_clean]["pass"] == s_pass:
+                    st.session_state.failed_logins = 0
                     st.session_state['school_logged_id'] = s_id_clean; del st.session_state['school_captcha']; st.rerun()
                 else:
+                    st.session_state.failed_logins += 1
                     st.error("❌ Invalid ID/Password!"); st.session_state['school_captcha'] = str(random.randint(10000, 99999)); st.rerun()
     else: 
         cur_school = st.session_state['school_logged_id']
