@@ -39,10 +39,11 @@ def atomic_save(data, filename):
             st.error(f"Save Error ({filename}): {e}")
 
 # ==========================================
-# 📂 DIRECTORY CREATION FOR SCHOLARSHIPS
+# 📂 DIRECTORY CREATION 
 # ==========================================
 os.makedirs("Scholarship_Data/Student_Submissions", exist_ok=True)
 os.makedirs("Scholarship_Data/Approved_Master", exist_ok=True)
+os.makedirs("Carousel_Images", exist_ok=True) # NEW FOLDER FOR HOME PAGE PHOTOS
 
 def save_master_approved_folder(app_id, s_data):
     folder_path = f"Scholarship_Data/Approved_Master/{app_id}"
@@ -439,6 +440,7 @@ def create_school_receipt_pdf(filename, sch_id, sch_data):
     c.setFont("Helvetica-Oblique", 10); c.drawCentredString(300, y, "Computer-generated receipt.")
     c.save()
 
+# --- FIXED RESULTS HTML (NO INDENTATION FOR STREAMLIT COMPATIBILITY) ---
 def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no, s_lang):
     disp_dob = format_display_date(st_data.get('dob', ''))
     raw_pub = st_data.get('pub_date', '')
@@ -591,21 +593,22 @@ if menu == "Home Page":
     event_images = ""
     event_title = "Welcome to Advanced School Management System"
     
-    if mm_dd == "10-02":
-        event_images += "<img class='marquee-img' src='https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/7/7a/Mahatma-Gandhi%2C_studio%2C_1931.jpg&w=400' alt='Gandhi'>"
-        event_title = "🙏 Happy Gandhi Jayanti 🙏"
-    elif mm_dd == "08-15":
-        event_images += "<img class='marquee-img' src='https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg&w=400' alt='Independence Day'>"
-        event_title = "🇮🇳 Happy Independence Day 🇮🇳"
-    elif mm_dd == "01-26":
-        event_images += "<img class='marquee-img' src='https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg&w=400' alt='Republic Day'>"
-        event_title = "🇮🇳 Happy Republic Day 🇮🇳"
-
-    base_images = (
-        "<img class='marquee-img' src='https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=600&q=80' alt='School Building'>"
-        "<img class='marquee-img' src='https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/e/e2/Droupadi_Murmu_Official_Portrait.jpg&w=400' alt='President Murmu'>"
-        "<img class='marquee-img' src='https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/c/c0/Official_Photograph_of_Prime_Minister_Narendra_Modi_Portrait.png&w=400' alt='PM Modi'>"
-    )
+    # FETCH CUSTOM CAROUSEL IMAGES
+    carousel_imgs_html = ""
+    if os.path.exists("Carousel_Images"):
+        for img_file in os.listdir("Carousel_Images"):
+            if img_file.lower().endswith(('png', 'jpg', 'jpeg')):
+                with open(os.path.join("Carousel_Images", img_file), "rb") as f:
+                    b64_str = base64.b64encode(f.read()).decode('utf-8')
+                    mime_type = "image/png" if img_file.lower().endswith('png') else "image/jpeg"
+                    carousel_imgs_html += f"<img class='marquee-img' src='data:{mime_type};base64,{b64_str}'>"
+    
+    if not carousel_imgs_html:
+        carousel_imgs_html = (
+            "<img class='marquee-img' src='https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=600&q=80'>"
+            "<img class='marquee-img' src='https://images.unsplash.com/photo-1509062522246-3755977927d7?w=600&q=80'>"
+            "<img class='marquee-img' src='https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=600&q=80'>"
+        )
 
     carousel_html = f"""
     <!DOCTYPE html>
@@ -619,7 +622,7 @@ if menu == "Home Page":
     <body>
     <div class="carousel-container">
         <marquee behavior="scroll" direction="left" scrollamount="12" onmouseover="this.stop();" onmouseout="this.start();" style="display: flex; align-items: center; white-space: nowrap; height: 100%;">
-            {event_images}{base_images}
+            {event_images}{carousel_imgs_html}
         </marquee>
         <div class="carousel-overlay">Connecting Students, Teachers & Administration Seamlessly</div>
     </div>
@@ -1273,7 +1276,7 @@ elif menu == "Master Login":
         if c2.button("🔴 Logout"): st.session_state['master_logged'] = False; st.rerun()
 
         st.markdown("---")
-        t1, t2, t3, t4, t5, t6 = st.tabs(["👁️ Schools", "💳 Payments", "🎓 Scholarships Verify", "🎓 Edit Students", "⚙️ Settings", "🏦 School Gateway Setup"])
+        t1, t2, t3, t4, t5, t6, t7 = st.tabs(["👁️ Schools", "💳 Payments", "🎓 Scholarships Verify", "🎓 Edit Students", "⚙️ Settings", "🏦 Gateway", "🖼️ Home Display"])
         
         with t1:
             st.markdown("### 🏫 Manage Schools")
@@ -1529,6 +1532,33 @@ elif menu == "Master Login":
                     st.success(f"Gateway settings securely saved for {curr_sch['name']}!")
             else:
                 st.warning("No schools registered yet.")
+                
+        with t7:
+            st.markdown("### 🖼️ Home Page Carousel Image Management")
+            st.info("Upload photos here to show them in the big scrolling display on the Home Page.")
+            
+            uploaded_carousel = st.file_uploader("Upload Custom Display Image (JPG/PNG)", type=['png', 'jpg', 'jpeg'], accept_multiple_files=True, key="m_carousel_up")
+            if st.button("📤 Upload to Home Display", key="m_carousel_btn"):
+                if uploaded_carousel:
+                    for file in uploaded_carousel:
+                        with open(os.path.join("Carousel_Images", file.name), "wb") as f:
+                            f.write(file.getbuffer())
+                    st.success("Images successfully uploaded and added to Home Display!")
+                    st.rerun()
+                    
+            st.markdown("#### Currently Displayed Images")
+            imgs = [f for f in os.listdir("Carousel_Images") if f.lower().endswith(('png', 'jpg', 'jpeg'))]
+            if imgs:
+                for img in imgs:
+                    col_img, col_del = st.columns([8, 2])
+                    with col_img:
+                        st.write(img)
+                    with col_del:
+                        if st.button("🗑️ Delete", key=f"del_img_{img}"):
+                            os.remove(os.path.join("Carousel_Images", img))
+                            st.rerun()
+            else:
+                st.warning("No custom images uploaded. Default images are running on the Home Page.")
 
 # ----------------- SCHOOL LOGIN -----------------
 elif menu == "School Login":
