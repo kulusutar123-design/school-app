@@ -43,7 +43,7 @@ def atomic_save(data, filename):
 # ==========================================
 os.makedirs("Scholarship_Data/Student_Submissions", exist_ok=True)
 os.makedirs("Scholarship_Data/Approved_Master", exist_ok=True)
-os.makedirs("Carousel_Images", exist_ok=True) # NEW FOLDER FOR HOME PAGE PHOTOS
+os.makedirs("Carousel_Images", exist_ok=True)
 
 def save_master_approved_folder(app_id, s_data):
     folder_path = f"Scholarship_Data/Approved_Master/{app_id}"
@@ -123,7 +123,10 @@ def load_master_data():
     default_master = {
         "username": "master", "password": "master123", "email": "kulusutar123@gmail.com", 
         "phone": "8910223342", "upi_id": "school@sbi", "reg_fee": 150.0, "gst_percent": 18.0,
-        "school_reg_fee": 1000.0, "school_gst_percent": 18.0, "scholarship_fee": 50.0
+        "school_reg_fee": 1000.0, "school_gst_percent": 18.0, "scholarship_fee": 50.0,
+        "notice_text": "📢 ନୂଆ ଅପଡେଟ୍: ଛାତ୍ରଛାତ୍ରୀମାନେ ଏବେ ଅନଲାଇନ୍ ରେଜିଷ୍ଟ୍ରେସନ୍, ସ୍କଲାରସିପ୍ ଏବଂ ପେମେଣ୍ଟ କରିପାରିବେ! <span class='new-badge'>NEW</span> &nbsp;&nbsp;|&nbsp;&nbsp; 👨‍💻 Software Developed by: KULU SUTAR &nbsp;&nbsp;|&nbsp;&nbsp; 📞 Helpdesk No: 8910223342 &nbsp;&nbsp;|&nbsp;&nbsp; ✉️ Mail ID: kulusutar123@gmail.com",
+        "news_text": "🔴 [ODISHA] ନୂଆ ଶିକ୍ଷା ନୀତି ଅନୁଯାୟୀ ସମସ୍ତ ସ୍କୁଲରେ ଡିଜିଟାଲ୍ କ୍ଲାସରୁମ୍ ଆରମ୍ଭ ହେବ! &nbsp;&nbsp;♦&nbsp;&nbsp; 🔴 [DELHI] Central Government announces new scholarship schemes for brilliant students across India! &nbsp;&nbsp;♦&nbsp;&nbsp; 🔴 [BENGAL] রাজ্যের সব স্কুলে নতুন শিক্ষাবর্ষের ভর্তি শুরু হচ্ছে! &nbsp;&nbsp;♦&nbsp;&nbsp; 🔴 [MAHARASHTRA] राज्यातील सर्व शाळांमध्ये नवीन तंत्रज्ञान लागू होणार! &nbsp;&nbsp;♦&nbsp;&nbsp; 🔴 [ANDHRA] రాష్ట్రంలోని పాఠశాలల్లో డిజిటల్ విద్య అమలు! &nbsp;&nbsp;♦&nbsp;&nbsp; 🔴 [HINDI] देश भर के सभी स्कूलों में नई डिजिटल शिक्षा प्रणाली लागू होगी!",
+        "bg_b64": ""
     }
     if os.path.exists(MASTER_FILE):
         try:
@@ -235,7 +238,7 @@ def create_student_receipt_pdf(filename, reg_id, s_data):
     c.setFont("Helvetica-Oblique", 10); c.drawCentredString(300, y, "Computer-generated receipt.")
     c.save()
 
-# --- FIXED ODISHA FORMAT SCHOLARSHIP HTML (NO INDENTATION FOR STREAMLIT COMPATIBILITY) ---
+# --- ODISHA FORMAT SCHOLARSHIP HTML ---
 def render_odisha_scholarship_html(app_id, s_data):
     adh = s_data.get('aadhaar', '')
     masked_adh = f"XXXXXXXX{adh[-4:]}" if len(adh) >= 4 else adh
@@ -440,7 +443,6 @@ def create_school_receipt_pdf(filename, sch_id, sch_data):
     c.setFont("Helvetica-Oblique", 10); c.drawCentredString(300, y, "Computer-generated receipt.")
     c.save()
 
-# --- FIXED RESULTS HTML (NO INDENTATION FOR STREAMLIT COMPATIBILITY) ---
 def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no, s_lang):
     disp_dob = format_display_date(st_data.get('dob', ''))
     raw_pub = st_data.get('pub_date', '')
@@ -571,15 +573,20 @@ batches_list = [f"{y}-{y+1}" for y in range(2020, 2051)]
 
 # ----------------- HOME PAGE -----------------
 if menu == "Home Page":
-    bg_images = [
-        "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1920",
-        "https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?q=80&w=1920"
-    ]
-    selected_bg = random.choice(bg_images)
+    bg_b64 = master_db.get("bg_b64", "")
+    if bg_b64:
+        bg_css = f"background-image: url('data:image/gif;base64,{bg_b64}');"
+    else:
+        bg_images = [
+            "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1920",
+            "https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?q=80&w=1920"
+        ]
+        selected_bg = random.choice(bg_images)
+        bg_css = f"background-image: url('{selected_bg}');"
     
     st.markdown(f"""
     <style>
-    .stApp {{ background-image: url("{selected_bg}"); background-size: cover; background-position: center; background-attachment: fixed; }}
+    .stApp {{ {bg_css} background-size: cover; background-position: center; background-attachment: fixed; }}
     .glass-panel {{ background: rgba(15, 23, 42, 0.85); padding: 20px; border-radius: 15px; border: 2px solid #38bdf8; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); backdrop-filter: blur(4px); margin-bottom: 25px; }}
     .login-card {{ background: rgba(255, 255, 255, 0.95) !important; border: 1px solid #cbd5e1; border-bottom: 5px solid #fbbf24; border-radius: 8px; padding: 20px; margin-bottom: 20px; text-align: center; text-decoration: none; display: block; color: #1e3a8a !important; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.3s; }}
     .login-card:hover {{ background: #ffffff !important; border-bottom: 5px solid #1e3a8a; transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.2); }}
@@ -593,7 +600,16 @@ if menu == "Home Page":
     event_images = ""
     event_title = "Welcome to Advanced School Management System"
     
-    # FETCH CUSTOM CAROUSEL IMAGES
+    if mm_dd == "10-02":
+        event_images += "<img class='marquee-img' src='https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/7/7a/Mahatma-Gandhi%2C_studio%2C_1931.jpg&w=400' alt='Gandhi'>"
+        event_title = "🙏 Happy Gandhi Jayanti 🙏"
+    elif mm_dd == "08-15":
+        event_images += "<img class='marquee-img' src='https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg&w=400' alt='Independence Day'>"
+        event_title = "🇮🇳 Happy Independence Day 🇮🇳"
+    elif mm_dd == "01-26":
+        event_images += "<img class='marquee-img' src='https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg&w=400' alt='Republic Day'>"
+        event_title = "🇮🇳 Happy Republic Day 🇮🇳"
+
     carousel_imgs_html = ""
     if os.path.exists("Carousel_Images"):
         for img_file in os.listdir("Carousel_Images"):
@@ -616,8 +632,8 @@ if menu == "Home Page":
     <head><style>
     html, body {{ margin: 0; padding: 0; background: transparent; font-family: sans-serif; overflow: hidden; height: 100%; }}
     .carousel-container {{ width: 100%; height: 350px; overflow: hidden; border-radius: 10px; position: relative; border: 2px solid #38bdf8; background: rgba(15, 23, 42, 0.6); }}
-    .marquee-img {{ height: 260px; border-radius: 10px; margin-right: 20px; object-fit: contain; display: inline-block; vertical-align: middle; margin-top: 15px; border: 2px solid #fbbf24; background-color: #fff; padding: 5px; }}
-    .carousel-overlay {{ position: absolute; bottom: 0; background: rgba(30,58,138,0.9); width: 100%; color: white; text-align: center; padding: 12px; font-weight: bold; font-size: 20px; }}
+    .marquee-img {{ height: 260px; border-radius: 10px; margin-right: 20px; object-fit: contain; display: inline-block; vertical-align: middle; margin-top: 15px; border: 2px solid #fbbf24; background-color: #fff; padding: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }}
+    .carousel-overlay {{ position: absolute; bottom: 0; background: rgba(30,58,138,0.9); width: 100%; color: white; text-align: center; padding: 12px; font-weight: bold; font-size: 20px; letter-spacing: 1px; box-sizing: border-box; text-shadow: 1px 1px 2px #000; }}
     </style></head>
     <body>
     <div class="carousel-container">
@@ -628,41 +644,34 @@ if menu == "Home Page":
     </div>
     </body></html>
     """
-    st.markdown(f"<div class='glass-panel'><h2 style='text-align: center; color: #fbbf24; margin-top: 0;'>🏫 {event_title}</h2>", unsafe_allow_html=True)
+    st.markdown(f"<div class='glass-panel'><h2 style='text-align: center; color: #fbbf24; margin-top: 0; text-shadow: 1px 1px 2px #000;'>🏫 {event_title}</h2>", unsafe_allow_html=True)
     components.html(carousel_html, height=360)
     st.markdown("</div>", unsafe_allow_html=True)
 
-    notice_and_news_html = """
+    notice_and_news_html = f"""
     <!DOCTYPE html>
     <html>
     <head>
     <meta charset="utf-8">
     <style>
-    body { margin: 0; padding: 0; font-family: sans-serif; background: transparent; }
-    .notice-box { background-color: rgba(30,41,59,0.9); border-radius: 5px; border: 1px solid #475569; overflow: hidden; color: #e2e8f0; font-size: 18px; padding: 10px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);}
-    .news-box { background-color: rgba(127,29,29,0.9); border-radius: 5px; border: 1px solid #ef4444; overflow: hidden; color: #ffffff; font-size: 18px; padding: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);}
-    .label { font-size:12px; font-weight:bold; margin-bottom:4px; letter-spacing: 1px; }
-    .new-badge { background-color: #fbbf24; color: black; font-size: 14px; font-weight: bold; padding: 2px 6px; border-radius: 3px; margin-left: 5px; }
+    body {{ margin: 0; padding: 0; font-family: sans-serif; background: transparent; }}
+    .notice-box {{ background-color: rgba(30,41,59,0.9); border-radius: 5px; border: 1px solid #475569; overflow: hidden; color: #e2e8f0; font-size: 18px; padding: 10px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);}}
+    .news-box {{ background-color: rgba(127,29,29,0.9); border-radius: 5px; border: 1px solid #ef4444; overflow: hidden; color: #ffffff; font-size: 18px; padding: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);}}
+    .label {{ font-size:12px; font-weight:bold; margin-bottom:4px; letter-spacing: 1px; }}
+    .new-badge {{ background-color: #fbbf24; color: black; font-size: 14px; font-weight: bold; padding: 2px 6px; border-radius: 3px; margin-left: 5px; }}
     </style>
     </head>
     <body>
         <div class="notice-box">
             <div class="label" style="color:#94a3b8;">📌 OFFICIAL NOTIFICATIONS & UPDATES</div>
             <marquee direction='left' scrollamount='8' style='font-weight: bold;'>
-                <span style='color: #fbbf24;'>📢 ନୂଆ ଅପଡେଟ୍: ଛାତ୍ରଛାତ୍ରୀମାନେ ଏବେ ଅନଲାଇନ୍ ରେଜିଷ୍ଟ୍ରେସନ୍, ସ୍କଲାରସିପ୍ ଏବଂ ପେମେଣ୍ଟ କରିପାରିବେ! <span class='new-badge'>NEW</span> &nbsp;&nbsp;|&nbsp;&nbsp; 👨‍💻 Software Developed by: KULU SUTAR &nbsp;&nbsp;|&nbsp;&nbsp; 📞 Helpdesk No: 8910223342 &nbsp;&nbsp;|&nbsp;&nbsp; ✉️ Mail ID: kulusutar123@gmail.com </span>
+                <span style='color: #fbbf24;'>{master_db.get('notice_text')}</span>
             </marquee>
         </div>
         <div class="news-box">
             <div class="label" style="color:#fca5a5;">📰 ALL INDIA DAILY BREAKING NEWS</div>
             <marquee direction='left' scrollamount='6' style='font-weight: bold;'>
-                <span>
-                🔴 [ODISHA] ନୂଆ ଶିକ୍ଷା ନୀତି ଅନୁଯାୟୀ ସମସ୍ତ ସ୍କୁଲରେ ଡିଜିଟାଲ୍ କ୍ଲାସରୁମ୍ ଆରମ୍ଭ ହେବ! &nbsp;&nbsp;♦&nbsp;&nbsp; 
-                🔴 [DELHI] Central Government announces new scholarship schemes for brilliant students across India! &nbsp;&nbsp;♦&nbsp;&nbsp; 
-                🔴 [BENGAL] রাজ্যের সব স্কুলে নতুন শিক্ষাবর্ষের ভর্তি শুরু হচ্ছে! &nbsp;&nbsp;♦&nbsp;&nbsp; 
-                🔴 [MAHARASHTRA] राज्यातील सर्व शाळांमध्ये नवीन तंत्रज्ञान लागू होणार! &nbsp;&nbsp;♦&nbsp;&nbsp; 
-                🔴 [ANDHRA] రాష్ట్రంలోని పాఠశాలల్లో డిజిటల్ విద్య అమలు! &nbsp;&nbsp;♦&nbsp;&nbsp; 
-                🔴 [HINDI] देश भर के सभी स्कूलों में नई डिजिटल शिक्षा प्रणाली लागू होगी!
-                </span>
+                <span>{master_db.get('news_text')}</span>
             </marquee>
         </div>
     </body>
@@ -1490,7 +1499,11 @@ elif menu == "Master Login":
                             st.rerun()
 
         with t5: 
-            st.markdown("### ⚙️ Update Master Profile, Payment & Fees")
+            st.markdown("### 📢 Update Notifications & Settings")
+            up_notice = st.text_area("Official Notification Text", value=master_db.get("notice_text", ""), height=100, key="m_set_not")
+            up_news = st.text_area("Breaking News Text", value=master_db.get("news_text", ""), height=100, key="m_set_new")
+            
+            st.markdown("---")
             up_m_user = st.text_input("Master Username", value=master_db.get("username", ""), key="m_set_usr")
             up_m_pass = st.text_input("New Master Password", type="password", key="m_set_pas")
             up_m_email = st.text_input("Recovery Email", value=master_db.get("email", ""), key="m_set_eml")
@@ -1505,13 +1518,28 @@ elif menu == "Master Login":
             up_sch_fee = c_s1.number_input("School Registration Base Fee (₹)", value=float(master_db.get("school_reg_fee", 1000.0)), min_value=0.0, key="m_set_sfee")
             up_sch_gst = c_s2.number_input("School GST Percentage (%)", value=float(master_db.get("school_gst_percent", 18.0)), min_value=0.0, key="m_set_sgst")
 
-            if st.button("Save Profile & Fee Settings", key="m_set_save"):
+            st.markdown("#### 🌌 Custom Background Animation/Image")
+            bg_upload = st.file_uploader("Upload App Background (GIF/JPG/PNG)", type=['gif', 'png', 'jpg', 'jpeg'], key="m_bg_up")
+            
+            c_save1, c_save2 = st.columns(2)
+            if c_save1.button("💾 Save Profile, Notifications & Background", key="m_set_save_all"):
                 master_db["username"] = sanitize(up_m_user); master_db["email"] = sanitize(up_m_email)
                 master_db["phone"] = sanitize(up_m_phone); master_db["upi_id"] = sanitize(up_m_upi)
                 master_db["reg_fee"] = float(up_base_fee); master_db["gst_percent"] = float(up_gst_pct)
                 master_db["school_reg_fee"] = float(up_sch_fee); master_db["school_gst_percent"] = float(up_sch_gst)
+                master_db["notice_text"] = up_notice
+                master_db["news_text"] = up_news
                 if up_m_pass: master_db["password"] = up_m_pass
-                save_master_data(master_db); st.success("Master settings successfully updated!")
+                if bg_upload:
+                    master_db["bg_b64"] = base64.b64encode(bg_upload.read()).decode('utf-8')
+                save_master_data(master_db); st.success("Master settings & Background successfully updated!")
+                st.rerun()
+                
+            if c_save2.button("🗑️ Remove Custom Background", key="m_bg_rem"):
+                master_db["bg_b64"] = ""
+                save_master_data(master_db)
+                st.success("Background reset to default!")
+                st.rerun()
 
         with t6:
             st.markdown("### 🏦 School Payment Gateway Setup (Master Control)")
