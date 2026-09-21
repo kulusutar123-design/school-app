@@ -54,29 +54,36 @@ def check_brute_force():
         st.stop()
 
 # ==========================================
-# 📱 REAL SMS GATEWAY (FAST2SMS DEFAULT OTP API - NO DLT REQUIRED)
+# 📱 REAL SMS GATEWAY (ADVANCED POST METHOD)
 # ==========================================
 def send_real_sms(mobile_no, otp_code):
-    url = "https://www.fast2sms.com/dev/bulkV2"
-    api_key = "gDA5mQEVzx1veCbdfwc8XOqUHT2WY"
-    
-    querystring = {
-        "authorization": api_key,
-        "variables_values": str(otp_code),
-        "route": "otp",
-        "numbers": str(mobile_no)
-    }
-    headers = {'cache-control': "no-cache"}
     try:
-        response = requests.request("GET", url, headers=headers, params=querystring)
+        url = "https://www.fast2sms.com/dev/bulkV2"
+        api_key = "gDA5mQEVzx1veCbdfwc8XOqUHT2WY"
+        
+        # Clean mobile number (Remove +91 and spaces)
+        clean_mob = "".join([c for c in str(mobile_no) if c.isdigit()])
+        if clean_mob.startswith("91") and len(clean_mob) == 12:
+            clean_mob = clean_mob[2:]
+            
+        payload = f"variables_values={otp_code}&route=otp&numbers={clean_mob}"
+        headers = {
+            'authorization': api_key,
+            'Content-Type': "application/x-www-form-urlencoded",
+            'Cache-Control': "no-cache",
+        }
+        
+        response = requests.request("POST", url, data=payload, headers=headers)
         res_data = response.json()
+        
         if res_data.get("return") == True:
             return True
         else:
-            st.session_state['sms_error'] = res_data.get("message", str(res_data))
+            # Capturing EXACT error from Fast2SMS
+            st.session_state['sms_error'] = str(res_data.get("message", res_data))
             return False
     except Exception as e:
-        st.session_state['sms_error'] = str(e)
+        st.session_state['sms_error'] = f"Server/Internet Error: {str(e)}"
         return False
 
 # ==========================================
@@ -1374,9 +1381,12 @@ elif menu == "Master Login":
                 if verify_contact == master_db.get("email") or verify_contact == master_db.get("phone"):
                     otp_code = str(random.randint(1000, 9999))
                     st.session_state['master_otp'] = otp_code
-                    send_real_sms(master_db.get("phone"), otp_code)
-                    st.success("OTP Sent Successfully!")
-                    st.info(f"📲 [DEMO SIMULATION] Your OTP is: **{otp_code}**")
+                    success = send_real_sms(master_db.get("phone"), otp_code)
+                    if success:
+                        st.success("OTP Sent Successfully via SMS!")
+                    else:
+                        st.error(f"❌ SMS Failed: {st.session_state.get('sms_error')}")
+                        st.info(f"📲 [SYSTEM FALLBACK] Demo OTP is: {otp_code}")
                 else: st.error("Invalid Email or Mobile Number!")
             if 'master_otp' in st.session_state:
                 entered_otp = st.text_input("Enter 4-digit OTP")
