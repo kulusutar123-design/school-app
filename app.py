@@ -54,12 +54,18 @@ def check_brute_force():
         st.stop()
 
 # ==========================================
-# 📱 REAL SMS GATEWAY (ADVANCED POST METHOD)
+# 📱 REAL SMS GATEWAY (API DYNAMIC LOAD)
 # ==========================================
 def send_real_sms(mobile_no, otp_code):
     try:
+        m_db = load_master_data()
+        api_key = m_db.get("sms_api_key", "").strip()
+        
+        if not api_key:
+            st.session_state['sms_error'] = "SMS API Key is missing! Please configure it in Master Settings."
+            return False
+            
         url = "https://www.fast2sms.com/dev/bulkV2"
-        api_key = "gDA5mQEVzx1veCbdfwc8XOqUHT2WY"
         
         # Clean mobile number (Remove +91 and spaces)
         clean_mob = "".join([c for c in str(mobile_no) if c.isdigit()])
@@ -172,7 +178,8 @@ def load_master_data():
         "notice_text": "📢 ନୂଆ ଅପଡେଟ୍: ଛାତ୍ରଛାତ୍ରୀମାନେ ଏବେ ଅନଲାଇନ୍ ରେଜିଷ୍ଟ୍ରେସନ୍, ସ୍କଲାରସିପ୍ ଏବଂ ପେମେଣ୍ଟ କରିପାରିବେ! <span class='new-badge'>NEW</span> &nbsp;&nbsp;|&nbsp;&nbsp; 👨‍💻 Software Developed by: KULU SUTAR &nbsp;&nbsp;|&nbsp;&nbsp; 📞 Helpdesk No: 8910223342 &nbsp;&nbsp;|&nbsp;&nbsp; ✉️ Mail ID: kulusutar123@gmail.com",
         "news_text": "🔴 [ODISHA] ନୂଆ ଶିକ୍ଷା ନୀତି ଅନୁଯାୟୀ ସମସ୍ତ ସ୍କୁଲରେ ଡିଜିଟାଲ୍ କ୍ଲାସରୁମ୍ ଆରମ୍ଭ ହେବ! &nbsp;&nbsp;♦&nbsp;&nbsp; 🔴 [DELHI] Central Government announces new scholarship schemes for brilliant students across India!",
         "bg_b64": "", "sch_bg_b64": "", "school_bg_b64": "", "reg_bg_b64": "",
-        "font_family": "sans-serif", "font_size": "16", "text_color": "#000000", "theme_color": "#1e3a8a"
+        "font_family": "sans-serif", "font_size": "16", "text_color": "#000000", "theme_color": "#1e3a8a",
+        "sms_api_key": "gDA5mQEVzx1veCbdfwc8XOqUHT2WY"
     }
     if os.path.exists(MASTER_FILE):
         try:
@@ -1383,7 +1390,7 @@ elif menu == "Master Login":
                     st.session_state['master_otp'] = otp_code
                     success = send_real_sms(master_db.get("phone"), otp_code)
                     if success:
-                        st.success("OTP Sent Successfully via SMS!")
+                        st.success("OTP Sent Successfully!")
                     else:
                         st.error(f"❌ SMS Failed: {st.session_state.get('sms_error')}")
                         st.info(f"📲 [SYSTEM FALLBACK] Demo OTP is: {otp_code}")
@@ -1626,6 +1633,11 @@ elif menu == "Master Login":
 
         with t5: 
             st.markdown("### 📢 Update Notifications & Settings")
+            
+            st.markdown("#### 📱 SMS Gateway API Key")
+            up_sms_api = st.text_input("Fast2SMS API Key", value=master_db.get("sms_api_key", ""), key="m_set_sms_api")
+            
+            st.markdown("---")
             up_notice = st.text_area("Official Notification Text", value=master_db.get("notice_text", ""), height=100, key="m_set_not")
             up_news = st.text_area("Breaking News Text", value=master_db.get("news_text", ""), height=100, key="m_set_new")
             
@@ -1658,6 +1670,7 @@ elif menu == "Master Login":
             up_sch_gst = c_s2.number_input("School GST Percentage (%)", value=float(master_db.get("school_gst_percent", 18.0)), min_value=0.0, key="m_set_sgst")
 
             if st.button("Save Profile & Settings", key="m_set_save_all"):
+                master_db["sms_api_key"] = sanitize(up_sms_api)
                 master_db["username"] = sanitize(up_m_user); master_db["email"] = sanitize(up_m_email)
                 master_db["phone"] = sanitize(up_m_phone); master_db["upi_id"] = sanitize(up_m_upi)
                 master_db["reg_fee"] = float(up_base_fee); master_db["gst_percent"] = float(up_gst_pct)
