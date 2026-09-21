@@ -54,7 +54,7 @@ def check_brute_force():
         st.stop()
 
 # ==========================================
-# 📱 REAL SMS GATEWAY (FAST2SMS API)
+# 📱 REAL SMS GATEWAY (FAST2SMS DEFAULT OTP API - NO DLT REQUIRED)
 # ==========================================
 def send_real_sms(mobile_no, otp_code):
     url = "https://www.fast2sms.com/dev/bulkV2"
@@ -62,9 +62,8 @@ def send_real_sms(mobile_no, otp_code):
     
     querystring = {
         "authorization": api_key,
-        "message": f"Your Verification OTP is {otp_code}. Do not share this with anyone.",
-        "language": "english",
-        "route": "q",
+        "variables_values": str(otp_code),
+        "route": "otp",
         "numbers": str(mobile_no)
     }
     headers = {'cache-control': "no-cache"}
@@ -164,7 +163,7 @@ def load_master_data():
         "phone": "8910223342", "upi_id": "school@sbi", "reg_fee": 150.0, "gst_percent": 18.0,
         "school_reg_fee": 1000.0, "school_gst_percent": 18.0, "scholarship_fee": 50.0,
         "notice_text": "📢 ନୂଆ ଅପଡେଟ୍: ଛାତ୍ରଛାତ୍ରୀମାନେ ଏବେ ଅନଲାଇନ୍ ରେଜିଷ୍ଟ୍ରେସନ୍, ସ୍କଲାରସିପ୍ ଏବଂ ପେମେଣ୍ଟ କରିପାରିବେ! <span class='new-badge'>NEW</span> &nbsp;&nbsp;|&nbsp;&nbsp; 👨‍💻 Software Developed by: KULU SUTAR &nbsp;&nbsp;|&nbsp;&nbsp; 📞 Helpdesk No: 8910223342 &nbsp;&nbsp;|&nbsp;&nbsp; ✉️ Mail ID: kulusutar123@gmail.com",
-        "news_text": "🔴 [ODISHA] ନୂଆ ଶିକ୍ଷା ନୀତି ଅନୁଯାୟୀ ସମସ୍ତ ସ୍କୁଲରେ ଡିଜିଟାଲ୍ କ୍ଲାସରୁମ୍ ଆରମ୍ଭ ହେବ! &nbsp;&nbsp;♦&nbsp;&nbsp; 🔴 [DELHI] Central Government announces new scholarship schemes for brilliant students across India! &nbsp;&nbsp;♦&nbsp;&nbsp; 🔴 [BENGAL] রাজ্যের সব স্কুলে নতুন শিক্ষাবর্ষের ভর্তি শুরু হচ্ছে!",
+        "news_text": "🔴 [ODISHA] ନୂଆ ଶିକ୍ଷା ନୀତି ଅନୁଯାୟୀ ସମସ୍ତ ସ୍କୁଲରେ ଡିଜିଟାଲ୍ କ୍ଲାସରୁମ୍ ଆରମ୍ଭ ହେବ! &nbsp;&nbsp;♦&nbsp;&nbsp; 🔴 [DELHI] Central Government announces new scholarship schemes for brilliant students across India!",
         "bg_b64": "", "sch_bg_b64": "", "school_bg_b64": "", "reg_bg_b64": "",
         "font_family": "sans-serif", "font_size": "16", "text_color": "#000000", "theme_color": "#1e3a8a"
     }
