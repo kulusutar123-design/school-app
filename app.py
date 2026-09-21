@@ -19,6 +19,7 @@ import html
 import threading
 import base64
 import time
+import requests
 
 # ==========================================
 # 🔒 HIGH-SECURITY ATOMIC CRASH PROTECTION
@@ -51,6 +52,26 @@ def check_brute_force():
     if st.session_state.failed_logins >= 5:
         st.error("🚨 ସୁରକ୍ଷା କାରଣରୁ ଆପଣଙ୍କୁ ବ୍ଲକ୍ କରାଯାଇଛି (Blocked due to repeated failed attempts). ବହୁତ ଥର ଭୁଲ୍ ପାସୱାର୍ଡ ଦିଆଯାଇଛି।")
         st.stop()
+
+# ==========================================
+# 📱 REAL SMS GATEWAY (FAST2SMS API)
+# ==========================================
+def send_real_sms(mobile_no, otp_code):
+    url = "https://www.fast2sms.com/dev/bulkV2"
+    api_key = "gDA5mQEVzx1veCbdfwc8XOqUHT2WY"
+    
+    querystring = {
+        "authorization": api_key,
+        "variables_values": str(otp_code),
+        "route": "otp",
+        "numbers": str(mobile_no)
+    }
+    headers = {'cache-control': "no-cache"}
+    try:
+        response = requests.request("GET", url, headers=headers, params=querystring)
+        return True
+    except Exception as e:
+        return False
 
 # ==========================================
 # 📂 DIRECTORY CREATION FOR SCHOLARSHIPS
@@ -136,7 +157,7 @@ def load_master_data():
         "phone": "8910223342", "upi_id": "school@sbi", "reg_fee": 150.0, "gst_percent": 18.0,
         "school_reg_fee": 1000.0, "school_gst_percent": 18.0, "scholarship_fee": 50.0,
         "notice_text": "📢 ନୂଆ ଅପଡେଟ୍: ଛାତ୍ରଛାତ୍ରୀମାନେ ଏବେ ଅନଲାଇନ୍ ରେଜିଷ୍ଟ୍ରେସନ୍, ସ୍କଲାରସିପ୍ ଏବଂ ପେମେଣ୍ଟ କରିପାରିବେ! <span class='new-badge'>NEW</span> &nbsp;&nbsp;|&nbsp;&nbsp; 👨‍💻 Software Developed by: KULU SUTAR &nbsp;&nbsp;|&nbsp;&nbsp; 📞 Helpdesk No: 8910223342 &nbsp;&nbsp;|&nbsp;&nbsp; ✉️ Mail ID: kulusutar123@gmail.com",
-        "news_text": "🔴 [ODISHA] ନୂଆ ଶିକ୍ଷା ନୀତି ଅନୁଯାୟୀ ସମସ୍ତ ସ୍କୁଲରେ ଡିଜିଟାଲ୍ କ୍ଲାସରୁମ୍ ଆରମ୍ଭ ହେବ! &nbsp;&nbsp;♦&nbsp;&nbsp; 🔴 [DELHI] Central Government announces new scholarship schemes for brilliant students across India! &nbsp;&nbsp;♦&nbsp;&nbsp; 🔴 [BENGAL] রাজ্যের সব স্কুলে নতুন শিক্ষাবর্ষের ভর্তি শুরু হচ্ছে!",
+        "news_text": "🔴 [ODISHA] ନୂଆ ଶିକ୍ଷା ନୀତି ଅନୁଯାୟୀ ସମସ୍ତ ସ୍କୁଲରେ ଡିଜିଟାଲ୍ କ୍ଲାସରୁମ୍ ଆରମ୍ଭ ହେବ! &nbsp;&nbsp;♦&nbsp;&nbsp; 🔴 [DELHI] Central Government announces new scholarship schemes for brilliant students across India!",
         "bg_b64": "", "sch_bg_b64": "", "school_bg_b64": "", "reg_bg_b64": "",
         "font_family": "sans-serif", "font_size": "16", "text_color": "#000000", "theme_color": "#1e3a8a"
     }
@@ -802,8 +823,9 @@ elif menu == "Scholarship Portal":
                         otp_code = str(random.randint(1000, 9999))
                         st.session_state['sch_f_otp'] = otp_code
                         st.session_state['sch_f_uid'] = sanitize(f_uid)
-                        st.success("OTP Sent Successfully to registered mobile!")
-                        st.info(f"📲 [DEMO SIMULATION] Your OTP is: **{otp_code}**")
+                        reg_mob = sch_users_db[sanitize(f_uid)]["mobile"]
+                        send_real_sms(reg_mob, otp_code)
+                        st.success("OTP Sent Successfully to registered mobile via SMS!")
                     else:
                         st.error("Aadhaar Number not found in our records!")
                         
@@ -848,12 +870,13 @@ elif menu == "Scholarship Portal":
                             st.session_state['temp_r_mob'] = sanitize(r_mob)
                             st.session_state['temp_r_adh'] = sanitize(r_adh)
                             st.session_state['temp_sch_otp'] = str(random.randint(1000, 9999))
+                            send_real_sms(sanitize(r_mob), st.session_state['temp_sch_otp'])
                             st.session_state['sch_reg_step'] = 2
                             st.rerun()
                     else: st.error("Please enter valid Mobile and Aadhaar numbers.")
             
             elif st.session_state['sch_reg_step'] == 2:
-                st.info(f"📲 OTP Sent to XXXXXX{st.session_state['temp_r_mob'][-4:]}. (Demo OTP: **{st.session_state['temp_sch_otp']}**)")
+                st.info(f"📲 Real SMS OTP Sent to XXXXXX{st.session_state['temp_r_mob'][-4:]}.")
                 in_otp = st.text_input("Enter OTP *")
                 if st.button("Verify OTP"):
                     if in_otp == st.session_state['temp_sch_otp']:
@@ -1337,8 +1360,8 @@ elif menu == "Master Login":
                 if verify_contact == master_db.get("email") or verify_contact == master_db.get("phone"):
                     otp_code = str(random.randint(1000, 9999))
                     st.session_state['master_otp'] = otp_code
-                    st.success("OTP Sent Successfully!")
-                    st.info(f"📲 [DEMO SIMULATION] Your OTP is: **{otp_code}**")
+                    send_real_sms(master_db.get("phone"), otp_code)
+                    st.success("OTP Sent Successfully via SMS!")
                 else: st.error("Invalid Email or Mobile Number!")
             if 'master_otp' in st.session_state:
                 entered_otp = st.text_input("Enter 4-digit OTP")
