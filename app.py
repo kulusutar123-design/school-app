@@ -65,23 +65,20 @@ def get_whatsapp_link(mobile_no, otp_code, student_name="Student"):
     return f"https://api.whatsapp.com/send?phone={clean_mob}&text={encoded_msg}"
 
 def send_real_sms(mobile_no, otp_code, student_name="Student"):
-    # Generates Fallback OTP and provides direct WhatsApp Notification Link
-    st.session_state['sms_error'] = "Fast2SMS Direct OTP is restricted without DLT. Using WhatsApp & Screen Fallback."
-    wa_link = get_whatsapp_link(mobile_no, otp_code, student_name)
-    st.session_state['whatsapp_link'] = wa_link
-    return False
-
-# ==========================================
-# 📂 DIRECTORY CREATION FOR SCHOLARSHIPS
-# ==========================================
-os.makedirs("Scholarship_Data/Student_Submissions", exist_ok=True)
-os.makedirs("Scholarship_Data/Approved_Master", exist_ok=True)
-os.makedirs("Carousel_Images", exist_ok=True)
-
-def save_master_approved_folder(app_id, s_data):
-    folder_path = f"Scholarship_Data/Approved_Master/{app_id}"
-    os.makedirs(folder_path, exist_ok=True)
-    
+    # 2Factor OTP API Integration
+    api_key = "25ba1bb7-b642-11f1-af74-0200cd936042"
+    url = f"https://2factor.in/API/V1/{api_key}/SMS/{mobile_no}/{otp_code}/AUTOGEN"
+    try:
+        response = requests.get(url)
+        data = response.json()
+        if data.get("Status") == "Success":
+            return True
+        else:
+            st.session_state['sms_error'] = f"2Factor Error: {data}"
+            return False
+    except Exception as e:
+        st.session_state['sms_error'] = str(e)
+        return False
     pdf_path = f"{folder_path}/Application_{app_id}.pdf"
     create_odisha_scholarship_pdf(pdf_path, app_id, s_data)
     
