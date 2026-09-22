@@ -460,7 +460,6 @@ def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no,
     w_tot_en = number_to_words(tot_obt)
     s_name_en = st_data.get('name', 'N/A').upper()
     
-    # Scanner-friendly full result text inside QR code
     qr_text = (
         f"--- STUDENT RESULT CARD ---\n"
         f"School: {school_name_en}\n"
@@ -567,7 +566,7 @@ def create_pdf(filename, school_name, st_data, roll_no):
     # 2. Header
     c.setFillColorRGB(0.59, 0.25, 0.60)
     school_text = str(school_name).upper()
-    c.setFont("Times-Bold", 16 if len(school_text) > 30 else 20)
+    c.setFont("Times-Bold", 15 if len(school_text) > 30 else 18)
     c.drawCentredString(306, 730, school_text)
     
     c.setFont("Helvetica-Bold", 11)
@@ -628,6 +627,7 @@ def create_pdf(filename, school_name, st_data, roll_no):
     t = Table(table_data, colWidths=[282, 120, 120])
     t.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#fcf4fc')),
+        ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.HexColor('#963f98')),
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
         ('FONTSIZE', (0, 0), (-1, -1), 8),
@@ -653,17 +653,17 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.drawString(400, curr_y, f"FINAL GRADE: {st_data.get('grade', 'N/A')}")
     
     # 7. Native Offline Barcode & Full-Details QR Code
-    curr_y -= 70
+    curr_y -= 68
     try:
         clean_roll = str(roll_no).strip()
-        bc_obj = code128.Code128(clean_roll, barHeight=28, barWidth=1.0)
-        d_bc = Drawing(160, 40)
+        bc_obj = code128.Code128(clean_roll, barHeight=26, barWidth=1.0)
+        d_bc = Drawing(160, 36)
         d_bc.add(bc_obj)
-        renderPDF.draw(d_bc, c, 45, curr_y + 16)
+        renderPDF.draw(d_bc, c, 45, curr_y + 14)
         
         c.setFont("Helvetica", 7)
         c.setFillColorRGB(0, 0, 0)
-        c.drawString(45, curr_y + 4, f"Roll: {clean_roll}")
+        c.drawString(45, curr_y + 2, f"Roll: {clean_roll}")
     except Exception:
         pass
         
@@ -687,9 +687,9 @@ def create_pdf(filename, school_name, st_data, roll_no):
         qr_w = bounds[2] - bounds[0]
         qr_h = bounds[3] - bounds[1]
         
-        d_qr = Drawing(60, 60, transform=[60.0/qr_w, 0, 0, 60.0/qr_h, 0, 0])
+        d_qr = Drawing(55, 55, transform=[55.0/qr_w, 0, 0, 55.0/qr_h, 0, 0])
         d_qr.add(qr_obj)
-        renderPDF.draw(d_qr, c, 260, curr_y)
+        renderPDF.draw(d_qr, c, 260, curr_y - 4)
     except Exception:
         pass
 
@@ -715,6 +715,7 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.setFillColorRGB(0.4, 0.4, 0.4)
     c.drawCentredString(306, 40, "This is a computer-generated mark sheet verified by the institution.")
     
+    c.showPage()
     c.save()
 
 # --- MAIN APP START ---
@@ -1033,7 +1034,8 @@ elif menu == "Scholarship Portal":
                 create_odisha_scholarship_pdf(pdf_path, existing_app_id, existing_app_data)
                 
             with open(pdf_path, "rb") as f:
-                c_btn1.download_button("📥 Download PDF", f, file_name=f"Scholarship_{existing_app_id}.pdf", mime="application/pdf", key="stu_dash_dl")
+                pdf_data_bytes = f.read()
+            c_btn1.download_button("📥 Download PDF", data=pdf_data_bytes, file_name=f"Scholarship_{existing_app_id}.pdf", mime="application/pdf", key="stu_dash_dl")
             
             if c_btn2.button("🖨️ Print Application", key="stu_dash_print"):
                 components.html("<script>window.parent.print();</script>", height=0)
@@ -1046,7 +1048,8 @@ elif menu == "Scholarship Portal":
                 with c_suc1:
                     if os.path.exists(pdf_path):
                         with open(pdf_path, "rb") as f: 
-                            st.download_button("📥 Download Application & Receipt PDF", f, file_name=f"Scholarship_{st.session_state['sch_app_id']}.pdf", mime="application/pdf", key="sch_dl_success")
+                            pdf_succ_bytes = f.read()
+                        st.download_button("📥 Download Application & Receipt PDF", data=pdf_succ_bytes, file_name=f"Scholarship_{st.session_state['sch_app_id']}.pdf", mime="application/pdf", key="sch_dl_success")
                 with c_suc2:
                     if st.button("🏠 Go to Home Page", key="sch_go_home"): 
                         st.query_params["portal"] = "home"
@@ -1238,7 +1241,9 @@ elif menu == "New Student Registration":
         st.success(f"✅ Application Submitted! Reg ID: **{st.session_state['stu_reg_id']}**.")
         pdf_file = f"Receipt_{st.session_state['stu_reg_id']}.pdf"
         create_student_receipt_pdf(pdf_file, st.session_state['stu_reg_id'], st.session_state['stu_reg_data'])
-        with open(pdf_file, "rb") as f: st.download_button("📥 Download PDF Receipt", f, file_name=pdf_file, mime="application/pdf", key="stu_dl_btn_unique")
+        with open(pdf_file, "rb") as f: 
+            stu_rc_bytes = f.read()
+        st.download_button("📥 Download PDF Receipt", data=stu_rc_bytes, file_name=pdf_file, mime="application/pdf", key="stu_dl_btn_unique")
         if st.button("⬅️ Done", key="stu_done_btn_unique"): st.session_state['stu_reg_success'] = False; st.rerun()
                 
     elif not st.session_state['payment_step']:
@@ -1366,7 +1371,9 @@ elif menu == "New School Registration":
         st.success("✅ Registration Successful! PENDING approval from Master Admin.")
         pdf_file = f"School_Receipt_{st.session_state['sch_reg_id']}.pdf"
         create_school_receipt_pdf(pdf_file, st.session_state['sch_reg_id'], st.session_state['sch_reg_data'])
-        with open(pdf_file, "rb") as f: st.download_button("📥 Download PDF Receipt", f, file_name=pdf_file, mime="application/pdf", key="sch_dl_btn_unique")
+        with open(pdf_file, "rb") as f: 
+            sch_rc_bytes = f.read()
+        st.download_button("📥 Download PDF Receipt", data=sch_rc_bytes, file_name=pdf_file, mime="application/pdf", key="sch_dl_btn_unique")
         if st.button("⬅️ Done", key="sch_done_btn_unique"): st.session_state['sch_reg_success'] = False; st.rerun()
 
     elif not st.session_state['school_payment_step']:
@@ -1589,7 +1596,8 @@ elif menu == "Master Login":
                     pdf_m_file = f"Scholarship_Data/Approved_Master/{a_id}/Application_{a_id}.pdf"
                     if os.path.exists(pdf_m_file):
                         with open(pdf_m_file, "rb") as f:
-                            st.download_button("📥 Download Final Application PDF", f, file_name=f"Application_{a_id}.pdf", mime="application/pdf", key=f"m_appr_pdf_{a_id}")
+                            m_appr_bytes = f.read()
+                        st.download_button("📥 Download Final Application PDF", data=m_appr_bytes, file_name=f"Application_{a_id}.pdf", mime="application/pdf", key=f"m_appr_pdf_{a_id}")
                     
                     app_data = approved_sch[a_id]
                     st.markdown(render_odisha_scholarship_html(a_id, app_data), unsafe_allow_html=True)
@@ -2052,7 +2060,8 @@ elif menu == "School Login":
                 pdf_file = f"Report_{rep_roll}.pdf"
                 create_pdf(pdf_file, sch_data['name'], approved_students[rep_roll], rep_roll)
                 with open(pdf_file, "rb") as f:
-                    st.download_button("📥 Download PDF", f, file_name=pdf_file, mime="application/pdf", key="s_dl_pdf_v2")
+                    pdf_data_bytes = f.read()
+                st.download_button("📥 Download PDF", data=pdf_data_bytes, file_name=pdf_file, mime="application/pdf", key="s_dl_pdf_v2")
                 if st.button("🖨️ Print Result Card", key="s_print_v2"):
                     components.html("<script>window.parent.print();</script>", height=0)
 
@@ -2060,7 +2069,10 @@ elif menu == "School Login":
 elif menu == "Results":
     c_home, c_title = st.columns([1, 8])
     with c_home:
-        if st.button("🏠 Home", key="st_home_btn"): st.query_params["portal"] = "home"; st.rerun()
+        if st.button("🏠 Home", key="st_home_btn"): 
+            st.query_params["portal"] = "home"
+            if 'active_result' in st.session_state: del st.session_state['active_result']
+            st.rerun()
     with c_title: st.subheader("🎓 Results Portal")
     
     st_search_query = st.text_input("Roll Number OR Student Name", key="res_q_v2")
@@ -2093,24 +2105,44 @@ elif menu == "Results":
                 if found_student: break
             
             if found_student:
-                sch = schools_db.get(found_school_id, {})
-                s_lang = sch.get("lang", "English")
-                st.success(f"🎉 **Welcome {found_student.get('name', '').upper()}!**")
-                
-                st.markdown(generate_result_card_html(sch.get('name', 'Unknown School'), sch.get('name_local', ''), found_student, found_roll, s_lang), unsafe_allow_html=True)
-                
-                pdf_file = f"Result_{found_roll}.pdf"
-                create_pdf(pdf_file, sch.get('name', 'Unknown School'), found_student, found_roll)
-                with open(pdf_file, "rb") as f:
-                    st.download_button("📥 Download PDF", f, file_name=pdf_file, mime="application/pdf", key="res_dl_v2")
-                if st.button("🖨️ Print Result Card", key="res_print_v2"):
-                    components.html("<script>window.parent.print();</script>", height=0)
+                st.session_state['active_result'] = {
+                    "student": found_student,
+                    "roll": found_roll,
+                    "school_id": found_school_id
+                }
+                st.rerun()
             elif pending_status:
                 st.warning(f"⚠️ ଆପଣଙ୍କ ରେକର୍ଡ ମିଳିଲା, କିନ୍ତୁ ଷ୍ଟାଟସ୍ ଏବେ: '{pending_status}' ଅଛି। Master ବା School ରୁ ଆପ୍ରୁଭ୍ କରନ୍ତୁ।")
             elif dob_mismatch:
                 st.warning("⚠️ Roll No/Name ମେଚ୍ ହେଲା କିନ୍ତୁ Date of Birth (DOB) ମେଚ୍ ହେଉନାହିଁ। ସଠିକ୍ DOB ଦିଅନ୍ତୁ।")
             else:
                 st.error("❌ କୌଣସି ରେକର୍ଡ ମିଳିଲା ନାହିଁ! Roll Number ଏବଂ DOB ରେ ଚେକ୍ କରନ୍ତୁ।")
+
+    # Render Result if stored in session
+    if 'active_result' in st.session_state:
+        res_info = st.session_state['active_result']
+        f_student = res_info['student']
+        f_roll = res_info['roll']
+        f_sch_id = res_info['school_id']
+        
+        sch = schools_db.get(f_sch_id, {})
+        s_lang = sch.get("lang", "English")
+        st.success(f"🎉 **Welcome {f_student.get('name', '').upper()}!**")
+        
+        st.markdown(generate_result_card_html(sch.get('name', 'Unknown School'), sch.get('name_local', ''), f_student, f_roll, s_lang), unsafe_allow_html=True)
+        
+        pdf_file = f"Result_{f_roll}.pdf"
+        create_pdf(pdf_file, sch.get('name', 'Unknown School'), f_student, f_roll)
+        
+        with open(pdf_file, "rb") as f:
+            pdf_bytes = f.read()
+            
+        c_res1, c_res2 = st.columns(2)
+        with c_res1:
+            st.download_button("📥 Download PDF", data=pdf_bytes, file_name=pdf_file, mime="application/pdf", key="res_dl_v2")
+        with c_res2:
+            if st.button("🖨️ Print Result Card", key="res_print_v2"):
+                components.html("<script>window.parent.print();</script>", height=0)
 
 st.markdown("---")
 st.markdown("<div style='text-align: center; padding: 15px; background: linear-gradient(90deg, #1e3a8a, #9333ea); color: white; border-radius: 8px; font-weight: bold;'>👨‍💻 Software Developed by: KULU SUTAR | 📞 Mob: 8910223342 | ✉️ kulusutar123@gmail.com</div>", unsafe_allow_html=True)
