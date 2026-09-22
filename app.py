@@ -75,8 +75,11 @@ def send_real_sms(mobile_no, otp_code, student_name="Student"):
         data = response.json()
         if data.get("type") == "success":
             return True
+       if data.get("type") == "success":
+            return True
         else:
-            st.session_state['sms_error'] = f"MSG91 Error: {data.get('message', 'Failed')}"
+            # eha dwara MSG91 ra asali error screen re dekha jiba
+            st.session_state['sms_error'] = f"MSG91 Asali Error: {data}"
             return False
     except Exception as e:
         st.session_state['sms_error'] = str(e)
