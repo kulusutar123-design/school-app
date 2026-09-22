@@ -65,7 +65,7 @@ def get_whatsapp_link(mobile_no, otp_code, student_name="Student"):
     return f"https://api.whatsapp.com/send?phone={clean_mob}&text={encoded_msg}"
 
 def send_real_sms(mobile_no, otp_code, student_name="Student"):
-    # Automated Direct WhatsApp Integration for Outdoor Students
+    # Clean Direct WhatsApp Link Generator for Outdoor Students
     clean_mob = "".join([c for c in str(mobile_no) if c.isdigit()])
     if not clean_mob.startswith("91") and len(clean_mob) == 10:
         clean_mob = "91" + clean_mob
@@ -75,13 +75,11 @@ def send_real_sms(mobile_no, otp_code, student_name="Student"):
     encoded_msg = urllib.parse.quote(message)
     wa_link = f"https://api.whatsapp.com/send?phone={clean_mob}&text={encoded_msg}"
     
-    # Automatically triggers direct WhatsApp redirect on screen
-    st.markdown(f'<meta http-equiv="refresh" content="0;url={wa_link}">', unsafe_allow_html=True)
+    # Displaying a clean clickable button without iframe error
     st.success(f"OTP tayar jhala ahe! Mobile number {clean_mob} sathi WhatsApp link ready ahe.")
-    st.markdown(f"<a href='{wa_link}' target='_blank' style='background-color:#25D366; color:white; padding:12px 24px; border-radius:6px; text-decoration:none; font-weight:bold; font-size:16px; display:block; text-align:center;'>WhatsApp var OTP pathavnyasathi ithe click kara</a>", unsafe_allow_html=True)
+    st.markdown(f"<a href='{wa_link}' target='_blank' style='background-color:#25D366; color:white; padding:12px 24px; border-radius:6px; text-decoration:none; font-weight:bold; font-size:16px; display:block; text-align:center;'>💬 WhatsApp var OTP pathavnyasathi ithe click kara</a>", unsafe_allow_html=True)
     
     return True
-    if s_data.get('photo_b64'):
         with open(f"{folder_path}/Profile_Photo.jpg", "wb") as f: f.write(base64.b64decode(s_data['photo_b64']))
     if s_data.get('inc_file_b64'):
         with open(f"{folder_path}/Income_Cert.jpg", "wb") as f: f.write(base64.b64decode(s_data['inc_file_b64']))
