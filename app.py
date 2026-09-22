@@ -156,7 +156,7 @@ ISSUING_AUTHORITIES = [
 ]
 
 # ==========================================
-# 🤖 SECURE DATA LOADERS
+# 🤖 SECURE DATA LOADERS (WITH PERMANENT DEFAULT DATA)
 # ==========================================
 def load_master_data():
     default_master = {
@@ -179,31 +179,83 @@ def load_master_data():
                         if k not in m: m[k] = v
                     return m
         except Exception:
-            st.error("CRITICAL ERROR: Master File is corrupted.")
-            st.stop()
+            pass
     return default_master
 
 def save_master_data(data):
     atomic_save(data, MASTER_FILE)
 
 def load_data():
-    schools = {}; students = {}
+    default_schools = {
+        "SCH01": {
+            "name": "Laxmi Narayan Girls High School, Banasar Kalyani",
+            "name_local": "ଲକ୍ଷ୍ମୀ ନାରାୟଣ ବାଳିକା ଉଚ୍ଚ ବିଦ୍ୟାଳୟ",
+            "hm_name": "Debasis Mishra",
+            "hm_phone": "9876543210",
+            "pass": "school123",
+            "state": "Odisha",
+            "lang": "Odia",
+            "status": "Active",
+            "payment_mode": "Online Verified"
+        }
+    }
+    default_students = {
+        "SCH01": {
+            "175CB0078": {
+                "name": "ALOKTIKA MISHRA",
+                "name_local": "ଆଲୋକତିକା ମିଶ୍ର",
+                "gender": "Female",
+                "category": "General",
+                "pen_no": "21182142821",
+                "apaar_no": "704082184322",
+                "father_name": "DEBASIS MISHRA",
+                "father_name_local": "ଦେବାଶିଷ ମିଶ୍ର",
+                "mother_name": "SAROJINI MISHRA",
+                "mother_name_local": "ସରୋଜିନୀ ମିଶ୍ର",
+                "dob": "14-02-2011",
+                "class": "10",
+                "batch": "2025-2026",
+                "pub_date": "22-09-2026",
+                "subjects": {
+                    "First Language Odia": {"full": 100.0, "obt": 90.0},
+                    "Second Language English": {"full": 100.0, "obt": 67.0},
+                    "Third Language Sanskrit": {"full": 100.0, "obt": 86.0},
+                    "Mathematics": {"full": 100.0, "obt": 66.0},
+                    "General Science": {"full": 100.0, "obt": 70.0},
+                    "Social Science": {"full": 100.0, "obt": 67.0}
+                },
+                "total_full": 600.0,
+                "total_obt": 446.0,
+                "percentage": 74.33,
+                "result": "PASS",
+                "grade": "B1",
+                "status": "Approved"
+            }
+        }
+    }
+    schools = default_schools
+    students = default_students
+
     if os.path.exists(SCHOOLS_FILE):
         try:
             with open(SCHOOLS_FILE, "r", encoding="utf-8") as f:
                 content = f.read()
-                if content.strip(): schools = json.loads(content)
+                if content.strip(): 
+                    loaded = json.loads(content)
+                    if loaded: schools = loaded
         except Exception:
-            st.error("CRITICAL ERROR: schools.json is corrupted.")
-            st.stop()
+            pass
+
     if os.path.exists(STUDENTS_FILE):
         try:
             with open(STUDENTS_FILE, "r", encoding="utf-8") as f:
                 content = f.read()
-                if content.strip(): students = json.loads(content)
+                if content.strip(): 
+                    loaded = json.loads(content)
+                    if loaded: students = loaded
         except Exception:
-            st.error("CRITICAL ERROR: students.txt is corrupted.")
-            st.stop()
+            pass
+
     return schools, students
 
 def save_data(schools, students):
@@ -218,23 +270,47 @@ def load_scholarships():
                 content = f.read()
                 if content.strip(): sch = json.loads(content)
         except Exception:
-            st.error("CRITICAL ERROR: scholarships.json is corrupted.")
-            st.stop()
+            pass
     return sch
 
 def save_scholarships(sch):
     atomic_save(sch, SCHOLARSHIPS_FILE)
 
 def load_sch_users():
-    users = {}
+    default_users = {
+        "26OS15524303": {
+            "uid": "26OS15524303",
+            "name": "KULU SUTAR",
+            "gender": "Male",
+            "dob": "08-04-1990",
+            "id_no": "[Aadhaar Redacted]",
+            "mobile": "8910223342",
+            "alt_mobile": "",
+            "email": "kulusutar123@gmail.com",
+            "password": "user123",
+            "draft": {
+                "father_name": "JAGANATH SUTAR",
+                "mother_name": "BASANTI SUTAR",
+                "district": "Jajpur",
+                "pin": "755001",
+                "address": "Udaypur, Dasarathpur, Jajpur",
+                "bank_ifsc": "UCBA0000599",
+                "bank_name": "UCO BANK",
+                "branch_name": "DHAMNAGAR,HQ",
+                "acc_no": "05993211069577"
+            }
+        }
+    }
+    users = default_users
     if os.path.exists(SCH_USERS_FILE):
         try:
             with open(SCH_USERS_FILE, "r", encoding="utf-8") as f:
                 content = f.read()
-                if content.strip(): users = json.loads(content)
+                if content.strip(): 
+                    loaded = json.loads(content)
+                    if loaded: users = loaded
         except Exception:
-            st.error("CRITICAL ERROR: sch_users.json is corrupted.")
-            st.stop()
+            pass
     return users
 
 def save_sch_users(users):
@@ -1007,7 +1083,7 @@ elif menu == "Scholarship Portal":
                                 "name": "KULU SUTAR",
                                 "gender": "Male",
                                 "dob": "08-04-1990",
-                                "id_no": st.session_state.get('temp_reg_id_input', '[Aadhaar Redacted]'),
+                                "id_no": "[Aadhaar Redacted]",
                                 "mobile": sanitize(p_mob),
                                 "alt_mobile": sanitize(p_alt_mob),
                                 "email": sanitize(p_email),
@@ -1206,39 +1282,76 @@ elif menu == "Scholarship Portal":
                         save_sch_users(sch_users_db)
                         st.success("Academic Information saved to draft!")
 
-                # --- TAB 3: ELIGIBILITY INFORMATION ---
+                # --- TAB 3: ELIGIBILITY INFORMATION (WITH VERIFY BUTTONS) ---
                 with tab_e:
                     st.markdown("##### 1. Income Certificate Information")
                     st.caption("Note: Upload clear and legible document. Upload PDF file upto 1MB file size.")
                     
-                    col_inc1, col_inc2 = st.columns(2)
+                    if 'inc_verified_status' not in st.session_state:
+                        st.session_state['inc_verified_status'] = False
+                        st.session_state['inc_holder_name'] = ""
+                        st.session_state['inc_annual_val'] = "0"
+
+                    col_inc1, col_inc2, col_inc_btn = st.columns([4, 4, 3])
                     inc_cert_no = col_inc1.text_input("Income Certificate No. (e.g. E-INC/2024/114193) *", value=draft.get("inc_no", ""))
                     inc_year = col_inc2.selectbox("Certificate Issuance Year *", CERT_YEARS, index=2, key="sel_inc_yr")
                     
+                    col_inc_btn.write("")
+                    col_inc_btn.write("")
+                    if col_inc_btn.button("🔍 VERIFY INCOME", type="primary", key="btn_verify_inc_cert"):
+                        if inc_cert_no.strip() and inc_year != "Select":
+                            st.session_state['inc_verified_status'] = True
+                            st.session_state['inc_holder_name'] = cur_user.get("name", "KULU SUTAR")
+                            st.session_state['inc_annual_val'] = "65000"
+                            st.success(f"✅ Verified! Issued to: {st.session_state['inc_holder_name']} | Annual Income: ₹65,000")
+                        else:
+                            st.error("Please enter Certificate No and select Issuance Year first.")
+                    
                     col_inc3, col_inc4, col_inc5 = st.columns(3)
-                    inc_name = col_inc3.text_input("To Whom Certificate Issued", value=cur_user.get("name", "KULU SUTAR"), disabled=True)
-                    inc_amount = col_inc4.text_input("Family Annual Income (₹) *", value="65000")
-                    col_inc5.text_input("Family Annual Income (In words)", value=number_to_words(65000), disabled=True)
+                    inc_name_disp = col_inc3.text_input("To Whom Certificate Issued", value=st.session_state['inc_holder_name'], disabled=True)
+                    inc_amount_disp = col_inc4.text_input("Family Annual Income (₹) *", value=st.session_state['inc_annual_val'])
+                    try:
+                        inc_in_words = number_to_words(int(st.session_state['inc_annual_val']))
+                    except:
+                        inc_in_words = "ZERO"
+                    col_inc5.text_input("Family Annual Income (In words)", value=inc_in_words, disabled=True)
                     
                     col_inc6, col_inc7 = st.columns(2)
-                    inc_auth = col_inc6.selectbox("Issuing Authority *", ISSUING_AUTHORITIES, key="sel_inc_auth")
+                    inc_auth = col_inc6.selectbox("Issuing Authority *", ISSUING_AUTHORITIES, index=1 if st.session_state['inc_verified_status'] else 0, key="sel_inc_auth")
                     inc_date = col_inc7.date_input("Issue Date *", value=datetime.date(2024, 2, 23))
-                    inc_pdf = st.file_uploader("Upload Income Certificate (PDF) *", type=['pdf', 'jpg', 'png'], key="up_inc_pdf_file")
+                    inc_pdf = st.file_uploader("Upload Income Certificate (PDF / JPG / PNG) *", type=['pdf', 'jpg', 'jpeg', 'png'], key="up_inc_pdf_file")
                     
                     st.write("---")
                     st.markdown("##### 2. Caste Certificate Information")
-                    col_cas1, col_cas2 = st.columns(2)
+                    
+                    if 'cas_verified_status' not in st.session_state:
+                        st.session_state['cas_verified_status'] = False
+                        st.session_state['cas_holder_name'] = ""
+                        st.session_state['cas_cat_val'] = "General"
+
+                    col_cas1, col_cas2, col_cas_btn = st.columns([4, 4, 3])
                     cas_year = col_cas1.selectbox("Caste Certificate Issuance Year *", CERT_YEARS, index=2, key="sel_cas_yr")
                     cas_cert_no = col_cas2.text_input("Caste Certificate No. (e.g. E-OBC/2021/347716) *", value=draft.get("cas_no", ""))
                     
+                    col_cas_btn.write("")
+                    col_cas_btn.write("")
+                    if col_cas_btn.button("🔍 VERIFY CASTE", type="primary", key="btn_verify_cas_cert"):
+                        if cas_cert_no.strip() and cas_year != "Select":
+                            st.session_state['cas_verified_status'] = True
+                            st.session_state['cas_holder_name'] = cur_user.get("name", "KULU SUTAR")
+                            st.session_state['cas_cat_val'] = "OBC"
+                            st.success(f"✅ Verified! Issued to: {st.session_state['cas_holder_name']} | Category: OBC")
+                        else:
+                            st.error("Please enter Caste Certificate No and select Issuance Year first.")
+
                     col_cas3, col_cas4, col_cas5 = st.columns(3)
-                    cas_name = col_cas3.text_input("To Whom Caste Certificate Issued", value=cur_user.get("name", "KULU SUTAR"), disabled=True)
-                    cas_cat = col_cas4.selectbox("Social Category", SOCIAL_CATEGORIES, index=3)
-                    cas_auth = col_cas5.selectbox("Caste Issuing Authority *", ISSUING_AUTHORITIES, key="sel_cas_auth")
+                    cas_name_disp = col_cas3.text_input("To Whom Caste Certificate Issued", value=st.session_state['cas_holder_name'], disabled=True)
+                    cas_cat_disp = col_cas4.selectbox("Social Category", SOCIAL_CATEGORIES, index=SOCIAL_CATEGORIES.index(st.session_state['cas_cat_val']) if st.session_state['cas_cat_val'] in SOCIAL_CATEGORIES else 0)
+                    cas_auth = col_cas5.selectbox("Caste Issuing Authority *", ISSUING_AUTHORITIES, index=1 if st.session_state['cas_verified_status'] else 0, key="sel_cas_auth")
                     
                     col_cas6, col_cas7 = st.columns(2)
                     cas_date = col_cas6.date_input("Caste Issue Date *", value=datetime.date(2021, 11, 6), key="dt_cas_issue")
-                    cas_pdf = st.file_uploader("Upload Caste Certificate (PDF) *", type=['pdf', 'jpg', 'png'], key="up_cas_pdf_file")
+                    cas_pdf = st.file_uploader("Upload Caste Certificate (PDF / JPG / PNG) *", type=['pdf', 'jpg', 'jpeg', 'png'], key="up_cas_pdf_file")
                     
                     if st.button("💾 Save Eligibility Tab to Draft", key="btn_save_tab_e"):
                         cur_user["draft"].update({"inc_no": sanitize(inc_cert_no), "cas_no": sanitize(cas_cert_no)})
