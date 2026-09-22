@@ -66,7 +66,7 @@ def get_whatsapp_link(mobile_no, otp_code, student_name="Student"):
 
 def send_real_sms(mobile_no, otp_code, student_name="Student"):
     # 2Factor OTP API Integration
-    api_key = "YOUR_2FACTOR_API_KEY"
+    api_key = "25ba1bb7-b642-11f1-af74-0200cd936042"
     
     url = f"https://2factor.in/API/V1/{api_key}/SMS/{mobile_no}/{otp_code}/AUTOGEN"
     
@@ -76,6 +76,12 @@ def send_real_sms(mobile_no, otp_code, student_name="Student"):
         
         if data.get("Status") == "Success":
             return True
+        else:
+            st.session_state['sms_error'] = f"2Factor Error: {data}"
+            return False
+    except Exception as e:
+        st.session_state['sms_error'] = str(e)
+        return False
         else:
             st.session_state['sms_error'] = f"2Factor Error: {data}"
             return False
