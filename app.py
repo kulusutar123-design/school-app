@@ -138,7 +138,7 @@ STATE_LANG_MAP = {
     "Odisha": "Odia", "Punjab": "Punjabi", "Rajasthan": "Hindi",
     "Sikkim": "English", "Tamil Nadu": "Tamil", "Telangana": "Telugu",
     "Tripura": "Bengali", "Uttar Pradesh": "Hindi", "Uttarakhand": "Hindi",
-    "West Bengal": "Bengali", "Delhi": "Hindi", "Jammon and Kashmir": "Urdu",
+    "West Bengal": "Bengali", "Delhi": "Hindi", "Jammu and Kashmir": "Urdu",
     "Ladakh": "English", "Puducherry": "Tamil", "Chandigarh": "Punjabi",
     "Andaman and Nicobar": "English", "Lakshadweep": "Malayalam", "Dadra & Nagar Haveli": "Gujarati"
 }
@@ -447,6 +447,9 @@ def create_school_receipt_pdf(filename, sch_id, sch_data):
     c.setFont("Helvetica-Oblique", 10); c.drawCentredString(300, y, "Computer-generated receipt.")
     c.save()
 
+# ==========================================
+# 🌐 COMPLETE PREVIEW HTML WITH BARCODE & SIGNATURES
+# ==========================================
 def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no, s_lang):
     disp_dob = format_display_date(st_data.get('dob', ''))
     raw_pub = st_data.get('pub_date', '')
@@ -455,39 +458,68 @@ def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no,
     tot_obt = st_data.get('total_obt', 0)
     w_tot_en = number_to_words(tot_obt)
     s_name_en = st_data.get('name', 'N/A').upper()
-    qr_text = f"SCHOOL: {school_name_en} | NAME: {s_name_en} | ROLL: {roll_no} | DOB: {disp_dob} | MARKS: {tot_obt}/{st_data.get('total_full', 0)} | GRADE: {st_data.get('grade', '')}"
-    qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={urllib.parse.quote(qr_text)}"
+    qr_text = f"SCHOOL: {school_name_en} | NAME: {s_name_en} | ROLL: {roll_no} | MARKS: {tot_obt}/{st_data.get('total_full', 0)} | RESULT: {st_data.get('result', '')}"
+    qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={urllib.parse.quote(qr_text)}"
     bc_url = f"https://barcode.tec-it.com/barcode.ashx?data={roll_no}&code=Code128&dpi=96"
-    rows_html = "".join([f"<tr style='border-bottom: 1px solid {b_col};'><td style='padding: 8px; border-right: 1px solid {b_col}; text-align: left; font-weight: bold; color: #000;'>{sub.upper()}</td><td style='padding: 8px; border-right: 1px solid {b_col}; color: #000;'>{m['full']}</td><td style='padding: 8px; font-weight: bold; color: #000;'>{m['obt']}</td></tr>" for sub, m in st_data.get('subjects', {}).items()])
+    rows_html = "".join([f"<tr style='border-bottom: 1px solid {b_col};'><td style='padding: 6px 8px; border-right: 1px solid {b_col}; text-align: left; font-weight: bold; color: #000;'>{sub.upper()}</td><td style='padding: 6px 8px; border-right: 1px solid {b_col}; color: #000;'>{m['full']}</td><td style='padding: 6px 8px; font-weight: bold; color: #000;'>{m['obt']}</td></tr>" for sub, m in st_data.get('subjects', {}).items()])
     
-    html_str = f"""<div style='font-family: "Times New Roman", serif; border: 15px solid {ob}; padding: 4px; max-width: 800px; margin: auto; background-color: #fff;'>
-<div style='border: 2px solid {b_col}; padding: 25px; background-color: {bc}; position: relative;'>
-<div style='text-align: center; color: {b_col}; margin-bottom: 20px;'>
-<h1 style='margin: 0; font-size: 24px; text-transform: uppercase;'>{school_name_en}</h1>
-<h3 style='margin: 5px 0; font-size: 16px;'>ANNUAL EXAMINATION - {st_data.get('batch', '2025-2026')}</h3>
-<p style='margin: 5px 0; font-weight: bold; font-size: 17px; text-decoration: underline;'>CERTIFICATE-CUM-MARK SHEET</p>
+    html_str = f"""<div style='font-family: "Times New Roman", serif; border: 12px solid {ob}; padding: 4px; max-width: 750px; margin: auto; background-color: #fff;'>
+<div style='border: 2px solid {b_col}; padding: 20px; background-color: {bc}; position: relative;'>
+<div style='text-align: center; color: {b_col}; margin-bottom: 15px;'>
+<h1 style='margin: 0; font-size: 20px; text-transform: uppercase;'>{school_name_en}</h1>
+<h3 style='margin: 4px 0; font-size: 14px;'>ANNUAL EXAMINATION - {st_data.get('batch', '2025-2026')}</h3>
+<p style='margin: 4px 0; font-weight: bold; font-size: 15px; text-decoration: underline;'>CERTIFICATE-CUM-MARK SHEET</p>
 </div>
-<table style='width: 100%; font-size: 13px; margin-bottom: 20px; font-weight: bold;'>
+<table style='width: 100%; font-size: 12px; margin-bottom: 12px; font-weight: bold;'>
 <tr><td><span style='color:{b_col};'>ROLL NO:</span> <span style='color:#000;'>{roll_no}</span></td><td style='text-align: right;'><span style='color:{b_col};'>CLASS:</span> <span style='color:#000;'>{st_data.get('class', '')}</span></td></tr>
 <tr><td><span style='color:{b_col};'>PEN NO:</span> <span style='color:#000;'>{st_data.get('pen_no', '')}</span></td><td style='text-align: right;'><span style='color:{b_col};'>APAAR NO:</span> <span style='color:#000;'>{st_data.get('apaar_no', '')}</span></td></tr>
 </table>
-<table style='width: 100%; font-size: 14px; margin-bottom: 15px; text-transform: uppercase; line-height: 1.8;'>
-<tr><td style='width: 250px; color: {b_col}; font-weight: bold;'>Certify that</td><td><b style='color:#000;'>{s_name_en}</b></td></tr>
+<table style='width: 100%; font-size: 12px; margin-bottom: 12px; text-transform: uppercase; line-height: 1.6;'>
+<tr><td style='width: 200px; color: {b_col}; font-weight: bold;'>Certify that</td><td><b style='color:#000;'>{s_name_en}</b></td></tr>
 <tr><td style='color: {b_col}; font-weight: bold;'>Mother's Name</td><td><b style='color:#000;'>{st_data.get('mother_name', '').upper()}</b></td></tr>
 <tr><td style='color: {b_col}; font-weight: bold;'>Father's Name</td><td><b style='color:#000;'>{st_data.get('father_name', '').upper()}</b></td></tr>
 <tr><td style='color: {b_col}; font-weight: bold;'>Date of Birth</td><td><b style='color:#000;'>{disp_dob}</b></td></tr>
 <tr><td style='color: {b_col}; font-weight: bold;'>Category</td><td><b style='color:#000;'>{st_data.get('category', 'General')}</b></td></tr>
 </table>
-<table style='width: 100%; border-collapse: collapse; border: 2px solid {b_col}; text-align: center; font-size: 13px;'>
+<table style='width: 100%; border-collapse: collapse; border: 2px solid {b_col}; text-align: center; font-size: 12px;'>
 <tr style='color: {b_col}; background-color: {t_bg}; border-bottom: 2px solid {b_col};'>
-<th style='padding: 8px; border-right: 1px solid {b_col};'>SUBJECT</th><th style='padding: 8px; border-right: 1px solid {b_col};'>FULL MARKS</th><th style='padding: 8px;'>MARKS SECURED</th>
+<th style='padding: 6px; border-right: 1px solid {b_col};'>SUBJECT</th><th style='padding: 6px; border-right: 1px solid {b_col};'>FULL MARKS</th><th style='padding: 6px;'>MARKS SECURED</th>
 </tr>
 {rows_html}
 <tr style='color: {b_col}; font-weight: bold; background-color: {t_bg}; border-top: 2px solid {b_col};'>
-<td style='padding: 10px; border-right: 1px solid {b_col}; text-align: right;'>TOTAL MARKS</td><td style='padding: 10px; border-right: 1px solid {b_col}; color:#000;'>{st_data.get('total_full', 0)}</td><td style='padding: 10px; color:#000;'>{tot_obt}</td>
+<td style='padding: 8px; border-right: 1px solid {b_col}; text-align: right;'>TOTAL MARKS</td><td style='padding: 8px; border-right: 1px solid {b_col}; color:#000;'>{st_data.get('total_full', 0)}</td><td style='padding: 8px; color:#000;'>{tot_obt}</td>
 </tr>
 </table>
-<div style='text-align: center; font-weight: bold; font-size: 14px; margin-top: 20px; color:#000;'>( {w_tot_en} )</div>
+<div style='text-align: center; font-weight: bold; font-size: 13px; margin: 12px 0; color:#000;'>( {w_tot_en} )</div>
+
+<!-- ବାରକୋଡ୍ ଏବଂ QR କୋଡ୍ ସେକ୍ସନ୍ -->
+<div style='display: flex; justify-content: space-between; align-items: center; margin: 15px 10px;'>
+  <div style='text-align: left;'>
+    <img src='{bc_url}' style='height: 45px;'><br>
+    <span style='font-size: 11px; font-weight: bold; color: #333;'>Roll: {roll_no}</span>
+  </div>
+  <div style='text-align: right;'>
+    <img src='{qr_url}' style='height: 60px; width: 60px;'>
+  </div>
+</div>
+
+<!-- ଦସ୍ତଖତ ଏବଂ ତାରିଖ ସେକ୍ସନ୍ -->
+<div style='display: flex; justify-content: space-between; align-items: flex-end; margin-top: 25px; padding: 0 10px; font-size: 12px; font-weight: bold;'>
+  <div style='text-align: left; width: 140px; border-top: 1px solid {b_col}; padding-top: 5px;'>
+    Date: {disp_pub_date}
+  </div>
+  <div style='text-align: center; width: 180px; border-top: 1px solid {b_col}; padding-top: 5px;'>
+    Class Teacher Signature
+  </div>
+  <div style='text-align: right; width: 180px; border-top: 1px solid {b_col}; padding-top: 5px;'>
+    Headmaster Signature
+  </div>
+</div>
+
+<div style='text-align: center; font-size: 10px; color: #666; margin-top: 15px; font-style: italic;'>
+  This is a computer-generated mark sheet verified by the institution.
+</div>
+
 </div>
 </div>"""
     return html_str
