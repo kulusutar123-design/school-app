@@ -65,11 +65,21 @@ def get_whatsapp_link(mobile_no, otp_code, student_name="Student"):
     return f"https://api.whatsapp.com/send?phone={clean_mob}&text={encoded_msg}"
 
 def send_real_sms(mobile_no, otp_code, student_name="Student"):
-    # Generates Fallback OTP and provides direct WhatsApp Notification Link
-    st.session_state['sms_error'] = "Fast2SMS Direct OTP is restricted without DLT. Using WhatsApp & Screen Fallback."
-    wa_link = get_whatsapp_link(mobile_no, otp_code, student_name)
-    st.session_state['whatsapp_link'] = wa_link
-    return False
+    # MSG91 API Integration
+    auth_key = "573765AaKxsZQR6ab1f5a6P1"
+    url = f"https://control.msg91.com/api/v5/otp?authkey={auth_key}&otp={otp_code}&mobile=91{mobile_no}"
+    
+    try:
+        response = requests.get(url)
+        data = response.json()
+        if data.get("type") == "success":
+            return True
+        else:
+            st.session_state['sms_error'] = f"MSG91 Error: {data.get('message', 'Failed')}"
+            return False
+    except Exception as e:
+        st.session_state['sms_error'] = str(e)
+        return False
 
 # ==========================================
 # 📂 DIRECTORY CREATION FOR SCHOLARSHIPS
