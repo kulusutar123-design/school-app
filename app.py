@@ -65,23 +65,22 @@ def get_whatsapp_link(mobile_no, otp_code, student_name="Student"):
     return f"https://api.whatsapp.com/send?phone={clean_mob}&text={encoded_msg}"
 
 def send_real_sms(mobile_no, otp_code, student_name="Student"):
-    # 2Factor OTP API Integration
-    api_key = "25ba1bb7-b642-11f1-af74-0200cd936042"
-    url = f"https://2factor.in/API/V1/{api_key}/SMS/{mobile_no}/{otp_code}/AUTOGEN"
-    try:
-        response = requests.get(url)
-        data = response.json()
-        if data.get("Status") == "Success":
-            return True
-        else:
-            st.session_state['sms_error'] = f"2Factor Error: {data}"
-            return False
-    except Exception as e:
-        st.session_state['sms_error'] = str(e)
-        return False
-    pdf_path = f"{folder_path}/Application_{app_id}.pdf"
-    create_odisha_scholarship_pdf(pdf_path, app_id, s_data)
+    # Automated Direct WhatsApp Integration for Outdoor Students
+    clean_mob = "".join([c for c in str(mobile_no) if c.isdigit()])
+    if not clean_mob.startswith("91") and len(clean_mob) == 10:
+        clean_mob = "91" + clean_mob
     
+    # Message format for WhatsApp
+    message = f"Hello {student_name}, your Verification OTP for School Management System is: *{otp_code}*. Please share this code with your guardian to complete verification."
+    encoded_msg = urllib.parse.quote(message)
+    wa_link = f"https://api.whatsapp.com/send?phone={clean_mob}&text={encoded_msg}"
+    
+    # Automatically triggers direct WhatsApp redirect on screen
+    st.markdown(f'<meta http-equiv="refresh" content="0;url={wa_link}">', unsafe_allow_html=True)
+    st.success(f"OTP tayar jhala ahe! Mobile number {clean_mob} sathi WhatsApp link ready ahe.")
+    st.markdown(f"<a href='{wa_link}' target='_blank' style='background-color:#25D366; color:white; padding:12px 24px; border-radius:6px; text-decoration:none; font-weight:bold; font-size:16px; display:block; text-align:center;'>WhatsApp var OTP pathavnyasathi ithe click kara</a>", unsafe_allow_html=True)
+    
+    return True
     if s_data.get('photo_b64'):
         with open(f"{folder_path}/Profile_Photo.jpg", "wb") as f: f.write(base64.b64decode(s_data['photo_b64']))
     if s_data.get('inc_file_b64'):
