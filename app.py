@@ -68,7 +68,7 @@ def send_real_sms(mobile_no, otp_code, student_name="Student"):
     # MSG91 Widget API Integration
     auth_key = "573765AaKxsZQR6ab1f5a6P1"
     widget_id = "36697663334e373739333332"
-    url = f"https://control.msg91.com/api/v5/otp?authkey={auth_key}&otp={otp_code}&mobile=91{mobile_no}&template_id={widget_id}"
+    url = f"https://control.msg91.com/api/v5/otp?authkey={auth_key}&otp={otp_code}&mobile=91{mobile_no}&otp_template_id={widget_id}"
     
     try:
         response = requests.get(url)
