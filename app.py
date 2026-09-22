@@ -65,42 +65,12 @@ def get_whatsapp_link(mobile_no, otp_code, student_name="Student"):
     return f"https://api.whatsapp.com/send?phone={clean_mob}&text={encoded_msg}"
 
 def send_real_sms(mobile_no, otp_code, student_name="Student"):
-    # 2Factor OTP API Integration
-    api_key = "25ba1bb7-b642-11f1-af74-0200cd936042"
-    
-    url = f"https://2factor.in/API/V1/{api_key}/SMS/{mobile_no}/{otp_code}/AUTOGEN"
-    
-    try:
-        response = requests.get(url)
-        data = response.json()
-        
-        if data.get("Status") == "Success":
-            return True
-        else:
-            st.session_state['sms_error'] = f"2Factor Error: {data}"
-            return False
-    except Exception as e:
-        st.session_state['sms_error'] = str(e)
-        return False
-        else:
-            st.session_state['sms_error'] = f"2Factor Error: {data}"
-            return False
-    except Exception as e:
-        st.session_state['sms_error'] = str(e)
-        return False
-    
-    try:
-        response = requests.post(url, json=payload, headers=headers)
-        data = response.json()
-        
-        if data.get("return") == True:
-            return True
-        else:
-            st.session_state['sms_error'] = f"Fast2SMS Error: {data.get('message', 'Failed')}"
-            return False
-    except Exception as e:
-        st.session_state['sms_error'] = str(e)
-        return False
+    # Generates Fallback OTP and provides direct WhatsApp Notification Link
+    st.session_state['sms_error'] = "Fast2SMS Direct OTP is restricted without DLT. Using WhatsApp & Screen Fallback."
+    wa_link = get_whatsapp_link(mobile_no, otp_code, student_name)
+    st.session_state['whatsapp_link'] = wa_link
+    return False
+
 # ==========================================
 # 📂 DIRECTORY CREATION FOR SCHOLARSHIPS
 # ==========================================
