@@ -54,32 +54,59 @@ def check_brute_force():
         st.stop()
 
 # ==========================================
-# 📱 WHATSAPP & SYSTEM FALLBACK OTP GATEWAY
+# 📱 REAL SMS GATEWAY (API DYNAMIC LOAD)
 # ==========================================
-def get_whatsapp_link(mobile_no, otp_code, student_name="Student"):
-    clean_mob = "".join([c for c in str(mobile_no) if c.isdigit()])
-    if not clean_mob.startswith("91") and len(clean_mob) == 10:
-        clean_mob = "91" + clean_mob
-    message = f"Hello {student_name}, your Registration/Login OTP for School Management System is: *{otp_code}*. Please use this code to verify your account."
-    encoded_msg = urllib.parse.quote(message)
-    return f"https://api.whatsapp.com/send?phone={clean_mob}&text={encoded_msg}"
+def send_real_sms(mobile_no, otp_code):
+    try:
+        m_db = load_master_data()
+        api_key = m_db.get("sms_api_key", "").strip()
+        
+        if not api_key:
+            st.session_state['sms_error'] = "SMS API Key is missing! Please configure it in Master Settings."
+            return False
+            
+        url = "https://www.fast2sms.com/dev/bulkV2"
+        
+        # Clean mobile number (Remove +91 and spaces)
+        clean_mob = "".join([c for c in str(mobile_no) if c.isdigit()])
+        if clean_mob.startswith("91") and len(clean_mob) == 12:
+            clean_mob = clean_mob[2:]
+            
+        payload = f"variables_values={otp_code}&route=otp&numbers={clean_mob}"
+        headers = {
+            'authorization': api_key,
+            'Content-Type': "application/x-www-form-urlencoded",
+            'Cache-Control': "no-cache",
+        }
+        
+        response = requests.request("POST", url, data=payload, headers=headers)
+        res_data = response.json()
+        
+        if res_data.get("return") == True:
+            return True
+        else:
+            # Capturing EXACT error from Fast2SMS
+            st.session_state['sms_error'] = str(res_data.get("message", res_data))
+            return False
+    except Exception as e:
+        st.session_state['sms_error'] = f"Server/Internet Error: {str(e)}"
+        return False
 
-def send_real_sms(mobile_no, otp_code, student_name="Student"):
-    # Clean Direct WhatsApp Link Generator for Outdoor Students
-    clean_mob = "".join([c for c in str(mobile_no) if c.isdigit()])
-    if not clean_mob.startswith("91") and len(clean_mob) == 10:
-        clean_mob = "91" + clean_mob
+# ==========================================
+# 📂 DIRECTORY CREATION FOR SCHOLARSHIPS
+# ==========================================
+os.makedirs("Scholarship_Data/Student_Submissions", exist_ok=True)
+os.makedirs("Scholarship_Data/Approved_Master", exist_ok=True)
+os.makedirs("Carousel_Images", exist_ok=True)
+
+def save_master_approved_folder(app_id, s_data):
+    folder_path = f"Scholarship_Data/Approved_Master/{app_id}"
+    os.makedirs(folder_path, exist_ok=True)
     
-    # Message format for WhatsApp
-    message = f"Hello {student_name}, your Verification OTP for School Management System is: *{otp_code}*. Please share this code with your guardian to complete verification."
-    encoded_msg = urllib.parse.quote(message)
-    wa_link = f"https://api.whatsapp.com/send?phone={clean_mob}&text={encoded_msg}"
+    pdf_path = f"{folder_path}/Application_{app_id}.pdf"
+    create_odisha_scholarship_pdf(pdf_path, app_id, s_data)
     
-    # Displaying a clean clickable button without iframe error
-    st.success(f"OTP tayar jhala ahe! Mobile number {clean_mob} sathi WhatsApp link ready ahe.")
-    st.markdown(f"<a href='{wa_link}' target='_blank' style='background-color:#25D366; color:white; padding:12px 24px; border-radius:6px; text-decoration:none; font-weight:bold; font-size:16px; display:block; text-align:center;'>💬 WhatsApp var OTP pathavnyasathi ithe click kara</a>", unsafe_allow_html=True)
-    
-    return True
+    if s_data.get('photo_b64'):
         with open(f"{folder_path}/Profile_Photo.jpg", "wb") as f: f.write(base64.b64decode(s_data['photo_b64']))
     if s_data.get('inc_file_b64'):
         with open(f"{folder_path}/Income_Cert.jpg", "wb") as f: f.write(base64.b64decode(s_data['inc_file_b64']))
@@ -131,6 +158,15 @@ STATE_LANG_MAP = {
 COUNTRIES = ["Yes - Indian National", "No - Other Country"]
 SOCIAL_CATEGORIES = ["General", "SC", "ST", "OBC", "SEBC", "Minority", "Others"]
 
+ISSUING_AUTHORITIES = [
+    "Select", "District Magistrate / Collector", "Additional District Magistrate",
+    "Sub-divisional Magistrate / Sub-divisional Officer", "Executive Magistrates",
+    "Revenue Officers not below the rank of Tahasildar / Additional Tahasildar"
+]
+
+RELATIONSHIPS = ["Select", "Father", "Mother", "Legal Guardian"]
+CERT_YEARS = ["Select", "Certificate issued before 1st Feb 2020", "Certificate issued on/after 1st Feb 2020"]
+
 # ==========================================
 # 🤖 SECURE DATA LOADERS
 # ==========================================
@@ -154,7 +190,7 @@ def load_master_data():
                     for k,v in default_master.items():
                         if k not in m: m[k] = v
                     return m
-        except Exception:
+        except Exception as e:
             st.error("CRITICAL ERROR: Master File is corrupted. System halted to prevent data loss.")
             st.stop()
     return default_master
@@ -169,7 +205,7 @@ def load_data():
             with open(SCHOOLS_FILE, "r", encoding="utf-8") as f:
                 content = f.read()
                 if content.strip(): schools = json.loads(content)
-        except Exception:
+        except Exception as e:
             st.error("CRITICAL ERROR: schools.json is corrupted. System halted to prevent data loss.")
             st.stop()
     if os.path.exists(STUDENTS_FILE):
@@ -177,7 +213,7 @@ def load_data():
             with open(STUDENTS_FILE, "r", encoding="utf-8") as f:
                 content = f.read()
                 if content.strip(): students = json.loads(content)
-        except Exception:
+        except Exception as e:
             st.error("CRITICAL ERROR: students.txt is corrupted. System halted to prevent data loss.")
             st.stop()
     return schools, students
@@ -350,6 +386,7 @@ def render_odisha_scholarship_html(app_id, s_data):
 def create_odisha_scholarship_pdf(filename, app_id, s_data):
     doc = SimpleDocTemplate(filename, pagesize=letter, rightMargin=30, leftMargin=30, topMargin=30, bottomMargin=30)
     elements = []
+    styles = getSampleStyleSheet()
     
     title_style = ParagraphStyle(name='TitleStyle', fontName='Helvetica-Bold', fontSize=14, alignment=1, spaceAfter=5)
     sub_title_style = ParagraphStyle(name='SubTitleStyle', fontName='Helvetica', fontSize=10, alignment=1, spaceAfter=15)
@@ -805,11 +842,12 @@ elif menu == "Scholarship Portal":
                         st.session_state['sch_f_uid'] = sanitize(f_uid)
                         reg_mob = sch_users_db[sanitize(f_uid)]["mobile"]
                         
-                        send_real_sms(reg_mob, otp_code)
-                        st.warning("⚠️ Direct SMS is restricted by gateway provider. Use the instant WhatsApp Notification button below to get your OTP on WhatsApp!")
-                        wa_url = st.session_state.get('whatsapp_link', '#')
-                        st.markdown(f"<a href='{wa_url}' target='_blank' style='background-color:#25D366; color:white; padding:10px 20px; border-radius:5px; text-decoration:none; font-weight:bold; display:inline-block; margin-top:10px;'>💬 Send OTP via WhatsApp</a>", unsafe_allow_html=True)
-                        st.info(f"📲 [SYSTEM FALLBACK] Demo OTP is: {otp_code}")
+                        success = send_real_sms(reg_mob, otp_code)
+                        if success:
+                            st.success("OTP Sent Successfully to registered mobile via SMS!")
+                        else:
+                            st.error(f"❌ SMS Failed: {st.session_state.get('sms_error')}")
+                            st.info(f"📲 [SYSTEM FALLBACK] Demo OTP is: {otp_code}")
                     else:
                         st.error("Aadhaar Number not found in our records!")
                         
@@ -855,11 +893,12 @@ elif menu == "Scholarship Portal":
                             st.session_state['temp_r_adh'] = sanitize(r_adh)
                             st.session_state['temp_sch_otp'] = str(random.randint(1000, 9999))
                             
-                            send_real_sms(sanitize(r_mob), st.session_state['temp_sch_otp'])
-                            st.warning("⚠️ Direct SMS is restricted. Use the instant WhatsApp button below to get your OTP on WhatsApp!")
-                            wa_url = st.session_state.get('whatsapp_link', '#')
-                            st.markdown(f"<a href='{wa_url}' target='_blank' style='background-color:#25D366; color:white; padding:10px 20px; border-radius:5px; text-decoration:none; font-weight:bold; display:inline-block; margin-top:10px;'>💬 Send OTP via WhatsApp</a>", unsafe_allow_html=True)
-                            st.info(f"📲 [SYSTEM FALLBACK] Demo OTP is: {st.session_state['temp_sch_otp']}")
+                            success = send_real_sms(sanitize(r_mob), st.session_state['temp_sch_otp'])
+                            if success:
+                                st.success("OTP Sent Successfully to registered mobile via SMS!")
+                            else:
+                                st.error(f"❌ SMS Failed: {st.session_state.get('sms_error')}")
+                                st.info(f"📲 [SYSTEM FALLBACK] Demo OTP is: {st.session_state['temp_sch_otp']}")
                                 
                             st.session_state['sch_reg_step'] = 2
                             st.rerun()
@@ -1349,11 +1388,12 @@ elif menu == "Master Login":
                 if verify_contact == master_db.get("email") or verify_contact == master_db.get("phone"):
                     otp_code = str(random.randint(1000, 9999))
                     st.session_state['master_otp'] = otp_code
-                    send_real_sms(master_db.get("phone"), otp_code, "Master Admin")
-                    st.warning("⚠️ Direct SMS is restricted. Use the instant WhatsApp button below to get your OTP on WhatsApp!")
-                    wa_url = st.session_state.get('whatsapp_link', '#')
-                    st.markdown(f"<a href='{wa_url}' target='_blank' style='background-color:#25D366; color:white; padding:10px 20px; border-radius:5px; text-decoration:none; font-weight:bold; display:inline-block; margin-top:10px;'>💬 Send OTP via WhatsApp</a>", unsafe_allow_html=True)
-                    st.info(f"📲 [SYSTEM FALLBACK] Demo OTP is: {otp_code}")
+                    success = send_real_sms(master_db.get("phone"), otp_code)
+                    if success:
+                        st.success("OTP Sent Successfully!")
+                    else:
+                        st.error(f"❌ SMS Failed: {st.session_state.get('sms_error')}")
+                        st.info(f"📲 [SYSTEM FALLBACK] Demo OTP is: {otp_code}")
                 else: st.error("Invalid Email or Mobile Number!")
             if 'master_otp' in st.session_state:
                 entered_otp = st.text_input("Enter 4-digit OTP")
@@ -1786,11 +1826,11 @@ elif menu == "School Login":
         with t_add:
             st.markdown("### ➕ Add Student Direct (Full Form)")
             c_roll, c_gen = st.columns(2)
-            add_roll = c_roll.text_input("Roll No *", key="s_add_roll_v2")
+            add_roll = c_roll.text_input(f"Roll No / {t('ROLL NO', s_lang)}", key="s_add_roll_v2")
             add_gen = c_gen.selectbox("Gender", ["Male", "Female", "Other"], key="s_add_gen_v2")
             
             c_n1, c_n2 = st.columns(2)
-            add_name = c_n1.text_input("Student Name (English) *", key="s_add_name_v2")
+            add_name = c_n1.text_input("Student Name (English)", key="s_add_name_v2")
             add_name_loc = c_n2.text_input(f"Student Name ({s_lang}) [Optional]", key="s_add_nameloc_v2")
             
             add_fname = c_n1.text_input("Father's Name (English)", key="s_add_fat_v2")
@@ -2002,11 +2042,11 @@ elif menu == "Results":
                 if st.button("🖨️ Print Result Card", key="res_print_v2"):
                     components.html("<script>window.parent.print();</script>", height=0)
             elif pending_status:
-                st.warning(f"⚠️ ଆପଣଙ୍କ ରେକର୍ଡ ମିଳିଲା, କିନ୍ତୁ ଷ୍ଟାଟସ୍ ଏବେ: '{pending_status}' ଅଛି। Master ବା School ରୁ ଆପ୍ରୁଭ୍ କରନ୍ତୁ।")
+                st.warning(f"⚠️ Appananka record milila, kintu status ebe: '{pending_status}' achi. Master ba School ru approve karantu.")
             elif dob_mismatch:
-                st.warning("⚠️ ରୋଲ୍ ନମ୍ବର୍ ବା ନାମ ମେଚ୍ ହେଲା କିନ୍ତୁ ଜନ୍ମ ତାରିଖ (DOB) ମେଚ୍ ହେଉନାହିଁ।")
+                st.warning("⚠️ Roll No/Name match hela kintu Date of Birth (DOB) match haunahi. Thik DOB diantu.")
             else:
-                st.error("❌ କୌଣସି ରେକର୍ଡ ମିଳିଲା ନାହିଁ! ସଠିକ୍ ରୋଲ୍ ନମ୍ବର୍ ଏବଂ DOB ଦିଅନ୍ତୁ।")
+                st.error("❌ Kaunasi record milila nahi! Roll Number au DOB re check karantu.")
 
 st.markdown("---")
 st.markdown("<div style='text-align: center; padding: 15px; background: linear-gradient(90deg, #1e3a8a, #9333ea); color: white; border-radius: 8px; font-weight: bold;'>👨‍💻 Software Developed by: KULU SUTAR | 📞 Mob: 8910223342 | ✉️ kulusutar123@gmail.com</div>", unsafe_allow_html=True)
