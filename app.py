@@ -65,7 +65,6 @@ def get_whatsapp_link(mobile_no, otp_code, student_name="Student"):
     return f"https://api.whatsapp.com/send?phone={clean_mob}&text={encoded_msg}"
 
 def send_real_sms(mobile_no, otp_code, student_name="Student"):
-    # MSG91 Widget API Integration
     auth_key = "573765AaKxsZQR6ab1f5a6P1"
     widget_id = "36697663334e373739333332"
     url = f"https://control.msg91.com/api/v5/otp?authkey={auth_key}&otp={otp_code}&mobile=91{mobile_no}&otp_template_id={widget_id}"
@@ -73,13 +72,11 @@ def send_real_sms(mobile_no, otp_code, student_name="Student"):
     try:
         response = requests.get(url)
         data = response.json()
+        
         if data.get("type") == "success":
             return True
-       if data.get("type") == "success":
-            return True
         else:
-            # eha dwara MSG91 ra asali error screen re dekha jiba
-            st.session_state['sms_error'] = f"MSG91 Asali Error: {data}"
+            st.session_state['sms_error'] = f"MSG91 Error: {data}"
             return False
     except Exception as e:
         st.session_state['sms_error'] = str(e)
