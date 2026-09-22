@@ -54,43 +54,24 @@ def check_brute_force():
         st.stop()
 
 # ==========================================
-# 📱 REAL SMS GATEWAY (API DYNAMIC LOAD)
+# 📱 WHATSAPP DIRECT OTP GATEWAY
 # ==========================================
-def send_real_sms(mobile_no, otp_code):
-    try:
-        m_db = load_master_data()
-        api_key = m_db.get("sms_api_key", "").strip()
-        
-        if not api_key:
-            st.session_state['sms_error'] = "SMS API Key is missing! Please configure it in Master Settings."
-            return False
-            
-        url = "https://www.fast2sms.com/dev/bulkV2"
-        
-        # Clean mobile number (Remove +91 and spaces)
-        clean_mob = "".join([c for c in str(mobile_no) if c.isdigit()])
-        if clean_mob.startswith("91") and len(clean_mob) == 12:
-            clean_mob = clean_mob[2:]
-            
-        payload = f"variables_values={otp_code}&route=otp&numbers={clean_mob}"
-        headers = {
-            'authorization': api_key,
-            'Content-Type': "application/x-www-form-urlencoded",
-            'Cache-Control': "no-cache",
-        }
-        
-        response = requests.request("POST", url, data=payload, headers=headers)
-        res_data = response.json()
-        
-        if res_data.get("return") == True:
-            return True
-        else:
-            # Capturing EXACT error from Fast2SMS
-            st.session_state['sms_error'] = str(res_data.get("message", res_data))
-            return False
-    except Exception as e:
-        st.session_state['sms_error'] = f"Server/Internet Error: {str(e)}"
-        return False
+def send_real_sms(mobile_no, otp_code, student_name="Student"):
+    # Clean Direct WhatsApp Link Generator
+    clean_mob = "".join([c for c in str(mobile_no) if c.isdigit()])
+    if not clean_mob.startswith("91") and len(clean_mob) == 10:
+        clean_mob = "91" + clean_mob
+    
+    # Message format for WhatsApp
+    message = f"Hello {student_name},\n\nYour Verification OTP for School Management System is: *{otp_code}*.\n\nPlease share this code to complete verification."
+    encoded_msg = urllib.parse.quote(message)
+    wa_link = f"https://api.whatsapp.com/send?phone={clean_mob}&text={encoded_msg}"
+    
+    # Displaying a clean clickable button
+    st.success(f"✅ OTP ତିଆରି ହୋଇଯାଇଛି! ମୋବାଇଲ୍ ନମ୍ବର {clean_mob} କୁ WhatsApp ରେ ପଠାଇବା ପାଇଁ ତଳେ କ୍ଲିକ୍ କରନ୍ତୁ।")
+    st.markdown(f"<a href='{wa_link}' target='_blank' style='background-color:#25D366; color:white; padding:12px 24px; border-radius:6px; text-decoration:none; font-weight:bold; font-size:16px; display:block; text-align:center; margin-bottom:15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);'>💬 Click Here to Send WhatsApp OTP Instantly</a>", unsafe_allow_html=True)
+    
+    return True
 
 # ==========================================
 # 📂 DIRECTORY CREATION FOR SCHOLARSHIPS
@@ -518,7 +499,7 @@ def create_odisha_scholarship_pdf(filename, app_id, s_data):
     
     elements.append(Spacer(1, 30))
     elements.append(Paragraph("Date: __________________", decl_style))
-    elements.append(Paragraph(f"Place: {s_data.get('district', '')}                                                                                     Full Signature of Applicant", decl_style))
+    elements.append(Paragraph(f"Place: {s_data.get('district', '')}                                                                          Full Signature of Applicant", decl_style))
     
     doc.build(elements)
 
@@ -844,10 +825,9 @@ elif menu == "Scholarship Portal":
                         
                         success = send_real_sms(reg_mob, otp_code)
                         if success:
-                            st.success("OTP Sent Successfully to registered mobile via SMS!")
+                            st.success("OTP Sent Successfully!")
                         else:
                             st.error(f"❌ SMS Failed: {st.session_state.get('sms_error')}")
-                            st.info(f"📲 [SYSTEM FALLBACK] Demo OTP is: {otp_code}")
                     else:
                         st.error("Aadhaar Number not found in our records!")
                         
@@ -895,10 +875,9 @@ elif menu == "Scholarship Portal":
                             
                             success = send_real_sms(sanitize(r_mob), st.session_state['temp_sch_otp'])
                             if success:
-                                st.success("OTP Sent Successfully to registered mobile via SMS!")
+                                st.success("OTP Sent Successfully!")
                             else:
                                 st.error(f"❌ SMS Failed: {st.session_state.get('sms_error')}")
-                                st.info(f"📲 [SYSTEM FALLBACK] Demo OTP is: {st.session_state['temp_sch_otp']}")
                                 
                             st.session_state['sch_reg_step'] = 2
                             st.rerun()
@@ -1826,7 +1805,7 @@ elif menu == "School Login":
         with t_add:
             st.markdown("### ➕ Add Student Direct (Full Form)")
             c_roll, c_gen = st.columns(2)
-            add_roll = c_roll.text_input(f"Roll No / {t('ROLL NO', s_lang)}", key="s_add_roll_v2")
+            add_roll = c_roll.text_input(f"Roll No / {t('ROLL NO', s_lang) if 't' in globals() else 'Roll No'}", key="s_add_roll_v2")
             add_gen = c_gen.selectbox("Gender", ["Male", "Female", "Other"], key="s_add_gen_v2")
             
             c_n1, c_n2 = st.columns(2)
@@ -2042,11 +2021,11 @@ elif menu == "Results":
                 if st.button("🖨️ Print Result Card", key="res_print_v2"):
                     components.html("<script>window.parent.print();</script>", height=0)
             elif pending_status:
-                st.warning(f"⚠️ Appananka record milila, kintu status ebe: '{pending_status}' achi. Master ba School ru approve karantu.")
+                st.warning(f"⚠️ ଆପଣଙ୍କ ରେକର୍ଡ ମିଳିଲା, କିନ୍ତୁ ଷ୍ଟାଟସ୍ ଏବେ: '{pending_status}' ଅଛି। Master ବା School ରୁ ଆପ୍ରୁଭ୍ କରନ୍ତୁ।")
             elif dob_mismatch:
-                st.warning("⚠️ Roll No/Name match hela kintu Date of Birth (DOB) match haunahi. Thik DOB diantu.")
+                st.warning("⚠️ Roll No/Name ମେଚ୍ ହେଲା କିନ୍ତୁ Date of Birth (DOB) ମେଚ୍ ହେଉନାହିଁ। ସଠିକ୍ DOB ଦିଅନ୍ତୁ।")
             else:
-                st.error("❌ Kaunasi record milila nahi! Roll Number au DOB re check karantu.")
+                st.error("❌ କୌଣସି ରେକର୍ଡ ମିଳିଲା ନାହିଁ! Roll Number ଏବଂ DOB ରେ ଚେକ୍ କରନ୍ତୁ।")
 
 st.markdown("---")
 st.markdown("<div style='text-align: center; padding: 15px; background: linear-gradient(90deg, #1e3a8a, #9333ea); color: white; border-radius: 8px; font-weight: bold;'>👨‍💻 Software Developed by: KULU SUTAR | 📞 Mob: 8910223342 | ✉️ kulusutar123@gmail.com</div>", unsafe_allow_html=True)
