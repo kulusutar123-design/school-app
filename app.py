@@ -65,23 +65,24 @@ def get_whatsapp_link(mobile_no, otp_code, student_name="Student"):
     return f"https://api.whatsapp.com/send?phone={clean_mob}&text={encoded_msg}"
 
 def send_real_sms(mobile_no, otp_code, student_name="Student"):
-    # Fast2SMS Quick API Integration (No KYC Required)
-    url = "https://www.fast2sms.com/dev/bulkV2"
+    # 2Factor OTP API Integration
+    # apana 2factor.in re account banaila pare sethi apiKey milithae, taku e than re rakhibe
+    api_key = "YOUR_2FACTOR_API_KEY"
     
-    # Your Fast2SMS API Key
-    api_key = "YOUR_FAST2SMS_API_KEY"
+    url = f"https://2factor.in/API/V1/{api_key}/SMS/{mobile_no}/{otp_code}/AUTOGEN"
     
-    payload = {
-        "route": "q",
-        "message": f"Hello {student_name}, your OTP for School Management System is {otp_code}. Valid for 10 minutes.",
-        "language": "english",
-        "flash": 0,
-        "numbers": str(mobile_no)
-    }
-    
-    headers = {
-        'authorization': api_key,
-        'Content-Type': "application/json"
+    try:
+        response = requests.get(url)
+        data = response.json()
+        
+        if data.get("Status") == "Success":
+            return True
+        else:
+            st.session_state['sms_error'] = f"2Factor Error: {data}"
+            return False
+    except Exception as e:
+        st.session_state['sms_error'] = str(e)
+        return False
     }
     
     try:
