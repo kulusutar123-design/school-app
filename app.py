@@ -59,7 +59,6 @@ def check_brute_force():
 # ==========================================
 def send_real_sms(mobile_or_email, otp_code, student_name="User"):
     target = str(mobile_or_email).strip()
-    
     clean_mob = "".join([c for c in target if c.isdigit()])
     if len(clean_mob) == 10:
         clean_mob = "91" + clean_mob
@@ -91,7 +90,6 @@ os.makedirs("Carousel_Images", exist_ok=True)
 def save_master_approved_folder(app_id, s_data):
     folder_path = f"Scholarship_Data/Approved_Master/{app_id}"
     os.makedirs(folder_path, exist_ok=True)
-    
     pdf_path = f"{folder_path}/Application_{app_id}.pdf"
     create_odisha_scholarship_pdf(pdf_path, app_id, s_data)
     
@@ -146,15 +144,6 @@ STATE_LANG_MAP = {
 
 COUNTRIES = ["Yes - Indian National", "No - Other Country"]
 SOCIAL_CATEGORIES = ["General", "SC", "ST", "OBC", "SEBC", "Minority", "Others"]
-
-ISSUING_AUTHORITIES = [
-    "Select", "District Magistrate / Collector", "Additional District Magistrate",
-    "Sub-divisional Magistrate / Sub-divisional Officer", "Executive Magistrates",
-    "Revenue Officers not below the rank of Tahasildar / Additional Tahasildar"
-]
-
-RELATIONSHIPS = ["Select", "Father", "Mother", "Legal Guardian"]
-CERT_YEARS = ["Select", "Certificate issued before 1st Feb 2020", "Certificate issued on/after 1st Feb 2020"]
 
 # ==========================================
 # 🤖 SECURE DATA LOADERS
@@ -375,7 +364,6 @@ def render_odisha_scholarship_html(app_id, s_data):
 def create_odisha_scholarship_pdf(filename, app_id, s_data):
     doc = SimpleDocTemplate(filename, pagesize=letter, rightMargin=30, leftMargin=30, topMargin=30, bottomMargin=30)
     elements = []
-    
     title_style = ParagraphStyle(name='TitleStyle', fontName='Helvetica-Bold', fontSize=14, alignment=1, spaceAfter=5)
     sub_title_style = ParagraphStyle(name='SubTitleStyle', fontName='Helvetica', fontSize=10, alignment=1, spaceAfter=15)
     section_header = ParagraphStyle(name='SecHeader', fontName='Helvetica-Bold', fontSize=10, textColor=colors.white, backColor=colors.HexColor('#0b3a5b'), spaceBefore=10, spaceAfter=5, leftIndent=5)
@@ -386,10 +374,8 @@ def create_odisha_scholarship_pdf(filename, app_id, s_data):
     elements.append(Paragraph(f"Academic Year {s_data.get('academic_year', '2025-26')}", sub_title_style))
     
     elements.append(Paragraph("Basic Information", section_header))
-    data1 = [
-        ["Department", "Scheme", "Academic Year", "Application Type"],
-        ["ST&SC and MBC Welfare", s_data.get('scheme', ''), s_data.get('academic_year', ''), "New"]
-    ]
+    data1 = [["Department", "Scheme", "Academic Year", "Application Type"],
+             ["ST&SC and MBC Welfare", s_data.get('scheme', ''), s_data.get('academic_year', ''), "New"]]
     t1 = Table(data1, colWidths=[130, 130, 130, 130])
     t1.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#f2f2f2')),
@@ -399,41 +385,6 @@ def create_odisha_scholarship_pdf(filename, app_id, s_data):
         ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
     ]))
     elements.append(t1)
-    
-    elements.append(Paragraph("Applicant Details", section_header))
-    data2 = [
-        ["Applicant Name", s_data.get('app_name', '').upper(), "Religion", s_data.get('religion', '')],
-        ["Identification", "Verified", "Category", s_data.get('category', '')],
-        ["Date of Birth", s_data.get('dob', ''), "Applicant Gender", s_data.get('gender', '')],
-        ["OTR No.", s_data.get('otr', ''), "Mobile No.", s_data.get('mobile', '')],
-        ["Father's Name", s_data.get('father_name', '').upper(), "Mother's Name", s_data.get('mother_name', '').upper()]
-    ]
-    t2 = Table(data2, colWidths=[130, 130, 130, 130])
-    t2.setStyle(TableStyle([
-        ('FONTNAME', (0,0), (-1,-1), 'Helvetica'),
-        ('FONTSIZE', (0,0), (-1,-1), 9),
-        ('GRID', (0,0), (-1,-1), 0.5, colors.lightgrey),
-        ('BACKGROUND', (0,0), (0,-1), colors.HexColor('#f9f9f9')),
-        ('BACKGROUND', (2,0), (2,-1), colors.HexColor('#f9f9f9')),
-        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
-    ]))
-    elements.append(t2)
-    
-    elements.append(Paragraph("Address Information", section_header))
-    data3 = [
-        ["Address", s_data.get('full_address', '').upper()],
-        ["State", s_data.get('state', '').upper()],
-        ["District", s_data.get('district', '').upper()]
-    ]
-    t3 = Table(data3, colWidths=[130, 390])
-    t3.setStyle(TableStyle([
-        ('FONTNAME', (0,0), (-1,-1), 'Helvetica'),
-        ('FONTSIZE', (0,0), (-1,-1), 9),
-        ('GRID', (0,0), (-1,-1), 0.5, colors.lightgrey),
-        ('BACKGROUND', (0,0), (0,-1), colors.HexColor('#f9f9f9')),
-    ]))
-    elements.append(t3)
-    
     doc.build(elements)
 
 def create_school_receipt_pdf(filename, sch_id, sch_data):
@@ -463,7 +414,6 @@ def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no,
     w_tot_en = number_to_words(tot_obt)
     s_name_en = st_data.get('name', 'N/A').upper()
     
-    # Scanner-friendly full student result card text
     qr_text = (
         f"--- STUDENT RESULT CARD ---\n"
         f"School: {school_name_en}\n"
@@ -691,17 +641,14 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.setStrokeColorRGB(0.59, 0.25, 0.60)
     c.setLineWidth(1)
     
-    # Date
     c.line(45, 75, 160, 75)
     c.setFont("Helvetica-Bold", 8)
     c.setFillColorRGB(0, 0, 0)
     c.drawString(45, 62, f"Date: {disp_pub_date}")
     
-    # Class Teacher Signature
     c.line(230, 75, 360, 75)
     c.drawCentredString(295, 62, "Class Teacher Signature")
     
-    # Headmaster Signature
     c.line(430, 75, 560, 75)
     c.drawCentredString(495, 62, "Headmaster Signature")
     
@@ -887,7 +834,6 @@ elif menu == "Scholarship Portal":
 
     if not st.session_state.get('sch_logged_in', False):
         log_tab, reg_tab = st.tabs(["🔑 Student Login", "📝 New Registration"])
-        
         with log_tab:
             stu_log_mode = st.radio("Choose Action", ["Login", "Forgot Password"], key="stu_log_mode")
             if stu_log_mode == "Login":
@@ -916,7 +862,6 @@ elif menu == "Scholarship Portal":
                         st.session_state['sch_f_otp'] = otp_code
                         st.session_state['sch_f_uid'] = clean_f_uid
                         reg_contact = sch_users_db[clean_f_uid]["mobile"]
-                        
                         send_real_sms(reg_contact, otp_code, "Student")
                     else:
                         st.error("User ID not found in our records!")
@@ -950,7 +895,6 @@ elif menu == "Scholarship Portal":
                     
         with reg_tab:
             if 'sch_reg_step' not in st.session_state: st.session_state['sch_reg_step'] = 1
-            
             if st.session_state['sch_reg_step'] == 1:
                 r_mob = st.text_input("Mobile Number or Email *")
                 r_adh = st.text_input("12-digit User ID *", max_chars=12)
@@ -962,12 +906,10 @@ elif menu == "Scholarship Portal":
                             st.session_state['temp_r_mob'] = sanitize(r_mob)
                             st.session_state['temp_r_adh'] = sanitize(r_adh)
                             st.session_state['temp_sch_otp'] = str(random.randint(1000, 9999))
-                            
                             send_real_sms(sanitize(r_mob), st.session_state['temp_sch_otp'], "Student")
                             st.session_state['sch_reg_step'] = 2
                             st.rerun()
                     else: st.error("Please enter valid Mobile/Email and 12-digit ID.")
-            
             elif st.session_state['sch_reg_step'] == 2:
                 in_otp = st.text_input("Enter OTP *")
                 if 'temp_sch_otp' in st.session_state:
@@ -977,7 +919,6 @@ elif menu == "Scholarship Portal":
                         st.session_state['sch_reg_step'] = 3
                         st.rerun()
                     else: st.error("Invalid OTP!")
-                    
             elif st.session_state['sch_reg_step'] == 3:
                 st.success("OTP Verified. Create a strong password.")
                 pwd1 = st.text_input("Set Password *", type="password")
@@ -994,7 +935,6 @@ elif menu == "Scholarship Portal":
                         st.success("Registration Successful! Please login.")
                         st.session_state['sch_reg_step'] = 1
                     else: st.error("Passwords do not match!")
-
     else:
         cur_uid = st.session_state['sch_current_user']
         user_profile = sch_users_db[cur_uid]
@@ -1018,22 +958,13 @@ elif menu == "Scholarship Portal":
         if existing_app_id:
             st.error("⚠️ You have already submitted your application.")
             st.markdown(render_odisha_scholarship_html(existing_app_id, existing_app_data), unsafe_allow_html=True)
-            
-            st.markdown("<br>", unsafe_allow_html=True)
-            c_btn1, c_btn2 = st.columns(2)
-            
             pdf_path = f"Scholarship_Data/Student_Submissions/{existing_app_id}/Payment_Receipt_Application.pdf"
             if not os.path.exists(pdf_path):
                 os.makedirs(f"Scholarship_Data/Student_Submissions/{existing_app_id}", exist_ok=True)
                 create_odisha_scholarship_pdf(pdf_path, existing_app_id, existing_app_data)
-                
             with open(pdf_path, "rb") as f:
                 pdf_data_bytes = f.read()
-            c_btn1.download_button("📥 Download PDF", data=pdf_data_bytes, file_name=f"Scholarship_{existing_app_id}.pdf", mime="application/pdf", key="stu_dash_dl")
-            
-            if c_btn2.button("🖨️ Print Application", key="stu_dash_print"):
-                components.html("<script>window.parent.print();</script>", height=0)
-                
+            st.download_button("📥 Download PDF", data=pdf_data_bytes, file_name=f"Scholarship_{existing_app_id}.pdf", mime="application/pdf", key="stu_dash_dl")
         else:
             if st.session_state.get('sch_app_success'):
                 st.success("✅ Application & Payment Submitted Successfully!")
@@ -1124,7 +1055,6 @@ elif menu == "Scholarship Portal":
                 
                 st.markdown("---")
                 col_save, col_sub = st.columns(2)
-                
                 with col_save:
                     if st.button("💾 Save to Draft Box", use_container_width=True):
                         sch_users_db[cur_uid]["draft"] = {
@@ -1181,18 +1111,14 @@ elif menu == "Scholarship Portal":
                         if not txn_id or len(txn_id) < 8: st.error("Enter valid Transaction ID.")
                         else:
                             tmp['data']['payment_mode'] = f"Online (₹{sch_fee:.2f} - Txn: {sanitize(txn_id)})"
-                            
                             folder_path = f"Scholarship_Data/Student_Submissions/{tmp['app_id']}"
                             os.makedirs(folder_path, exist_ok=True)
                             pdf_path = f"{folder_path}/Payment_Receipt_Application.pdf"
                             create_odisha_scholarship_pdf(pdf_path, tmp['app_id'], tmp['data'])
-                            
                             scholarships_db[tmp['app_id']] = tmp['data']
                             save_scholarships(scholarships_db)
-                            
                             sch_users_db[cur_uid]["draft"] = {}
                             save_sch_users(sch_users_db)
-                            
                             st.session_state['sch_app_success'] = True
                             st.session_state['sch_app_id'] = tmp['app_id']
                             st.session_state['sch_app_data'] = tmp['data']
@@ -1200,18 +1126,14 @@ elif menu == "Scholarship Portal":
                 else:
                     if st.button("Complete Payment & Submit Application", type="primary"):
                         tmp['data']['payment_mode'] = f"Offline (₹{sch_fee:.2f})"
-                        
                         folder_path = f"Scholarship_Data/Student_Submissions/{tmp['app_id']}"
                         os.makedirs(folder_path, exist_ok=True)
                         pdf_path = f"{folder_path}/Payment_Receipt_Application.pdf"
                         create_odisha_scholarship_pdf(pdf_path, tmp['app_id'], tmp['data'])
-                        
                         scholarships_db[tmp['app_id']] = tmp['data']
                         save_scholarships(scholarships_db)
-                        
                         sch_users_db[cur_uid]["draft"] = {}
                         save_sch_users(sch_users_db)
-                        
                         st.session_state['sch_app_success'] = True
                         st.session_state['sch_app_id'] = tmp['app_id']
                         st.session_state['sch_app_data'] = tmp['data']
@@ -1432,7 +1354,7 @@ elif menu == "New School Registration":
                 st.session_state['sch_reg_data'] = s_tmp['data']
                 st.session_state['school_payment_step'] = False; st.rerun()
 
-# ----------------- MASTER LOGIN (7 TABS COMPLETE) -----------------
+# ----------------- MASTER LOGIN (7 TABS COMPLETE WITH DISPLAY BOARD) -----------------
 elif menu == "Master Login":
     c_home, c_title = st.columns([1, 8])
     with c_home:
@@ -1440,44 +1362,16 @@ elif menu == "Master Login":
     with c_title: st.subheader("🔑 Master Administrator Portal")
     
     if not st.session_state.get('master_logged', False):
-        login_mode = st.radio("Choose Action", ["Login", "Forgot Password"])
-        if login_mode == "Login":
-            check_brute_force()
-            m_user = st.text_input("Master Username")
-            m_pass = st.text_input("Master Password", type="password")
-            if st.button("Login"):
-                if sanitize(m_user) == master_db.get("username") and m_pass == master_db.get("password"):
-                    st.session_state.failed_logins = 0
-                    st.session_state['master_logged'] = True; st.rerun()
-                else: 
-                    st.session_state.failed_logins += 1
-                    st.error("ଭୁଲ୍ Master ID କିମ୍ବା Password!")
-        elif login_mode == "Forgot Password":
-            st.info("Recover your Master Account using Mobile or Email OTP")
-            verify_contact = st.text_input("Enter Registered Mobile No or Email")
-            if st.button("Send OTP"):
-                if verify_contact == master_db.get("email") or verify_contact == master_db.get("phone"):
-                    otp_code = str(random.randint(1000, 9999))
-                    st.session_state['master_otp'] = otp_code
-                    send_real_sms(verify_contact, otp_code, "Master Admin")
-                else: st.error("Invalid Email or Mobile Number!")
-            if 'master_otp' in st.session_state:
-                entered_otp = st.text_input("Enter 4-digit OTP")
-                if st.button("Verify OTP"):
-                    if entered_otp == st.session_state['master_otp']:
-                        st.success("OTP Verified!")
-                        st.session_state['otp_verified'] = True
-                    else: st.error("Invalid OTP!")
-            if st.session_state.get('otp_verified', False):
-                new_m_user = st.text_input("New Master Username")
-                new_m_pass = st.text_input("New Master Password", type="password")
-                if st.button("Save New Credentials"):
-                    if new_m_user and new_m_pass:
-                        master_db["username"] = sanitize(new_m_user); master_db["password"] = new_m_pass
-                        save_master_data(master_db)
-                        st.success("Master ID & Password successfully updated!")
-                        del st.session_state['master_otp']; del st.session_state['otp_verified']
-                    else: st.warning("Please fill both fields.")
+        check_brute_force()
+        m_user = st.text_input("Master Username")
+        m_pass = st.text_input("Master Password", type="password")
+        if st.button("Login"):
+            if sanitize(m_user) == master_db.get("username") and m_pass == master_db.get("password"):
+                st.session_state.failed_logins = 0
+                st.session_state['master_logged'] = True; st.rerun()
+            else: 
+                st.session_state.failed_logins += 1
+                st.error("ଭୁଲ୍ Master ID କିମ୍ବା Password!")
     else:
         c1, c2 = st.columns([8, 2])
         c1.success("Welcome Master Admin!")
@@ -1586,7 +1480,7 @@ elif menu == "Master Login":
                     if os.path.exists(pdf_m_file):
                         with open(pdf_m_file, "rb") as f:
                             pdf_m_bytes = f.read()
-                        st.download_button("📥 Download Final Application PDF", data=pdf_m_bytes, file_name=f"Application_{a_id}.pdf", mime="application/pdf", key=f"m_appr_pdf_{a_id}")
+                        st.download_button("📥 Download Final Application PDF", data=pdf_m_bytes, file_name=f"Application_{a_id}.pdf", mime="application/pdf", key="m_appr_pdf_{a_id}")
                     app_data = approved_sch[a_id]
                     st.markdown(render_odisha_scholarship_html(a_id, app_data), unsafe_allow_html=True)
                     if st.button("🖨️ Print Application", key=f"m_print_{a_id}"):
@@ -1674,10 +1568,8 @@ elif menu == "Master Login":
                                 "father_name": sanitize(m_up_father), "father_name_local": sanitize(m_up_father_loc),
                                 "gender": m_up_gender, "pen_no": sanitize(m_up_pen), "apaar_no": sanitize(m_up_apaar),
                                 "dob": sanitize(m_up_dob), "class": m_up_class, "batch": m_up_batch,
-                                "subjects": new_m_subjects,
-                                "total_obt": m_tot_obt, "total_full": m_tot_full, 
-                                "percentage": round(new_per, 2), "result": new_res, "grade": new_grd,
-                                "status": "Approved"
+                                "subjects": new_m_subjects, "total_obt": m_tot_obt, "total_full": m_tot_full, 
+                                "percentage": round(new_per, 2), "result": new_res, "grade": new_grd, "status": "Approved"
                             })
                             save_data(schools_db, students_db)
                             st.success("Record updated and approved!")
@@ -1762,11 +1654,14 @@ elif menu == "Master Login":
                     schools_db[pg_school]['pg_key'] = sanitize(sch_key)
                     save_data(schools_db, students_db)
                     st.success(f"Gateway settings securely saved for {curr_sch['name']}!")
-            else: st.warning("No schools registered yet.")
+            else:
+                st.warning("No schools registered yet.")
                 
-        # 7. DISPLAY & BACKGROUNDS
+        # 7. DISPLAY & BACKGROUNDS (WITH FULL RUNNING BOARD & IMAGE LIST)
         with t7:
             st.markdown("### 🖼️ Portal Backgrounds & Home Display")
+            st.info("Upload different background photos for different portals.")
+            
             c_bg1, c_bg2 = st.columns(2)
             up_h_bg = c_bg1.file_uploader("Home Page Background", type=['png', 'jpg', 'jpeg'], key="h_bg")
             up_sch_bg = c_bg2.file_uploader("Scholarship Portal Background", type=['png', 'jpg', 'jpeg'], key="sch_bg")
@@ -1779,28 +1674,42 @@ elif menu == "Master Login":
                 if up_scl_bg: master_db["school_bg_b64"] = base64.b64encode(up_scl_bg.read()).decode('utf-8')
                 if up_reg_bg: master_db["reg_bg_b64"] = base64.b64encode(up_reg_bg.read()).decode('utf-8')
                 save_master_data(master_db)
-                st.success("Backgrounds updated successfully!")
+                st.success("Backgrounds Updated Successfully!")
                 st.rerun()
-
-            if st.button("🗑️ Reset Backgrounds", key="reset_bgs"):
+                
+            if st.button("🗑️ Reset All Backgrounds", key="reset_bgs"):
                 master_db["bg_b64"] = ""
                 master_db["sch_bg_b64"] = ""
                 master_db["school_bg_b64"] = ""
                 master_db["reg_bg_b64"] = ""
                 save_master_data(master_db)
-                st.success("Reset to default!")
+                st.success("Backgrounds reset to default!")
                 st.rerun()
-
+                
             st.markdown("---")
             st.markdown("#### 🖼️ Home Page Carousel Image Management")
             uploaded_carousel = st.file_uploader("Upload Custom Display Image (JPG/PNG)", type=['png', 'jpg', 'jpeg'], accept_multiple_files=True, key="m_carousel_up")
-            if st.button("📤 Upload to Carousel", key="m_carousel_btn"):
+            if st.button("📤 Upload to Home Display", key="m_carousel_btn"):
                 if uploaded_carousel:
                     for file in uploaded_carousel:
                         with open(os.path.join("Carousel_Images", file.name), "wb") as f:
                             f.write(file.getbuffer())
-                    st.success("Images added to carousel!")
+                    st.success("Images successfully uploaded and added to Home Display!")
                     st.rerun()
+                    
+            st.markdown("#### Currently Displayed Images")
+            imgs = [f for f in os.listdir("Carousel_Images") if f.lower().endswith(('png', 'jpg', 'jpeg'))]
+            if imgs:
+                for img in imgs:
+                    col_img, col_del = st.columns([8, 2])
+                    with col_img:
+                        st.write(f"🖼️ {img}")
+                    with col_del:
+                        if st.button("🗑️ Delete", key=f"del_img_{img}"):
+                            os.remove(os.path.join("Carousel_Images", img))
+                            st.rerun()
+            else:
+                st.warning("No custom images uploaded.")
 
 # ----------------- SCHOOL LOGIN (5 TABS COMPLETE) -----------------
 elif menu == "School Login":
@@ -1841,6 +1750,7 @@ elif menu == "School Login":
         c1.info(f"🏫 **School Portal** | ID: {cur_school} | {sch_data['name']}")
         if c2.button("🔴 Logout"): del st.session_state['school_logged_id']; st.rerun()
 
+        # 5 TABS FULLY RESTORED
         t_list, t_reg, t_add, t_edit, t_rep = st.tabs(["📋 My Students", "✅ Registrations", "➕ Add Student", "✏️ Edit Student", "🖨️ Report Card"])
         cur_students = students_db.get(cur_school, {})
         
@@ -1936,14 +1846,14 @@ elif menu == "School Login":
                     if cur_school not in students_db: students_db[cur_school] = {}
                     students_db[cur_school][sanitize(add_roll)] = new_data
                     save_data(schools_db, students_db)
-                    st.success("Added!")
+                    st.success("Student added successfully!")
                     st.rerun()
                     
         # 4. EDIT STUDENT DATA
         with t_edit:
             st.markdown("### ✏️ Edit Student Data (Full Form)")
             if cur_students:
-                edit_roll = st.selectbox("Select Roll No", list(cur_students.keys()), key="s_edit_roll_v2")
+                edit_roll = st.selectbox("Select Roll No to Edit", list(cur_students.keys()), key="s_edit_roll_v2")
                 curr_st = cur_students[edit_roll]
                 
                 c_up_n1, c_up_n2 = st.columns(2)
@@ -2027,14 +1937,16 @@ elif menu == "School Login":
                     save_data(schools_db, students_db)
                     st.success("Record updated and approved!")
                     st.rerun()
+            else:
+                st.info("No students enrolled yet to edit.")
 
-        # 5. REPORT CARD
+        # 5. REPORT CARD GENERATOR
         with t_rep:
             st.markdown("### 🖨️ Report Card")
             approved_students = {k:v for k,v in cur_students.items() if v.get('status') == 'Approved'}
             if approved_students:
                 rep_roll = st.selectbox("Select Roll for Report", list(approved_students.keys()), key="s_rep_roll_v2")
-                curr_st_obj = approved_students[rep_roll]
+                curr_st_obj = cur_students[rep_roll]
                 
                 st.markdown(generate_result_card_html(sch_data['name'], sch_data.get('name_local', ''), curr_st_obj, rep_roll, s_lang), unsafe_allow_html=True)
                 pdf_file = f"Report_{rep_roll}.pdf"
@@ -2070,7 +1982,6 @@ elif menu == "Results":
             ndob = normalize_dob(st_dob_input)
             
             found_student = None; found_roll = None; found_school_id = None
-            pending_status = None
             dob_mismatch = False
             
             for s_id, school_students in students_db.items():
@@ -2081,12 +1992,10 @@ elif menu == "Results":
                     if match_roll or match_name:
                         st_dob_norm = normalize_dob(s_info.get("dob", ""))
                         if st_dob_norm == ndob:
-                            if s_info.get("status", "Approved") == "Approved":
-                                found_student = s_info
-                                found_roll = r_no
-                                found_school_id = s_id
-                                break
-                            else: pending_status = s_info.get("status")
+                            found_student = s_info
+                            found_roll = r_no
+                            found_school_id = s_id
+                            break
                         else: dob_mismatch = True
                 if found_student: break
             
@@ -2097,14 +2006,11 @@ elif menu == "Results":
                     "school_id": found_school_id
                 }
                 st.rerun()
-            elif pending_status:
-                st.warning(f"⚠️ ଆପଣଙ୍କ ରେକର୍ଡ ମିଳିଲା, କିନ୍ତୁ ଷ୍ଟାଟସ୍ ଏବେ: '{pending_status}' ଅଛି। Master ବା School ରୁ ଆପ୍ରୁଭ୍ କରନ୍ତୁ।")
             elif dob_mismatch:
-                st.warning("⚠️ Roll No/Name ମେଚ୍ ହେଲା କିନ୍ତୁ Date of Birth (DOB) ମେଚ୍ ହେଉନାହିଁ। ସଠିକ୍ DOB ଦିଅନ୍ତୁ।")
+                st.warning("⚠️ Roll No/Name ମେଚ୍ ହେଲା କିନ୍ତୁ Date of Birth (DOB) ମେଚ୍ ହେଉନାହିଁ।")
             else:
                 st.error("❌ କୌଣସି ରେକର୍ଡ ମିଳିଲା ନାହିଁ! Roll Number ଏବଂ DOB ରେ ଚେକ୍ କରନ୍ତୁ।")
 
-    # Render Result if stored in session
     if 'active_result' in st.session_state:
         res_info = st.session_state['active_result']
         f_student = res_info['student']
