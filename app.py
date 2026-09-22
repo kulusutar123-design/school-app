@@ -66,7 +66,6 @@ def get_whatsapp_link(mobile_no, otp_code, student_name="Student"):
 
 def send_real_sms(mobile_no, otp_code, student_name="Student"):
     # 2Factor OTP API Integration
-    # apana 2factor.in re account banaila pare sethi apiKey milithae, taku e than re rakhibe
     api_key = "YOUR_2FACTOR_API_KEY"
     
     url = f"https://2factor.in/API/V1/{api_key}/SMS/{mobile_no}/{otp_code}/AUTOGEN"
@@ -83,7 +82,6 @@ def send_real_sms(mobile_no, otp_code, student_name="Student"):
     except Exception as e:
         st.session_state['sms_error'] = str(e)
         return False
-    }
     
     try:
         response = requests.post(url, json=payload, headers=headers)
