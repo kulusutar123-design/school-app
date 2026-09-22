@@ -65,23 +65,37 @@ def get_whatsapp_link(mobile_no, otp_code, student_name="Student"):
     return f"https://api.whatsapp.com/send?phone={clean_mob}&text={encoded_msg}"
 
 def send_real_sms(mobile_no, otp_code, student_name="Student"):
-    auth_key = "573765AaKxsZQR6ab1f5a6P1"
-    widget_id = "36697663334e373739333332"
-    url = f"https://control.msg91.com/api/v5/otp?authkey={auth_key}&otp={otp_code}&mobile=91{mobile_no}&otp_template_id={widget_id}"
+    # Fast2SMS Quick API Integration (No KYC Required)
+    url = "https://www.fast2sms.com/dev/bulkV2"
+    
+    # Your Fast2SMS API Key
+    api_key = "YOUR_FAST2SMS_API_KEY"
+    
+    payload = {
+        "route": "q",
+        "message": f"Hello {student_name}, your OTP for School Management System is {otp_code}. Valid for 10 minutes.",
+        "language": "english",
+        "flash": 0,
+        "numbers": str(mobile_no)
+    }
+    
+    headers = {
+        'authorization': api_key,
+        'Content-Type': "application/json"
+    }
     
     try:
-        response = requests.get(url)
+        response = requests.post(url, json=payload, headers=headers)
         data = response.json()
         
-        if data.get("type") == "success":
+        if data.get("return") == True:
             return True
         else:
-            st.session_state['sms_error'] = f"MSG91 Error: {data}"
+            st.session_state['sms_error'] = f"Fast2SMS Error: {data.get('message', 'Failed')}"
             return False
     except Exception as e:
         st.session_state['sms_error'] = str(e)
         return False
-
 # ==========================================
 # 📂 DIRECTORY CREATION FOR SCHOLARSHIPS
 # ==========================================
