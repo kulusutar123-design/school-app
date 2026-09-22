@@ -324,7 +324,7 @@ def create_student_receipt_pdf(filename, reg_id, s_data):
     c.save()
 
 def render_odisha_scholarship_html(app_id, s_data):
-    masked_adh = "XXXXXXXX" + str(s_data.get('aadhaar', ''))[-4:]
+    masked_id = "XXXXXXXX" + str(s_data.get('aadhaar', ''))[-4:]
     html_str = f"""<div style="font-family: Arial, sans-serif; border: 1px solid #ccc; padding: 20px; max-width: 900px; margin: auto; background-color: #fff;">
 <div style="text-align: center; margin-bottom: 20px;">
 <h2 style="margin: 0; color: #0b3a5b;">Government of Odisha</h2>
@@ -340,7 +340,7 @@ def render_odisha_scholarship_html(app_id, s_data):
 <h4 style="background-color: #0b3a5b; color: white; padding: 5px; margin: 0;">Applicant Details</h4>
 <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 15px;" border="1">
 <tr><td style="background-color: #f9f9f9; width: 25%;"><b>Applicant Name</b></td><td style="width: 25%;">{s_data.get('app_name', '').upper()}</td><td style="background-color: #f9f9f9; width: 25%;"><b>Religion</b></td><td style="width: 25%;">{s_data.get('religion', '')}</td></tr>
-<tr><td style="background-color: #f9f9f9;"><b>ID Status</b></td><td>{masked_adh}</td><td style="background-color: #f9f9f9;"><b>Category</b></td><td>{s_data.get('category', '')}</td></tr>
+<tr><td style="background-color: #f9f9f9;"><b>ID Status</b></td><td>{masked_id}</td><td style="background-color: #f9f9f9;"><b>Category</b></td><td>{s_data.get('category', '')}</td></tr>
 <tr><td style="background-color: #f9f9f9;"><b>Date of Birth</b></td><td>{s_data.get('dob', '')}</td><td style="background-color: #f9f9f9;"><b>Applicant Gender</b></td><td>{s_data.get('gender', '')}</td></tr>
 <tr><td style="background-color: #f9f9f9;"><b>OTR No.</b></td><td>{s_data.get('otr', '')}</td><td style="background-color: #f9f9f9;"><b>Mobile No.</b></td><td>{s_data.get('mobile', '')}</td></tr>
 <tr><td style="background-color: #f9f9f9;"><b>Father's Name</b></td><td>{s_data.get('father_name', '').upper()}</td><td style="background-color: #f9f9f9;"><b>Mother's Name</b></td><td>{s_data.get('mother_name', '').upper()}</td></tr>
@@ -448,7 +448,7 @@ def create_school_receipt_pdf(filename, sch_id, sch_data):
     c.save()
 
 # ==========================================
-# 🌐 COMPLETE PREVIEW HTML WITH BARCODE & SIGNATURES
+# 🌐 COMPLETE PREVIEW HTML WITH FULL DETAILS QR CODE & SIGNATURES
 # ==========================================
 def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no, s_lang):
     disp_dob = format_display_date(st_data.get('dob', ''))
@@ -456,10 +456,24 @@ def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no,
     disp_pub_date = format_display_date(raw_pub) if raw_pub else datetime.date.today().strftime('%d-%m-%Y')
     bc, b_col, ob, t_bg = "#fef9f7", "#963f98", "#ce9bd0", "#fcf4fc"
     tot_obt = st_data.get('total_obt', 0)
+    tot_full = st_data.get('total_full', 0)
     w_tot_en = number_to_words(tot_obt)
     s_name_en = st_data.get('name', 'N/A').upper()
-    qr_text = f"SCHOOL: {school_name_en} | NAME: {s_name_en} | ROLL: {roll_no} | MARKS: {tot_obt}/{st_data.get('total_full', 0)} | RESULT: {st_data.get('result', '')}"
-    qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={urllib.parse.quote(qr_text)}"
+    
+    # Scanner-friendly full result text inside QR code
+    qr_text = (
+        f"--- STUDENT RESULT CARD ---\n"
+        f"School: {school_name_en}\n"
+        f"Name: {s_name_en}\n"
+        f"Roll No: {roll_no}\n"
+        f"Class: {st_data.get('class', '')}\n"
+        f"DOB: {disp_dob}\n"
+        f"Total Marks: {tot_obt}/{tot_full}\n"
+        f"Percentage: {st_data.get('percentage', 0.0)}%\n"
+        f"Result: {st_data.get('result', 'PASS')}\n"
+        f"Grade: {st_data.get('grade', '')}"
+    )
+    qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={urllib.parse.quote(qr_text)}"
     bc_url = f"https://barcode.tec-it.com/barcode.ashx?data={roll_no}&code=Code128&dpi=96"
     rows_html = "".join([f"<tr style='border-bottom: 1px solid {b_col};'><td style='padding: 6px 8px; border-right: 1px solid {b_col}; text-align: left; font-weight: bold; color: #000;'>{sub.upper()}</td><td style='padding: 6px 8px; border-right: 1px solid {b_col}; color: #000;'>{m['full']}</td><td style='padding: 6px 8px; font-weight: bold; color: #000;'>{m['obt']}</td></tr>" for sub, m in st_data.get('subjects', {}).items()])
     
@@ -487,34 +501,38 @@ def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no,
 </tr>
 {rows_html}
 <tr style='color: {b_col}; font-weight: bold; background-color: {t_bg}; border-top: 2px solid {b_col};'>
-<td style='padding: 8px; border-right: 1px solid {b_col}; text-align: right;'>TOTAL MARKS</td><td style='padding: 8px; border-right: 1px solid {b_col}; color:#000;'>{st_data.get('total_full', 0)}</td><td style='padding: 8px; color:#000;'>{tot_obt}</td>
+<td style='padding: 8px; border-right: 1px solid {b_col}; text-align: right;'>TOTAL MARKS</td><td style='padding: 8px; border-right: 1px solid {b_col}; color:#000;'>{tot_full}</td><td style='padding: 8px; color:#000;'>{tot_obt}</td>
 </tr>
 </table>
 <div style='text-align: center; font-weight: bold; font-size: 13px; margin: 12px 0; color:#000;'>( {w_tot_en} )</div>
 
-<!-- ବାରକୋଡ୍ ଏବଂ QR କୋଡ୍ ସେକ୍ସନ୍ -->
-<div style='display: flex; justify-content: space-between; align-items: center; margin: 15px 10px;'>
-  <div style='text-align: left;'>
+<!-- Barcode & QR Code Section -->
+<table style='width: 100%; margin-top: 15px; margin-bottom: 15px;'>
+<tr>
+  <td style='text-align: left; vertical-align: middle; width: 60%;'>
     <img src='{bc_url}' style='height: 45px;'><br>
-    <span style='font-size: 11px; font-weight: bold; color: #333;'>Roll: {roll_no}</span>
-  </div>
-  <div style='text-align: right;'>
-    <img src='{qr_url}' style='height: 60px; width: 60px;'>
-  </div>
-</div>
+    <span style='font-size: 11px; font-weight: bold; color: #000;'>Roll: {roll_no}</span>
+  </td>
+  <td style='text-align: right; vertical-align: middle; width: 40%;'>
+    <img src='{qr_url}' style='height: 80px; width: 80px; border: 1px solid #ccc; padding: 2px;'>
+  </td>
+</tr>
+</table>
 
-<!-- ଦସ୍ତଖତ ଏବଂ ତାରିଖ ସେକ୍ସନ୍ -->
-<div style='display: flex; justify-content: space-between; align-items: flex-end; margin-top: 25px; padding: 0 10px; font-size: 12px; font-weight: bold;'>
-  <div style='text-align: left; width: 140px; border-top: 1px solid {b_col}; padding-top: 5px;'>
+<!-- Signatures Section -->
+<table style='width: 100%; margin-top: 30px; font-size: 12px; font-weight: bold;'>
+<tr>
+  <td style='text-align: left; border-top: 1px solid {b_col}; padding-top: 6px; width: 25%;'>
     Date: {disp_pub_date}
-  </div>
-  <div style='text-align: center; width: 180px; border-top: 1px solid {b_col}; padding-top: 5px;'>
+  </td>
+  <td style='text-align: center; border-top: 1px solid {b_col}; padding-top: 6px; width: 50%;'>
     Class Teacher Signature
-  </div>
-  <div style='text-align: right; width: 180px; border-top: 1px solid {b_col}; padding-top: 5px;'>
+  </td>
+  <td style='text-align: right; border-top: 1px solid {b_col}; padding-top: 6px; width: 25%;'>
     Headmaster Signature
-  </div>
-</div>
+  </td>
+</tr>
+</table>
 
 <div style='text-align: center; font-size: 10px; color: #666; margin-top: 15px; font-style: italic;'>
   This is a computer-generated mark sheet verified by the institution.
@@ -525,7 +543,7 @@ def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no,
     return html_str
 
 # ==========================================
-# 🖨️ PERFECT PDF GENERATION WITH BARCODE & SIGNATURES
+# 🖨️ PERFECT PDF GENERATION WITH FULL DETAILS QR CODE & SIGNATURES
 # ==========================================
 def create_pdf(filename, school_name, st_data, roll_no):
     disp_dob = format_display_date(st_data.get('dob', ''))
@@ -634,29 +652,42 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.drawString(200, curr_y, f"PERCENTAGE: {st_data.get('percentage', 0.0)}%")
     c.drawString(400, curr_y, f"FINAL GRADE: {st_data.get('grade', 'N/A')}")
     
-    # 7. Native Offline Barcode & QR Code
-    curr_y -= 65
+    # 7. Native Offline Barcode & Full-Details QR Code
+    curr_y -= 70
     try:
         clean_roll = str(roll_no).strip()
         bc_obj = code128.Code128(clean_roll, barHeight=28, barWidth=1.0)
         d_bc = Drawing(160, 40)
         d_bc.add(bc_obj)
-        renderPDF.draw(d_bc, c, 45, curr_y + 12)
+        renderPDF.draw(d_bc, c, 45, curr_y + 16)
         
         c.setFont("Helvetica", 7)
         c.setFillColorRGB(0, 0, 0)
-        c.drawString(45, curr_y + 2, f"Roll: {clean_roll}")
+        c.drawString(45, curr_y + 4, f"Roll: {clean_roll}")
     except Exception:
         pass
         
     try:
-        qr_content = f"ID:{roll_no}|NAME:{st_data.get('name','')}|MARKS:{st_data.get('total_obt',0)}/{st_data.get('total_full',0)}|RES:{st_data.get('result','')}"
+        tot_m = f"{st_data.get('total_obt', 0)}/{st_data.get('total_full', 0)}"
+        qr_content = (
+            f"--- STUDENT RESULT CARD ---\n"
+            f"School: {school_name}\n"
+            f"Name: {st_data.get('name', '')}\n"
+            f"Roll No: {roll_no}\n"
+            f"Class: {st_data.get('class', '')}\n"
+            f"DOB: {disp_dob}\n"
+            f"Total Marks: {tot_m}\n"
+            f"Percentage: {st_data.get('percentage', 0.0)}%\n"
+            f"Result: {st_data.get('result', 'PASS')}\n"
+            f"Grade: {st_data.get('grade', '')}"
+        )
+        
         qr_obj = qr.QrCodeWidget(qr_content)
         bounds = qr_obj.getBounds()
         qr_w = bounds[2] - bounds[0]
         qr_h = bounds[3] - bounds[1]
         
-        d_qr = Drawing(55, 55, transform=[55.0/qr_w, 0, 0, 55.0/qr_h, 0, 0])
+        d_qr = Drawing(60, 60, transform=[60.0/qr_w, 0, 0, 60.0/qr_h, 0, 0])
         d_qr.add(qr_obj)
         renderPDF.draw(d_qr, c, 260, curr_y)
     except Exception:
