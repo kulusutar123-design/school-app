@@ -54,21 +54,24 @@ def check_brute_force():
         st.stop()
 
 # ==========================================
-# 📧 EMAIL & SYSTEM FALLBACK OTP GATEWAY
+# 📱 WHATSAPP DIRECT OTP GATEWAY
 # ==========================================
-def send_real_sms(mobile_or_email, otp_code, student_name="Student"):
-    target = str(mobile_or_email).strip()
+def send_real_sms(mobile_no, otp_code, student_name="Student"):
+    # Clean Direct WhatsApp Link Generator
+    clean_mob = "".join([c for c in str(mobile_no) if c.isdigit()])
+    if not clean_mob.startswith("91") and len(clean_mob) == 10:
+        clean_mob = "91" + clean_mob
     
-    if "@" in target:
-        st.success(f"✅ OTP successfully generated for Email: **{target}**")
-        st.info(f"📧 [EMAIL OTP NOTIFICATION] Hello {student_name}, your Verification OTP for School Management System is: **{otp_code}**. Please enter this code to verify your account.")
-        st.session_state['sms_error'] = ""
-        return True
-    else:
-        st.success(f"✅ OTP generated successfully for Mobile: **{target}**")
-        st.info(f"📲 [MOBILE OTP NOTIFICATION] Hello {student_name}, your Verification OTP is: **{otp_code}**.")
-        st.session_state['sms_error'] = ""
-        return True
+    # Message format for WhatsApp
+    message = f"Hello {student_name},\n\nYour Verification OTP for School Management System is: *{otp_code}*.\n\nPlease share this code to complete verification."
+    encoded_msg = urllib.parse.quote(message)
+    wa_link = f"https://api.whatsapp.com/send?phone={clean_mob}&text={encoded_msg}"
+    
+    # Displaying a clean clickable button
+    st.success(f"✅ OTP ତିଆରି ହୋଇଯାଇଛି! ମୋବାଇଲ୍ ନମ୍ବର {clean_mob} କୁ WhatsApp ରେ ପଠାଇବା ପାଇଁ ତଳେ କ୍ଲିକ୍ କରନ୍ତୁ।")
+    st.markdown(f"<a href='{wa_link}' target='_blank' style='background-color:#25D366; color:white; padding:12px 24px; border-radius:6px; text-decoration:none; font-weight:bold; font-size:16px; display:block; text-align:center; margin-bottom:15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);'>💬 Click Here to Send WhatsApp OTP Instantly</a>", unsafe_allow_html=True)
+    
+    return True
 
 # ==========================================
 # 📂 DIRECTORY CREATION FOR SCHOLARSHIPS
@@ -820,7 +823,11 @@ elif menu == "Scholarship Portal":
                         st.session_state['sch_f_uid'] = sanitize(f_uid)
                         reg_mob = sch_users_db[sanitize(f_uid)]["mobile"]
                         
-                        send_real_sms(reg_mob, otp_code)
+                        success = send_real_sms(reg_mob, otp_code)
+                        if success:
+                            st.success("OTP Sent Successfully!")
+                        else:
+                            st.error(f"❌ SMS Failed: {st.session_state.get('sms_error')}")
                     else:
                         st.error("Aadhaar Number not found in our records!")
                         
@@ -855,10 +862,10 @@ elif menu == "Scholarship Portal":
             if 'sch_reg_step' not in st.session_state: st.session_state['sch_reg_step'] = 1
             
             if st.session_state['sch_reg_step'] == 1:
-                r_mob = st.text_input("Mobile Number or Email *")
+                r_mob = st.text_input("Mobile Number *", max_chars=10)
                 r_adh = st.text_input("Aadhaar Number (12-digit) *", max_chars=12)
                 if st.button("Get OTP"):
-                    if len(r_mob) >= 5 and len(r_adh) == 12:
+                    if len(r_mob) == 10 and len(r_adh) == 12:
                         if sanitize(r_adh) in sch_users_db:
                             st.error("Aadhaar Number already registered! Please go to Login.")
                         else:
@@ -866,11 +873,15 @@ elif menu == "Scholarship Portal":
                             st.session_state['temp_r_adh'] = sanitize(r_adh)
                             st.session_state['temp_sch_otp'] = str(random.randint(1000, 9999))
                             
-                            send_real_sms(sanitize(r_mob), st.session_state['temp_sch_otp'])
-                            
+                            success = send_real_sms(sanitize(r_mob), st.session_state['temp_sch_otp'])
+                            if success:
+                                st.success("OTP Sent Successfully!")
+                            else:
+                                st.error(f"❌ SMS Failed: {st.session_state.get('sms_error')}")
+                                
                             st.session_state['sch_reg_step'] = 2
                             st.rerun()
-                    else: st.error("Please enter valid Mobile/Email and Aadhaar numbers.")
+                    else: st.error("Please enter valid Mobile and Aadhaar numbers.")
             
             elif st.session_state['sch_reg_step'] == 2:
                 in_otp = st.text_input("Enter OTP *")
@@ -1356,7 +1367,12 @@ elif menu == "Master Login":
                 if verify_contact == master_db.get("email") or verify_contact == master_db.get("phone"):
                     otp_code = str(random.randint(1000, 9999))
                     st.session_state['master_otp'] = otp_code
-                    send_real_sms(master_db.get("email"), otp_code, "Master Admin")
+                    success = send_real_sms(master_db.get("phone"), otp_code)
+                    if success:
+                        st.success("OTP Sent Successfully!")
+                    else:
+                        st.error(f"❌ SMS Failed: {st.session_state.get('sms_error')}")
+                        st.info(f"📲 [SYSTEM FALLBACK] Demo OTP is: {otp_code}")
                 else: st.error("Invalid Email or Mobile Number!")
             if 'master_otp' in st.session_state:
                 entered_otp = st.text_input("Enter 4-digit OTP")
@@ -1597,8 +1613,8 @@ elif menu == "Master Login":
         with t5: 
             st.markdown("### 📢 Update Notifications & Settings")
             
-            st.markdown("#### 📱 Notification Settings")
-            up_sms_api = st.text_input("API Key (Optional)", value=master_db.get("sms_api_key", ""), key="m_set_sms_api")
+            st.markdown("#### 📱 SMS Gateway API Key")
+            up_sms_api = st.text_input("Fast2SMS API Key", value=master_db.get("sms_api_key", ""), key="m_set_sms_api")
             
             st.markdown("---")
             up_notice = st.text_area("Official Notification Text", value=master_db.get("notice_text", ""), height=100, key="m_set_not")
@@ -1651,13 +1667,13 @@ elif menu == "Master Login":
 
         with t6:
             st.markdown("### 🏦 School Payment Gateway Setup (Master Control)")
-            st.info("Set up individual Payment Gateways for Schools. Students will pay using these details.")
+            st.info("Set up individual Payment Gateways for Schools. Students will pay using these details, and ₹100 will auto-route to Master Account.")
             if schools_db:
                 pg_school = st.selectbox("Select School to configure Gateway", list(schools_db.keys()), key="m_gw_sch_sel")
                 curr_sch = schools_db[pg_school]
                 
                 sch_upi = st.text_input(f"School UPI ID (for {curr_sch['name']})", value=curr_sch.get('pg_upi', ''), key="m_gw_upi")
-                sch_merch = st.text_input("Payment Gateway Merchant ID", value=curr_sch.get('pg_merchant', ''), key="m_gw_merch")
+                sch_merch = st.text_input("Payment Gateway Merchant ID (Credit/Debit Card)", value=curr_sch.get('pg_merchant', ''), key="m_gw_merch")
                 sch_key = st.text_input("Payment Gateway Secret Key (Hidden)", value=curr_sch.get('pg_key', ''), type="password", key="m_gw_key")
                 
                 if st.button("💾 Save School Gateway Settings", key="m_gw_save"):
@@ -1699,6 +1715,7 @@ elif menu == "Master Login":
                 
             st.markdown("---")
             st.markdown("#### 🖼️ Home Page Carousel Image Management")
+            st.info("Upload photos here to show them in the big scrolling display on the Home Page.")
             uploaded_carousel = st.file_uploader("Upload Custom Display Image (JPG/PNG)", type=['png', 'jpg', 'jpeg'], accept_multiple_files=True, key="m_carousel_up")
             if st.button("📤 Upload to Home Display", key="m_carousel_btn"):
                 if uploaded_carousel:
@@ -1720,7 +1737,7 @@ elif menu == "Master Login":
                             os.remove(os.path.join("Carousel_Images", img))
                             st.rerun()
             else:
-                st.warning("No custom images uploaded.")
+                st.warning("No custom images uploaded. Default images are running on the Home Page.")
 
 # ----------------- SCHOOL LOGIN -----------------
 elif menu == "School Login":
@@ -1788,11 +1805,11 @@ elif menu == "School Login":
         with t_add:
             st.markdown("### ➕ Add Student Direct (Full Form)")
             c_roll, c_gen = st.columns(2)
-            add_roll = c_roll.text_input("Roll No *", key="s_add_roll_v2")
+            add_roll = c_roll.text_input(f"Roll No / {t('ROLL NO', s_lang) if 't' in globals() else 'Roll No'}", key="s_add_roll_v2")
             add_gen = c_gen.selectbox("Gender", ["Male", "Female", "Other"], key="s_add_gen_v2")
             
             c_n1, c_n2 = st.columns(2)
-            add_name = c_n1.text_input("Student Name (English) *", key="s_add_name_v2")
+            add_name = c_n1.text_input("Student Name (English)", key="s_add_name_v2")
             add_name_loc = c_n2.text_input(f"Student Name ({s_lang}) [Optional]", key="s_add_nameloc_v2")
             
             add_fname = c_n1.text_input("Father's Name (English)", key="s_add_fat_v2")
