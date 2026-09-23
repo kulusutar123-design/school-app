@@ -1672,18 +1672,17 @@ elif menu == "Master Login":
                 elif m_action == "Delete School":
                     st.markdown("#### 🗑️ Delete School Record")
                     if schools_db:
-                        selected_del_s = st.selectbox("Select School to Delete", list(schools_db.keys()), key="del_school_sel_box_unique_123")
-                        st.warning(f"⚠️ Warning: Deleting School ID '{selected_del_s}' will remove its records permanently.")
-                        
-                        # Direct Action Button for Immediate Deletion
-                        if st.button("🗑️ Click Here to Permanently Delete School", type="primary", key="direct_del_action_btn_999"):
-                            if selected_del_s in schools_db:
-                                del schools_db[selected_del_s]
-                                if selected_del_s in students_db: 
-                                    del students_db[selected_del_s]
+                        # Direct Table/List Delete with Unique Buttons
+                        for s_id, s_info in list(schools_db.items()):
+                            col_d1, col_d2 = st.columns([4, 1])
+                            col_d1.write(f"🏫 **{s_id}** - {s_info.get('name')}")
+                            if col_d2.button("🗑️ Delete", key=f"perm_del_sch_{s_id}"):
+                                del schools_db[s_id]
+                                if s_id in students_db:
+                                    del students_db[s_id]
                                 save_data(schools_db, students_db)
-                                st.success(f"School ID {selected_del_s} deleted successfully!")
-                                time.sleep(0.5)
+                                st.success(f"School {s_id} deleted permanently!")
+                                time.sleep(0.3)
                                 st.rerun()
                     else:
                         st.info("No schools available to delete.")
