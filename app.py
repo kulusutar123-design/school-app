@@ -1584,7 +1584,7 @@ elif menu == "New School Registration":
                 st.session_state['sch_reg_data'] = s_tmp['data']
                 st.session_state['school_payment_step'] = False; st.rerun()
 
-# ----------------- MASTER LOGIN (7 TABS RESTORED) -----------------
+# ----------------- MASTER LOGIN (7 TABS) -----------------
 elif menu == "Master Login":
     c_home, c_title = st.columns([1, 8])
     with c_home:
@@ -1611,40 +1611,17 @@ elif menu == "Master Login":
         t1, t2, t3, t4, t5, t6, t7 = st.tabs(["👁️ Schools", "💳 Payments", "🎓 Scholarships Verify", "🎓 Edit Students", "⚙️ Settings", "🏦 Gateway", "🖼️ Display & Backgrounds"])
         
         with t1:
-            st.markdown("### 🏫 School Management Dashboard")
-            with st.expander("⚙️ Master School Control Box", expanded=True):
-                m_action = st.radio("Choose Action", ["Add New School", "Edit Existing School", "Delete School", "Toggle Active / Inactive Status"], horizontal=True)
-                
-                if m_action == "Add New School":
-                    with st.form("master_add_school_form"):
-                        n_s_id = st.text_input("School ID *")
-                        n_s_name = st.text_input("School Name *")
-                        n_s_pass = st.text_input("School Password *", type="password")
-                        n_s_state = st.selectbox("State", list(STATE_LANG_MAP.keys()), index=18)
-                        if st.form_submit_button("Save & Create School"):
-                            clean_id = sanitize(n_s_id)
-                            if clean_id and n_s_name and n_s_pass:
-                                schools_db[clean_id] = {
-                                    "name": sanitize(n_s_name), "name_local": "", "hm_name": "Admin", "hm_phone": "9999999999",
-                                    "pass": n_s_pass, "state": n_s_state, "lang": STATE_LANG_MAP[n_s_state], "status": "Active", "payment_mode": "Master Created"
-                                }
-                                save_data(schools_db, students_db)
-                                st.success(f"School {clean_id} created!")
-                                st.rerun()
-                elif m_action == "Delete School":
-                    if schools_db:
-                        for s_id, s_info in list(schools_db.items()):
-                            cols_del = st.columns([3, 1])
-                            cols_del[0].markdown(f"**{s_id}** - {s_info.get('name')}")
-                            if cols_del[1].button("🗑️ Delete", key=f"btn_del_safe_{s_id}"):
-                                del schools_db[s_id]
-                                if s_id in students_db: del students_db[s_id]
-                                save_data(schools_db, students_db)
-                                st.success(f"School {s_id} deleted!")
-                                time.sleep(0.3)
-                                st.rerun()
-                    else:
-                        st.info("No schools available.")
+            st.markdown("### 🏫 Manage Schools")
+            for s_id, s_info in list(schools_db.items()):
+                status = s_info.get("status", "Active") 
+                bg = "#f0fdf4" if status == "Active" else "#fef2f2"
+                st.markdown(f"<div style='border:1px solid #cbd5e1; padding:10px; margin-bottom:10px; background-color:{bg};'><b>School ID:</b> {s_id} | <b>Name:</b> {s_info['name']} | Status: {status}</div>", unsafe_allow_html=True)
+                if status == "Pending_Master_Approval":
+                    if st.button("✅ Approve School Registration", key=f"app_{s_id}"):
+                        s_info["status"] = "Active"; save_data(schools_db, students_db); st.rerun()
+                elif status == "Inactive":
+                    if st.button("✅ Make Active", key=f"act_{s_id}"):
+                        s_info["status"] = "Active"; save_data(schools_db, students_db); st.rerun()
 
         with t2:
             st.markdown("### 💳 Verify Student Payments (Master)")
@@ -1656,23 +1633,83 @@ elif menu == "Master Login":
             if pending_master:
                 for s_id, r_no, p_st in pending_master:
                     st.write(f"**Reg:** {r_no} | **Name:** {p_st.get('name')} | **Amount:** ₹{p_st.get('total_fee', 0)}")
-                    if st.button(f"✅ Verify {r_no}", key=f"vp_{r_no}"):
-                        p_st["status"] = "Pending_School"
-                        save_data(schools_db, students_db)
-                        st.success("Verified!")
-                        st.rerun()
-            else:
-                st.success("No pending student payments.")
+                    c_pay1, c_pay2 = st.columns(2)
+                    if c_pay1.button(f"✅ Verify {r_no}", key=f"vp_{r_no}"):
+                        p_st["status"] = "Pending_School"; save_data(schools_db, students_db); st.success("Verified!"); st.rerun()
+                    if c_pay2.button(f"🚫 Reject {r_no}", key=f"rp_{r_no}"):
+                        p_st['status'] = "Rejected_Refund"; save_data(schools_db, students_db); st.error("Rejected"); st.rerun()
+            else: st.success("No pending student payments.")
 
-        with t5:
-            st.markdown("### ⚙️ Settings & Notifications")
-            up_notice = st.text_area("Official Running Notification Text", value=master_db.get("notice_text", ""))
-            up_news = st.text_area("Breaking Running News Text", value=master_db.get("news_text", ""))
+        with t3:
+            st.markdown("### 🎓 Scholarship Verifications (Master)")
+            sch_tab1, sch_tab2 = st.tabs(["⏳ Pending Verification", "📂 Approved Master Folders"])
+            with sch_tab1:
+                pending_sch = {k: v for k, v in scholarships_db.items() if v.get("status") == "Pending_Master"}
+                if pending_sch:
+                    app_id = st.selectbox("Select Scholarship", list(pending_sch.keys()), key="m_sch_app_sel")
+                    s_data = pending_sch[app_id]
+                    st.write(f"**Application ID:** {app_id} | **Payment:** {s_data.get('payment_mode')}")
+                    
+                    with st.expander("👁️ View & Edit Full Application", expanded=True):
+                        c_e1, c_e2, c_e3 = st.columns(3)
+                        e_name = c_e1.text_input("Applicant Name", s_data.get('app_name', ''), key=f"ms_name_{app_id}")
+                        e_aadhaar = c_e2.text_input("Identification", s_data.get('aadhaar', ''), key=f"ms_adh_{app_id}")
+                        e_mob = c_e3.text_input("Mobile No", s_data.get('mobile', ''), key=f"ms_mob_{app_id}")
+                        
+                        if st.button("✅ Update Data & Approve Scholarship (Create Folder)", type="primary", key=f"m_sch_fwd_btn_{app_id}"):
+                            s_data['app_name'] = sanitize(e_name)
+                            s_data['aadhaar'] = sanitize(e_aadhaar)
+                            s_data['mobile'] = sanitize(e_mob)
+                            s_data['status'] = "Approved" 
+                            save_master_approved_folder(app_id, s_data)
+                            scholarships_db[app_id] = s_data
+                            save_scholarships(scholarships_db)
+                            st.success(f"Approved!")
+                            st.rerun()
+                else: st.success("No pending scholarships.")
+            with sch_tab2:
+                approved_sch = {k: v for k, v in scholarships_db.items() if v.get("status") == "Approved"}
+                if approved_sch:
+                    a_id = st.selectbox("Select Approved Application Folder", list(approved_sch.keys()), key="m_appr_sel")
+                    st.success(f"📂 Folder: Scholarship_Data/Approved_Master/{a_id}")
+                    pdf_m_file = f"Scholarship_Data/Approved_Master/{a_id}/Application_{a_id}.pdf"
+                    if os.path.exists(pdf_m_file):
+                        with open(pdf_m_file, "rb") as f:
+                            pdf_m_bytes = f.read()
+                        st.download_button("📥 Download Final Application PDF", data=pdf_m_bytes, file_name=f"Application_{a_id}.pdf", mime="application/pdf", key=f"m_appr_pdf_{a_id}")
+                    app_data = approved_sch[a_id]
+                    st.markdown(render_odisha_scholarship_html(a_id, app_data), unsafe_allow_html=True)
+                else: st.info("No approved folders yet.")
+
+        with t4: 
+            st.markdown("### 🎓 Edit & Delete Students Data (Master)")
+            master_school_sel = st.selectbox("Select School", ["--Select--"] + list(schools_db.keys()), key="m_sch_sel_fixed")
+            if master_school_sel != "--Select--":
+                school_students = students_db.get(master_school_sel, {})
+                s_lang = schools_db[master_school_sel].get("lang", "English")
+                if school_students:
+                    m_edit_roll = st.selectbox("Select Student Roll No", list(school_students.keys()), key="m_roll_sel_fixed")
+                    m_curr_st = school_students[m_edit_roll]
+                    
+                    c1, c2 = st.columns(2)
+                    m_up_name = c1.text_input("Name (English)", value=m_curr_st.get('name',''), key=f"m_name_fix_{m_edit_roll}")
+                    m_up_name_loc = c2.text_input(f"Name ({s_lang})", value=m_curr_st.get('name_local',''), key=f"m_nameloc_fix_{m_edit_roll}")
+                    
+                    if st.button("💾 Force Update Record", key=f"m_fix_upd_btn_{m_edit_roll}"):
+                        students_db[master_school_sel][m_edit_roll].update({"name": sanitize(m_up_name), "name_local": sanitize(m_up_name_loc)})
+                        save_data(schools_db, students_db)
+                        st.success("Updated!")
+                        st.rerun()
+
+        with t5: 
+            st.markdown("### 📢 Update Notifications & Settings")
+            up_notice = st.text_area("Official Running Notification Text", value=master_db.get("notice_text", ""), height=100, key="m_set_not")
+            up_news = st.text_area("Breaking Running News Text", value=master_db.get("news_text", ""), height=100, key="m_set_new")
             if st.button("Save Settings", key="m_set_save_all"):
                 master_db["notice_text"] = up_notice
                 master_db["news_text"] = up_news
                 save_master_data(master_db)
-                st.success("Settings updated successfully!")
+                st.success("Settings updated!")
                 st.rerun()
 
         with t6:
@@ -1683,21 +1720,182 @@ elif menu == "Master Login":
                 if st.button("💾 Save Gateway", key="m_gw_save"):
                     schools_db[pg_school]['pg_upi'] = sanitize(sch_upi)
                     save_data(schools_db, students_db)
-                    st.success("Payment Gateway Saved!")
+                    st.success("Saved!")
 
         with t7:
-            st.markdown("### 🖼️ Portal Backgrounds & Display")
+            st.markdown("### 🖼️ Portal Backgrounds & Home Display")
             up_h_bg = st.file_uploader("Home Page Background", type=['png', 'jpg', 'jpeg'], key="h_bg")
             if st.button("💾 Save Background", key="save_bgs"):
                 if up_h_bg: master_db["bg_b64"] = base64.b64encode(up_h_bg.read()).decode('utf-8')
                 save_master_data(master_db)
-                st.success("Background Saved!")
+                st.success("Saved!")
                 st.rerun()
+            
+            st.markdown("#### Carousel Image Management")
+            uploaded_carousel = st.file_uploader("Upload Display Image", type=['png', 'jpg', 'jpeg'], accept_multiple_files=True, key="m_carousel_up")
+            if st.button("📤 Upload to Carousel", key="m_carousel_btn"):
+                if uploaded_carousel:
+                    for file in uploaded_carousel:
+                        with open(os.path.join("Carousel_Images", file.name), "wb") as f:
+                            f.write(file.getbuffer())
+                    st.success("Uploaded!")
+                    st.rerun()
 
 # ----------------- SCHOOL LOGIN -----------------
 elif menu == "School Login":
-    st.subheader("🏫 School Portal")
-    # ... School Login Code ...
+    c_home, c_title = st.columns([1, 8])
+    with c_home:
+        if st.button("🏠 Home", key="s_home_btn"): st.query_params["portal"] = "home"; st.rerun()
+    with c_title: st.subheader("🏫 School Portal")
+    
+    if 'school_logged_id' not in st.session_state:
+        check_brute_force()
+        s_login_state = st.selectbox("📍 Select State / ରାଜ୍ୟ ଚୟନ କରନ୍ତୁ *", list(STATE_LANG_MAP.keys()), index=18, key="s_login_state_sel")
+        s_id = st.text_input("School ID")
+        s_pass = st.text_input("School Password", type="password")
+        
+        if 'school_captcha' not in st.session_state:
+            st.session_state['school_captcha'] = str(random.randint(10000, 99999))
+        
+        st.markdown(f"<div style='background:#f1f5f9; padding:5px 20px; font-size:22px; font-weight:bold; letter-spacing:6px; border:1px solid #cbd5e1; border-radius:5px; display:inline-block; color:#000;'>{st.session_state['school_captcha']}</div>", unsafe_allow_html=True)
+        entered_captcha = st.text_input("Enter the CAPTCHA code")
+        
+        if st.button("Login as School"):
+            if entered_captcha != st.session_state['school_captcha']:
+                st.error("❌ ଭୁଲ୍ CAPTCHA!")
+                st.session_state['school_captcha'] = str(random.randint(10000, 99999)); st.rerun()
+            else:
+                s_id_clean = sanitize(s_id)
+                if s_id_clean in schools_db:
+                    sch_entry = schools_db[s_id_clean]
+                    if sch_entry.get("state") != s_login_state:
+                        st.session_state.failed_logins += 1
+                        st.error(f"❌ ଏହି School ID ଟି '{s_login_state}' ରାଜ୍ୟରେ ପଞ୍ଜୀକୃତ ନୁହେଁ!")
+                    elif sch_entry.get("pass") == s_pass:
+                        st.session_state.failed_logins = 0
+                        st.session_state['school_logged_id'] = s_id_clean
+                        if 'school_captcha' in st.session_state: del st.session_state['school_captcha']
+                        st.rerun()
+                    else:
+                        st.session_state.failed_logins += 1
+                        st.error("❌ ଭୁଲ୍ Password!")
+                else:
+                    st.session_state.failed_logins += 1
+                    st.error("❌ ଏହି School ID ମିଳିଲା ନାହିଁ!")
+    else: 
+        cur_school = st.session_state['school_logged_id']
+        sch_data = schools_db[cur_school]
+        s_lang = sch_data.get("lang", "English")
+        
+        c1, c2 = st.columns([8, 2])
+        c1.info(f"🏫 **School Portal** | ID: {cur_school} | {sch_data['name']}")
+        if c2.button("🔴 Logout"): del st.session_state['school_logged_id']; st.rerun()
+
+        t_list, t_reg, t_add, t_edit, t_rep = st.tabs(["📋 My Students", "✅ Registrations", "➕ Add Student", "✏️ Edit Student", "🖨️ Report Card"])
+        cur_students = students_db.get(cur_school, {})
+        
+        with t_list:
+            st.markdown("### 📋 My Students")
+            for r_no, s_info in cur_students.items():
+                st.write(f"✅ **Roll:** {r_no} | **Name:** {s_info.get('name')}")
+            if not cur_students: st.warning("No students found.")
+            
+        with t_reg:
+            st.markdown("### ✅ Review Online Registrations")
+            pending_students = {k:v for k,v in cur_students.items() if v.get('status') in ['Pending_School', 'Pending_Master']}
+            if pending_students:
+                app_roll = st.selectbox("Select Pending Student", list(pending_students.keys()), key="s_pend_roll_sel")
+                if st.button("✅ Final Approve", key="s_pend_app_btn"):
+                    cur_students[app_roll]["status"] = "Approved"
+                    save_data(schools_db, students_db)
+                    st.success("Approved!")
+                    st.rerun()
+            else: st.success("No pending approvals.")
+                
+        with t_add:
+            st.markdown("### ➕ Add Student Direct")
+            add_roll = st.text_input("Roll No *", key="s_add_roll_v2")
+            add_name = st.text_input("Student Name *", key="s_add_name_v2")
+            if st.button("💾 Save Student Data", key="s_save_stud_btn_v2"):
+                if add_roll and add_name:
+                    students_db[cur_school][sanitize(add_roll)] = {
+                        "name": sanitize(add_name), "class": "10", "batch": "2025-2026",
+                        "subjects": {"Odia": {"full": 100, "obt": 80}}, "total_full": 100, "total_obt": 80,
+                        "percentage": 80.0, "result": "PASS", "grade": "A", "status": "Approved"
+                    }
+                    save_data(schools_db, students_db)
+                    st.success("Added!")
+                    st.rerun()
+                    
+        with t_edit:
+            st.markdown("### ✏️ Edit Student Data")
+            if cur_students:
+                edit_roll = st.selectbox("Select Roll No", list(cur_students.keys()), key="s_edit_roll_v2")
+                up_name = st.text_input("Edit Name", value=cur_students[edit_roll].get('name', ''), key=f"s_up_name_{edit_roll}")
+                if st.button("💾 Save", key=f"s_save_{edit_roll}"):
+                    cur_students[edit_roll]["name"] = sanitize(up_name)
+                    save_data(schools_db, students_db)
+                    st.success("Updated!")
+                    st.rerun()
+
+        with t_rep:
+            st.markdown("### 🖨️ Report Card")
+            if cur_students:
+                rep_roll = st.selectbox("Select Roll", list(cur_students.keys()), key="s_rep_roll_v2")
+                st.markdown(generate_result_card_html(sch_data['name'], sch_data.get('name_local', ''), cur_students[rep_roll], rep_roll, s_lang), unsafe_allow_html=True)
+                pdf_file = f"Report_{rep_roll}.pdf"
+                create_pdf(pdf_file, sch_data['name'], cur_students[rep_roll], rep_roll)
+                with open(pdf_file, "rb") as f:
+                    st.download_button("📥 Download PDF", f.read(), file_name=pdf_file, mime="application/pdf", key="s_dl_pdf_v2")
+
+# ----------------- RESULTS PORTAL -----------------
+elif menu == "Results":
+    c_home, c_title = st.columns([1, 8])
+    with c_home:
+        if st.button("🏠 Home", key="st_home_btn"): 
+            st.query_params["portal"] = "home"
+            if 'active_result' in st.session_state: del st.session_state['active_result']
+            st.rerun()
+    with c_title: st.subheader("🎓 Results Portal")
+    
+    st_search_query = st.text_input("Roll Number OR Student Name", key="res_q_v2")
+    st_dob_input = st.text_input("Date of Birth (DD-MM-YYYY)", key="res_dob_v2")
+    
+    if st.button("View Result", key="res_view_v2"):
+        if st_search_query and st_dob_input:
+            sq_clean = st_search_query.strip().lower()
+            ndob = normalize_dob(st_dob_input)
+            
+            found_student = None; found_roll = None; found_school_id = None
+            for s_id, school_students in students_db.items():
+                for r_no, s_info in school_students.items():
+                    if (r_no.strip().lower() == sq_clean or s_info.get("name", "").strip().lower() == sq_clean):
+                        if normalize_dob(s_info.get("dob", "")) == ndob:
+                            found_student = s_info
+                            found_roll = r_no
+                            found_school_id = s_id
+                            break
+                if found_student: break
+            
+            if found_student:
+                st.session_state['active_result'] = {"student": found_student, "roll": found_roll, "school_id": found_school_id}
+                st.rerun()
+            else:
+                st.error("❌ Record nahi mila! (Tip: Roll: 175CB0078, DOB: 14-02-2011)")
+
+    if 'active_result' in st.session_state:
+        res_info = st.session_state['active_result']
+        f_student = res_info['student']
+        f_roll = res_info['roll']
+        f_sch_id = res_info['school_id']
+        
+        sch = schools_db.get(f_sch_id, {})
+        st.success(f"🎉 **Welcome {f_student.get('name', '').upper()}!**")
+        st.markdown(generate_result_card_html(sch.get('name', ''), sch.get('name_local', ''), f_student, f_roll, sch.get('lang', 'English')), unsafe_allow_html=True)
+        pdf_file = f"Result_{f_roll}.pdf"
+        create_pdf(pdf_file, sch.get('name', ''), f_student, f_roll)
+        with open(pdf_file, "rb") as f:
+            st.download_button("📥 Download PDF", data=f.read(), file_name=pdf_file, mime="application/pdf", key="res_dl_v2")
 
 st.markdown("---")
 st.markdown("<div style='text-align: center; padding: 15px; background: linear-gradient(90deg, #1e3a8a, #9333ea); color: white; border-radius: 8px; font-weight: bold;'>👨‍💻 Software Developed by: KULU SUTAR | 📞 Mob: 8910223342 | ✉️ kulusutar123@gmail.com</div>", unsafe_allow_html=True)
