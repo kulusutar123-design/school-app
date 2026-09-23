@@ -1593,7 +1593,7 @@ elif menu == "New School Registration":
                 st.session_state['sch_reg_data'] = s_tmp['data']
                 st.session_state['school_payment_step'] = False; st.rerun()
 
-# ----------------- MASTER LOGIN (7 TABS RESTORED WITH FULL CONTROLS & SETTINGS) -----------------
+# ----------------- MASTER LOGIN (7 TABS RESTORED WITH FULL CONTROLS & EDIT SUBJECTS) -----------------
 elif menu == "Master Login":
     c_home, c_title = st.columns([1, 8])
     with c_home:
@@ -1689,23 +1689,46 @@ elif menu == "Master Login":
                 st.success("No pending student payments.")
 
         with t4:
-            st.markdown("### 🎓 Edit Student Records (Master Control)")
+            st.markdown("### 🎓 Edit Student Records & Subjects (Master Control)")
             if schools_db:
                 ed_sch = st.selectbox("Select School", list(schools_db.keys()), key="master_edit_stu_sch_sel")
                 sch_studs = students_db.get(ed_sch, {})
                 if sch_studs:
                     ed_roll = st.selectbox("Select Student Roll No", list(sch_studs.keys()), key="master_edit_stu_roll_sel")
                     stu_rec = sch_studs[ed_roll]
+                    
                     with st.form("master_edit_student_form"):
                         up_s_name = st.text_input("Student Name", value=stu_rec.get('name', ''))
                         up_s_dob = st.text_input("Date of Birth (DD-MM-YYYY)", value=stu_rec.get('dob', ''))
                         up_s_phone = st.text_input("Mobile Number", value=stu_rec.get('phone', ''))
-                        if st.form_submit_button("Save Student Updates"):
+                        
+                        st.markdown("#### 📚 Subject Marks Editor")
+                        subjects_data = stu_rec.get('subjects', {})
+                        updated_subjects = {}
+                        
+                        if subjects_data:
+                            for sub_name, sub_vals in subjects_data.items():
+                                col_sub1, col_sub2 = st.columns(2)
+                                f_mark = col_sub1.number_input(f"{sub_name} - Full Marks", value=float(sub_vals.get('full', 100)), key=f"full_{ed_roll}_{sub_name}")
+                                o_mark = col_sub2.number_input(f"{sub_name} - Secured Marks", value=float(sub_vals.get('obt', 0)), key=f"obt_{ed_roll}_{sub_name}")
+                                updated_subjects[sub_name] = {"full": f_mark, "obt": o_mark}
+                        else:
+                            st.info("No subject marks found for this student.")
+
+                        if st.form_submit_button("💾 Save Student Updates & Marks"):
                             students_db[ed_sch][ed_roll]['name'] = sanitize(up_s_name)
                             students_db[ed_sch][ed_roll]['dob'] = sanitize(up_s_dob)
                             students_db[ed_sch][ed_roll]['phone'] = sanitize(up_s_phone)
+                            if updated_subjects:
+                                students_db[ed_sch][ed_roll]['subjects'] = updated_subjects
+                                total_obt_val = sum([v['obt'] for v in updated_subjects.values()])
+                                total_full_val = sum([v['full'] for v in updated_subjects.values()])
+                                students_db[ed_sch][ed_roll]['total_obt'] = total_obt_val
+                                students_db[ed_sch][ed_roll]['total_full'] = total_full_val
+                                students_db[ed_sch][ed_roll]['percentage'] = round((total_obt_val / total_full_val * 100), 2) if total_full_val > 0 else 0.0
+                            
                             save_data(schools_db, students_db)
-                            st.success("Student details updated successfully!")
+                            st.success("Student details and subject marks updated successfully!")
                             st.rerun()
                 else:
                     st.info("No students found in this school.")
