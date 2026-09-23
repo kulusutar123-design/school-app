@@ -23,7 +23,7 @@ import time
 import requests
 
 # ==========================================
-# 🔒 100% BULLET-PROOF ATOMIC CRASH PROTECTION
+# 🔒 HIGH-SECURITY ATOMIC CRASH PROTECTION
 # ==========================================
 file_lock = threading.Lock()
 
@@ -66,7 +66,7 @@ def send_real_sms(mobile_or_email, otp_code, student_name="User"):
     encoded_msg = urllib.parse.quote(wa_msg)
     wa_link = f"https://api.whatsapp.com/send?phone={clean_mob}&text={encoded_msg}" if clean_mob else None
     
-    st.success(f"✅ OTP Generated for Mobile: **{target}**")
+    st.success(f"✅ OTP Generated for Mobile/Email: **{target}**")
     st.info(f"📲 [SYSTEM OTP DISPLAY] Verification OTP: **{otp_code}**")
         
     if wa_link:
@@ -1593,7 +1593,7 @@ elif menu == "New School Registration":
                 st.session_state['sch_reg_data'] = s_tmp['data']
                 st.session_state['school_payment_step'] = False; st.rerun()
 
-# ----------------- MASTER LOGIN (7 TABS RESTORED WITH FORGOT PASSWORD & FULL CONTROLS) -----------------
+# ----------------- MASTER LOGIN (7 TABS RESTORED WITH FULL CONTROLS & SETTINGS) -----------------
 elif menu == "Master Login":
     c_home, c_title = st.columns([1, 8])
     with c_home:
@@ -1688,16 +1688,46 @@ elif menu == "Master Login":
             else:
                 st.success("No pending student payments.")
 
+        with t4:
+            st.markdown("### 🎓 Edit Student Records (Master Control)")
+            if schools_db:
+                ed_sch = st.selectbox("Select School", list(schools_db.keys()), key="master_edit_stu_sch_sel")
+                sch_studs = students_db.get(ed_sch, {})
+                if sch_studs:
+                    ed_roll = st.selectbox("Select Student Roll No", list(sch_studs.keys()), key="master_edit_stu_roll_sel")
+                    stu_rec = sch_studs[ed_roll]
+                    with st.form("master_edit_student_form"):
+                        up_s_name = st.text_input("Student Name", value=stu_rec.get('name', ''))
+                        up_s_dob = st.text_input("Date of Birth (DD-MM-YYYY)", value=stu_rec.get('dob', ''))
+                        up_s_phone = st.text_input("Mobile Number", value=stu_rec.get('phone', ''))
+                        if st.form_submit_button("Save Student Updates"):
+                            students_db[ed_sch][ed_roll]['name'] = sanitize(up_s_name)
+                            students_db[ed_sch][ed_roll]['dob'] = sanitize(up_s_dob)
+                            students_db[ed_sch][ed_roll]['phone'] = sanitize(up_s_phone)
+                            save_data(schools_db, students_db)
+                            st.success("Student details updated successfully!")
+                            st.rerun()
+                else:
+                    st.info("No students found in this school.")
+
         with t5:
-            st.markdown("### ⚙️ Settings & Notifications")
-            up_notice = st.text_area("Official Running Notification Text", value=master_db.get("notice_text", ""))
-            up_news = st.text_area("Breaking Running News Text", value=master_db.get("news_text", ""))
-            if st.button("Save Settings", key="m_set_save_all"):
-                master_db["notice_text"] = up_notice
-                master_db["news_text"] = up_news
-                save_master_data(master_db)
-                st.success("Settings updated successfully!")
-                st.rerun()
+            st.markdown("### ⚙️ Settings & Mobile / Email Registration")
+            with st.form("master_settings_form"):
+                m_phone = st.text_input("Master Registered Mobile No.", value=master_db.get("phone", ""))
+                m_email = st.text_input("Master Registered Email ID", value=master_db.get("email", ""))
+                m_upi = st.text_input("Default Master UPI ID", value=master_db.get("upi_id", ""))
+                up_notice = st.text_area("Official Running Notification Text", value=master_db.get("notice_text", ""))
+                up_news = st.text_area("Breaking Running News Text", value=master_db.get("news_text", ""))
+                
+                if st.form_submit_button("Save All Settings"):
+                    master_db["phone"] = sanitize(m_phone)
+                    master_db["email"] = sanitize(m_email)
+                    master_db["upi_id"] = sanitize(m_upi)
+                    master_db["notice_text"] = up_notice
+                    master_db["news_text"] = up_news
+                    save_master_data(master_db)
+                    st.success("Master settings, mobile and email updated successfully!")
+                    st.rerun()
 
         with t6:
             st.markdown("### 🏦 School Payment Gateway Setup (Master Control)")
