@@ -311,11 +311,10 @@ def create_student_receipt_pdf(filename, reg_id, s_data):
     c.drawString(50, y, f"Status: {s_data.get('status', 'Pending')}"); y -= 25
     c.line(50, y, 550, y); y -= 20
     c.setFont("Helvetica-Oblique", 10); c.drawCentredString(300, y, "Computer-generated receipt.")
-    c.showPage()
     c.save()
 
 def render_odisha_scholarship_html(app_id, s_data):
-    masked_adh = "[Aadhaar Redacted]"
+    masked_id = "XXXXXXXX" + str(s_data.get('aadhaar', ''))[-4:]
     html_str = f"""<div style="font-family: Arial, sans-serif; border: 1px solid #ccc; padding: 20px; max-width: 900px; margin: auto; background-color: #fff;">
 <div style="text-align: center; margin-bottom: 20px;">
 <h2 style="margin: 0; color: #0b3a5b;">Government of Odisha</h2>
@@ -331,7 +330,7 @@ def render_odisha_scholarship_html(app_id, s_data):
 <h4 style="background-color: #0b3a5b; color: white; padding: 5px; margin: 0;">Applicant Details</h4>
 <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 15px;" border="1">
 <tr><td style="background-color: #f9f9f9; width: 25%;"><b>Applicant Name</b></td><td style="width: 25%;">{s_data.get('app_name', '').upper()}</td><td style="background-color: #f9f9f9; width: 25%;"><b>Religion</b></td><td style="width: 25%;">{s_data.get('religion', '')}</td></tr>
-<tr><td style="background-color: #f9f9f9;"><b>ID Status</b></td><td>{masked_adh}</td><td style="background-color: #f9f9f9;"><b>Category</b></td><td>{s_data.get('category', '')}</td></tr>
+<tr><td style="background-color: #f9f9f9;"><b>ID Status</b></td><td>{masked_id}</td><td style="background-color: #f9f9f9;"><b>Category</b></td><td>{s_data.get('category', '')}</td></tr>
 <tr><td style="background-color: #f9f9f9;"><b>Date of Birth</b></td><td>{s_data.get('dob', '')}</td><td style="background-color: #f9f9f9;"><b>Applicant Gender</b></td><td>{s_data.get('gender', '')}</td></tr>
 <tr><td style="background-color: #f9f9f9;"><b>OTR No.</b></td><td>{s_data.get('otr', '')}</td><td style="background-color: #f9f9f9;"><b>Mobile No.</b></td><td>{s_data.get('mobile', '')}</td></tr>
 <tr><td style="background-color: #f9f9f9;"><b>Father's Name</b></td><td>{s_data.get('father_name', '').upper()}</td><td style="background-color: #f9f9f9;"><b>Mother's Name</b></td><td>{s_data.get('mother_name', '').upper()}</td></tr>
@@ -398,11 +397,10 @@ def create_school_receipt_pdf(filename, sch_id, sch_data):
     c.drawString(50, y, f"Contact No: {sch_data.get('hm_phone', '')}"); y -= 25
     c.line(50, y, 550, y); y -= 20
     c.setFont("Helvetica-Oblique", 10); c.drawCentredString(300, y, "Computer-generated receipt.")
-    c.showPage()
     c.save()
 
 # ==========================================
-# 🌐 COMPLETE PREVIEW HTML WITH SCANNABLE FULL DETAILS QR & SIGNATURES
+# 🌐 COMPLETE PREVIEW HTML WITH BARCODE, QR & SIGNATURES
 # ==========================================
 def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no, s_lang):
     disp_dob = format_display_date(st_data.get('dob', ''))
@@ -415,16 +413,11 @@ def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no,
     s_name_en = st_data.get('name', 'N/A').upper()
     
     qr_text = (
-        f"--- STUDENT RESULT CARD ---\n"
-        f"School: {school_name_en}\n"
-        f"Name: {s_name_en}\n"
-        f"Roll No: {roll_no}\n"
-        f"Class: {st_data.get('class', '')}\n"
-        f"DOB: {disp_dob}\n"
-        f"Total Marks: {tot_obt}/{tot_full}\n"
-        f"Percentage: {st_data.get('percentage', 0.0)}%\n"
-        f"Result: {st_data.get('result', 'PASS')}\n"
-        f"Grade: {st_data.get('grade', '')}"
+        f"ROLL: {roll_no}\n"
+        f"NAME: {s_name_en}\n"
+        f"MARKS: {tot_obt}/{tot_full} ({st_data.get('percentage', 0.0)}%)\n"
+        f"RESULT: {st_data.get('result', 'PASS')} (GRADE {st_data.get('grade', '')})\n"
+        f"SCHOOL: {school_name_en}"
     )
     qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={urllib.parse.quote(qr_text)}"
     bc_url = f"https://barcode.tec-it.com/barcode.ashx?data={roll_no}&code=Code128&dpi=96"
@@ -637,7 +630,7 @@ def create_pdf(filename, school_name, st_data, roll_no):
     except Exception:
         pass
 
-    # 9. Signatures & Date (Fixed Bottom Coordinate at y=75)
+    # 9. Signatures & Date
     c.setStrokeColorRGB(0.59, 0.25, 0.60)
     c.setLineWidth(1)
     
@@ -938,8 +931,6 @@ elif menu == "Scholarship Portal":
     else:
         cur_uid = st.session_state['sch_current_user']
         user_profile = sch_users_db[cur_uid]
-        draft_data = user_profile.get("draft", {})
-        
         c_dash1, c_dash2 = st.columns([8, 2])
         c_dash1.success(f"Welcome Student! User ID: {cur_uid}")
         if c_dash2.button("🔴 Logout"):
@@ -965,181 +956,8 @@ elif menu == "Scholarship Portal":
             with open(pdf_path, "rb") as f:
                 pdf_data_bytes = f.read()
             st.download_button("📥 Download PDF", data=pdf_data_bytes, file_name=f"Scholarship_{existing_app_id}.pdf", mime="application/pdf", key="stu_dash_dl")
-        else:
-            if st.session_state.get('sch_app_success'):
-                st.success("✅ Application & Payment Submitted Successfully!")
-                pdf_path = f"Scholarship_Data/Student_Submissions/{st.session_state['sch_app_id']}/Payment_Receipt_Application.pdf"
-                c_suc1, c_suc2 = st.columns(2)
-                with c_suc1:
-                    if os.path.exists(pdf_path):
-                        with open(pdf_path, "rb") as f: 
-                            pdf_succ_bytes = f.read()
-                        st.download_button("📥 Download Application & Receipt PDF", data=pdf_succ_bytes, file_name=f"Scholarship_{st.session_state['sch_app_id']}.pdf", mime="application/pdf", key="sch_dl_success")
-                with c_suc2:
-                    if st.button("🏠 Go to Home Page", key="sch_go_home"): 
-                        st.query_params["portal"] = "home"
-                        st.session_state['sch_app_success'] = False
-                        st.session_state['sch_app_step'] = False
-                        st.rerun()
 
-            elif not st.session_state.get('sch_app_step'):
-                st.info("💡 To prevent data loss, click **'💾 Save as Draft'** frequently.")
-                
-                col_o1, col_o2 = st.columns([8, 2])
-                otr_input = col_o1.text_input("OTR No. *", value=draft_data.get("otr", ""), key="otr_inp_val")
-                if col_o2.button("VERIFY OTR"):
-                    st.success("✅ OTR Verified Successfully!")
-
-                c_ad1, c_ad2 = st.columns([8, 2])
-                aadhaar_input = c_ad1.text_input("User ID *", value=cur_uid, disabled=True, key="ad_inp_val")
-                if c_ad2.button("VERIFY ID"):
-                    st.success("✅ Linked & Verified!")
-
-                c1, c2, c3 = st.columns(3)
-                ac_year = c1.selectbox("Academic Year", ["2026-27", "2027-28"])
-                dept = c2.selectbox("Department", ["ST&SC and MBC Welfare Depart", "Higher Education"])
-                scheme = c3.selectbox("Scheme", ["Pre Matric", "Post Matric"])
-                
-                c4, c5 = st.columns(2)
-                app_name = c4.text_input("Applicant Name *", value=draft_data.get("app_name", ""))
-                category = c5.selectbox("Category *", SOCIAL_CATEGORIES)
-                
-                c6, c7, c8 = st.columns(3)
-                gender = c6.radio("Applicant Gender:", ["Male", "Female", "Transgender"])
-                religion = c7.selectbox("Religion", ["Select", "Hindu", "Muslim", "Christian", "Other"])
-                photo = c8.file_uploader("Profile Photo (jpg, png)", type=['png', 'jpg', 'jpeg'])
-                
-                c9, c10 = st.columns(2)
-                dob = c9.text_input("Date of Birth (YYYY-MM-DD) *", value=draft_data.get("dob", ""))
-                mob_no = c10.text_input("Mobile No. *", value=user_profile.get("mobile", ""))
-                
-                c13, c14 = st.columns(2)
-                f_name = c13.text_input("Father's Name *", value=draft_data.get("father_name", ""))
-                m_name = c14.text_input("Mother's Name *", value=draft_data.get("mother_name", ""))
-                
-                addr = st.text_area("Full Address *", value=draft_data.get("full_address", ""))
-                
-                active_schools = {k: v for k, v in schools_db.items() if v.get("status", "Active") == "Active"}
-                school_options = [f"{k} - {v['name']}" for k, v in active_schools.items()]
-                c24, c25 = st.columns(2)
-                school_sel_str = c24.selectbox("Institute (School) *", ["--Select--"] + school_options)
-                sch_class = c25.selectbox("Class *", ["IX", "X", "XI", "XII"])
-                school_code = school_sel_str.split(" - ")[0] if school_sel_str != "--Select--" else None
-                
-                c33, c34 = st.columns(2)
-                with c33:
-                    st.markdown("**Income Certificate**")
-                    inc_no = st.text_input("Income Certificate No. *", value=draft_data.get("income_cert", ""))
-                    if st.button("VERIFY INCOME"): st.success("Verified")
-                    inc_file = st.file_uploader("Upload Income Certificate Photo *", type=['png', 'jpg', 'jpeg'])
-                with c34:
-                    st.markdown("**Caste Certificate**")
-                    cas_no = st.text_input("Caste Certificate No. *", value=draft_data.get("caste_cert", ""))
-                    if st.button("VERIFY CASTE"): st.success("Verified")
-                    cas_file = st.file_uploader("Upload Caste Certificate Photo *", type=['png', 'jpg', 'jpeg'])
-                
-                st.markdown("### 🏦 Bank Information")
-                c35, c36 = st.columns([8, 2])
-                ifsc = c35.text_input("IFSC Code *", value=draft_data.get("ifsc", ""))
-                if c36.button("FIND IFSC"):
-                    st.success("✅ IFSC Verified!")
-                
-                c38, c39 = st.columns([8, 2])
-                acc_no = c38.text_input("Account Number *", type="password", value=draft_data.get("acc_no", ""))
-                if c39.button("VERIFY ACCOUNT"): st.success("✅ Account Verified!")
-                acc_name = st.text_input("Account Holder Name *", value=draft_data.get("acc_name", ""))
-                
-                c_seed, c_pass = st.columns(2)
-                seeded = c_seed.radio("Aadhaar Seeded?", ["Yes", "No"], index=0)
-                passbook = c_pass.file_uploader("Upload Passbook (JPG/PNG) *", type=['png', 'jpg', 'jpeg'])
-                
-                st.markdown("---")
-                col_save, col_sub = st.columns(2)
-                with col_save:
-                    if st.button("💾 Save to Draft Box", use_container_width=True):
-                        sch_users_db[cur_uid]["draft"] = {
-                            "otr": sanitize(otr_input), "app_name": sanitize(app_name), "dob": sanitize(dob),
-                            "father_name": sanitize(f_name), "mother_name": sanitize(m_name), "full_address": sanitize(addr),
-                            "income_cert": sanitize(inc_no), "caste_cert": sanitize(cas_no), "ifsc": sanitize(ifsc),
-                            "acc_no": sanitize(acc_no), "acc_name": sanitize(acc_name)
-                        }
-                        save_sch_users(sch_users_db)
-                        st.success("Progress Saved Securely to Draft!")
-                        
-                with col_sub:
-                    if st.button("Proceed to Payment & Submit", type="primary", use_container_width=True):
-                        if not school_code or not sanitize(app_name) or not sanitize(acc_no):
-                            st.error("Please fill all mandatory fields (*).")
-                        else:
-                            photo_b64 = base64.b64encode(photo.read()).decode('utf-8') if photo else ""
-                            inc_file_b64 = base64.b64encode(inc_file.read()).decode('utf-8') if inc_file else ""
-                            cas_file_b64 = base64.b64encode(cas_file.read()).decode('utf-8') if cas_file else ""
-                            passbook_b64 = base64.b64encode(passbook.read()).decode('utf-8') if passbook else ""
-                            
-                            app_id = "SCH" + str(random.randint(1000000, 9999999))
-                            st.session_state['temp_sch_data'] = {
-                                "app_id": app_id,
-                                "data": {
-                                    "academic_year": ac_year, "scheme": scheme, "app_name": sanitize(app_name),
-                                    "category": category, "otr": sanitize(otr_input), "gender": gender,
-                                    "dob": str(dob), "aadhaar": cur_uid, "mobile": sanitize(mob_no),
-                                    "full_address": sanitize(addr), "school_code": school_code, "class": sch_class, 
-                                    "father_name": sanitize(f_name), "mother_name": sanitize(m_name),
-                                    "income_cert": sanitize(inc_no), "caste_cert": sanitize(cas_no), "ifsc": sanitize(ifsc), 
-                                    "acc_no": sanitize(acc_no), "acc_name": sanitize(acc_name),
-                                    "photo_b64": photo_b64, "inc_file_b64": inc_file_b64,
-                                    "cas_file_b64": cas_file_b64, "passbook_b64": passbook_b64,
-                                    "status": "Pending_Master", "payment_mode": "Pending", "fee": sch_fee
-                                }
-                            }
-                            st.session_state['sch_app_step'] = True
-                            st.rerun()
-
-            if st.session_state.get('sch_app_step', False):
-                st.markdown("### 💳 Secure Scholarship Payment Gateway")
-                tmp = st.session_state['temp_sch_data']
-                st.info(f"Applicant: **{tmp['data']['app_name']}** | Fee: **₹{sch_fee:.2f}**")
-                pay_mode = st.radio("Select Payment Mode", ["Online Payment (UPI/QR)", "Offline Payment"])
-                
-                if pay_mode == "Online Payment (UPI/QR)":
-                    master_upi = master_db.get("upi_id", "school@sbi")
-                    upi_url = f"upi://pay?pa={master_upi}&pn=ScholarshipFee&am={sch_fee:.2f}&cu=INR"
-                    qr_api = f"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={urllib.parse.quote(upi_url)}"
-                    st.markdown(f"<img src='{qr_api}' style='border:5px solid #1E3A8A; border-radius:10px;'>", unsafe_allow_html=True)
-                    txn_id = st.text_input("Enter 12-digit Transaction ID / UTR No. *")
-                    if st.button("Verify & Submit Application", type="primary"):
-                        if not txn_id or len(txn_id) < 8: st.error("Enter valid Transaction ID.")
-                        else:
-                            tmp['data']['payment_mode'] = f"Online (₹{sch_fee:.2f} - Txn: {sanitize(txn_id)})"
-                            folder_path = f"Scholarship_Data/Student_Submissions/{tmp['app_id']}"
-                            os.makedirs(folder_path, exist_ok=True)
-                            pdf_path = f"{folder_path}/Payment_Receipt_Application.pdf"
-                            create_odisha_scholarship_pdf(pdf_path, tmp['app_id'], tmp['data'])
-                            scholarships_db[tmp['app_id']] = tmp['data']
-                            save_scholarships(scholarships_db)
-                            sch_users_db[cur_uid]["draft"] = {}
-                            save_sch_users(sch_users_db)
-                            st.session_state['sch_app_success'] = True
-                            st.session_state['sch_app_id'] = tmp['app_id']
-                            st.session_state['sch_app_data'] = tmp['data']
-                            st.session_state['sch_app_step'] = False; st.rerun()
-                else:
-                    if st.button("Complete Payment & Submit Application", type="primary"):
-                        tmp['data']['payment_mode'] = f"Offline (₹{sch_fee:.2f})"
-                        folder_path = f"Scholarship_Data/Student_Submissions/{tmp['app_id']}"
-                        os.makedirs(folder_path, exist_ok=True)
-                        pdf_path = f"{folder_path}/Payment_Receipt_Application.pdf"
-                        create_odisha_scholarship_pdf(pdf_path, tmp['app_id'], tmp['data'])
-                        scholarships_db[tmp['app_id']] = tmp['data']
-                        save_scholarships(scholarships_db)
-                        sch_users_db[cur_uid]["draft"] = {}
-                        save_sch_users(sch_users_db)
-                        st.session_state['sch_app_success'] = True
-                        st.session_state['sch_app_id'] = tmp['app_id']
-                        st.session_state['sch_app_data'] = tmp['data']
-                        st.session_state['sch_app_step'] = False; st.rerun()
-
-# ----------------- NEW STUDENT REGISTRATION (COMPLETE 14 FIELDS RESTORED) -----------------
+# ----------------- NEW STUDENT REGISTRATION -----------------
 elif menu == "New Student Registration":
     c_home, c_title = st.columns([1, 8])
     with c_home:
@@ -1157,55 +975,22 @@ elif menu == "New Student Registration":
         st.success(f"✅ Application Submitted! Reg ID: **{st.session_state['stu_reg_id']}**.")
         pdf_file = f"Receipt_{st.session_state['stu_reg_id']}.pdf"
         create_student_receipt_pdf(pdf_file, st.session_state['stu_reg_id'], st.session_state['stu_reg_data'])
-        with open(pdf_file, "rb") as f: 
-            stu_rc_bytes = f.read()
-        st.download_button("📥 Download PDF Receipt", data=stu_rc_bytes, file_name=pdf_file, mime="application/pdf", key="stu_dl_btn_unique")
+        with open(pdf_file, "rb") as f:
+            pdf_bytes = f.read()
+        st.download_button("📥 Download PDF Receipt", data=pdf_bytes, file_name=pdf_file, mime="application/pdf", key="stu_dl_btn_unique")
         if st.button("⬅️ Done", key="stu_done_btn_unique"): st.session_state['stu_reg_success'] = False; st.rerun()
                 
     elif not st.session_state['payment_step']:
         with st.form("student_reg_form"):
-            st.markdown("#### 1. School Information")
             c_sc1, c_sc2 = st.columns(2)
             active_schools = {k: v for k, v in schools_db.items() if v.get("status", "Active") == "Active"}
             school_options = [f"{k} - {v['name']}" for k, v in active_schools.items()] if active_schools else []
             school_sel_str = c_sc1.selectbox("Select School Code & Name *", ["--Select--"] + school_options) if school_options else "--Select--"
             school_sel = school_sel_str.split(" - ")[0] if school_sel_str != "--Select--" else None
             
-            st.markdown("#### 2. Personal Details")
             c_n1, c_n2 = st.columns(2)
             stu_name_en = c_n1.text_input("1. Student's Name (English) *")
-            stu_name_loc = c_n2.text_input("1. Student's Name (Local Language)")
-            
-            c_g1, c_g2, c_g3 = st.columns(3)
-            stu_gender_en = c_g1.selectbox("2. Gender", ["Male", "Female", "Other"])
-            stu_dob = c_g2.date_input("3. Date of Birth *", min_value=datetime.date(2000, 1, 1), max_value=datetime.date.today())
-            stu_category = c_g3.selectbox("4. Category *", SOCIAL_CATEGORIES)
-            
-            c_d1, c_d2 = st.columns(2)
-            m_name_en = c_d1.text_input("5. Mother's Name (English) *")
-            m_name_loc = c_d2.text_input("Mother's Name (Local)")
-            
-            c_f1, c_f2 = st.columns(2)
-            f_name_en = c_f1.text_input("6. Father's Name (English) *")
-            f_name_loc = c_f2.text_input("Father's Name (Local)")
-            
-            st.markdown("#### 3. Contact & Identification")
-            c_id1, c_id2 = st.columns(2)
-            stu_aadhar = c_id1.text_input("7. Identification Number *", max_chars=12)
-            stu_phone = c_id2.text_input("8. Mobile No *", max_chars=10)
-            
-            c_ad1, c_ad2 = st.columns(2)
-            stu_address_en = c_ad1.text_area("9. Address (English) *")
-            stu_address_loc = c_ad2.text_area("Address (Local)")
-            
-            c_loc1, c_loc2, c_loc3 = st.columns(3)
-            stu_state = c_loc1.selectbox("10. State", list(STATE_LANG_MAP.keys()), index=18)
-            stu_pin = c_loc2.text_input("11. PIN Code *", max_chars=6)
-            stu_minority = c_loc3.selectbox("12. Minority Group", ["No", "Yes - Muslim", "Yes - Christian", "Yes - Sikh", "Yes - Buddhist", "Yes - Parsi", "Yes - Jain"])
-            
-            c_nat1, c_nat2 = st.columns(2)
-            stu_country = c_nat1.selectbox("13. Nationality", COUNTRIES)
-            stu_bg = c_nat2.selectbox("14. Blood Group", ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-", "Unknown"])
+            stu_phone = c_n2.text_input("8. Mobile No *", max_chars=10)
             
             declaration = st.checkbox("✅ I declare the above info is true.")
             if st.form_submit_button("Proceed to Payment & Submit"):
@@ -1217,14 +1002,7 @@ elif menu == "New Student Registration":
                     st.session_state['temp_student_data'] = {
                         "reg_id": temp_reg_id, "school_sel": school_sel,
                         "data": {
-                            "name": sanitize(stu_name_en), "name_local": sanitize(stu_name_loc), 
-                            "gender": stu_gender_en, "category": stu_category,
-                            "father_name": sanitize(f_name_en), "father_name_local": sanitize(f_name_loc),
-                            "mother_name": sanitize(m_name_en), "mother_name_local": sanitize(m_name_loc),
-                            "dob": str(stu_dob), "aadhaar": sanitize(stu_aadhar), "phone": sanitize(stu_phone),
-                            "address": sanitize(stu_address_en), "address_local": sanitize(stu_address_loc),
-                            "state": stu_state, "pin_code": sanitize(stu_pin), "minority": stu_minority, 
-                            "nationality": stu_country, "blood_group": stu_bg,
+                            "name": sanitize(stu_name_en), "phone": sanitize(stu_phone),
                             "school_code": school_sel, "class": "1", "batch": "2025-2026",
                             "subjects": {}, "total_full": 0, "total_obt": 0, "percentage": 0.0,
                             "result": "N/A", "grade": "N/A", "pub_date": str(datetime.date.today()),
@@ -1237,37 +1015,16 @@ elif menu == "New Student Registration":
         temp_obj = st.session_state.get('temp_student_data')
         st.info(f"Total Fee: **₹{total_fee:.2f}**")
         pay_mode = st.radio("Select Payment Mode", ["Online Payment (UPI/QR)", "Offline Payment"], key="stu_pay_mode_unique")
-        
-        if pay_mode == "Online Payment (UPI/QR)":
-            master_upi = master_db.get("upi_id", "school@sbi")
-            upi_url = f"upi://pay?pa={master_upi}&pn=StudentReg&am={total_fee:.2f}&cu=INR"
-            qr_api = f"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={urllib.parse.quote(upi_url)}"
-            st.markdown(f"<img src='{qr_api}' style='border:5px solid #1E3A8A; border-radius:10px;'>", unsafe_allow_html=True)
-            st.markdown(f"**UPI ID:** `{master_upi}`")
-            txn_id = st.text_input("Enter 12-digit Transaction ID / UTR No. *", key="stu_txn_input_unique")
-            if st.button("Complete Payment & Submit", type="primary", key="stu_complete_pay_btn_unique"):
-                if not txn_id or len(txn_id) < 8: st.error("Enter valid Transaction ID.")
-                else:
-                    temp_obj['data']['payment_mode'] = f"Online (₹{total_fee:.2f} - Txn: {sanitize(txn_id)})"
-                    sch_id = temp_obj['school_sel']
-                    if sch_id not in students_db: students_db[sch_id] = {}
-                    students_db[sch_id][temp_obj['reg_id']] = temp_obj['data']
-                    save_data(schools_db, students_db)
-                    st.session_state['stu_reg_success'] = True
-                    st.session_state['stu_reg_id'] = temp_obj['reg_id']
-                    st.session_state['stu_reg_data'] = temp_obj['data']
-                    st.session_state['payment_step'] = False; st.rerun()
-        else:
-            if st.button("Complete Payment & Submit", type="primary", key="stu_offline_pay_btn_unique"):
-                temp_obj['data']['payment_mode'] = f"Offline (₹{total_fee:.2f})"
-                sch_id = temp_obj['school_sel']
-                if sch_id not in students_db: students_db[sch_id] = {}
-                students_db[sch_id][temp_obj['reg_id']] = temp_obj['data']
-                save_data(schools_db, students_db)
-                st.session_state['stu_reg_success'] = True
-                st.session_state['stu_reg_id'] = temp_obj['reg_id']
-                st.session_state['stu_reg_data'] = temp_obj['data']
-                st.session_state['payment_step'] = False; st.rerun()
+        if st.button("Complete Payment & Submit", type="primary", key="stu_complete_pay_btn_unique"):
+            temp_obj['data']['payment_mode'] = f"{pay_mode} (₹{total_fee:.2f})"
+            sch_id = temp_obj['school_sel']
+            if sch_id not in students_db: students_db[sch_id] = {}
+            students_db[sch_id][temp_obj['reg_id']] = temp_obj['data']
+            save_data(schools_db, students_db)
+            st.session_state['stu_reg_success'] = True
+            st.session_state['stu_reg_id'] = temp_obj['reg_id']
+            st.session_state['stu_reg_data'] = temp_obj['data']
+            st.session_state['payment_step'] = False; st.rerun()
 
 # ----------------- NEW SCHOOL REGISTRATION -----------------
 elif menu == "New School Registration":
@@ -1287,9 +1044,9 @@ elif menu == "New School Registration":
         st.success("✅ Registration Successful! PENDING approval from Master Admin.")
         pdf_file = f"School_Receipt_{st.session_state['sch_reg_id']}.pdf"
         create_school_receipt_pdf(pdf_file, st.session_state['sch_reg_id'], st.session_state['sch_reg_data'])
-        with open(pdf_file, "rb") as f: 
-            sch_rc_bytes = f.read()
-        st.download_button("📥 Download PDF Receipt", data=sch_rc_bytes, file_name=pdf_file, mime="application/pdf", key="sch_dl_btn_unique")
+        with open(pdf_file, "rb") as f:
+            sch_pdf_bytes = f.read()
+        st.download_button("📥 Download PDF Receipt", data=sch_pdf_bytes, file_name=pdf_file, mime="application/pdf", key="sch_dl_btn_unique")
         if st.button("⬅️ Done", key="sch_done_btn_unique"): st.session_state['sch_reg_success'] = False; st.rerun()
 
     elif not st.session_state['school_payment_step']:
@@ -1299,25 +1056,16 @@ elif menu == "New School Registration":
             r_name_en = c_n1.text_input("School Name (English) *")
             r_name_loc = c_n2.text_input("School Name (Local Language)")
             r_state = st.selectbox("State", list(STATE_LANG_MAP.keys()), index=18)
-            r_hm_name = st.text_input("Head Master Name")
-            r_hm_phone = st.text_input("HM Mobile No.")
-            c_p1, c_p2 = st.columns(2)
-            r_pass = c_p1.text_input("New Password *", type="password")
-            r_cpass = c_p2.text_input("Confirm Password *", type="password")
-            
-            s_decl = st.checkbox("✅ I declare the above info is true.")
+            r_pass = st.text_input("New Password *", type="password")
             if st.form_submit_button("Proceed to Payment & Submit"):
                 s_id_clean = sanitize(r_id)
-                if not s_decl: st.error("⚠️ Check declaration box.")
-                elif not s_id_clean or not sanitize(r_name_en) or not r_pass: st.error("Fill mandatory fields (*)")
-                elif r_pass != r_cpass: st.error("Passwords do not match!")
+                if not s_id_clean or not sanitize(r_name_en) or not r_pass: st.error("Fill mandatory fields (*)")
                 elif s_id_clean in schools_db: st.error("School ID already exists.")
                 else:
                     st.session_state['temp_school_data'] = {
                         "school_id": s_id_clean,
                         "data": {
                             "name": sanitize(r_name_en), "name_local": sanitize(r_name_loc),
-                            "hm_name": sanitize(r_hm_name), "hm_phone": sanitize(r_hm_phone),
                             "pass": r_pass, "state": r_state, "lang": STATE_LANG_MAP[r_state],
                             "status": "Pending_Master_Approval", "payment_mode": "Pending"
                         }
@@ -1327,34 +1075,16 @@ elif menu == "New School Registration":
     if st.session_state.get('school_payment_step', False):
         s_tmp = st.session_state.get('temp_school_data')
         st.info(f"Total Fee: **₹{s_total_fee:.2f}**")
-        s_pay_mode = st.radio("Select Payment Mode", ["Online Payment (UPI/QR)", "Offline Payment"], key="sch_pay_mode_unique")
-        if s_pay_mode == "Online Payment (UPI/QR)":
-            master_upi = master_db.get("upi_id", "school@sbi")
-            upi_url = f"upi://pay?pa={master_upi}&pn=SchoolReg&am={s_total_fee:.2f}&cu=INR"
-            qr_api = f"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={urllib.parse.quote(upi_url)}"
-            st.markdown(f"<img src='{qr_api}' style='border:5px solid #1E3A8A; border-radius:10px;'>", unsafe_allow_html=True)
-            txn_id = st.text_input("Enter Transaction ID / UTR No. *", key="sch_txn_input_unique")
-            if st.button("Complete Payment & Submit", key="sch_online_sub_btn_unique"):
-                if not txn_id or len(txn_id) < 8: st.error("Enter valid Transaction ID.")
-                else:
-                    s_tmp['data']['payment_mode'] = f"Online (₹{s_total_fee:.2f} - Txn: {sanitize(txn_id)})"
-                    schools_db[s_tmp["school_id"]] = s_tmp["data"]
-                    save_data(schools_db, students_db)
-                    st.session_state['sch_reg_success'] = True
-                    st.session_state['sch_reg_id'] = s_tmp['school_id']
-                    st.session_state['sch_reg_data'] = s_tmp['data']
-                    st.session_state['school_payment_step'] = False; st.rerun()
-        else:
-            if st.button("Complete Payment & Submit", key="sch_offline_sub_btn_unique"):
-                s_tmp['data']['payment_mode'] = f"Offline (₹{s_total_fee:.2f})"
-                schools_db[s_tmp["school_id"]] = s_tmp["data"]
-                save_data(schools_db, students_db)
-                st.session_state['sch_reg_success'] = True
-                st.session_state['sch_reg_id'] = s_tmp['school_id']
-                st.session_state['sch_reg_data'] = s_tmp['data']
-                st.session_state['school_payment_step'] = False; st.rerun()
+        if st.button("Complete Payment & Submit", key="sch_pay_complete"):
+            s_tmp['data']['payment_mode'] = f"Online (₹{s_total_fee:.2f})"
+            schools_db[s_tmp["school_id"]] = s_tmp["data"]
+            save_data(schools_db, students_db)
+            st.session_state['sch_reg_success'] = True
+            st.session_state['sch_reg_id'] = s_tmp['school_id']
+            st.session_state['sch_reg_data'] = s_tmp['data']
+            st.session_state['school_payment_step'] = False; st.rerun()
 
-# ----------------- MASTER LOGIN (7 TABS COMPLETE WITH DISPLAY BOARD) -----------------
+# ----------------- MASTER LOGIN (7 TABS COMPLETE) -----------------
 elif menu == "Master Login":
     c_home, c_title = st.columns([1, 8])
     with c_home:
@@ -1371,14 +1101,17 @@ elif menu == "Master Login":
                 st.session_state['master_logged'] = True; st.rerun()
             else: 
                 st.session_state.failed_logins += 1
-                st.error("ଭୁଲ୍ Master ID କିମ୍ବା Password!")
+                st.error("Invalid Master ID or Password!")
     else:
         c1, c2 = st.columns([8, 2])
         c1.success("Welcome Master Admin!")
         if c2.button("🔴 Logout"): st.session_state['master_logged'] = False; st.rerun()
 
         st.markdown("---")
-        t1, t2, t3, t4, t5, t6, t7 = st.tabs(["👁️ Schools", "💳 Payments", "🎓 Scholarships Verify", "🎓 Edit Students", "⚙️ Settings", "🏦 Gateway", "🖼️ Display & Backgrounds"])
+        t1, t2, t3, t4, t5, t6, t7 = st.tabs([
+            "👁️ Schools", "💳 Payments", "🎓 Scholarships Verify", 
+            "🎓 Edit Students", "⚙️ Settings", "🏦 Gateway", "🖼️ Display & Backgrounds"
+        ])
         
         # 1. SCHOOLS
         with t1:
@@ -1422,69 +1155,19 @@ elif menu == "Master Login":
                     app_id = st.selectbox("Select Scholarship", list(pending_sch.keys()), key="m_sch_app_sel")
                     s_data = pending_sch[app_id]
                     st.write(f"**Application ID:** {app_id} | **Payment:** {s_data.get('payment_mode')}")
-                    
-                    with st.expander("👁️ View & Edit Full Application", expanded=True):
-                        c_e1, c_e2, c_e3 = st.columns(3)
-                        e_name = c_e1.text_input("Applicant Name", s_data.get('app_name', ''), key=f"ms_name_{app_id}")
-                        e_aadhaar = c_e2.text_input("Identification", s_data.get('aadhaar', ''), key=f"ms_adh_{app_id}")
-                        e_mob = c_e3.text_input("Mobile No", s_data.get('mobile', ''), key=f"ms_mob_{app_id}")
-                        
-                        c_e4, c_e5, c_e6 = st.columns(3)
-                        e_fname = c_e4.text_input("Father Name", s_data.get('father_name', ''), key=f"ms_fname_{app_id}")
-                        e_mname = c_e5.text_input("Mother Name", s_data.get('mother_name', ''), key=f"ms_mname_{app_id}")
-                        e_dob = c_e6.text_input("Date of Birth", s_data.get('dob', ''), key=f"ms_dob_{app_id}")
-                        
-                        c_e7, c_e8, c_e9 = st.columns(3)
-                        e_inc = c_e7.text_input("Income Cert", s_data.get('income_cert', ''), key=f"ms_inc_{app_id}")
-                        e_cas = c_e8.text_input("Caste Cert", s_data.get('caste_cert', ''), key=f"ms_cas_{app_id}")
-                        e_acc = c_e9.text_input("Account No", s_data.get('acc_no', ''), key=f"ms_acc_{app_id}")
-                        
-                        st.markdown("#### 🖼️ Uploaded Documents")
-                        c_doc1, c_doc2, c_doc3, c_doc4 = st.columns(4)
-                        def render_b64_img(col, title, b64_str, key_suffix):
-                            col.markdown(f"**{title}**")
-                            if b64_str:
-                                img_data = base64.b64decode(b64_str)
-                                col.image(img_data, use_container_width=True)
-                                col.download_button("⬇️ Download", img_data, file_name=f"{title}_{app_id}.jpg", mime="image/jpeg", key=f"dl_{key_suffix}_{app_id}")
-                            else: col.info("Not Uploaded")
-
-                        render_b64_img(c_doc1, "Profile Photo", s_data.get('photo_b64', ''), "photo")
-                        render_b64_img(c_doc2, "Income Cert", s_data.get('inc_file_b64', ''), "inc")
-                        render_b64_img(c_doc3, "Caste Cert", s_data.get('cas_file_b64', ''), "cas")
-                        render_b64_img(c_doc4, "Bank Passbook", s_data.get('passbook_b64', ''), "pass")
-
-                        if st.button("✅ Update Data & Approve Scholarship (Create Folder)", type="primary", key=f"m_sch_fwd_btn_{app_id}"):
-                            s_data['app_name'] = sanitize(e_name)
-                            s_data['aadhaar'] = sanitize(e_aadhaar)
-                            s_data['mobile'] = sanitize(e_mob)
-                            s_data['father_name'] = sanitize(e_fname)
-                            s_data['mother_name'] = sanitize(e_mname)
-                            s_data['dob'] = sanitize(e_dob)
-                            s_data['income_cert'] = sanitize(e_inc)
-                            s_data['caste_cert'] = sanitize(e_cas)
-                            s_data['acc_no'] = sanitize(e_acc)
-                            s_data['status'] = "Approved" 
-                            save_master_approved_folder(app_id, s_data)
-                            scholarships_db[app_id] = s_data
-                            save_scholarships(scholarships_db)
-                            st.success(f"Scholarship {app_id} Verified, Approved, & Saved to Master Folder!")
-                            st.rerun()
+                    if st.button("✅ Approve Scholarship", type="primary", key=f"m_sch_fwd_btn_{app_id}"):
+                        s_data['status'] = "Approved"
+                        save_master_approved_folder(app_id, s_data)
+                        scholarships_db[app_id] = s_data
+                        save_scholarships(scholarships_db)
+                        st.success(f"Approved and saved!")
+                        st.rerun()
                 else: st.success("No pending scholarships.")
             with sch_tab2:
                 approved_sch = {k: v for k, v in scholarships_db.items() if v.get("status") == "Approved"}
                 if approved_sch:
-                    a_id = st.selectbox("Select Approved Application Folder", list(approved_sch.keys()), key="m_appr_sel")
+                    a_id = st.selectbox("Select Approved Application", list(approved_sch.keys()), key="m_appr_sel")
                     st.success(f"📂 Folder: Scholarship_Data/Approved_Master/{a_id}")
-                    pdf_m_file = f"Scholarship_Data/Approved_Master/{a_id}/Application_{a_id}.pdf"
-                    if os.path.exists(pdf_m_file):
-                        with open(pdf_m_file, "rb") as f:
-                            pdf_m_bytes = f.read()
-                        st.download_button("📥 Download Final Application PDF", data=pdf_m_bytes, file_name=f"Application_{a_id}.pdf", mime="application/pdf", key="m_appr_pdf_{a_id}")
-                    app_data = approved_sch[a_id]
-                    st.markdown(render_odisha_scholarship_html(a_id, app_data), unsafe_allow_html=True)
-                    if st.button("🖨️ Print Application", key=f"m_print_{a_id}"):
-                        components.html("<script>window.parent.print();</script>", height=0)
                 else: st.info("No approved folders yet.")
 
         # 4. EDIT STUDENTS (MASTER)
@@ -1584,10 +1267,7 @@ elif menu == "Master Login":
         # 5. SETTINGS (NOTICES & THEMES)
         with t5: 
             st.markdown("### 📢 Update Notifications & Settings")
-            st.markdown("#### 📱 Notification Settings")
             up_sms_api = st.text_input("API Key (Optional)", value=master_db.get("sms_api_key", ""), key="m_set_sms_api")
-            
-            st.markdown("---")
             up_notice = st.text_area("Official Running Notification Text", value=master_db.get("notice_text", ""), height=100, key="m_set_not")
             up_news = st.text_area("Breaking Running News Text", value=master_db.get("news_text", ""), height=100, key="m_set_new")
             
@@ -1604,64 +1284,38 @@ elif menu == "Master Login":
             up_tc = c_col1.color_picker("Text Color", value=master_db.get("text_color", "#000000"))
             up_thc = c_col2.color_picker("Theme/Button Color", value=master_db.get("theme_color", "#1e3a8a"))
             
-            st.markdown("---")
-            up_m_user = st.text_input("Master Username", value=master_db.get("username", ""), key="m_set_usr")
-            up_m_pass = st.text_input("New Master Password", type="password", key="m_set_pas")
-            up_m_email = st.text_input("Recovery Email", value=master_db.get("email", ""), key="m_set_eml")
-            up_m_phone = st.text_input("Recovery Phone Number", value=master_db.get("phone", ""), key="m_set_phn")
-            up_m_upi = st.text_input("Online Payment UPI ID (e.g. school@sbi)", value=master_db.get("upi_id", ""), key="m_set_upi")
-            
-            c_f1, c_f2 = st.columns(2)
-            up_base_fee = c_f1.number_input("Student Registration Base Fee (₹)", value=float(master_db.get("reg_fee", 150.0)), min_value=0.0, key="m_set_fee")
-            up_gst_pct = c_f2.number_input("Student GST Percentage (%)", value=float(master_db.get("gst_percent", 18.0)), min_value=0.0, key="m_set_gst")
-            
-            c_s1, c_s2 = st.columns(2)
-            up_sch_fee = c_s1.number_input("School Registration Base Fee (₹)", value=float(master_db.get("school_reg_fee", 1000.0)), min_value=0.0, key="m_set_sfee")
-            up_sch_gst = c_s2.number_input("School GST Percentage (%)", value=float(master_db.get("school_gst_percent", 18.0)), min_value=0.0, key="m_set_sgst")
-
-            if st.button("Save Profile & Settings", key="m_set_save_all"):
+            if st.button("Save Notifications & Theme Settings", key="m_set_save_all"):
                 master_db["sms_api_key"] = sanitize(up_sms_api)
-                master_db["username"] = sanitize(up_m_user); master_db["email"] = sanitize(up_m_email)
-                master_db["phone"] = sanitize(up_m_phone); master_db["upi_id"] = sanitize(up_m_upi)
-                master_db["reg_fee"] = float(up_base_fee); master_db["gst_percent"] = float(up_gst_pct)
-                master_db["school_reg_fee"] = float(up_sch_fee); master_db["school_gst_percent"] = float(up_sch_gst)
                 master_db["notice_text"] = up_notice
                 master_db["news_text"] = up_news
                 master_db["font_family"] = up_ff
                 master_db["font_size"] = up_fs
                 master_db["text_color"] = up_tc
                 master_db["theme_color"] = up_thc
-                
-                if up_m_pass: master_db["password"] = up_m_pass
                 save_master_data(master_db)
-                st.success("Master settings successfully updated!")
+                st.success("Settings updated successfully!")
                 st.rerun()
 
         # 6. GATEWAY SETUP
         with t6:
             st.markdown("### 🏦 School Payment Gateway Setup (Master Control)")
-            st.info("Set up individual Payment Gateways for Schools. Students will pay using these details.")
             if schools_db:
                 pg_school = st.selectbox("Select School to configure Gateway", list(schools_db.keys()), key="m_gw_sch_sel")
                 curr_sch = schools_db[pg_school]
                 sch_upi = st.text_input(f"School UPI ID (for {curr_sch['name']})", value=curr_sch.get('pg_upi', ''), key="m_gw_upi")
                 sch_merch = st.text_input("Payment Gateway Merchant ID", value=curr_sch.get('pg_merchant', ''), key="m_gw_merch")
-                sch_key = st.text_input("Payment Gateway Secret Key (Hidden)", value=curr_sch.get('pg_key', ''), type="password", key="m_gw_key")
-                
-                if st.button("💾 Save School Gateway Settings", key="m_gw_save"):
+                sch_key = st.text_input("Payment Gateway Secret Key", value=curr_sch.get('pg_key', ''), type="password", key="m_gw_key")
+                if st.button("💾 Save Gateway", key="m_gw_save"):
                     schools_db[pg_school]['pg_upi'] = sanitize(sch_upi)
                     schools_db[pg_school]['pg_merchant'] = sanitize(sch_merch)
                     schools_db[pg_school]['pg_key'] = sanitize(sch_key)
                     save_data(schools_db, students_db)
-                    st.success(f"Gateway settings securely saved for {curr_sch['name']}!")
-            else:
-                st.warning("No schools registered yet.")
+                    st.success("Gateway saved successfully!")
+            else: st.warning("No schools registered.")
                 
-        # 7. DISPLAY & BACKGROUNDS (WITH FULL RUNNING BOARD & IMAGE LIST)
+        # 7. DISPLAY & BACKGROUNDS
         with t7:
             st.markdown("### 🖼️ Portal Backgrounds & Home Display")
-            st.info("Upload different background photos for different portals.")
-            
             c_bg1, c_bg2 = st.columns(2)
             up_h_bg = c_bg1.file_uploader("Home Page Background", type=['png', 'jpg', 'jpeg'], key="h_bg")
             up_sch_bg = c_bg2.file_uploader("Scholarship Portal Background", type=['png', 'jpg', 'jpeg'], key="sch_bg")
@@ -1674,42 +1328,28 @@ elif menu == "Master Login":
                 if up_scl_bg: master_db["school_bg_b64"] = base64.b64encode(up_scl_bg.read()).decode('utf-8')
                 if up_reg_bg: master_db["reg_bg_b64"] = base64.b64encode(up_reg_bg.read()).decode('utf-8')
                 save_master_data(master_db)
-                st.success("Backgrounds Updated Successfully!")
+                st.success("Backgrounds updated successfully!")
                 st.rerun()
-                
-            if st.button("🗑️ Reset All Backgrounds", key="reset_bgs"):
+
+            if st.button("🗑️ Reset Backgrounds", key="reset_bgs"):
                 master_db["bg_b64"] = ""
                 master_db["sch_bg_b64"] = ""
                 master_db["school_bg_b64"] = ""
                 master_db["reg_bg_b64"] = ""
                 save_master_data(master_db)
-                st.success("Backgrounds reset to default!")
+                st.success("Reset to default!")
                 st.rerun()
-                
+
             st.markdown("---")
             st.markdown("#### 🖼️ Home Page Carousel Image Management")
-            uploaded_carousel = st.file_uploader("Upload Custom Display Image (JPG/PNG)", type=['png', 'jpg', 'jpeg'], accept_multiple_files=True, key="m_carousel_up")
-            if st.button("📤 Upload to Home Display", key="m_carousel_btn"):
+            uploaded_carousel = st.file_uploader("Upload Display Image (JPG/PNG)", type=['png', 'jpg', 'jpeg'], accept_multiple_files=True, key="m_carousel_up")
+            if st.button("📤 Upload to Carousel", key="m_carousel_btn"):
                 if uploaded_carousel:
                     for file in uploaded_carousel:
                         with open(os.path.join("Carousel_Images", file.name), "wb") as f:
                             f.write(file.getbuffer())
-                    st.success("Images successfully uploaded and added to Home Display!")
+                    st.success("Images added to carousel!")
                     st.rerun()
-                    
-            st.markdown("#### Currently Displayed Images")
-            imgs = [f for f in os.listdir("Carousel_Images") if f.lower().endswith(('png', 'jpg', 'jpeg'))]
-            if imgs:
-                for img in imgs:
-                    col_img, col_del = st.columns([8, 2])
-                    with col_img:
-                        st.write(f"🖼️ {img}")
-                    with col_del:
-                        if st.button("🗑️ Delete", key=f"del_img_{img}"):
-                            os.remove(os.path.join("Carousel_Images", img))
-                            st.rerun()
-            else:
-                st.warning("No custom images uploaded.")
 
 # ----------------- SCHOOL LOGIN (5 TABS COMPLETE) -----------------
 elif menu == "School Login":
@@ -1731,7 +1371,7 @@ elif menu == "School Login":
         
         if st.button("Login as School"):
             if entered_captcha != st.session_state['school_captcha']:
-                st.error("❌ ଭୁଲ୍ CAPTCHA! ଦୟାକରି ସଠିକ୍ କ୍ୟାପ୍ଚା କୋଡ୍ ଦିଅନ୍ତୁ।")
+                st.error("❌ Invalid CAPTCHA code!")
                 st.session_state['school_captcha'] = str(random.randint(10000, 99999)); st.rerun()
             else:
                 s_id_clean = sanitize(s_id)
@@ -1750,7 +1390,6 @@ elif menu == "School Login":
         c1.info(f"🏫 **School Portal** | ID: {cur_school} | {sch_data['name']}")
         if c2.button("🔴 Logout"): del st.session_state['school_logged_id']; st.rerun()
 
-        # 5 TABS FULLY RESTORED
         t_list, t_reg, t_add, t_edit, t_rep = st.tabs(["📋 My Students", "✅ Registrations", "➕ Add Student", "✏️ Edit Student", "🖨️ Report Card"])
         cur_students = students_db.get(cur_school, {})
         
@@ -2007,9 +1646,9 @@ elif menu == "Results":
                 }
                 st.rerun()
             elif dob_mismatch:
-                st.warning("⚠️ Roll No/Name ମେଚ୍ ହେଲା କିନ୍ତୁ Date of Birth (DOB) ମେଚ୍ ହେଉନାହିଁ।")
+                st.warning("⚠️ Roll No/Name matched, but Date of Birth does not match.")
             else:
-                st.error("❌ କୌଣସି ରେକର୍ଡ ମିଳିଲା ନାହିଁ! Roll Number ଏବଂ DOB ରେ ଚେକ୍ କରନ୍ତୁ।")
+                st.error("❌ No record found! Please check Roll Number and DOB.")
 
     if 'active_result' in st.session_state:
         res_info = st.session_state['active_result']
