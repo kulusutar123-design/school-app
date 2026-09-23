@@ -194,9 +194,7 @@ def load_data():
             "state": "Odisha",
             "lang": "Odia",
             "status": "Active",
-            "payment_mode": "Online Verified",
-            "pg_upi": "school01@sbi",
-            "school_bg_b64": ""
+            "payment_mode": "Online Verified"
         }
     }
     default_students = {
@@ -1488,17 +1486,10 @@ elif menu == "New Student Registration":
 
     if st.session_state.get('payment_step', False):
         temp_obj = st.session_state.get('temp_student_data')
-        selected_school_id = temp_obj['school_sel']
-        school_upi = schools_db.get(selected_school_id, {}).get('pg_upi', master_db.get('upi_id', 'school@sbi'))
-        st.info(f"Total Fee: **₹{total_fee:.2f}** | Pay to School UPI: **{school_upi}**")
-        
-        upi_url = f"upi://pay?pa={school_upi}&pn=SchoolFee&am={total_fee:.2f}&cu=INR"
-        qr_api = f"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={urllib.parse.quote(upi_url)}"
-        st.markdown(f"<div style='text-align:center;'><img src='{qr_api}' style='border:4px solid #1E3A8A; border-radius:10px;'></div>", unsafe_allow_html=True)
-        
+        st.info(f"Total Fee: **₹{total_fee:.2f}**")
         pay_mode = st.radio("Select Payment Mode", ["Online Payment (UPI/QR)", "Offline Payment"], key="stu_pay_mode_unique")
         if st.button("Complete Payment & Submit", type="primary", key="stu_complete_pay_btn_unique"):
-            temp_obj['data']['payment_mode'] = f"{pay_mode} (₹{total_fee:.2f} via {school_upi})"
+            temp_obj['data']['payment_mode'] = f"{pay_mode} (₹{total_fee:.2f})"
             sch_id = temp_obj['school_sel']
             if sch_id not in students_db: students_db[sch_id] = {}
             students_db[sch_id][temp_obj['reg_id']] = temp_obj['data']
@@ -1558,7 +1549,7 @@ elif menu == "New School Registration":
                             "name": sanitize(r_name_en), "name_local": sanitize(r_name_loc),
                             "hm_name": sanitize(r_hm_name), "hm_phone": sanitize(r_hm_phone),
                             "pass": r_pass, "state": r_state, "lang": STATE_LANG_MAP[r_state],
-                            "status": "Pending_Master_Approval", "payment_mode": "Pending", "pg_upi": "school@sbi"
+                            "status": "Pending_Master_Approval", "payment_mode": "Pending"
                         }
                     }
                     st.session_state['school_payment_step'] = True; st.rerun()
@@ -1566,13 +1557,12 @@ elif menu == "New School Registration":
     if st.session_state.get('school_payment_step', False):
         s_tmp = st.session_state.get('temp_school_data')
         st.info(f"Total Fee: **₹{s_total_fee:.2f}**")
-        master_upi = master_db.get("upi_id", "school@sbi")
-        upi_url = f"upi://pay?pa={master_upi}&pn=SchoolReg&am={s_total_fee:.2f}&cu=INR"
-        qr_api = f"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={urllib.parse.quote(upi_url)}"
-        st.markdown(f"<div style='text-align:center;'><img src='{qr_api}' style='border:4px solid #1E3A8A; border-radius:10px;'></div>", unsafe_allow_html=True)
-        
         s_pay_mode = st.radio("Select Payment Mode", ["Online Payment (UPI/QR)", "Offline Payment"], key="sch_pay_mode_unique")
         if s_pay_mode == "Online Payment (UPI/QR)":
+            master_upi = master_db.get("upi_id", "school@sbi")
+            upi_url = f"upi://pay?pa={master_upi}&pn=SchoolReg&am={s_total_fee:.2f}&cu=INR"
+            qr_api = f"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={urllib.parse.quote(upi_url)}"
+            st.markdown(f"<img src='{qr_api}' style='border:5px solid #1E3A8A; border-radius:10px;'>", unsafe_allow_html=True)
             txn_id = st.text_input("Enter Transaction ID / UTR No. *", key="sch_txn_input_unique")
             if st.button("Complete Payment & Submit", key="sch_online_sub_btn_unique"):
                 if not txn_id or len(txn_id) < 8: st.error("Enter valid Transaction ID.")
@@ -1594,7 +1584,7 @@ elif menu == "New School Registration":
                 st.session_state['sch_reg_data'] = s_tmp['data']
                 st.session_state['school_payment_step'] = False; st.rerun()
 
-# ----------------- MASTER LOGIN (7 TABS RESTORED WITH FULL CONTROLS) -----------------
+# ----------------- MASTER LOGIN (7 TABS RESTORED) -----------------
 elif menu == "Master Login":
     c_home, c_title = st.columns([1, 8])
     with c_home:
@@ -1621,21 +1611,40 @@ elif menu == "Master Login":
         t1, t2, t3, t4, t5, t6, t7 = st.tabs(["👁️ Schools", "💳 Payments", "🎓 Scholarships Verify", "🎓 Edit Students", "⚙️ Settings", "🏦 Gateway", "🖼️ Display & Backgrounds"])
         
         with t1:
-            st.markdown("### 🏫 School Management & Deletion")
+            st.markdown("### 🏫 School Management Dashboard")
             with st.expander("⚙️ Master School Control Box", expanded=True):
-                if schools_db:
-                    for s_id, s_info in list(schools_db.items()):
-                        cols_d = st.columns([3, 1])
-                        cols_d[0].markdown(f"**{s_id}** - {s_info.get('name')} (Status: {s_info.get('status', 'Active')})")
-                        if cols_d[1].button("🗑️ Delete", key=f"btn_del_safe_{s_id}"):
-                            del schools_db[s_id]
-                            if s_id in students_db: del students_db[s_id]
-                            save_data(schools_db, students_db)
-                            st.success(f"School {s_id} deleted successfully!")
-                            time.sleep(0.3)
-                            st.rerun()
-                else:
-                    st.info("No schools registered.")
+                m_action = st.radio("Choose Action", ["Add New School", "Edit Existing School", "Delete School", "Toggle Active / Inactive Status"], horizontal=True)
+                
+                if m_action == "Add New School":
+                    with st.form("master_add_school_form"):
+                        n_s_id = st.text_input("School ID *")
+                        n_s_name = st.text_input("School Name *")
+                        n_s_pass = st.text_input("School Password *", type="password")
+                        n_s_state = st.selectbox("State", list(STATE_LANG_MAP.keys()), index=18)
+                        if st.form_submit_button("Save & Create School"):
+                            clean_id = sanitize(n_s_id)
+                            if clean_id and n_s_name and n_s_pass:
+                                schools_db[clean_id] = {
+                                    "name": sanitize(n_s_name), "name_local": "", "hm_name": "Admin", "hm_phone": "9999999999",
+                                    "pass": n_s_pass, "state": n_s_state, "lang": STATE_LANG_MAP[n_s_state], "status": "Active", "payment_mode": "Master Created"
+                                }
+                                save_data(schools_db, students_db)
+                                st.success(f"School {clean_id} created!")
+                                st.rerun()
+                elif m_action == "Delete School":
+                    if schools_db:
+                        for s_id, s_info in list(schools_db.items()):
+                            cols_del = st.columns([3, 1])
+                            cols_del[0].markdown(f"**{s_id}** - {s_info.get('name')}")
+                            if cols_del[1].button("🗑️ Delete", key=f"btn_del_safe_{s_id}"):
+                                del schools_db[s_id]
+                                if s_id in students_db: del students_db[s_id]
+                                save_data(schools_db, students_db)
+                                st.success(f"School {s_id} deleted!")
+                                time.sleep(0.3)
+                                st.rerun()
+                    else:
+                        st.info("No schools available.")
 
         with t2:
             st.markdown("### 💳 Verify Student Payments (Master)")
@@ -1650,7 +1659,7 @@ elif menu == "Master Login":
                     if st.button(f"✅ Verify {r_no}", key=f"vp_{r_no}"):
                         p_st["status"] = "Pending_School"
                         save_data(schools_db, students_db)
-                        st.success("Verified successfully!")
+                        st.success("Verified!")
                         st.rerun()
             else:
                 st.success("No pending student payments.")
@@ -1667,48 +1676,28 @@ elif menu == "Master Login":
                 st.rerun()
 
         with t6:
-            st.markdown("### 🏦 School Payment Gateway Setup (Master Control)")
-            st.info("Master Admin can set individual School UPI IDs here so student registration fees go directly to the respective school's account.")
+            st.markdown("### 🏦 School Payment Gateway Setup")
             if schools_db:
                 pg_school = st.selectbox("Select School", list(schools_db.keys()), key="m_gw_sch_sel")
-                current_upi = schools_db[pg_school].get('pg_upi', 'school@sbi')
-                sch_upi = st.text_input("School UPI ID / Account Details", value=current_upi, key="m_gw_upi")
-                if st.button("💾 Save School Gateway", key="m_gw_save"):
+                sch_upi = st.text_input("School UPI ID", value=schools_db[pg_school].get('pg_upi', ''), key="m_gw_upi")
+                if st.button("💾 Save Gateway", key="m_gw_save"):
                     schools_db[pg_school]['pg_upi'] = sanitize(sch_upi)
                     save_data(schools_db, students_db)
-                    st.success(f"Payment Gateway for {pg_school} successfully updated to {sch_upi}!")
-            else:
-                st.info("No schools available.")
+                    st.success("Payment Gateway Saved!")
 
         with t7:
-            st.markdown("### 🖼️ Portal Backgrounds & Running Display Management")
-            st.info("Upload running display images / carousel banners and customize portal backgrounds.")
-            
-            up_h_bg = st.file_uploader("Upload Home Page Background Image", type=['png', 'jpg', 'jpeg'], key="h_bg")
-            if st.button("💾 Save Home Background", key="save_bgs"):
-                if up_h_bg: 
-                    master_db["bg_b64"] = base64.b64encode(up_h_bg.read()).decode('utf-8')
-                    save_master_data(master_db)
-                    st.success("Home Background Saved Successfully!")
-                    st.rerun()
-            
-            st.markdown("#### Carousel Running Images Management")
-            uploaded_carousel = st.file_uploader("Upload Images for Running Display", type=['png', 'jpg', 'jpeg'], accept_multiple_files=True, key="m_carousel_up")
-            if st.button("📤 Upload to Running Display", key="m_carousel_btn"):
-                if uploaded_carousel:
-                    for file in uploaded_carousel:
-                        with open(os.path.join("Carousel_Images", file.name), "wb") as f:
-                            f.write(file.getbuffer())
-                    st.success("Images uploaded and added to running display successfully!")
-                    st.rerun()
+            st.markdown("### 🖼️ Portal Backgrounds & Display")
+            up_h_bg = st.file_uploader("Home Page Background", type=['png', 'jpg', 'jpeg'], key="h_bg")
+            if st.button("💾 Save Background", key="save_bgs"):
+                if up_h_bg: master_db["bg_b64"] = base64.b64encode(up_h_bg.read()).decode('utf-8')
+                save_master_data(master_db)
+                st.success("Background Saved!")
+                st.rerun()
 
 # ----------------- SCHOOL LOGIN -----------------
 elif menu == "School Login":
-    c_home, c_title = st.columns([1, 8])
-    with c_home:
-        if st.button("🏠 Home", key="s_home_btn"): st.query_params["portal"] = "home"; st.rerun()
-    with c_title: st.subheader("🏫 School Portal")
-    # ... School Portal implementation ...
+    st.subheader("🏫 School Portal")
+    # ... School Login Code ...
 
 st.markdown("---")
 st.markdown("<div style='text-align: center; padding: 15px; background: linear-gradient(90deg, #1e3a8a, #9333ea); color: white; border-radius: 8px; font-weight: bold;'>👨‍💻 Software Developed by: KULU SUTAR | 📞 Mob: 8910223342 | ✉️ kulusutar123@gmail.com</div>", unsafe_allow_html=True)
