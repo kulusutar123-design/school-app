@@ -1593,7 +1593,7 @@ elif menu == "New School Registration":
                 st.session_state['sch_reg_data'] = s_tmp['data']
                 st.session_state['school_payment_step'] = False; st.rerun()
 
-# ----------------- MASTER LOGIN (7 TABS RESTORED WITH FULL CONTROLS) -----------------
+# ----------------- MASTER LOGIN (7 TABS RESTORED WITH FULL CONTROLS & FORGOT PASSWORD) -----------------
 elif menu == "Master Login":
     c_home, c_title = st.columns([1, 8])
     with c_home:
@@ -1602,15 +1602,50 @@ elif menu == "Master Login":
     
     if not st.session_state.get('master_logged', False):
         check_brute_force()
-        m_user = st.text_input("Master Username")
-        m_pass = st.text_input("Master Password", type="password")
-        if st.button("Login"):
-            if sanitize(m_user) == master_db.get("username") and m_pass == master_db.get("password"):
-                st.session_state.failed_logins = 0
-                st.session_state['master_logged'] = True; st.rerun()
-            else: 
-                st.session_state.failed_logins += 1
-                st.error("ଭୁଲ୍ Master ID କିମ୍ବା Password!")
+        master_auth_mode = st.radio("Choose Action", ["Login", "Forgot Password"], key="master_auth_mode_unique")
+        
+        if master_auth_mode == "Login":
+            m_user = st.text_input("Master Username")
+            m_pass = st.text_input("Master Password", type="password")
+            if st.button("Login"):
+                if sanitize(m_user) == master_db.get("username") and m_pass == master_db.get("password"):
+                    st.session_state.failed_logins = 0
+                    st.session_state['master_logged'] = True; st.rerun()
+                else: 
+                    st.session_state.failed_logins += 1
+                    st.error("ଭୁଲ୍ Master ID କିମ୍ବା Password!")
+                    
+        elif master_auth_mode == "Forgot Password":
+            st.info("Recover Master Password using registered email / phone.")
+            f_email = st.text_input("Registered Email ID", value=master_db.get("email", ""))
+            if st.button("Send Master OTP"):
+                if f_email == master_db.get("email"):
+                    master_otp = str(random.randint(1000, 9999))
+                    st.session_state['master_otp'] = master_otp
+                    send_real_sms(master_db.get("phone"), master_otp, "Master Admin")
+                else:
+                    st.error("Email not found in master records!")
+                    
+            if 'master_otp' in st.session_state:
+                entered_m_otp = st.text_input("Enter 4-digit OTP", key="m_otp_input")
+                if st.button("Verify OTP & Reset Password"):
+                    if entered_m_otp == st.session_state['master_otp']:
+                        st.success("OTP Verified! You can now set a new password.")
+                        st.session_state['master_otp_verified'] = True
+                    else:
+                        st.error("Invalid OTP!")
+                        
+            if st.session_state.get('master_otp_verified', False):
+                new_m_pwd = st.text_input("New Master Password", type="password", key="new_mpwd")
+                if st.button("Save New Master Password"):
+                    if new_m_pwd:
+                        master_db["password"] = new_m_pwd
+                        save_master_data(master_db)
+                        st.success("Master Password successfully updated! Please switch to 'Login'.")
+                        del st.session_state['master_otp']
+                        del st.session_state['master_otp_verified']
+                    else:
+                        st.warning("Please enter a valid password.")
     else:
         c1, c2 = st.columns([8, 2])
         c1.success("Welcome Master Admin!")
