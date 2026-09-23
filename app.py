@@ -1149,60 +1149,34 @@ elif menu == "Scholarship Portal":
                 ])
                 draft = cur_user.get("draft", {})
                 
-                # --- TAB 1: STUDENT PROFILE INFORMATION (WITH OTR NO & VERIFY) ---
                 with tab_p:
                     c1, c2 = st.columns(2)
                     app_ac_year = c1.selectbox("Academic Year *", ["2026-27", "2027-28"])
                     app_dept = c2.selectbox("Department *", ["ST&SC and MBC Welfare Department", "Higher Education"])
-                    
                     c3, c4 = st.columns(2)
                     app_scheme = c3.selectbox("Scheme *", ["Post Matric Scholarship", "Pre Matric Scholarship"])
                     app_inst_type = c4.radio("Institute Type *", ["SAMS", "NON-SAMS"])
-                    
                     st.write("---")
-                    st.markdown("##### OTR Verification")
-                    col_otr1, col_otr2 = st.columns([6, 2])
-                    input_otr_no = col_otr1.text_input("OTR No. *", value=draft.get("otr_no", ""), key="input_student_otr_number_unique")
-                    col_otr2.write("")
-                    col_otr2.write("")
-                    if col_otr2.button("VERIFY", type="primary", key="btn_verify_otr_number_unique"):
-                        if input_otr_no.strip():
-                            st.success("✅ OTR Verified Successfully!")
-                        else:
-                            st.error("Please enter OTR No.")
-
-                    st.write("---")
-                    st.markdown("##### Basic Information")
                     c5, c6 = st.columns(2)
                     c_app_name = c5.text_input("Applicant Name *", value=cur_user.get("name", "KULU SUTAR"))
                     c_app_cat = c6.selectbox("Category *", SOCIAL_CATEGORIES)
-                    
                     c7, c8 = st.columns(2)
                     c_app_gen = c7.selectbox("Applicant Gender *", ["Male", "Female", "Transgender"])
                     c_app_rel = c8.selectbox("Religion *", ["Hindu", "Muslim", "Christian", "Sikh", "Buddhist", "Jain", "Other"])
-                    
                     c9, c10 = st.columns(2)
                     c_app_dob = c9.text_input("Date of Birth *", value=cur_user.get("dob", "08-04-1990"))
                     c_photo = c10.file_uploader("Profile Photo *", type=['jpg', 'jpeg', 'png'], key="uploader_prof_photo")
-                    
                     c11, c12 = st.columns(2)
                     c_fname = c11.text_input("Father's Name *", value=draft.get("father_name", ""))
                     c_mname = c12.text_input("Mother's Name *", value=draft.get("mother_name", ""))
-                    
                     st.write("---")
-                    st.markdown("##### Address Information")
                     c13, c14, c15 = st.columns(3)
                     c_state = c13.selectbox("State", list(STATE_LANG_MAP.keys()), index=18)
                     c_dist = c14.text_input("District *", value=draft.get("district", "Jajpur"))
                     c_pin = c15.text_input("PIN Code *", value=draft.get("pin", ""))
                     c_addr = st.text_area("Full Address *", value=draft.get("address", ""))
-                    
                     if st.button("💾 Save Profile Tab to Draft", key="btn_save_tab_p"):
-                        cur_user["draft"].update({
-                            "otr_no": sanitize(input_otr_no),
-                            "father_name": sanitize(c_fname), "mother_name": sanitize(c_mname), 
-                            "district": sanitize(c_dist), "pin": sanitize(c_pin), "address": sanitize(c_addr)
-                        })
+                        cur_user["draft"].update({"father_name": sanitize(c_fname), "mother_name": sanitize(c_mname), "district": sanitize(c_dist), "pin": sanitize(c_pin), "address": sanitize(c_addr)})
                         sch_users_db[cur_user_id] = cur_user
                         save_sch_users(sch_users_db)
                         st.success("Profile saved!")
@@ -1233,7 +1207,7 @@ elif menu == "Scholarship Portal":
                         save_sch_users(sch_users_db)
                         st.success("Academic saved!")
 
-                # --- TAB 3: ELIGIBILITY INFORMATION ---
+                # --- TAB 3: ELIGIBILITY INFORMATION (FIXED KEYS) ---
                 with tab_e:
                     st.markdown("##### 1. Income Certificate Information")
                     if 'inc_verified_status' not in st.session_state:
