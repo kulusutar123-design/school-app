@@ -1672,16 +1672,16 @@ elif menu == "Master Login":
                 elif m_action == "Delete School":
                     st.markdown("#### 🗑️ Delete School Record")
                     if schools_db:
-                        # Direct Table/List Delete with Unique Buttons
+                        st.info("Select a school below and click Delete to remove it immediately:")
                         for s_id, s_info in list(schools_db.items()):
-                            col_d1, col_d2 = st.columns([4, 1])
-                            col_d1.write(f"🏫 **{s_id}** - {s_info.get('name')}")
-                            if col_d2.button("🗑️ Delete", key=f"perm_del_sch_{s_id}"):
+                            cols_del = st.columns([3, 1])
+                            cols_del[0].markdown(f"**{s_id}** - {s_info.get('name')}")
+                            if cols_del[1].button("🗑️ Delete", key=f"btn_del_direct_{s_id}"):
                                 del schools_db[s_id]
                                 if s_id in students_db:
                                     del students_db[s_id]
                                 save_data(schools_db, students_db)
-                                st.success(f"School {s_id} deleted permanently!")
+                                st.success(f"School {s_id} deleted successfully!")
                                 time.sleep(0.3)
                                 st.rerun()
                     else:
