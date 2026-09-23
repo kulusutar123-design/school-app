@@ -44,22 +44,8 @@ if 'failed_logins' not in st.session_state:
 
 def check_brute_force():
     if st.session_state.failed_logins >= 5:
-        st.error("🚨 Blocked due to repeated failed attempts. Too many incorrect passwords.")
+        st.error("🚨 Blocked due to repeated failed attempts.")
         st.stop()
-
-def send_real_sms(mobile_or_email, otp_code, student_name="User"):
-    target = str(mobile_or_email).strip()
-    clean_mob = "".join([c for c in target if c.isdigit()])
-    if len(clean_mob) == 10:
-        clean_mob = "91" + clean_mob
-    
-    wa_msg = f"Hello {student_name}, your Verification OTP for School Management System is: *{otp_code}*."
-    encoded_msg = urllib.parse.quote(wa_msg)
-    wa_link = f"https://api.whatsapp.com/send?phone={clean_mob}&text={encoded_msg}" if clean_mob else None
-    
-    st.success(f"✅ OTP Generated for: **{target}**")
-    st.info(f"📲 [SYSTEM OTP DISPLAY] Verification OTP: **{otp_code}**")
-    return True
 
 os.makedirs("Scholarship_Data/Student_Submissions", exist_ok=True)
 os.makedirs("Scholarship_Data/Approved_Master", exist_ok=True)
@@ -92,14 +78,19 @@ STATE_LANG_MAP = {
     "Odisha": "Odia", "Punjab": "Punjabi", "Rajasthan": "Hindi",
     "Sikkim": "English", "Tamil Nadu": "Tamil", "Telangana": "Telugu",
     "Tripura": "Bengali", "Uttar Pradesh": "Hindi", "Uttarakhand": "Hindi",
-    "West Bengal": "Bengali", "Delhi": "Hindi", "Jammu and Kashmir": "Urdu"
+    "West Bengal": "Bengali", "Delhi": "Hindi", "Jammu and Kashmir": "Urdu",
+    "Ladakh": "English", "Puducherry": "Tamil", "Chandigarh": "Punjabi",
+    "Andaman and Nicobar": "English", "Lakshadweep": "Malayalam", "Dadra & Nagar Haveli": "Gujarati"
 }
 
 def load_master_data():
     default_master = {
         "username": "master", "password": "master123", "email": "kulusutar123@gmail.com", 
         "phone": "8910223342", "upi_id": "school@sbi", "reg_fee": 150.0, "gst_percent": 18.0,
-        "notice_text": "📢 ସ୍ୱାଗତମ୍! ଅନଲାଇନ୍ ରେଜିଷ୍ଟ୍ରେସନ୍ ଜାରି ରହିଛି।", "news_text": "🔴 [ODISHA] ନୂଆ ଶିକ୍ଷା ନୀତି ଅନୁଯାୟୀ ସମସ୍ତ ସ୍କୁଲରେ ଡିଜିଟାଲ୍ କ୍ଲାସରୁମ୍ ଆରମ୍ଭ ହେବ!"
+        "school_reg_fee": 1000.0, "school_gst_percent": 18.0, "scholarship_fee": 50.0,
+        "notice_text": "📢 ନୂଆ ଅପଡେଟ୍: ଛାତ୍ରଛାତ୍ରୀମାନେ ଏବେ ଅନଲାଇନ୍ ରେଜିଷ୍ଟ୍ରେସନ୍, ସ୍କଲାରସିପ୍ ଏବଂ ପେମେଣ୍ଟ କରିପାରିବେ!",
+        "news_text": "🔴 [ODISHA] ନୂଆ ଶିକ୍ଷା ନୀତି ଅନୁଯାୟୀ ସମସ୍ତ ସ୍କୁଲରେ ଡିଜିଟାଲ୍ କ୍ଲାସରୁମ୍ ଆରମ୍ଭ ହେବ!",
+        "bg_b64": "", "font_family": "sans-serif", "font_size": "16", "text_color": "#000000", "theme_color": "#1e3a8a"
     }
     if os.path.exists(MASTER_FILE):
         try:
@@ -120,8 +111,7 @@ def save_master_data(data):
 def load_data():
     default_schools = {
         "SCH01": {
-            "name": "Laxmi Narayan Girls High School, Banasar Kalyani",
-            "name_local": "ଲକ୍ଷ୍ମୀ ନାରାୟଣ ବାଳିକା ଉଚ୍ଚ ବିଦ୍ୟାଳୟ",
+            "name": "Laxmi Narayan Girls High School",
             "hm_name": "Debasis Mishra",
             "hm_phone": "9876543210",
             "pass": "school123",
@@ -131,33 +121,8 @@ def load_data():
             "pg_upi": "school@sbi"
         }
     }
-    default_students = {
-        "SCH01": {
-            "175CB0078": {
-                "name": "ALOKTIKA MISHRA",
-                "name_local": "ଆଲୋକତିକା ମିଶ୍ର",
-                "gender": "Female",
-                "category": "General",
-                "pen_no": "21182142821",
-                "apaar_no": "704082184322",
-                "father_name": "DEBASIS MISHRA",
-                "mother_name": "SAROJINI MISHRA",
-                "dob": "14-02-2011",
-                "class": "10",
-                "batch": "2025-2026",
-                "pub_date": "22-09-2026",
-                "subjects": {
-                    "First Language Odia": {"full": 100.0, "obt": 90.0},
-                    "Second Language English": {"full": 100.0, "obt": 67.0},
-                    "Mathematics": {"full": 100.0, "obt": 66.0}
-                },
-                "total_full": 300.0, "total_obt": 223.0, "percentage": 74.33,
-                "result": "PASS", "grade": "B1", "status": "Approved"
-            }
-        }
-    }
     schools = dict(default_schools)
-    students = dict(default_students)
+    students = {}
 
     if os.path.exists(SCHOOLS_FILE):
         try:
@@ -168,20 +133,6 @@ def load_data():
                     if isinstance(loaded, dict): schools.update(loaded)
         except Exception:
             pass
-
-    if os.path.exists(STUDENTS_FILE):
-        try:
-            with open(STUDENTS_FILE, "r", encoding="utf-8") as f:
-                content = f.read()
-                if content.strip(): 
-                    loaded = json.loads(content)
-                    if isinstance(loaded, dict):
-                        for s_k, s_v in loaded.items():
-                            if s_k not in students: students[s_k] = s_v
-                            else: students[s_k].update(s_v)
-        except Exception:
-            pass
-
     return schools, students
 
 def save_data(schools, students):
@@ -191,12 +142,11 @@ def save_data(schools, students):
 schools_db, students_db = load_data()
 master_db = load_master_data()
 
-menu_items = ["Home Page", "Master Login", "School Login"]
-menu = st.sidebar.selectbox("🎯 Navigation Menu", menu_items)
+menu = st.sidebar.selectbox("🎯 Navigation Menu", ["Home Page", "Master Login", "New School Registration"])
 
-if menu == "HomePage" or menu == "Home Page":
+if menu == "Home Page":
     st.subheader("🏫 Welcome to Advanced School Management System")
-    st.write("Please select your portal from the sidebar menu to login or register.")
+    st.write("Use the sidebar to access Master Login, School Registrations, and Portals.")
 
 elif menu == "Master Login":
     st.subheader("🔑 Master Administrator Portal")
@@ -213,43 +163,69 @@ elif menu == "Master Login":
         if st.button("🔴 Logout"):
             st.session_state['master_logged'] = False
             st.rerun()
-        st.success("Welcome Master Admin! All systems operating securely.")
 
-elif menu == "School Login":
-    st.subheader("🏫 School Portal Login")
-    if 'school_logged_id' not in st.session_state:
-        s_login_state = st.selectbox("📍 Select State", list(STATE_LANG_MAP.keys()), index=18)
-        s_id = st.text_input("School ID")
-        s_pass = st.text_input("School Password", type="password")
+        t1, t2, t3, t4, t5, t6, t7 = st.tabs(["👁️ Schools", "💳 Payments", "🎓 Scholarships Verify", "🎓 Edit Students", "⚙️ Settings", "🏦 Gateway", "🖼️ Display & Backgrounds"])
         
-        if st.button("Login as School"):
-            s_id_clean = sanitize(s_id)
-            if s_id_clean in schools_db:
-                sch_entry = schools_db[s_id_clean]
-                if sch_entry.get("pass") == s_pass:
-                    st.session_state['school_logged_id'] = s_id_clean
-                    st.success("Login Successful!")
-                    st.rerun()
+        with t1:
+            st.markdown("### 🏫 School Management Dashboard")
+            with st.expander("⚙️ Master School Control Box", expanded=True):
+                if schools_db:
+                    for s_id, s_info in list(schools_db.items()):
+                        cols_d = st.columns([3, 1])
+                        cols_d[0].markdown(f"**{s_id}** - {s_info.get('name')} (Status: {s_info.get('status', 'Active')})")
+                        if cols_d[1].button("🗑️ Delete", key=f"btn_del_safe_{s_id}"):
+                            del schools_db[s_id]
+                            if s_id in students_db: del students_db[s_id]
+                            save_data(schools_db, students_db)
+                            st.success(f"School {s_id} deleted successfully!")
+                            time.sleep(0.3)
+                            st.rerun()
                 else:
-                    st.error("❌ ଭୁଲ୍ Password!")
+                    st.info("No schools registered.")
+
+        with t5:
+            st.markdown("### ⚙️ Settings & Notifications")
+            up_notice = st.text_area("Official Running Notification Text", value=master_db.get("notice_text", ""))
+            up_news = st.text_area("Breaking Running News Text", value=master_db.get("news_text", ""))
+            if st.button("Save Settings", key="m_set_save_all"):
+                master_db["notice_text"] = up_notice
+                master_db["news_text"] = up_news
+                save_master_data(master_db)
+                st.success("Settings updated successfully!")
+                st.rerun()
+
+        with t6:
+            st.markdown("### 🏦 School Payment Gateway Setup (Master Control)")
+            if schools_db:
+                pg_school = st.selectbox("Select School", list(schools_db.keys()), key="m_gw_sch_sel")
+                current_upi = schools_db[pg_school].get('pg_upi', 'school@sbi')
+                sch_upi = st.text_input("School UPI ID", value=current_upi, key="m_gw_upi")
+                if st.button("💾 Save School Gateway", key="m_gw_save"):
+                    schools_db[pg_school]['pg_upi'] = sanitize(sch_upi)
+                    save_data(schools_db, students_db)
+                    st.success(f"Payment Gateway for {pg_school} successfully updated!")
             else:
-                st.error("❌ ଏହି School ID ମିଳିଲା ନାହିଁ!")
-    else:
-        cur_school = st.session_state['school_logged_id']
-        sch_data = schools_db[cur_school]
-        st.info(f"🏫 **School Dashboard** | ID: {cur_school} | {sch_data['name']}")
-        if st.button("🔴 Logout School"):
-            del st.session_state['school_logged_id']
-            st.rerun()
-        
-        t_list, t_add = st.tabs(["📋 My Students", "➕ Add Student"])
-        with t_list:
-            st.markdown("### My Registered Students")
-            cur_students = students_db.get(cur_school, {})
-            for r_no, s_info in cur_students.items():
-                st.write(f"Roll: **{r_no}** | Name: **{s_info.get('name')}**")
-            if not cur_students:
-                st.info("No students found.")
+                st.info("No schools available.")
+
+        with t7:
+            st.markdown("### 🖼️ Portal Backgrounds & Running Display Management")
+            up_h_bg = st.file_uploader("Upload Home Page Background Image", type=['png', 'jpg', 'jpeg'], key="h_bg")
+            if st.button("💾 Save Home Background", key="save_bgs"):
+                if up_h_bg: 
+                    master_db["bg_b64"] = base64.b64encode(up_h_bg.read()).decode('utf-8')
+                    save_master_data(master_db)
+                    st.success("Home Background Saved Successfully!")
+                    st.rerun()
+            
+            st.markdown("#### Carousel Running Images Management")
+            uploaded_carousel = st.file_uploader("Upload Images for Running Display", type=['png', 'jpg', 'jpeg'], accept_multiple_files=True, key="m_carousel_up")
+            if st.button("📤 Upload to Running Display", key="m_carousel_btn"):
+                if uploaded_carousel:
+                    for file in uploaded_carousel:
+                        with open(os.path.join("Carousel_Images", file.name), "wb") as f:
+                            f.write(file.getbuffer())
+                    st.success("Images uploaded successfully!")
+                    st.rerun()
 
 st.markdown("---")
 st.markdown("<div style='text-align: center; padding: 15px; background: linear-gradient(90deg, #1e3a8a, #9333ea); color: white; border-radius: 8px; font-weight: bold;'>👨‍💻 Software Developed by: KULU SUTAR | 📞 Mob: 8910223342 | ✉️ kulusutar123@gmail.com</div>", unsafe_allow_html=True)
