@@ -910,17 +910,17 @@ elif menu == "Scholarship Portal":
             if 'sch_reg_stage' not in st.session_state:
                 st.session_state['sch_reg_stage'] = 'consent'
                 
-            # 1. CONSENT PAGE
+            # 1. CONSENT PAGE[cite: 4]
             if st.session_state['sch_reg_stage'] == 'consent':
                 st.markdown("### One-time, online registration of students for applying for Scholarship via portal:")
                 st.markdown("""
-                * Kindly link/seed/NPCI map your Identification number with your Bank account to receive scholarship amount under the schemes e Medhabruti (UG Merit, PG Merit, Technical Professional) GSSY, VFMB Scholarship implemented by Higher Education Deptt. for the Year 2025-26.
-                * I have read and understood the eligibility and other conditions of award of Scholarship as per the scheme guidelines.
-                * I understand that my application is liable to be rejected if I provide wrong Identification number or details of someone else's.
-                * I understand that if more than one application is found to be made on-line, all my applications are liable to be rejected.
-                * Registration on the portal is based on verified demographic authentication.
+                * Kindly link/seed/NPCI map your Identification number with your Bank account to receive scholarship amount under the schemes e Medhabruti (UG Merit, PG Merit, Technical Professional) GSSY, VFMB Scholarship implemented by Higher Education Deptt. for the Year 2025-26.[cite: 4]
+                * I have read and understood the eligibility and other conditions of award of Scholarship as per the scheme guidelines.[cite: 4]
+                * I understand that my application is liable to be rejected if I provide wrong Identification number or details of someone else's.[cite: 4]
+                * I understand that if more than one application is found to be made on-line, all my applications are liable to be rejected.[cite: 4]
+                * Registration on the portal is based on verified demographic authentication.[cite: 4]
                 """)
-                consent_check = st.checkbox("I have read the above statements & agree with the conditions. Further, I hereby state that I have no objection in authenticating myself with Demographic authentication system for the purpose of availing benefit of Scholarship.")
+                consent_check = st.checkbox("I have read the above statements & agree with the conditions. Further, I hereby state that I have no objection in authenticating myself with Demographic authentication system for the purpose of availing benefit of Scholarship.")[cite: 4]
                 if st.button("Proceed", type="primary", key="btn_consent_proceed"):
                     if consent_check:
                         st.session_state['sch_reg_stage'] = 'enter_id'
@@ -928,24 +928,24 @@ elif menu == "Scholarship Portal":
                     else:
                         st.warning("Please agree to the statements and check the box before proceeding.")
 
-            # 2. ENTER IDENTIFICATION NUMBER
+            # 2. ENTER IDENTIFICATION NUMBER[cite: 5]
             elif st.session_state['sch_reg_stage'] == 'enter_id':
                 st.markdown("<div style='background-color:#1e5b8c; color:white; padding:15px; border-radius:8px; max-width:550px; margin:auto;'>"
-                            "<h3 style='margin:0; color:white;'>STUDENT REGISTRATION <span style='font-size:14px;'>(for Applying Scholarship)</span></h3></div>", unsafe_allow_html=True)
+                            "<h3 style='margin:0; color:white;'>STUDENT REGISTRATION <span style='font-size:14px;'>(for Applying Scholarship)</span></h3></div>", unsafe_allow_html=True)[cite: 5]
                 
                 with st.container():
                     st.write("")
                     col_b1, col_b2, col_b3 = st.columns([1, 2, 1])
                     with col_b2:
-                        input_id_no = st.text_input("Enter Your 12-digit Identification Number *", max_chars=12, key="inp_reg_id_val")
+                        input_id_no = st.text_input("Enter Your 12-digit Identification Number *", max_chars=12, key="inp_reg_id_val")[cite: 5]
                         input_reg_mob = st.text_input("Enter Mobile Number (for OTP) *", max_chars=10, key="inp_reg_mob_pre")
                         st.markdown("<div style='background-color:#f8fafc; border:1px solid #cbd5e1; padding:12px; border-radius:6px; font-size:12px; color:#334155; margin-bottom:10px;'>"
                                     "I hereby consent to providing my Demographic/Biometric data for authentication purposes for Registration and Login into State Scholarship Portal."
-                                    "</div>", unsafe_allow_html=True)
+                                    "</div>", unsafe_allow_html=True)[cite: 5]
                         
                         col_o1, col_o2 = st.columns(2)
                         with col_o1:
-                            if st.button("Get OTP", type="primary", use_container_width=True, key="btn_sch_get_otp"):
+                            if st.button("Get OTP", type="primary", use_container_width=True, key="btn_sch_get_otp"):[cite: 5]
                                 clean_id = sanitize(input_id_no)
                                 clean_mob = sanitize(input_reg_mob)
                                 if len(clean_id) == 12 and clean_id.isdigit() and len(clean_mob) == 10:
@@ -981,21 +981,21 @@ elif menu == "Scholarship Portal":
                         if st.button("Change ID", use_container_width=True, key="btn_back_enter_id"):
                             st.session_state['sch_reg_stage'] = 'enter_id'; st.rerun()
 
-            # 4. DEMOGRAPHIC AUTO-FILL & REGISTER
+            # 4. DEMOGRAPHIC AUTO-FILL & REGISTER[cite: 6]
             elif st.session_state['sch_reg_stage'] == 'fill_profile':
                 col_left, col_right = st.columns([1.2, 1])
                 with col_left:
                     st.markdown("<div style='background-color:#1e5b8c; color:white; padding:12px; border-radius:6px;'>"
                                 "<h4 style='margin:0; color:white;'>KULU SUTAR (Male)</h4>"
-                                "<p style='margin:4px 0 0 0; font-size:13px;'>Date of Birth: <b>08-04-1990</b></p></div>", unsafe_allow_html=True)
+                                "<p style='margin:4px 0 0 0; font-size:13px;'>Date of Birth: <b>08-04-1990</b></p></div>", unsafe_allow_html=True)[cite: 6]
                     st.write("")
-                    p_mob = st.text_input("Mobile Number *", value=st.session_state.get('temp_reg_mob_input', ''), max_chars=10, key="p_reg_mob")
-                    p_alt_mob = st.text_input("Alternative Mobile Number (if any)", max_chars=10, key="p_reg_alt_mob")
-                    p_email = st.text_input("Email Address *", key="p_reg_email")
-                    p_pwd1 = st.text_input("Create Password *", type="password", key="p_reg_pwd1")
-                    p_pwd2 = st.text_input("Re-enter password *", type="password", key="p_reg_pwd2")
+                    p_mob = st.text_input("Mobile Number *", value=st.session_state.get('temp_reg_mob_input', ''), max_chars=10, key="p_reg_mob")[cite: 6]
+                    p_alt_mob = st.text_input("Alternative Mobile Number (if any)", max_chars=10, key="p_reg_alt_mob")[cite: 6]
+                    p_email = st.text_input("Email Address *", key="p_reg_email")[cite: 6]
+                    p_pwd1 = st.text_input("Create Password *", type="password", key="p_reg_pwd1")[cite: 6]
+                    p_pwd2 = st.text_input("Re-enter password *", type="password", key="p_reg_pwd2")[cite: 6]
                     
-                    if st.button("Register", type="primary", use_container_width=True, key="btn_sch_final_register"):
+                    if st.button("Register", type="primary", use_container_width=True, key="btn_sch_final_register"):[cite: 6]
                         if not p_mob or not p_email or not p_pwd1:
                             st.error("Please fill all mandatory fields (*).")
                         elif p_pwd1 != p_pwd2:
@@ -1027,11 +1027,11 @@ elif menu == "Scholarship Portal":
                     👉 Please ensure your Name, Gender and DOB reflected are correct.<br><br>
                     👉 Keep your password secure and note down the Reference Number.
                     </div>
-                    """, unsafe_allow_html=True)
+                    """, unsafe_allow_html=True)[cite: 6]
 
-            # 5. REGISTRATION COMPLETED
+            # 5. REGISTRATION COMPLETED[cite: 7]
             elif st.session_state['sch_reg_stage'] == 'completed':
-                ref_num = st.session_state.get('completed_ref_no', '26OS15524303')
+                ref_num = st.session_state.get('completed_ref_no', '26OS15524303')[cite: 7]
                 st.markdown(f"""
                 <div style='text-align:center; padding:30px; border:1px solid #cbd5e1; border-radius:10px; background-color:#ffffff; max-width:600px; margin:auto;'>
                     <div style='font-size:60px; color:#22c55e;'>✔</div>
@@ -1040,18 +1040,18 @@ elif menu == "Scholarship Portal":
                     Your reference no. : <b style='color:#0f172a; font-size:17px;'>{ref_num}</b><br>
                     You're now able to enjoy full access to all the features and advantages offered by this platform.</p>
                 </div>
-                """, unsafe_allow_html=True)
+                """, unsafe_allow_html=True)[cite: 7]
                 
                 st.write("")
                 c_c1, c_c2, c_c3 = st.columns([1, 1, 1])
                 with c_c2:
                     col_b_h, col_b_l = st.columns(2)
                     with col_b_h:
-                        if st.button("Home", use_container_width=True, key="btn_sch_done_home"):
+                        if st.button("Home", use_container_width=True, key="btn_sch_done_home"):[cite: 7]
                             st.query_params["portal"] = "home"
                             st.session_state['sch_reg_stage'] = 'consent'; st.rerun()
                     with col_b_l:
-                        if st.button("Go to Login", type="primary", use_container_width=True, key="btn_sch_done_login"):
+                        if st.button("Go to Login", type="primary", use_container_width=True, key="btn_sch_done_login"):[cite: 7]
                             st.session_state['sch_reg_stage'] = 'consent'
                             st.rerun()
 
@@ -1070,11 +1070,11 @@ elif menu == "Scholarship Portal":
                 <h4 style='margin:5px 0;'>{cur_user.get('name', 'STUDENT')}</h4>
                 <p style='font-size:12px; color:#64748b;'>Unique ID: <b>{cur_user_id}</b></p>
             </div>
-            """, unsafe_allow_html=True)
+            """, unsafe_allow_html=True)[cite: 8]
             
             nav_choice = st.radio("Student Menu", [
                 "📊 Dashboard", "📝 Apply Scholarship", "📂 View / Renew Application", "🔔 Notification", "🔴 Logout"
-            ], label_visibility="collapsed")
+            ], label_visibility="collapsed")[cite: 8]
             
             if nav_choice == "🔴 Logout":
                 st.session_state['sch_logged_in'] = False
@@ -1084,9 +1084,9 @@ elif menu == "Scholarship Portal":
         with c_main:
             if nav_choice == "📊 Dashboard":
                 st.markdown("<div style='background-color:#eff6ff; border-left:4px solid #3b82f6; padding:10px; font-size:13px; margin-bottom:15px;'>"
-                            "📢 <b>Important Notification:</b> All eligible students are required to verify demographic authentication before final submission.</div>", unsafe_allow_html=True)
+                            "📢 <b>Important Notification:</b> All eligible students are required to verify demographic authentication before final submission.</div>", unsafe_allow_html=True)[cite: 8]
                 
-                st.markdown("#### Profile Details")
+                st.markdown("#### Profile Details")[cite: 8]
                 st.markdown(f"""
                 <div style='background:#ffffff; border:1px solid #e2e8f0; padding:15px; border-radius:8px; font-size:13px; line-height:2;'>
                     <div style='display:flex; justify-content:space-between;'>
@@ -1102,62 +1102,62 @@ elif menu == "Scholarship Portal":
                         <div>✉ <b>Email:</b> {cur_user.get('email', '')}</div>
                     </div>
                 </div>
-                """, unsafe_allow_html=True)
+                """, unsafe_allow_html=True)[cite: 8]
                 
                 st.write("")
                 c_s1, c_s2, c_s3, c_s4 = st.columns(4)
-                c_s1.markdown("<div style='background:#0284c7; color:white; padding:15px; border-radius:8px; text-align:center;'><h4>Applied</h4><h2>0</h2></div>", unsafe_allow_html=True)
-                c_s2.markdown("<div style='background:#f59e0b; color:white; padding:15px; border-radius:8px; text-align:center;'><h4>Inprogress</h4><h2>0</h2></div>", unsafe_allow_html=True)
-                c_s3.markdown("<div style='background:#10b981; color:white; padding:15px; border-radius:8px; text-align:center;'><h4>Disbursed</h4><h2>0</h2></div>", unsafe_allow_html=True)
-                c_s4.markdown("<div style='background:#ef4444; color:white; padding:15px; border-radius:8px; text-align:center;'><h4>Reverted</h4><h2>0</h2></div>", unsafe_allow_html=True)
+                c_s1.markdown("<div style='background:#0284c7; color:white; padding:15px; border-radius:8px; text-align:center;'><h4>Applied</h4><h2>0</h2></div>", unsafe_allow_html=True)[cite: 8]
+                c_s2.markdown("<div style='background:#f59e0b; color:white; padding:15px; border-radius:8px; text-align:center;'><h4>Inprogress</h4><h2>0</h2></div>", unsafe_allow_html=True)[cite: 8]
+                c_s3.markdown("<div style='background:#10b981; color:white; padding:15px; border-radius:8px; text-align:center;'><h4>Disbursed</h4><h2>0</h2></div>", unsafe_allow_html=True)[cite: 8]
+                c_s4.markdown("<div style='background:#ef4444; color:white; padding:15px; border-radius:8px; text-align:center;'><h4>Reverted</h4><h2>0</h2></div>", unsafe_allow_html=True)[cite: 8]
 
             elif nav_choice == "📝 Apply Scholarship":
-                st.markdown("### Scholarship Application Form")
+                st.markdown("### Scholarship Application Form")[cite: 9, 10, 11, 13]
                 
                 tab_p, tab_a, tab_e, tab_b = st.tabs([
                     "1. Student Profile Information", 
                     "2. Academic Information", 
                     "3. Eligibility Information", 
                     "4. Account Information"
-                ])
+                ])[cite: 9, 10, 11, 13]
                 
                 draft = cur_user.get("draft", {})
                 
-                # --- TAB 1: STUDENT PROFILE INFORMATION ---
+                # --- TAB 1: STUDENT PROFILE INFORMATION[cite: 9] ---
                 with tab_p:
                     c1, c2 = st.columns(2)
-                    app_ac_year = c1.selectbox("Academic Year *", ["2026-27", "2027-28"])
-                    app_dept = c2.selectbox("Department *", ["ST&SC and MBC Welfare Department", "Higher Education"])
+                    app_ac_year = c1.selectbox("Academic Year *", ["2026-27", "2027-28"])[cite: 9]
+                    app_dept = c2.selectbox("Department *", ["ST&SC and MBC Welfare Department", "Higher Education"])[cite: 9]
                     
                     c3, c4 = st.columns(2)
-                    app_scheme = c3.selectbox("Scheme *", ["Post Matric Scholarship", "Pre Matric Scholarship"])
-                    app_inst_type = c4.radio("Institute Type *", ["SAMS", "NON-SAMS"])
+                    app_scheme = c3.selectbox("Scheme *", ["Post Matric Scholarship", "Pre Matric Scholarship"])[cite: 9]
+                    app_inst_type = c4.radio("Institute Type *", ["SAMS", "NON-SAMS"])[cite: 9]
                     
                     st.write("---")
-                    st.markdown("##### Basic Information")
+                    st.markdown("##### Basic Information")[cite: 9]
                     c5, c6 = st.columns(2)
-                    c_app_name = c5.text_input("Applicant Name *", value=cur_user.get("name", "KULU SUTAR"))
-                    c_app_cat = c6.selectbox("Category *", SOCIAL_CATEGORIES)
+                    c_app_name = c5.text_input("Applicant Name *", value=cur_user.get("name", "KULU SUTAR"))[cite: 9]
+                    c_app_cat = c6.selectbox("Category *", SOCIAL_CATEGORIES)[cite: 9]
                     
                     c7, c8 = st.columns(2)
-                    c_app_gen = c7.selectbox("Applicant Gender *", ["Male", "Female", "Transgender"])
-                    c_app_rel = c8.selectbox("Religion *", ["Hindu", "Muslim", "Christian", "Sikh", "Buddhist", "Jain", "Other"])
+                    c_app_gen = c7.selectbox("Applicant Gender *", ["Male", "Female", "Transgender"])[cite: 9]
+                    c_app_rel = c8.selectbox("Religion *", ["Hindu", "Muslim", "Christian", "Sikh", "Buddhist", "Jain", "Other"])[cite: 9]
                     
                     c9, c10 = st.columns(2)
-                    c_app_dob = c9.text_input("Date of Birth *", value=cur_user.get("dob", "08-04-1990"))
-                    c_photo = c10.file_uploader("Profile Photo (jpg/png) *", type=['jpg', 'jpeg', 'png'], key="uploader_prof_photo")
+                    c_app_dob = c9.text_input("Date of Birth *", value=cur_user.get("dob", "08-04-1990"))[cite: 9]
+                    c_photo = c10.file_uploader("Profile Photo (jpg/png) *", type=['jpg', 'jpeg', 'png'], key="uploader_prof_photo")[cite: 9]
                     
                     c11, c12 = st.columns(2)
-                    c_fname = c11.text_input("Father's Name *", value=draft.get("father_name", ""))
-                    c_mname = c12.text_input("Mother's Name *", value=draft.get("mother_name", ""))
+                    c_fname = c11.text_input("Father's Name *", value=draft.get("father_name", ""))[cite: 9]
+                    c_mname = c12.text_input("Mother's Name *", value=draft.get("mother_name", ""))[cite: 9]
                     
                     st.write("---")
-                    st.markdown("##### Address Information")
+                    st.markdown("##### Address Information")[cite: 9]
                     c13, c14, c15 = st.columns(3)
                     c_state = c13.selectbox("State", list(STATE_LANG_MAP.keys()), index=18)
-                    c_dist = c14.text_input("District *", value=draft.get("district", "Jajpur"))
-                    c_pin = c15.text_input("PIN Code *", value=draft.get("pin", ""))
-                    c_addr = st.text_area("Full Address *", value=draft.get("address", ""))
+                    c_dist = c14.text_input("District *", value=draft.get("district", "Jajpur"))[cite: 9]
+                    c_pin = c15.text_input("PIN Code *", value=draft.get("pin", ""))[cite: 9]
+                    c_addr = st.text_area("Full Address *", value=draft.get("address", ""))[cite: 9]
                     
                     if st.button("💾 Save Profile Tab to Draft", key="btn_save_tab_p"):
                         cur_user["draft"].update({
@@ -1168,35 +1168,35 @@ elif menu == "Scholarship Portal":
                         save_sch_users(sch_users_db)
                         st.success("Profile Information saved to draft!")
 
-                # --- TAB 2: ACADEMIC INFORMATION ---
+                # --- TAB 2: ACADEMIC INFORMATION[cite: 10] ---
                 with tab_a:
-                    st.markdown("##### Educational Qualification Details")
-                    acad_for = st.radio("Qualification For:", ["Matric-Annual", "Matric-Supplementary", "Non-Matric"], horizontal=True)
+                    st.markdown("##### Educational Qualification Details")[cite: 10]
+                    acad_for = st.radio("Qualification For:", ["Matric-Annual", "Matric-Supplementary", "Non-Matric"], horizontal=True)[cite: 10]
                     
                     col_q1, col_q2, col_q3, col_q4, col_q5 = st.columns([1.5, 2, 1.2, 1.2, 1.5])
-                    q_course = col_q1.selectbox("Course", ["X (Matric)", "XII (Higher Secondary)", "Graduation", "Post Graduation"])
-                    q_board = col_q2.selectbox("Board / University", ["BSE, Odisha", "CBSE", "ICSE", "CHSE, Odisha", "Utkal University"])
-                    q_pass_yr = col_q3.selectbox("Passing Year", [str(y) for y in range(2026, 2010, -1)])
-                    q_roll = col_q4.text_input("Roll No *", value=draft.get("acad_roll", ""))
-                    q_mark_opt = col_q5.radio("Source", ["Desktop", "DigiLocker"], horizontal=True, key="rad_cert_src")
+                    q_course = col_q1.selectbox("Course", ["X (Matric)", "XII (Higher Secondary)", "Graduation", "Post Graduation"])[cite: 10]
+                    q_board = col_q2.selectbox("Board / University", ["BSE, Odisha", "CBSE", "ICSE", "CHSE, Odisha", "Utkal University"])[cite: 10]
+                    q_pass_yr = col_q3.selectbox("Passing Year", [str(y) for y in range(2026, 2010, -1)])[cite: 10]
+                    q_roll = col_q4.text_input("Roll No *", value=draft.get("acad_roll", ""))[cite: 10]
+                    q_mark_opt = col_q5.radio("Source", ["Desktop", "DigiLocker"], horizontal=True, key="rad_cert_src")[cite: 10]
                     
                     col_m1, col_m2, col_m3, col_m4 = st.columns(4)
-                    q_tot = col_m1.number_input("Total Mark/CGPA *", value=600.0)
-                    q_obt = col_m2.number_input("Secured Marks/CGPA *", value=450.0)
+                    q_tot = col_m1.number_input("Total Mark/CGPA *", value=600.0)[cite: 10]
+                    q_obt = col_m2.number_input("Secured Marks/CGPA *", value=450.0)[cite: 10]
                     q_pct = round((q_obt / q_tot * 100), 2) if q_tot > 0 else 0.0
-                    col_m3.text_input("Percentage (%)", value=f"{q_pct}%", disabled=True)
-                    q_cert_file = col_m4.file_uploader("Upload Marksheet / Certificate (PDF) *", type=['pdf', 'jpg', 'png'])
+                    col_m3.text_input("Percentage (%)", value=f"{q_pct}%", disabled=True)[cite: 10]
+                    q_cert_file = col_m4.file_uploader("Upload Marksheet / Certificate (PDF) *", type=['pdf', 'jpg', 'png'])[cite: 10]
                     
                     st.write("---")
-                    st.markdown("##### Institute / Course Information (Current Education)")
-                    c_st_type = st.radio("Student For:", ["Within State", "Outside State"], horizontal=True)
+                    st.markdown("##### Institute / Course Information (Current Education)")[cite: 10]
+                    c_st_type = st.radio("Student For:", ["Within State", "Outside State"], horizontal=True)[cite: 10]
                     
                     col_i1, col_i2, col_i3 = st.columns(3)
                     active_schools = {k: v for k, v in schools_db.items() if v.get("status", "Active") == "Active"}
                     school_opts = [f"{k} - {v['name']}" for k, v in active_schools.items()]
-                    i_school = col_i1.selectbox("Institute (School/College) *", ["--Select--"] + school_opts)
+                    i_school = col_i1.selectbox("Institute (School/College) *", ["--Select--"] + school_opts)[cite: 10]
                     i_class = col_i2.selectbox("Class / Year of Study *", ["IX", "X", "XI", "XII", "+3 1st Year", "+3 2nd Year", "+3 Final Year"])
-                    i_adm_no = col_i3.text_input("Admission / Enrollment No. *", value=draft.get("enroll_no", ""))
+                    i_adm_no = col_i3.text_input("Admission / Enrollment No. *", value=draft.get("enroll_no", ""))[cite: 10]
                     
                     if st.button("💾 Save Academic Tab to Draft", key="btn_save_tab_a"):
                         cur_user["draft"].update({
@@ -1206,39 +1206,39 @@ elif menu == "Scholarship Portal":
                         save_sch_users(sch_users_db)
                         st.success("Academic Information saved to draft!")
 
-                # --- TAB 3: ELIGIBILITY INFORMATION ---
+                # --- TAB 3: ELIGIBILITY INFORMATION[cite: 11] ---
                 with tab_e:
-                    st.markdown("##### 1. Income Certificate Information")
-                    st.caption("Note: Upload clear and legible document. Upload PDF file upto 1MB file size.")
+                    st.markdown("##### 1. Income Certificate Information")[cite: 11]
+                    st.caption("Note: Upload clear and legible document. Upload PDF file upto 1MB file size.")[cite: 11]
                     
                     col_inc1, col_inc2 = st.columns(2)
-                    inc_cert_no = col_inc1.text_input("Income Certificate No. (e.g. E-INC/2024/114193) *", value=draft.get("inc_no", ""))
-                    inc_year = col_inc2.selectbox("Certificate Issuance Year *", CERT_YEARS, index=2, key="sel_inc_yr")
+                    inc_cert_no = col_inc1.text_input("Income Certificate No. (e.g. E-INC/2024/114193) *", value=draft.get("inc_no", ""))[cite: 11]
+                    inc_year = col_inc2.selectbox("Certificate Issuance Year *", CERT_YEARS, index=2, key="sel_inc_yr")[cite: 11]
                     
                     col_inc3, col_inc4, col_inc5 = st.columns(3)
-                    inc_name = col_inc3.text_input("To Whom Certificate Issued", value=cur_user.get("name", "KULU SUTAR"), disabled=True)
-                    inc_amount = col_inc4.text_input("Family Annual Income (₹) *", value="65000")
-                    col_inc5.text_input("Family Annual Income (In words)", value=number_to_words(65000), disabled=True)
+                    inc_name = col_inc3.text_input("To Whom Certificate Issued", value=cur_user.get("name", "KULU SUTAR"), disabled=True)[cite: 11]
+                    inc_amount = col_inc4.text_input("Family Annual Income (₹) *", value="65000")[cite: 11]
+                    col_inc5.text_input("Family Annual Income (In words)", value=number_to_words(65000), disabled=True)[cite: 11]
                     
                     col_inc6, col_inc7 = st.columns(2)
-                    inc_auth = col_inc6.selectbox("Issuing Authority *", ISSUING_AUTHORITIES, key="sel_inc_auth")
-                    inc_date = col_inc7.date_input("Issue Date *", value=datetime.date(2024, 2, 23))
-                    inc_pdf = st.file_uploader("Upload Income Certificate (PDF) *", type=['pdf', 'jpg', 'png'], key="up_inc_pdf_file")
+                    inc_auth = col_inc6.selectbox("Issuing Authority *", ISSUING_AUTHORITIES, key="sel_inc_auth")[cite: 11]
+                    inc_date = col_inc7.date_input("Issue Date *", value=datetime.date(2024, 2, 23))[cite: 11]
+                    inc_pdf = st.file_uploader("Upload Income Certificate (PDF) *", type=['pdf', 'jpg', 'png'], key="up_inc_pdf_file")[cite: 11]
                     
                     st.write("---")
-                    st.markdown("##### 2. Caste Certificate Information")
+                    st.markdown("##### 2. Caste Certificate Information")[cite: 11, 12]
                     col_cas1, col_cas2 = st.columns(2)
-                    cas_year = col_cas1.selectbox("Caste Certificate Issuance Year *", CERT_YEARS, index=2, key="sel_cas_yr")
-                    cas_cert_no = col_cas2.text_input("Caste Certificate No. (e.g. E-OBC/2021/347716) *", value=draft.get("cas_no", ""))
+                    cas_year = col_cas1.selectbox("Caste Certificate Issuance Year *", CERT_YEARS, index=2, key="sel_cas_yr")[cite: 12]
+                    cas_cert_no = col_cas2.text_input("Caste Certificate No. (e.g. E-OBC/2021/347716) *", value=draft.get("cas_no", ""))[cite: 12]
                     
                     col_cas3, col_cas4, col_cas5 = st.columns(3)
-                    cas_name = col_cas3.text_input("To Whom Caste Certificate Issued", value=cur_user.get("name", "KULU SUTAR"), disabled=True)
-                    cas_cat = col_cas4.selectbox("Social Category", SOCIAL_CATEGORIES, index=3)
-                    cas_auth = col_cas5.selectbox("Caste Issuing Authority *", ISSUING_AUTHORITIES, key="sel_cas_auth")
+                    cas_name = col_cas3.text_input("To Whom Caste Certificate Issued", value=cur_user.get("name", "KULU SUTAR"), disabled=True)[cite: 11]
+                    cas_cat = col_cas4.selectbox("Social Category", SOCIAL_CATEGORIES, index=3)[cite: 11]
+                    cas_auth = col_cas5.selectbox("Caste Issuing Authority *", ISSUING_AUTHORITIES, key="sel_cas_auth")[cite: 12]
                     
                     col_cas6, col_cas7 = st.columns(2)
-                    cas_date = col_cas6.date_input("Caste Issue Date *", value=datetime.date(2021, 11, 6), key="dt_cas_issue")
-                    cas_pdf = st.file_uploader("Upload Caste Certificate (PDF) *", type=['pdf', 'jpg', 'png'], key="up_cas_pdf_file")
+                    cas_date = col_cas6.date_input("Caste Issue Date *", value=datetime.date(2021, 11, 6), key="dt_cas_issue")[cite: 12]
+                    cas_pdf = st.file_uploader("Upload Caste Certificate (PDF) *", type=['pdf', 'jpg', 'png'], key="up_cas_pdf_file")[cite: 11]
                     
                     if st.button("💾 Save Eligibility Tab to Draft", key="btn_save_tab_e"):
                         cur_user["draft"].update({"inc_no": sanitize(inc_cert_no), "cas_no": sanitize(cas_cert_no)})
@@ -1246,19 +1246,19 @@ elif menu == "Scholarship Portal":
                         save_sch_users(sch_users_db)
                         st.success("Eligibility Information saved to draft!")
 
-                # --- TAB 4: ACCOUNT INFORMATION ---
+                # --- TAB 4: ACCOUNT INFORMATION[cite: 13] ---
                 with tab_b:
-                    st.markdown("##### Bank Information")
-                    st.caption("Kindly provide correct and active bank account number and IFSC code. Scholarships are disbursed through DBT.")
+                    st.markdown("##### Bank Information")[cite: 13]
+                    st.caption("Kindly provide correct and active bank account number and IFSC code. Scholarships are disbursed through DBT.")[cite: 13]
                     
                     col_b_ifsc, col_b_btn = st.columns([6, 2])
-                    input_ifsc = col_b_ifsc.text_input("IFSC Code *", value=draft.get("bank_ifsc", "UCBA0000599")).upper()
+                    input_ifsc = col_b_ifsc.text_input("IFSC Code *", value=draft.get("bank_ifsc", "UCBA0000599")).upper()[cite: 13]
                     
                     if 'verified_bank_name' not in st.session_state:
-                        st.session_state['verified_bank_name'] = draft.get("bank_name", "UCO BANK")
-                        st.session_state['verified_branch_name'] = draft.get("branch_name", "DHAMNAGAR,HQ")
+                        st.session_state['verified_bank_name'] = draft.get("bank_name", "UCO BANK")[cite: 13]
+                        st.session_state['verified_branch_name'] = draft.get("branch_name", "DHAMNAGAR,HQ")[cite: 13]
                         
-                    if col_b_btn.button("GET IFSC CODE", type="primary", key="btn_find_ifsc_live"):
+                    if col_b_btn.button("GET IFSC CODE", type="primary", key="btn_find_ifsc_live"):[cite: 13]
                         clean_ifsc = sanitize(input_ifsc).strip()
                         if len(clean_ifsc) == 11:
                             try:
@@ -1276,18 +1276,18 @@ elif menu == "Scholarship Portal":
                             st.error("Please enter a valid 11-digit IFSC code.")
                     
                     col_bnk1, col_bnk2 = st.columns(2)
-                    b_name = col_bnk1.text_input("Bank Name", value=st.session_state['verified_bank_name'])
-                    b_branch = col_bnk2.text_input("Branch Name", value=st.session_state['verified_branch_name'])
+                    b_name = col_bnk1.text_input("Bank Name", value=st.session_state['verified_bank_name'])[cite: 13]
+                    b_branch = col_bnk2.text_input("Branch Name", value=st.session_state['verified_branch_name'])[cite: 13]
                     
                     col_acc1, col_acc2, col_acc3 = st.columns(3)
-                    b_holder = col_acc1.text_input("Account Holder Name *", value=cur_user.get("name", "KULU SUTAR"))
-                    b_acc1 = col_acc2.text_input("Account No. *", type="password", value=draft.get("acc_no", "05993211069577"))
-                    b_acc2 = col_acc3.text_input("Re-type Account No. *", value=draft.get("acc_no", "05993211069577"))
+                    b_holder = col_acc1.text_input("Account Holder Name *", value=cur_user.get("name", "KULU SUTAR"))[cite: 13]
+                    b_acc1 = col_acc2.text_input("Account No. *", type="password", value=draft.get("acc_no", "05993211069577"))[cite: 13]
+                    b_acc2 = col_acc3.text_input("Re-type Account No. *", value=draft.get("acc_no", "05993211069577"))[cite: 13]
                     
                     st.write("")
                     col_seed, col_pass_up = st.columns(2)
-                    b_seeded = col_seed.radio("Whether account number tagged /seeded with the Identification number?", ["Yes", "No"], index=0)
-                    b_passbook_file = col_pass_up.file_uploader("Upload front page of passbook (PDF/JPG) *", type=['pdf', 'jpg', 'jpeg', 'png'])
+                    b_seeded = col_seed.radio("Whether account number tagged /seeded with the Identification number?", ["Yes", "No"], index=0)[cite: 13]
+                    b_passbook_file = col_pass_up.file_uploader("Upload front page of passbook (PDF/JPG) *", type=['pdf', 'jpg', 'jpeg', 'png'])[cite: 13]
                     
                     st.write("---")
                     col_btn_draft, col_btn_submit = st.columns(2)
@@ -1329,7 +1329,7 @@ elif menu == "Scholarship Portal":
                                 st.rerun()
 
             elif nav_choice == "📂 View / Renew Application":
-                st.markdown("### Submitted Applications")
+                st.markdown("### Submitted Applications")[cite: 8]
                 user_apps = {k: v for k, v in scholarships_db.items() if v.get("otr") == cur_user_id or v.get("app_name") == cur_user.get("name")}
                 if user_apps:
                     for a_id, a_data in user_apps.items():
@@ -1342,7 +1342,7 @@ elif menu == "Scholarship Portal":
                     st.info("No applications submitted yet. Click on 'Apply Scholarship' to submit.")
 
             elif nav_choice == "🔔 Notification":
-                st.markdown("### Official Notifications")
+                st.markdown("### Official Notifications")[cite: 8]
                 st.info(master_db.get("notice_text", "No new notifications at this time."))
 
 # ----------------- RESULTS PORTAL -----------------
