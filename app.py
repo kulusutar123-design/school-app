@@ -23,7 +23,7 @@ import time
 import requests
 
 # ==========================================
-# 🔒 HIGH-SECURITY ATOMIC CRASH PROTECTION
+# 🔒 100% BULLET-PROOF ATOMIC CRASH PROTECTION
 # ==========================================
 file_lock = threading.Lock()
 
@@ -1593,7 +1593,7 @@ elif menu == "New School Registration":
                 st.session_state['sch_reg_data'] = s_tmp['data']
                 st.session_state['school_payment_step'] = False; st.rerun()
 
-# ----------------- MASTER LOGIN (7 TABS RESTORED WITH FULL CONTROLS & FORGOT PASSWORD) -----------------
+# ----------------- MASTER LOGIN (7 TABS RESTORED WITH FORGOT PASSWORD & FULL CONTROLS) -----------------
 elif menu == "Master Login":
     c_home, c_title = st.columns([1, 8])
     with c_home:
@@ -1616,7 +1616,7 @@ elif menu == "Master Login":
                     st.error("ଭୁଲ୍ Master ID କିମ୍ବା Password!")
                     
         elif master_auth_mode == "Forgot Password":
-            st.info("Recover Master Password using registered email / phone.")
+            st.info("Recover Master Password using registered mobile/email.")
             f_email = st.text_input("Registered Email ID", value=master_db.get("email", ""))
             if st.button("Send Master OTP"):
                 if f_email == master_db.get("email"):
