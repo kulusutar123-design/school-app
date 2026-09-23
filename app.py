@@ -154,7 +154,7 @@ ISSUING_AUTHORITIES = [
 ]
 
 # ==========================================
-# 🤖 SECURE DATA LOADERS (PERMANENT RETENTION)
+# 🤖 SECURE DATA LOADERS (WITH PERMANENT RETENTION)
 # ==========================================
 def load_master_data():
     default_master = {
@@ -1207,73 +1207,73 @@ elif menu == "Scholarship Portal":
                         save_sch_users(sch_users_db)
                         st.success("Academic saved!")
 
-                # --- TAB 3: ELIGIBILITY INFORMATION (FIXED KEYS) ---
+                # --- TAB 3: ELIGIBILITY INFORMATION (WITH DEDICATED VERIFY BUTTONS) ---
                 with tab_e:
                     st.markdown("##### 1. Income Certificate Information")
                     if 'inc_verified_status' not in st.session_state:
                         st.session_state['inc_verified_status'] = False
-                        st.session_state['inc_holder_val'] = ""
+                        st.session_state['inc_holder_name'] = ""
                         st.session_state['inc_annual_val'] = "0"
 
                     col_inc1, col_inc2, col_inc_btn = st.columns([4, 4, 3])
-                    inc_cert_no = col_inc1.text_input("Income Certificate No. *", value=draft.get("inc_no", ""), key="input_inc_cert_number_unique")
-                    inc_year = col_inc2.selectbox("Issuance Year *", CERT_YEARS, index=2, key="sel_inc_iss_year_unique")
+                    inc_cert_no = col_inc1.text_input("Income Certificate No. *", value=draft.get("inc_no", ""))
+                    inc_year = col_inc2.selectbox("Issuance Year *", CERT_YEARS, index=2, key="sel_inc_yr")
                     
                     col_inc_btn.write("")
                     col_inc_btn.write("")
-                    if col_inc_btn.button("🔍 VERIFY INCOME", type="primary", key="btn_verify_income_cert_unique"):
+                    if col_inc_btn.button("🔍 VERIFY INCOME", type="primary", key="btn_verify_inc_cert"):
                         if inc_cert_no.strip() and inc_year != "Select":
                             st.session_state['inc_verified_status'] = True
-                            st.session_state['inc_holder_val'] = cur_user.get("name", "KULU SUTAR")
+                            st.session_state['inc_holder_name'] = cur_user.get("name", "KULU SUTAR")
                             st.session_state['inc_annual_val'] = "65000"
-                            st.success("✅ Income Certificate Verified Successfully!")
+                            st.success(f"✅ Verified! Issued to: {st.session_state['inc_holder_name']} | Annual Income: ₹65,000")
                         else:
                             st.error("Please enter Certificate No and select Year first.")
                     
                     col_inc3, col_inc4, col_inc5 = st.columns(3)
-                    inc_name_disp = col_inc3.text_input("To Whom Certificate Issued", value=st.session_state['inc_holder_val'], disabled=True, key="disp_inc_holder_name_unique")
-                    inc_amount_disp = col_inc4.text_input("Family Annual Income (₹) *", value=st.session_state['inc_annual_val'], key="input_inc_annual_income_unique")
+                    inc_name_disp = col_inc3.text_input("To Whom Certificate Issued", value=st.session_state['inc_holder_name'], disabled=True)
+                    inc_amount_disp = col_inc4.text_input("Family Annual Income (₹) *", value=st.session_state['inc_annual_val'])
                     try:
                         inc_in_words = number_to_words(int(st.session_state['inc_annual_val']))
                     except:
                         inc_in_words = "ZERO"
-                    col_inc5.text_input("Family Annual Income (In words)", value=inc_in_words, disabled=True, key="disp_inc_in_words_unique")
+                    col_inc5.text_input("Family Annual Income (In words)", value=inc_in_words, disabled=True)
                     
                     col_inc6, col_inc7 = st.columns(2)
-                    inc_auth = col_inc6.selectbox("Issuing Authority *", ISSUING_AUTHORITIES, index=1 if st.session_state['inc_verified_status'] else 0, key="sel_inc_auth_unique")
-                    inc_date = col_inc7.date_input("Issue Date *", value=datetime.date(2024, 2, 23), key="date_inc_issue_unique")
-                    inc_pdf = st.file_uploader("Upload Income Certificate *", type=['pdf', 'jpg', 'jpeg', 'png'], key="up_inc_pdf_file_unique")
+                    inc_auth = col_inc6.selectbox("Issuing Authority *", ISSUING_AUTHORITIES, index=1 if st.session_state['inc_verified_status'] else 0, key="sel_inc_auth")
+                    inc_date = col_inc7.date_input("Issue Date *", value=datetime.date(2024, 2, 23))
+                    inc_pdf = st.file_uploader("Upload Income Certificate (PDF / JPG) *", type=['pdf', 'jpg', 'jpeg', 'png'], key="up_inc_pdf_file")
                     
                     st.write("---")
                     st.markdown("##### 2. Caste Certificate Information")
                     if 'cas_verified_status' not in st.session_state:
                         st.session_state['cas_verified_status'] = False
-                        st.session_state['cas_holder_val'] = ""
+                        st.session_state['cas_holder_name'] = ""
                         st.session_state['cas_cat_val'] = "General"
 
                     col_cas1, col_cas2, col_cas_btn = st.columns([4, 4, 3])
-                    cas_year = col_cas1.selectbox("Caste Certificate Issuance Year *", CERT_YEARS, index=2, key="sel_cas_iss_year_unique")
-                    cas_cert_no = col_cas2.text_input("Caste Certificate No. *", value=draft.get("cas_no", ""), key="input_cas_cert_number_unique")
+                    cas_year = col_cas1.selectbox("Caste Certificate Issuance Year *", CERT_YEARS, index=2, key="sel_cas_yr")
+                    cas_cert_no = col_cas2.text_input("Caste Certificate No. *", value=draft.get("cas_no", ""))
                     
                     col_cas_btn.write("")
                     col_cas_btn.write("")
-                    if col_cas_btn.button("🔍 VERIFY CASTE", type="primary", key="btn_verify_caste_cert_unique"):
+                    if col_cas_btn.button("🔍 VERIFY CASTE", type="primary", key="btn_verify_cas_cert"):
                         if cas_cert_no.strip() and cas_year != "Select":
                             st.session_state['cas_verified_status'] = True
-                            st.session_state['cas_holder_val'] = cur_user.get("name", "KULU SUTAR")
+                            st.session_state['cas_holder_name'] = cur_user.get("name", "KULU SUTAR")
                             st.session_state['cas_cat_val'] = "OBC"
-                            st.success("✅ Caste Certificate Verified Successfully!")
+                            st.success(f"✅ Verified! Issued to: {st.session_state['cas_holder_name']} | Category: OBC")
                         else:
                             st.error("Please enter Caste Certificate No and select Year first.")
 
                     col_cas3, col_cas4, col_cas5 = st.columns(3)
-                    cas_name_disp = col_cas3.text_input("To Whom Certificate Issued", value=st.session_state['cas_holder_val'], disabled=True, key="disp_cas_holder_name_unique")
-                    cas_cat_disp = col_cas4.selectbox("Social Category", SOCIAL_CATEGORIES, index=SOCIAL_CATEGORIES.index(st.session_state['cas_cat_val']) if st.session_state['cas_cat_val'] in SOCIAL_CATEGORIES else 0, key="sel_cas_category_unique")
-                    cas_auth = col_cas5.selectbox("Caste Issuing Authority *", ISSUING_AUTHORITIES, index=1 if st.session_state['cas_verified_status'] else 0, key="sel_cas_auth_unique")
+                    cas_name_disp = col_cas3.text_input("To Whom Certificate Issued", value=st.session_state['cas_holder_name'], disabled=True)
+                    cas_cat_disp = col_cas4.selectbox("Social Category", SOCIAL_CATEGORIES, index=SOCIAL_CATEGORIES.index(st.session_state['cas_cat_val']) if st.session_state['cas_cat_val'] in SOCIAL_CATEGORIES else 0)
+                    cas_auth = col_cas5.selectbox("Caste Issuing Authority *", ISSUING_AUTHORITIES, index=1 if st.session_state['cas_verified_status'] else 0, key="sel_cas_auth")
                     
                     col_cas6, col_cas7 = st.columns(2)
-                    cas_date = col_cas6.date_input("Caste Issue Date *", value=datetime.date(2021, 11, 6), key="date_cas_issue_unique")
-                    cas_pdf = st.file_uploader("Upload Caste Certificate *", type=['pdf', 'jpg', 'jpeg', 'png'], key="up_cas_pdf_file_unique")
+                    cas_date = col_cas6.date_input("Caste Issue Date *", value=datetime.date(2021, 11, 6), key="dt_cas_issue")
+                    cas_pdf = st.file_uploader("Upload Caste Certificate (PDF / JPG) *", type=['pdf', 'jpg', 'jpeg', 'png'], key="up_cas_pdf_file")
                     
                     if st.button("💾 Save Eligibility Tab to Draft", key="btn_save_tab_e"):
                         cur_user["draft"].update({"inc_no": sanitize(inc_cert_no), "cas_no": sanitize(cas_cert_no)})
@@ -1629,6 +1629,11 @@ elif menu == "Master Login":
                         e_name = c_e1.text_input("Applicant Name", s_data.get('app_name', ''), key=f"ms_name_{app_id}")
                         e_aadhaar = c_e2.text_input("Identification", s_data.get('aadhaar', ''), key=f"ms_adh_{app_id}")
                         e_mob = c_e3.text_input("Mobile No", s_data.get('mobile', ''), key=f"ms_mob_{app_id}")
+                        
+                        c_e4, c_e5, c_e6 = st.columns(3)
+                        e_fname = c_e4.text_input("Father Name", s_data.get('father_name', ''), key=f"ms_fname_{app_id}")
+                        e_mname = c_e5.text_input("Mother Name", s_data.get('mother_name', ''), key=f"ms_mname_{app_id}")
+                        e_dob = c_e6.text_input("Date of Birth", s_data.get('dob', ''), key=f"ms_dob_{app_id}")
                         
                         if st.button("✅ Update Data & Approve Scholarship (Create Folder)", type="primary", key=f"m_sch_fwd_btn_{app_id}"):
                             s_data['app_name'] = sanitize(e_name)
