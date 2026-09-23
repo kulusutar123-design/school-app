@@ -1674,12 +1674,16 @@ elif menu == "Master Login":
                     if schools_db:
                         selected_del_s = st.selectbox("Select School to Delete", list(schools_db.keys()), key="del_school_sel_box_unique_123")
                         st.warning(f"⚠️ Warning: Deleting School ID '{selected_del_s}' will remove its records permanently.")
-                        if st.button("Confirm & Delete School", type="primary", key="confirm_del_school_btn_unique_456"):
+                        
+                        # Direct Action Button for Immediate Deletion
+                        if st.button("🗑️ Click Here to Permanently Delete School", type="primary", key="direct_del_action_btn_999"):
                             if selected_del_s in schools_db:
                                 del schools_db[selected_del_s]
-                                if selected_del_s in students_db: del students_db[selected_del_s]
+                                if selected_del_s in students_db: 
+                                    del students_db[selected_del_s]
                                 save_data(schools_db, students_db)
                                 st.success(f"School ID {selected_del_s} deleted successfully!")
+                                time.sleep(0.5)
                                 st.rerun()
                     else:
                         st.info("No schools available to delete.")
