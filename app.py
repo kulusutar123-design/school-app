@@ -1102,7 +1102,7 @@ elif menu == "New Student Registration":
                             "school_code": school_sel, "class": "1", "batch": "2025-2026",
                             "subjects": {}, "total_full": 0, "total_obt": 0, "percentage": 0.0,
                             "result": "N/A", "grade": "N/A", "pub_date": str(datetime.date.today()),
-                            "payment_mode": "Pending", "status": "Pending_Master", "total_fee": total_fee
+                            "payment_mode": "Pending", "status": "Pending_School", "total_fee": total_fee
                         }
                     }
                     st.session_state['payment_step'] = True; st.rerun()
