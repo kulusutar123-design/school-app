@@ -1611,91 +1611,110 @@ elif menu == "Master Login":
         t1, t2, t3, t4, t5, t6, t7 = st.tabs(["👁️ Schools", "💳 Payments", "🎓 Scholarships Verify", "🎓 Edit Students", "⚙️ Settings", "🏦 Gateway", "🖼️ Display & Backgrounds"])
         
         with t1:
-            st.markdown("### 🏫 Manage, Edit, Approve & Delete Schools")
+            st.markdown("### 🏫 School Management Dashboard")
             
-            # Add New School Directly from Master
-            with st.expander("➕ Add New School Directly"):
-                new_s_id = st.text_input("New School ID *", key="m_add_s_id")
-                new_s_name = st.text_input("School Name *", key="m_add_s_name")
-                new_s_pass = st.text_input("School Password *", type="password", key="m_add_s_pass")
-                new_s_state = st.selectbox("State", list(STATE_LANG_MAP.keys()), index=18, key="m_add_s_state")
-                if st.button("Create School", key="m_create_school_btn"):
-                    clean_s_id = sanitize(new_s_id)
-                    if clean_s_id and new_s_name and new_s_pass:
-                        schools_db[clean_s_id] = {
-                            "name": sanitize(new_s_name),
-                            "name_local": "",
-                            "hm_name": "Admin",
-                            "hm_phone": "9999999999",
-                            "pass": new_s_pass,
-                            "state": new_s_state,
-                            "lang": STATE_LANG_MAP[new_s_state],
-                            "status": "Active",
-                            "payment_mode": "Master Created"
-                        }
-                        save_data(schools_db, students_db)
-                        st.success(f"School {clean_s_id} created successfully!")
-                        st.rerun()
+            # Master Control Box (Expander) for Add, Edit, Delete, Active/Inactive
+            with st.expander("⚙️ Master School Control Box (Add / Edit / Delete / Status)", expanded=True):
+                m_action = st.radio("Choose Action", ["Add New School", "Edit Existing School", "Delete School", "Toggle Active / Inactive Status"], horizontal=True)
+                
+                if m_action == "Add New School":
+                    st.markdown("#### ➕ Add New School Form")
+                    with st.form("master_add_school_form"):
+                        n_s_id = st.text_input("School ID *")
+                        n_s_name = st.text_input("School Name *")
+                        n_s_pass = st.text_input("School Password *", type="password")
+                        n_s_state = st.selectbox("State", list(STATE_LANG_MAP.keys()), index=18)
+                        n_hm_name = st.text_input("Head Master Name")
+                        n_hm_phone = st.text_input("HM Phone Number")
+                        
+                        if st.form_submit_button("Save & Create School"):
+                            clean_id = sanitize(n_s_id)
+                            if clean_id and n_s_name and n_s_pass:
+                                schools_db[clean_id] = {
+                                    "name": sanitize(n_s_name),
+                                    "name_local": "",
+                                    "hm_name": sanitize(n_hm_name),
+                                    "hm_phone": sanitize(n_hm_phone),
+                                    "pass": n_s_pass,
+                                    "state": n_s_state,
+                                    "lang": STATE_LANG_MAP[n_s_state],
+                                    "status": "Active",
+                                    "payment_mode": "Master Created"
+                                }
+                                save_data(schools_db, students_db)
+                                st.success(f"School ID {clean_id} successfully created!")
+                                st.rerun()
+                            else:
+                                st.error("Please fill all mandatory fields (*).")
+
+                elif m_action == "Edit Existing School":
+                    st.markdown("#### ✏️ Edit School Details")
+                    if schools_db:
+                        selected_edit_s = st.selectbox("Select School to Edit", list(schools_db.keys()))
+                        s_curr = schools_db[selected_edit_s]
+                        with st.form("master_edit_school_form"):
+                            e_name = st.text_input("School Name", value=s_curr.get('name', ''))
+                            e_pass = st.text_input("School Password", value=s_curr.get('pass', ''))
+                            e_hm = st.text_input("HM Name", value=s_curr.get('hm_name', ''))
+                            e_phone = st.text_input("HM Phone", value=s_curr.get('hm_phone', ''))
+                            
+                            if st.form_submit_button("Update School Details"):
+                                schools_db[selected_edit_s]['name'] = sanitize(e_name)
+                                schools_db[selected_edit_s]['pass'] = e_pass
+                                schools_db[selected_edit_s]['hm_name'] = sanitize(e_hm)
+                                schools_db[selected_edit_s]['hm_phone'] = sanitize(e_phone)
+                                save_data(schools_db, students_db)
+                                st.success(f"School {selected_edit_s} updated successfully!")
+                                st.rerun()
                     else:
-                        st.error("Please fill all required fields.")
+                        st.info("No schools available.")
+
+                elif m_action == "Delete School":
+                    st.markdown("#### 🗑️ Delete School Record")
+                    if schools_db:
+                        selected_del_s = st.selectbox("Select School to Delete", list(schools_db.keys()), key="del_school_sel_box")
+                        st.warning(f"⚠️ Warning: Deleting School ID '{selected_del_s}' will remove its records permanently.")
+                        if st.button("Confirm & Delete School", type="primary"):
+                            if selected_del_s in schools_db:
+                                del schools_db[selected_del_s]
+                                if selected_del_s in students_db: del students_db[selected_del_s]
+                                save_data(schools_db, students_db)
+                                st.success(f"School ID {selected_del_s} deleted successfully!")
+                                st.rerun()
+                    else:
+                        st.info("No schools available to delete.")
+
+                elif m_action == "Toggle Active / Inactive Status":
+                    st.markdown("#### 🔄 Manage School Active / Inactive Status")
+                    if schools_db:
+                        selected_stat_s = st.selectbox("Select School", list(schools_db.keys()), key="stat_school_sel_box")
+                        curr_status = schools_db[selected_stat_s].get("status", "Active")
+                        st.info(f"Current Status of {selected_stat_s}: **{curr_status}**")
+                        
+                        col_st1, col_st2 = st.columns(2)
+                        if col_st1.button("✅ Set as Active"):
+                            schools_db[selected_stat_s]["status"] = "Active"
+                            save_data(schools_db, students_db)
+                            st.success(f"School {selected_stat_s} is now Active!")
+                            st.rerun()
+                        if col_st2.button("🚫 Set as Inactive"):
+                            schools_db[selected_stat_s]["status"] = "Inactive"
+                            save_data(schools_db, students_db)
+                            st.warning(f"School {selected_stat_s} is now Inactive!")
+                            st.rerun()
 
             st.write("---")
-            st.markdown("#### Existing Schools List, Approvals & Controls")
+            st.markdown("#### All Registered Schools Overview & Quick Approvals")
             for s_id, s_info in list(schools_db.items()):
                 status = s_info.get("status", "Active") 
                 bg = "#f0fdf4" if status == "Active" else "#fef2f2"
                 st.markdown(f"<div style='border:1px solid #cbd5e1; padding:10px; margin-bottom:10px; background-color:{bg};'><b>School ID:</b> {s_id} | <b>Name:</b> {s_info['name']} | <b>Status:</b> {status} | <b>Payment:</b> {s_info.get('payment_mode', 'N/A')}</div>", unsafe_allow_html=True)
-                
-                col_m_act1, col_m_act2, col_m_act3, col_m_act4 = st.columns(4)
-                
-                # Approve Pending Registration
                 if status == "Pending_Master_Approval":
-                    if col_m_act1.button(f"✅ Verify & Approve {s_id}", key=f"app_s_{s_id}"):
-                        s_info["status"] = "Active"
+                    if st.button(f"✅ Verify & Approve Registration for {s_id}", key=f"quick_app_{s_id}"):
+                        schools_db[s_id]["status"] = "Active"
                         save_data(schools_db, students_db)
-                        st.success(f"School {s_id} Approved & Activated!")
+                        st.success(f"School {s_id} approved!")
                         st.rerun()
-                elif status == "Active":
-                    if col_m_act1.button(f"🚫 Make Inactive {s_id}", key=f"inact_s_{s_id}"):
-                        s_info["status"] = "Inactive"
-                        save_data(schools_db, students_db)
-                        st.warning(f"School {s_id} marked Inactive!")
-                        st.rerun()
-                else:
-                    if col_m_act1.button(f"✅ Make Active {s_id}", key=f"act_s_{s_id}"):
-                        s_info["status"] = "Active"
-                        save_data(schools_db, students_db)
-                        st.success(f"School {s_id} activated!")
-                        st.rerun()
-                
-                # Edit School Details
-                if col_m_act2.button(f"✏️ Edit Details {s_id}", key=f"edit_s_{s_id}"):
-                    st.session_state[f'editing_school_{s_id}'] = not st.session_state.get(f'editing_school_{s_id}', False)
-
-                # Delete School Option
-                if col_m_act3.button(f"🗑️ Delete School {s_id}", key=f"del_s_{s_id}"):
-                    if s_id in schools_db:
-                        del schools_db[s_id]
-                        if s_id in students_db: del students_db[s_id]
-                        save_data(schools_db, students_db)
-                        st.error(f"School {s_id} deleted successfully!")
-                        st.rerun()
-
-                if st.session_state.get(f'editing_school_{s_id}', False):
-                    with st.form(key=f"form_edit_school_{s_id}"):
-                        up_s_name = st.text_input("Edit School Name", value=s_info.get('name', ''))
-                        up_s_pass = st.text_input("Edit Password", value=s_info.get('pass', ''))
-                        up_hm_name = st.text_input("Edit HM Name", value=s_info.get('hm_name', ''))
-                        up_hm_phone = st.text_input("Edit HM Phone", value=s_info.get('hm_phone', ''))
-                        if st.form_submit_button("Save Changes"):
-                            s_info['name'] = sanitize(up_s_name)
-                            s_info['pass'] = up_s_pass
-                            s_info['hm_name'] = sanitize(up_hm_name)
-                            s_info['hm_phone'] = sanitize(up_hm_phone)
-                            save_data(schools_db, students_db)
-                            st.success("School details updated!")
-                            st.session_state[f'editing_school_{s_id}'] = False
-                            st.rerun()
 
         with t2:
             st.markdown("### 💳 Verify Student Payments (Master)")
