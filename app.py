@@ -23,7 +23,7 @@ import time
 import requests
 
 # ==========================================
-# 🔒 100% BULLET-PROOF ATOMIC CRASH & HACK PROTECTION (1 CR+ USERS READY)
+# 🔒 100% BULLET-PROOF ATOMIC CRASH & HACK PROTECTION
 # ==========================================
 file_lock = threading.Lock()
 
