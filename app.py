@@ -1672,9 +1672,9 @@ elif menu == "Master Login":
                 elif m_action == "Delete School":
                     st.markdown("#### 🗑️ Delete School Record")
                     if schools_db:
-                        selected_del_s = st.selectbox("Select School to Delete", list(schools_db.keys()), key="del_school_sel_box")
+                        selected_del_s = st.selectbox("Select School to Delete", list(schools_db.keys()), key="del_school_sel_box_unique_123")
                         st.warning(f"⚠️ Warning: Deleting School ID '{selected_del_s}' will remove its records permanently.")
-                        if st.button("Confirm & Delete School", type="primary"):
+                        if st.button("Confirm & Delete School", type="primary", key="confirm_del_school_btn_unique_456"):
                             if selected_del_s in schools_db:
                                 del schools_db[selected_del_s]
                                 if selected_del_s in students_db: del students_db[selected_del_s]
