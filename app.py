@@ -485,7 +485,7 @@ def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no,
 </tr>
 {rows_html}
 <tr style='color: {b_col}; font-weight: bold; background-color: {t_bg}; border-top: 2px solid {b_col};'>
-<td style='padding: 10px; border-right: 1px solid {b_col}; text-align: right;'>TOTAL MARKS</td><td style='padding: 10px; border-right: 1px solid {b_col}; color:#000;'>{st_data.get('total_full', 0)}</td><td style='padding: 10px; color:#000;'>{tot_obt}</td>
+<td style='padding: 10px; border-right: 1px solid {b_col}; text-align: right;'>TOTAL MARKS</td><td style='padding: 10px; border-right: 1px solid {b_col}; color:#000;'>{tot_full}</td><td style='padding: 10px; color:#000;'>{tot_obt}</td>
 </tr>
 </table>
 <div style='text-align: center; font-weight: bold; font-size: 14px; margin-top: 20px; color:#000;'>( {w_tot_en} )</div>
@@ -1691,6 +1691,10 @@ elif menu == "Master Login":
             up_m_upi = st.text_input("Online Payment UPI ID (e.g. school@sbi)", value=master_db.get("upi_id", ""), key="m_set_upi")
             
             st.markdown("#### 💰 Global Fee Configuration")
+            c_f1, c_f2 = st.columns(2)
+            up_base_fee = c_f1.number_input("Student Registration Base Fee (₹)", value=float(master_db.get("reg_fee", 150.0)), min_value=0.0, key="m_set_fee_gw")
+            up_gst_pct = c_f2.number_input("Student GST Percentage (%)", value=float(master_db.get("gst_percent", 18.0)), min_value=0.0, key="m_set_gst_gw")
+            
             c_s1, c_s2 = st.columns(2)
             up_sch_fee = c_s1.number_input("School Registration Base Fee (₹)", value=float(master_db.get("school_reg_fee", 1000.0)), min_value=0.0, key="m_set_sfee_t5")
             up_sch_gst = c_s2.number_input("School GST Percentage (%)", value=float(master_db.get("school_gst_percent", 18.0)), min_value=0.0, key="m_set_sgst_t5")
@@ -1703,6 +1707,7 @@ elif menu == "Master Login":
                 master_db["sms_api_key"] = sanitize(up_sms_api)
                 master_db["username"] = sanitize(up_m_user); master_db["email"] = sanitize(up_m_email)
                 master_db["phone"] = sanitize(up_m_phone); master_db["upi_id"] = sanitize(up_m_upi)
+                master_db["reg_fee"] = float(up_base_fee); master_db["gst_percent"] = float(up_gst_pct)
                 master_db["school_reg_fee"] = float(up_sch_fee); master_db["school_gst_percent"] = float(up_sch_gst)
                 master_db["scholarship_fee"] = float(up_schol_fee); master_db["scholarship_gst_percent"] = float(up_schol_gst)
                 master_db["notice_text"] = up_notice
@@ -1718,32 +1723,16 @@ elif menu == "Master Login":
 
         with t6:
             st.markdown("### 🏦 School Payment Gateway Setup")
-            st.info("Configure the Student Registration Fees and individual School Gateways.")
-            
-            st.markdown("#### 💰 Student Registration Fee Configuration")
-            with st.form("m_fee_form"):
-                c_f1, c_f2 = st.columns(2)
-                up_base_fee = c_f1.number_input("New Student Registration Base Fee (₹)", value=float(master_db.get("reg_fee", 150.0)), min_value=0.0, key="m_set_fee_gw")
-                up_gst_pct = c_f2.number_input("Student GST Percentage (%)", value=float(master_db.get("gst_percent", 18.0)), min_value=0.0, key="m_set_gst_gw")
-                
-                if st.form_submit_button("💾 Save Student Fee Settings"):
-                    master_db["reg_fee"] = float(up_base_fee)
-                    master_db["gst_percent"] = float(up_gst_pct)
-                    save_master_data(master_db)
-                    st.success("Student Fee settings successfully updated!")
-                    st.rerun()
-
-            st.markdown("---")
-            st.markdown("#### 🔗 Individual School Gateway Setup")
+            st.info("Set up individual Payment Gateways for Schools. Students will pay using these details.")
             if schools_db:
                 pg_school = st.selectbox("Select School to configure Gateway", list(schools_db.keys()), key="m_gw_sch_sel")
                 curr_sch = schools_db[pg_school]
                 
-                sch_upi = st.text_input(f"School UPI ID (for {curr_sch['name']})", value=curr_sch.get('pg_upi', ''), key="m_gw_upi")
-                sch_merch = st.text_input("Payment Gateway Merchant ID", value=curr_sch.get('pg_merchant', ''), key="m_gw_merch")
-                sch_key = st.text_input("Payment Gateway Secret Key (Hidden)", value=curr_sch.get('pg_key', ''), type="password", key="m_gw_key")
+                sch_upi = st.text_input(f"School UPI ID (for {curr_sch['name']})", value=curr_sch.get('pg_upi', ''), key=f"m_gw_upi_{pg_school}")
+                sch_merch = st.text_input("Payment Gateway Merchant ID", value=curr_sch.get('pg_merchant', ''), key=f"m_gw_merch_{pg_school}")
+                sch_key = st.text_input("Payment Gateway Secret Key (Hidden)", value=curr_sch.get('pg_key', ''), type="password", key=f"m_gw_key_{pg_school}")
                 
-                if st.button("💾 Save School Gateway Settings", key="m_gw_save"):
+                if st.button("💾 Save School Gateway Settings", key=f"m_gw_save_{pg_school}"):
                     schools_db[pg_school]['pg_upi'] = sanitize(sch_upi)
                     schools_db[pg_school]['pg_merchant'] = sanitize(sch_merch)
                     schools_db[pg_school]['pg_key'] = sanitize(sch_key)
