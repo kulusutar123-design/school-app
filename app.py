@@ -456,7 +456,7 @@ def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no,
     tot_full = st_data.get('total_full', 0)
     w_tot_en = number_to_words(tot_obt)
     s_name_en = st_data.get('name', 'N/A').upper()
-    qr_text = f"SCHOOL: {school_name_en} | NAME: {s_name_en} | ROLL: {roll_no} | DOB: {disp_dob} | MARKS: {tot_obt}/{st_data.get('total_full', 0)} | GRADE: {st_data.get('grade', '')}"
+    qr_text = f"Name: {s_name_en}\nRoll No: {roll_no}\nClass: {st_data.get('class', '')}\nDOB: {disp_dob}\nMarks: {tot_obt}/{tot_full}\nResult: {st_data.get('result', 'PASS')} [{st_data.get('grade', '')}]\nSchool: {school_name_en}"
     qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={urllib.parse.quote(qr_text)}"
     bc_url = f"https://barcode.tec-it.com/barcode.ashx?data={roll_no}&code=Code128&dpi=96"
     rows_html = "".join([f"<tr style='border-bottom: 1px solid {b_col};'><td style='padding: 8px; border-right: 1px solid {b_col}; text-align: left; font-weight: bold; color: #000;'>{sub.upper()}</td><td style='padding: 8px; border-right: 1px solid {b_col}; color: #000;'>{m['full']}</td><td style='padding: 8px; font-weight: bold; color: #000;'>{m['obt']}</td></tr>" for sub, m in st_data.get('subjects', {}).items()])
@@ -485,7 +485,7 @@ def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no,
 </tr>
 {rows_html}
 <tr style='color: {b_col}; font-weight: bold; background-color: {t_bg}; border-top: 2px solid {b_col};'>
-<td style='padding: 10px; border-right: 1px solid {b_col}; text-align: right;'>TOTAL MARKS</td><td style='padding: 10px; border-right: 1px solid {b_col}; color:#000;'>{st_data.get('total_full', 0)}</td><td style='padding: 10px; color:#000;'>{tot_obt}</td>
+<td style='padding: 10px; border-right: 1px solid {b_col}; text-align: right;'>TOTAL MARKS</td><td style='padding: 10px; border-right: 1px solid {b_col}; color:#000;'>{tot_full}</td><td style='padding: 10px; color:#000;'>{tot_obt}</td>
 </tr>
 </table>
 <div style='text-align: center; font-weight: bold; font-size: 14px; margin-top: 20px; color:#000;'>( {w_tot_en} )</div>
@@ -619,7 +619,6 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.drawString(200, curr_y, f"PERCENTAGE: {st_data.get('percentage', 0.0)}%")
     c.drawString(400, curr_y, f"FINAL GRADE: {st_data.get('grade', 'N/A')}")
     
-    # Standard Barcode
     curr_y -= 85
     clean_roll = str(roll_no).strip()
     try:
@@ -629,7 +628,6 @@ def create_pdf(filename, school_name, st_data, roll_no):
         c.setFont("Helvetica-Bold", 10)
         c.drawString(45, curr_y + 20, f"ROLL: {clean_roll}")
         
-    # Detailed Scannable QR Code
     try:
         tot_m = f"{st_data.get('total_obt', 0)}/{st_data.get('total_full', 0)}"
         qr_content = f"Name: {st_data.get('name', '').upper()}\nRoll: {roll_no}\nClass: {st_data.get('class', '')}\nDOB: {disp_dob}\nMarks: {tot_m}\nResult: {st_data.get('result', 'PASS')} [{st_data.get('grade', '')}]"
@@ -644,7 +642,6 @@ def create_pdf(filename, school_name, st_data, roll_no):
     except Exception:
         pass
 
-    # Signatures
     c.setStrokeColorRGB(0.59, 0.25, 0.60)
     c.setLineWidth(1)
     
@@ -1137,13 +1134,8 @@ elif menu == "Scholarship Portal":
                         var timeLeft = 60;
                         var elem = document.getElementById('time');
                         var timerId = setInterval(function() {
-                            if (timeLeft <= 0) {
-                                clearTimeout(timerId);
-                                elem.innerHTML = "Expired";
-                            } else {
-                                timeLeft--;
-                                elem.innerHTML = timeLeft;
-                            }
+                            if (timeLeft <= 0) { clearTimeout(timerId); elem.innerHTML = "Expired"; }
+                            else { timeLeft--; elem.innerHTML = timeLeft; }
                         }, 1000);
                     </script>
                     """
@@ -1578,20 +1570,19 @@ elif menu == "Master Login":
                     st.info("No schools to edit.")
 
         with t2:
-            st.markdown("### 💳 Verify Student Payments (Master)")
+            st.markdown("### 💳 View Student Payments (Master)")
+            st.info("Payment approval is now handled directly by the respective Schools. This tab allows you to monitor all global transactions.")
             pending_master = []
             for s_id, s_studs in students_db.items():
                 for r_no, p_st in s_studs.items():
-                    if p_st.get("status") == "Pending_Master":
+                    if p_st.get("status") in ["Pending_Master", "Pending_School"]:
                         pending_master.append((s_id, r_no, p_st))
             if pending_master:
                 for s_id, r_no, p_st in pending_master:
-                    st.write(f"**Reg:** {r_no} | **Name:** {p_st.get('name')} | **Amount:** ₹{p_st.get('total_fee', 0)}")
-                    c_pay1, c_pay2 = st.columns(2)
-                    if c_pay1.button(f"✅ Verify {r_no}", key=f"vp_{r_no}"):
-                        p_st["status"] = "Pending_School"; save_data(schools_db, students_db); st.success("Verified!"); st.rerun()
-                    if c_pay2.button(f"🚫 Reject {r_no}", key=f"rp_{r_no}"):
-                        p_st['status'] = "Rejected_Refund"; save_data(schools_db, students_db); st.error("Rejected"); st.rerun()
+                    st.markdown(f"<div style='border:1px solid #e2e8f0; padding:10px; border-radius:5px; margin-bottom:5px;'>"
+                                f"<b>School:</b> {s_id} | <b>Reg No:</b> {r_no} | <b>Name:</b> {p_st.get('name')}<br>"
+                                f"<b>Amount:</b> ₹{p_st.get('total_fee', 0)} | <b>Status:</b> {p_st.get('payment_mode', 'N/A')}</div>", 
+                                unsafe_allow_html=True)
             else: st.success("No pending student payments.")
 
         with t3:
@@ -1804,21 +1795,11 @@ elif menu == "Master Login":
             up_m_email = st.text_input("Recovery Email", value=master_db.get("email", ""), key="m_set_eml")
             up_m_phone = st.text_input("Recovery Phone Number", value=master_db.get("phone", ""), key="m_set_phn")
             up_m_upi = st.text_input("Online Payment UPI ID (e.g. school@sbi)", value=master_db.get("upi_id", ""), key="m_set_upi")
-            
-            c_f1, c_f2 = st.columns(2)
-            up_base_fee = c_f1.number_input("Student Registration Base Fee (₹)", value=float(master_db.get("reg_fee", 150.0)), min_value=0.0, key="m_set_fee")
-            up_gst_pct = c_f2.number_input("Student GST Percentage (%)", value=float(master_db.get("gst_percent", 18.0)), min_value=0.0, key="m_set_gst")
-            
-            c_s1, c_s2 = st.columns(2)
-            up_sch_fee = c_s1.number_input("School Registration Base Fee (₹)", value=float(master_db.get("school_reg_fee", 1000.0)), min_value=0.0, key="m_set_sfee")
-            up_sch_gst = c_s2.number_input("School GST Percentage (%)", value=float(master_db.get("school_gst_percent", 18.0)), min_value=0.0, key="m_set_sgst")
 
             if st.button("Save Profile & Settings", key="m_set_save_all"):
                 master_db["sms_api_key"] = sanitize(up_sms_api)
                 master_db["username"] = sanitize(up_m_user); master_db["email"] = sanitize(up_m_email)
                 master_db["phone"] = sanitize(up_m_phone); master_db["upi_id"] = sanitize(up_m_upi)
-                master_db["reg_fee"] = float(up_base_fee); master_db["gst_percent"] = float(up_gst_pct)
-                master_db["school_reg_fee"] = float(up_sch_fee); master_db["school_gst_percent"] = float(up_sch_gst)
                 master_db["notice_text"] = up_notice
                 master_db["news_text"] = up_news
                 master_db["font_family"] = up_ff
@@ -1831,8 +1812,30 @@ elif menu == "Master Login":
                 st.rerun()
 
         with t6:
-            st.markdown("### 🏦 School Payment Gateway Setup (Master Control)")
-            st.info("Set up individual Payment Gateways for Schools. Students will pay using these details.")
+            st.markdown("### 🏦 School Payment Gateway & Fee Settings")
+            st.info("Configure the global application fees for Students & Schools, and manage individual School Gateways.")
+            
+            st.markdown("#### 💰 Global Fee Configuration")
+            with st.form("m_fee_form"):
+                c_f1, c_f2 = st.columns(2)
+                up_base_fee = c_f1.number_input("Student Registration Base Fee (₹)", value=float(master_db.get("reg_fee", 150.0)), min_value=0.0, key="m_set_fee_gw")
+                up_gst_pct = c_f2.number_input("Student GST Percentage (%)", value=float(master_db.get("gst_percent", 18.0)), min_value=0.0, key="m_set_gst_gw")
+                
+                c_s1, c_s2 = st.columns(2)
+                up_sch_fee = c_s1.number_input("School Registration Base Fee (₹)", value=float(master_db.get("school_reg_fee", 1000.0)), min_value=0.0, key="m_set_sfee_gw")
+                up_sch_gst = c_s2.number_input("School GST Percentage (%)", value=float(master_db.get("school_gst_percent", 18.0)), min_value=0.0, key="m_set_sgst_gw")
+                
+                if st.form_submit_button("💾 Save Global Fee Settings"):
+                    master_db["reg_fee"] = float(up_base_fee)
+                    master_db["gst_percent"] = float(up_gst_pct)
+                    master_db["school_reg_fee"] = float(up_sch_fee)
+                    master_db["school_gst_percent"] = float(up_sch_gst)
+                    save_master_data(master_db)
+                    st.success("Fee settings successfully updated!")
+                    st.rerun()
+
+            st.markdown("---")
+            st.markdown("#### 🔗 Individual School Gateway Setup")
             if schools_db:
                 pg_school = st.selectbox("Select School to configure Gateway", list(schools_db.keys()), key="m_gw_sch_sel")
                 curr_sch = schools_db[pg_school]
@@ -1966,13 +1969,24 @@ elif menu == "School Login":
             else: st.warning("No students found.")
             
         with t_reg:
-            st.markdown("### ✅ Review Online Registrations")
+            st.markdown("### ✅ Review Online Registrations & Payments")
+            st.info("Verify the student's payment details and approve or reject the application.")
             pending_students = {k:v for k,v in cur_students.items() if v.get('status') in ['Pending_School', 'Pending_Master']}
             if pending_students:
                 app_roll = st.selectbox("Select Pending Student", list(pending_students.keys()), key="s_pend_roll_sel")
-                if st.button("✅ Final Approve", key="s_pend_app_btn"):
+                p_st = pending_students[app_roll]
+                
+                st.info(f"**Student Name:** {p_st.get('name')} | **Class:** {p_st.get('class', 'N/A')}\n\n"
+                        f"**Amount Paid:** ₹{p_st.get('total_fee', 0)}\n\n"
+                        f"**Payment Details:** {p_st.get('payment_mode', 'N/A')}")
+                        
+                c_btn1, c_btn2 = st.columns(2)
+                if c_btn1.button("✅ Approve Student", key="s_pend_app_btn"):
                     cur_students[app_roll]["status"] = "Approved"
                     save_data(schools_db, students_db); st.success("Approved!"); st.rerun()
+                if c_btn2.button("🚫 Reject Application", key="s_pend_rej_btn"):
+                    cur_students[app_roll]["status"] = "Rejected"
+                    save_data(schools_db, students_db); st.error("Application Rejected!"); st.rerun()
             else: st.success("No pending approvals.")
                 
         with t_add:
