@@ -20,6 +20,8 @@ import threading
 import base64
 import time
 import requests
+import smtplib
+from email.message import EmailMessage
 
 # ==========================================
 # 🔒 HIGH-SECURITY ATOMIC CRASH PROTECTION
@@ -54,29 +56,41 @@ def check_brute_force():
         st.stop()
 
 # ==========================================
-# 📱 DUAL GATEWAY: WHATSAPP & EMAIL OTP
+# 📱 DUAL GATEWAY: WHATSAPP & ACTUAL EMAIL OTP
 # ==========================================
 def send_real_sms(mobile_or_email, otp_code, student_name="User"):
     target = str(mobile_or_email).strip()
     
-    clean_mob = "".join([c for c in target if c.isdigit()])
-    if len(clean_mob) == 10:
-        clean_mob = "91" + clean_mob
-    
-    wa_msg = f"Hello {student_name}, your Verification OTP for School Management System is: *{otp_code}*. Please enter this code to verify."
-    encoded_msg = urllib.parse.quote(wa_msg)
-    wa_link = f"https://api.whatsapp.com/send?phone={clean_mob}&text={encoded_msg}" if clean_mob else None
-    
     if "@" in target:
-        st.success(f"✅ OTP Generated for Email: **{target}**")
-        st.info(f"📧 [EMAIL OTP NOTIFICATION] Hello {student_name}, your OTP is: **{otp_code}**")
+        try:
+            msg = EmailMessage()
+            msg.set_content(f"Hello {student_name},\n\nYour Verification OTP for School Management System is: {otp_code}\n\nPlease enter this code to verify your account.\n\nThanks,\nSchool Admin")
+            msg['Subject'] = "OTP Verification - School Management System"
+            msg['From'] = "kulusutar123@gmail.com"
+            msg['To'] = target
+
+            with smtplib.SMTP("smtp.gmail.com", 587) as server:
+                server.starttls()
+                server.login("kulusutar123@gmail.com", "nfmh uncm cabq pdrj")
+                server.send_message(msg)
+            
+            st.success(f"✅ OTP Sent successfully to Email: **{target}**")
+        except Exception as e:
+            st.error(f"❌ Email sending failed: {e}")
+            
     else:
+        clean_mob = "".join([c for c in target if c.isdigit()])
+        if len(clean_mob) == 10:
+            clean_mob = "91" + clean_mob
+        
+        wa_msg = f"Hello {student_name}, your Verification OTP for School Management System is: *{otp_code}*. Please enter this code to verify."
+        encoded_msg = urllib.parse.quote(wa_msg)
+        wa_link = f"https://api.whatsapp.com/send?phone={clean_mob}&text={encoded_msg}" if clean_mob else None
+        
         st.success(f"✅ OTP Generated for Mobile: **{target}**")
-        st.info(f"📲 [SYSTEM OTP FALLBACK] Verification OTP: **{otp_code}**")
-        
-    if wa_link:
-        st.markdown(f"<a href='{wa_link}' target='_blank' style='background-color:#25D366; color:white; padding:10px 20px; border-radius:6px; text-decoration:none; font-weight:bold; font-size:15px; display:inline-block; margin-top:8px; margin-bottom:12px;'>💬 Send OTP via WhatsApp</a>", unsafe_allow_html=True)
-        
+        if wa_link:
+            st.markdown(f"<a href='{wa_link}' target='_blank' style='background-color:#25D366; color:white; padding:10px 20px; border-radius:6px; text-decoration:none; font-weight:bold; font-size:15px; display:inline-block; margin-top:8px; margin-bottom:12px;'>💬 Send OTP via WhatsApp</a>", unsafe_allow_html=True)
+            
     st.session_state['sms_error'] = ""
     return True
 
