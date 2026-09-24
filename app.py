@@ -485,7 +485,7 @@ def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no,
 </tr>
 {rows_html}
 <tr style='color: {b_col}; font-weight: bold; background-color: {t_bg}; border-top: 2px solid {b_col};'>
-<td style='padding: 10px; border-right: 1px solid {b_col}; text-align: right;'>TOTAL MARKS</td><td style='padding: 10px; border-right: 1px solid {b_col}; color:#000;'>{tot_full}</td><td style='padding: 10px; color:#000;'>{tot_obt}</td>
+<td style='padding: 10px; border-right: 1px solid {b_col}; text-align: right;'>TOTAL MARKS</td><td style='padding: 10px; border-right: 1px solid {b_col}; color:#000;'>{st_data.get('total_full', 0)}</td><td style='padding: 10px; color:#000;'>{tot_obt}</td>
 </tr>
 </table>
 <div style='text-align: center; font-weight: bold; font-size: 14px; margin-top: 20px; color:#000;'>( {w_tot_en} )</div>
@@ -619,6 +619,7 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.drawString(200, curr_y, f"PERCENTAGE: {st_data.get('percentage', 0.0)}%")
     c.drawString(400, curr_y, f"FINAL GRADE: {st_data.get('grade', 'N/A')}")
     
+    # Standard Barcode
     curr_y -= 85
     clean_roll = str(roll_no).strip()
     try:
@@ -628,6 +629,7 @@ def create_pdf(filename, school_name, st_data, roll_no):
         c.setFont("Helvetica-Bold", 10)
         c.drawString(45, curr_y + 20, f"ROLL: {clean_roll}")
         
+    # Detailed Scannable QR Code
     try:
         tot_m = f"{st_data.get('total_obt', 0)}/{st_data.get('total_full', 0)}"
         qr_content = f"Name: {st_data.get('name', '').upper()}\nRoll: {roll_no}\nClass: {st_data.get('class', '')}\nDOB: {disp_dob}\nMarks: {tot_m}\nResult: {st_data.get('result', 'PASS')} [{st_data.get('grade', '')}]"
@@ -642,6 +644,7 @@ def create_pdf(filename, school_name, st_data, roll_no):
     except Exception:
         pass
 
+    # Signatures
     c.setStrokeColorRGB(0.59, 0.25, 0.60)
     c.setLineWidth(1)
     
@@ -1273,7 +1276,7 @@ elif menu == "New Student Registration":
                             "school_code": school_sel, "class": "1", "batch": "2025-2026",
                             "subjects": {}, "total_full": 0, "total_obt": 0, "percentage": 0.0,
                             "result": "N/A", "grade": "N/A", "pub_date": str(datetime.date.today()),
-                            "payment_mode": "Pending", "status": "Pending_Master", "total_fee": total_fee
+                            "payment_mode": "Pending", "status": "Pending_School", "total_fee": total_fee
                         }
                     }
                     st.session_state['payment_step'] = True; st.rerun()
@@ -1501,11 +1504,12 @@ elif menu == "Master Login":
                 for s_id, s_info in list(schools_db.items()):
                     status = s_info.get("status", "Active") 
                     bg = "#f0fdf4" if status == "Active" else "#fef2f2"
-                    st.markdown(f"<div style='border:1px solid #cbd5e1; padding:10px; margin-bottom:10px; background-color:{bg};'><b>School ID:</b> {s_id} | <b>Name:</b> {s_info['name']} | Status: {status}</div>", unsafe_allow_html=True)
+                    pay_info = s_info.get("payment_mode", "N/A")
+                    st.markdown(f"<div style='border:1px solid #cbd5e1; padding:10px; margin-bottom:10px; background-color:{bg};'><b>School ID:</b> {s_id} | <b>Name:</b> {s_info['name']} <br><b>Payment Info:</b> <span style='color:#dc2626;'>{pay_info}</span> <br><b>Status:</b> {status}</div>", unsafe_allow_html=True)
                     
                     c_btn1, c_btn2, c_btn3 = st.columns([3, 3, 4])
                     if status == "Pending_Master_Approval":
-                        if c_btn1.button("✅ Approve School", key=f"app_{s_id}"):
+                        if c_btn1.button("✅ Approve School & Verify Payment", key=f"app_{s_id}"):
                             s_info["status"] = "Active"; save_data(schools_db, students_db); st.rerun()
                     elif status == "Active":
                         if c_btn1.button("🔴 Make Inactive", key=f"tog_{s_id}"):
@@ -1812,8 +1816,8 @@ elif menu == "Master Login":
                 st.rerun()
 
         with t6:
-            st.markdown("### 🏦 School Payment Gateway & Fee Settings")
-            st.info("Configure the global application fees for Students & Schools, and manage individual School Gateways.")
+            st.markdown("### 🏦 Global Fee Settings & School Gateway")
+            st.info("Configure the global application fees for Students & Scholarships, and manage individual School Gateways.")
             
             st.markdown("#### 💰 Global Fee Configuration")
             with st.form("m_fee_form"):
@@ -1822,14 +1826,12 @@ elif menu == "Master Login":
                 up_gst_pct = c_f2.number_input("Student GST Percentage (%)", value=float(master_db.get("gst_percent", 18.0)), min_value=0.0, key="m_set_gst_gw")
                 
                 c_s1, c_s2 = st.columns(2)
-                up_sch_fee = c_s1.number_input("School Registration Base Fee (₹)", value=float(master_db.get("school_reg_fee", 1000.0)), min_value=0.0, key="m_set_sfee_gw")
-                up_sch_gst = c_s2.number_input("School GST Percentage (%)", value=float(master_db.get("school_gst_percent", 18.0)), min_value=0.0, key="m_set_sgst_gw")
+                up_scholarship_fee = c_s1.number_input("Scholarship Application Fee (₹)", value=float(master_db.get("scholarship_fee", 50.0)), min_value=0.0, key="m_set_schol_fee_gw")
                 
                 if st.form_submit_button("💾 Save Global Fee Settings"):
                     master_db["reg_fee"] = float(up_base_fee)
                     master_db["gst_percent"] = float(up_gst_pct)
-                    master_db["school_reg_fee"] = float(up_sch_fee)
-                    master_db["school_gst_percent"] = float(up_sch_gst)
+                    master_db["scholarship_fee"] = float(up_scholarship_fee)
                     save_master_data(master_db)
                     st.success("Fee settings successfully updated!")
                     st.rerun()
