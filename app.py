@@ -162,7 +162,7 @@ def load_master_data():
     default_master = {
         "username": "master", "password": "master123", "email": "kulusutar123@gmail.com", 
         "phone": "8910223342", "upi_id": "school@sbi", "reg_fee": 150.0, "gst_percent": 18.0,
-        "school_reg_fee": 1000.0, "school_gst_percent": 18.0, "scholarship_fee": 50.0,
+        "school_reg_fee": 1000.0, "school_gst_percent": 18.0, "scholarship_fee": 50.0, "scholarship_gst_percent": 0.0,
         "notice_text": "📢 ନୂଆ ଅପଡେଟ୍: ଛାତ୍ରଛାତ୍ରୀମାନେ ଏବେ ଅନଲାଇନ୍ ରେଜିଷ୍ଟ୍ରେସନ୍, ସ୍କଲାରସିପ୍ ଏବଂ ପେମେଣ୍ଟ କରିପାରିବେ! <span class='new-badge'>NEW</span> &nbsp;&nbsp;|&nbsp;&nbsp; 👨‍💻 Software Developed by: KULU SUTAR &nbsp;&nbsp;|&nbsp;&nbsp; 📞 Helpdesk No: 8910223342 &nbsp;&nbsp;|&nbsp;&nbsp; ✉️ Mail ID: kulusutar123@gmail.com",
         "news_text": "🔴 [ODISHA] ନୂଆ ଶିକ୍ଷା ନୀତି ଅନୁଯାୟୀ ସମସ୍ତ ସ୍କୁଲରେ ଡିଜିଟାଲ୍ କ୍ଲାସରୁମ୍ ଆରମ୍ଭ ହେବ! &nbsp;&nbsp;♦&nbsp;&nbsp; 🔴 [DELHI] Central Government announces new scholarship schemes for brilliant students across India!",
         "bg_b64": "", "sch_bg_b64": "", "school_bg_b64": "", "reg_bg_b64": "",
@@ -619,7 +619,6 @@ def create_pdf(filename, school_name, st_data, roll_no):
     c.drawString(200, curr_y, f"PERCENTAGE: {st_data.get('percentage', 0.0)}%")
     c.drawString(400, curr_y, f"FINAL GRADE: {st_data.get('grade', 'N/A')}")
     
-    # Standard Barcode
     curr_y -= 85
     clean_roll = str(roll_no).strip()
     try:
@@ -629,7 +628,6 @@ def create_pdf(filename, school_name, st_data, roll_no):
         c.setFont("Helvetica-Bold", 10)
         c.drawString(45, curr_y + 20, f"ROLL: {clean_roll}")
         
-    # Detailed Scannable QR Code
     try:
         tot_m = f"{st_data.get('total_obt', 0)}/{st_data.get('total_full', 0)}"
         qr_content = f"Name: {st_data.get('name', '').upper()}\nRoll: {roll_no}\nClass: {st_data.get('class', '')}\nDOB: {disp_dob}\nMarks: {tot_m}\nResult: {st_data.get('result', 'PASS')} [{st_data.get('grade', '')}]"
@@ -644,7 +642,6 @@ def create_pdf(filename, school_name, st_data, roll_no):
     except Exception:
         pass
 
-    # Signatures
     c.setStrokeColorRGB(0.59, 0.25, 0.60)
     c.setLineWidth(1)
     
@@ -671,6 +668,11 @@ schools_db, students_db = load_data()
 master_db = load_master_data()
 scholarships_db = load_scholarships()
 sch_users_db = load_sch_users()
+
+# Dynamic Calculation for Scholarship Fee (Base + GST)
+sch_base_fee = float(master_db.get("scholarship_fee", 50.0))
+sch_gst_pct = float(master_db.get("scholarship_gst_percent", 0.0))
+sch_fee = round(sch_base_fee + (sch_base_fee * (sch_gst_pct / 100.0)), 2)
 
 inject_custom_styles(master_db)
 
@@ -837,8 +839,6 @@ elif menu == "Scholarship Portal":
         if st.button("🏠 Home", key="sch_home"): st.query_params["portal"] = "home"; st.rerun()
     with c_t: st.subheader("💰 Scholarship Student Portal")
     
-    sch_fee = float(master_db.get("scholarship_fee", 50.0))
-
     if not st.session_state.get('sch_logged_in', False):
         log_tab, reg_tab = st.tabs(["🔑 Student Login", "📝 New Registration"])
         
@@ -1504,12 +1504,11 @@ elif menu == "Master Login":
                 for s_id, s_info in list(schools_db.items()):
                     status = s_info.get("status", "Active") 
                     bg = "#f0fdf4" if status == "Active" else "#fef2f2"
-                    pay_info = s_info.get("payment_mode", "N/A")
-                    st.markdown(f"<div style='border:1px solid #cbd5e1; padding:10px; margin-bottom:10px; background-color:{bg};'><b>School ID:</b> {s_id} | <b>Name:</b> {s_info['name']} <br><b>Payment Info:</b> <span style='color:#dc2626;'>{pay_info}</span> <br><b>Status:</b> {status}</div>", unsafe_allow_html=True)
+                    st.markdown(f"<div style='border:1px solid #cbd5e1; padding:10px; margin-bottom:10px; background-color:{bg};'><b>School ID:</b> {s_id} | <b>Name:</b> {s_info['name']} | Status: {status}</div>", unsafe_allow_html=True)
                     
                     c_btn1, c_btn2, c_btn3 = st.columns([3, 3, 4])
                     if status == "Pending_Master_Approval":
-                        if c_btn1.button("✅ Approve School & Verify Payment", key=f"app_{s_id}"):
+                        if c_btn1.button("✅ Approve School", key=f"app_{s_id}"):
                             s_info["status"] = "Active"; save_data(schools_db, students_db); st.rerun()
                     elif status == "Active":
                         if c_btn1.button("🔴 Make Inactive", key=f"tog_{s_id}"):
@@ -1816,8 +1815,8 @@ elif menu == "Master Login":
                 st.rerun()
 
         with t6:
-            st.markdown("### 🏦 Global Fee Settings & School Gateway")
-            st.info("Configure the global application fees for Students & Scholarships, and manage individual School Gateways.")
+            st.markdown("### 🏦 School Payment Gateway & Fee Settings")
+            st.info("Configure the global application fees for Students & Schools, and manage individual School Gateways.")
             
             st.markdown("#### 💰 Global Fee Configuration")
             with st.form("m_fee_form"):
@@ -1826,12 +1825,20 @@ elif menu == "Master Login":
                 up_gst_pct = c_f2.number_input("Student GST Percentage (%)", value=float(master_db.get("gst_percent", 18.0)), min_value=0.0, key="m_set_gst_gw")
                 
                 c_s1, c_s2 = st.columns(2)
-                up_scholarship_fee = c_s1.number_input("Scholarship Application Fee (₹)", value=float(master_db.get("scholarship_fee", 50.0)), min_value=0.0, key="m_set_schol_fee_gw")
+                up_sch_fee = c_s1.number_input("School Registration Base Fee (₹)", value=float(master_db.get("school_reg_fee", 1000.0)), min_value=0.0, key="m_set_sfee_gw")
+                up_sch_gst = c_s2.number_input("School GST Percentage (%)", value=float(master_db.get("school_gst_percent", 18.0)), min_value=0.0, key="m_set_sgst_gw")
+                
+                c_sch1, c_sch2 = st.columns(2)
+                up_schol_fee = c_sch1.number_input("Scholarship Base Fee (₹)", value=float(master_db.get("scholarship_fee", 50.0)), min_value=0.0, key="m_set_schol_fee")
+                up_schol_gst = c_sch2.number_input("Scholarship GST Percentage (%)", value=float(master_db.get("scholarship_gst_percent", 0.0)), min_value=0.0, key="m_set_schol_gst")
                 
                 if st.form_submit_button("💾 Save Global Fee Settings"):
                     master_db["reg_fee"] = float(up_base_fee)
                     master_db["gst_percent"] = float(up_gst_pct)
-                    master_db["scholarship_fee"] = float(up_scholarship_fee)
+                    master_db["school_reg_fee"] = float(up_sch_fee)
+                    master_db["school_gst_percent"] = float(up_sch_gst)
+                    master_db["scholarship_fee"] = float(up_schol_fee)
+                    master_db["scholarship_gst_percent"] = float(up_schol_gst)
                     save_master_data(master_db)
                     st.success("Fee settings successfully updated!")
                     st.rerun()
