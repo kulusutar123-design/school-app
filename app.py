@@ -447,6 +447,9 @@ def create_school_receipt_pdf(filename, sch_id, sch_data):
     c.setFont("Helvetica-Oblique", 10); c.drawCentredString(300, y, "Computer-generated receipt.")
     c.save()
 
+# ==========================================
+# 🌐 HTML RESULT CARD WITH DETAILED QR CODE
+# ==========================================
 def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no, s_lang):
     disp_dob = format_display_date(st_data.get('dob', ''))
     raw_pub = st_data.get('pub_date', '')
@@ -456,9 +459,12 @@ def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no,
     tot_full = st_data.get('total_full', 0)
     w_tot_en = number_to_words(tot_obt)
     s_name_en = st_data.get('name', 'N/A').upper()
-    qr_text = f"SCHOOL: {school_name_en} | NAME: {s_name_en} | ROLL: {roll_no} | DOB: {disp_dob} | MARKS: {tot_obt}/{st_data.get('total_full', 0)} | GRADE: {st_data.get('grade', '')}"
+    
+    # Detailed text for Mobile Scanner
+    qr_text = f"Name: {s_name_en}\nRoll No: {roll_no}\nClass: {st_data.get('class', '')}\nDOB: {disp_dob}\nMarks: {tot_obt}/{tot_full}\nResult: {st_data.get('result', 'PASS')} [{st_data.get('grade', '')}]\nSchool: {school_name_en}"
     qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={urllib.parse.quote(qr_text)}"
     bc_url = f"https://barcode.tec-it.com/barcode.ashx?data={roll_no}&code=Code128&dpi=96"
+    
     rows_html = "".join([f"<tr style='border-bottom: 1px solid {b_col};'><td style='padding: 8px; border-right: 1px solid {b_col}; text-align: left; font-weight: bold; color: #000;'>{sub.upper()}</td><td style='padding: 8px; border-right: 1px solid {b_col}; color: #000;'>{m['full']}</td><td style='padding: 8px; font-weight: bold; color: #000;'>{m['obt']}</td></tr>" for sub, m in st_data.get('subjects', {}).items()])
     
     html_str = f"""<div style='font-family: "Times New Roman", serif; border: 15px solid {ob}; padding: 4px; max-width: 800px; margin: auto; background-color: #fff;'>
@@ -489,27 +495,184 @@ def generate_result_card_html(school_name_en, school_name_loc, st_data, roll_no,
 </tr>
 </table>
 <div style='text-align: center; font-weight: bold; font-size: 14px; margin-top: 20px; color:#000;'>( {w_tot_en} )</div>
+
+<table style='width: 100%; margin-top: 20px; margin-bottom: 10px;'>
+<tr>
+  <td style='text-align: left; vertical-align: middle; width: 60%;'>
+    <img src='{bc_url}' style='height: 45px;'><br>
+    <span style='font-size: 11px; font-weight: bold; color: #000;'>Roll: {roll_no}</span>
+  </td>
+  <td style='text-align: right; vertical-align: middle; width: 40%;'>
+    <img src='{qr_url}' style='height: 85px; width: 85px; border: 1px solid #ccc; padding: 2px;'>
+  </td>
+</tr>
+</table>
+
+<table style='width: 100%; margin-top: 40px; font-size: 12px; font-weight: bold;'>
+<tr>
+  <td style='text-align: left; border-top: 1px solid {b_col}; padding-top: 6px; width: 25%;'>
+    Date: {disp_pub_date}
+  </td>
+  <td style='text-align: center; border-top: 1px solid {b_col}; padding-top: 6px; width: 50%;'>
+    Class Teacher Signature
+  </td>
+  <td style='text-align: right; border-top: 1px solid {b_col}; padding-top: 6px; width: 25%;'>
+    Headmaster Signature
+  </td>
+</tr>
+</table>
+
 </div>
 </div>"""
     return html_str
 
+# ==========================================
+# 🖨️ PERFECT PDF GENERATION ENGINE
+# ==========================================
 def create_pdf(filename, school_name, st_data, roll_no):
     disp_dob = format_display_date(st_data.get('dob', ''))
     raw_pub = st_data.get('pub_date', '')
     disp_pub_date = format_display_date(raw_pub) if raw_pub else datetime.date.today().strftime('%d-%m-%Y')
+    
     c = canvas.Canvas(filename, pagesize=letter)
-    c.setFillColorRGB(0.99, 0.98, 0.97); c.rect(30, 30, 552, 732, fill=1, stroke=0)
-    c.setStrokeColorRGB(0.82, 0.60, 0.83); c.setLineWidth(15); c.rect(15, 15, 582, 762, fill=0, stroke=1)
-    c.setStrokeColorRGB(0.59, 0.25, 0.60); c.setLineWidth(2); c.rect(30, 30, 552, 732, fill=0, stroke=1)
+    
+    c.setFillColorRGB(0.99, 0.98, 0.97)
+    c.rect(20, 20, 572, 752, fill=1, stroke=0)
+    c.setStrokeColorRGB(0.82, 0.60, 0.83)
+    c.setLineWidth(8)
+    c.rect(20, 20, 572, 752, fill=0, stroke=1)
+    c.setStrokeColorRGB(0.59, 0.25, 0.60)
+    c.setLineWidth(2)
+    c.rect(30, 30, 552, 732, fill=0, stroke=1)
+    
     c.setFillColorRGB(0.59, 0.25, 0.60)
-    school_text = school_name.upper()
-    c.setFont("Times-Bold", 16 if len(school_text)>25 else 20)
-    c.drawCentredString(300, 720, school_text)
-    c.setFont("Helvetica-Bold", 12); c.drawCentredString(300, 695, f"ANNUAL EXAMINATION - {st_data.get('batch', '2025-2026')}")
-    c.setFont("Helvetica", 11); c.drawCentredString(300, 675, "CERTIFICATE-CUM-MARK SHEET")
-    c.drawString(50, 635, "ROLL NO:"); c.setFillColorRGB(0,0,0); c.setFont("Helvetica-Bold", 11); c.drawString(110, 635, f"{roll_no}")
-    c.setFillColorRGB(0.59, 0.25, 0.60); c.drawString(450, 635, "CLASS:"); c.setFillColorRGB(0,0,0); c.drawString(500, 635, f"{st_data.get('class', '')}")
-    c.line(50, 485, 550, 485)
+    school_text = str(school_name).upper()
+    c.setFont("Times-Bold", 15 if len(school_text) > 30 else 18)
+    c.drawCentredString(306, 730, school_text)
+    
+    c.setFont("Helvetica-Bold", 11)
+    c.drawCentredString(306, 712, f"ANNUAL EXAMINATION - {st_data.get('batch', '2025-2026')}")
+    c.setFont("Helvetica-Bold", 10)
+    c.drawCentredString(306, 696, "CERTIFICATE-CUM-MARK SHEET")
+    
+    c.setLineWidth(1)
+    c.line(45, 688, 567, 688)
+    
+    c.setFont("Helvetica-Bold", 9)
+    c.setFillColorRGB(0.59, 0.25, 0.60)
+    c.drawString(45, 672, "ROLL NO:")
+    c.drawString(45, 656, "PEN NO:")
+    c.drawString(410, 672, "CLASS:")
+    c.drawString(410, 656, "APAAR NO:")
+    
+    c.setFillColorRGB(0, 0, 0)
+    c.drawString(100, 672, str(roll_no))
+    c.drawString(100, 656, str(st_data.get('pen_no', 'N/A')))
+    c.drawString(470, 672, str(st_data.get('class', 'N/A')))
+    c.drawString(470, 656, str(st_data.get('apaar_no', 'N/A')))
+    
+    c.setStrokeColorRGB(0.85, 0.85, 0.85)
+    c.line(45, 646, 567, 646)
+    
+    labels = [
+        ("Candidate Name:", st_data.get('name', 'N/A').upper()),
+        ("Mother's Name:", st_data.get('mother_name', 'N/A').upper()),
+        ("Father's Name:", st_data.get('father_name', 'N/A').upper()),
+        ("Date of Birth:", disp_dob),
+        ("Category:", st_data.get('category', 'General'))
+    ]
+    
+    curr_y = 630
+    for lbl, val in labels:
+        c.setFont("Helvetica-Bold", 9)
+        c.setFillColorRGB(0.59, 0.25, 0.60)
+        c.drawString(45, curr_y, lbl)
+        c.setFillColorRGB(0, 0, 0)
+        c.drawString(160, curr_y, str(val))
+        curr_y -= 16
+        
+    c.setStrokeColorRGB(0.59, 0.25, 0.60)
+    c.line(45, curr_y + 4, 567, curr_y + 4)
+    curr_y -= 10
+    
+    subjects = st_data.get('subjects', {})
+    table_data = [["SUBJECT", "FULL MARKS", "MARKS SECURED"]]
+    for sub, m in subjects.items():
+        table_data.append([str(sub).upper(), str(m.get('full', 0)), str(m.get('obt', 0))])
+    table_data.append(["TOTAL MARKS", str(st_data.get('total_full', 0)), str(st_data.get('total_obt', 0))])
+    
+    t = Table(table_data, colWidths=[282, 120, 120])
+    t.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#fcf4fc')),
+        ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.HexColor('#963f98')),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 8),
+        ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+        ('ALIGN', (1, 0), (-1, -1), 'CENTER'),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#963f98')),
+        ('BACKGROUND', (0, -1), (-1, -1), colors.HexColor('#fcf4fc')),
+        ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),
+        ('TOPPADDING', (0, 0), (-1, -1), 3),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+    ]))
+    
+    tw, th = t.wrap(522, 300)
+    curr_y -= th
+    t.drawOn(c, 45, curr_y)
+    
+    curr_y -= 16
+    c.setFont("Helvetica-Bold", 9)
+    c.setFillColorRGB(0, 0, 0)
+    c.drawString(45, curr_y, f"RESULT: {st_data.get('result', 'N/A')}")
+    c.drawString(200, curr_y, f"PERCENTAGE: {st_data.get('percentage', 0.0)}%")
+    c.drawString(400, curr_y, f"FINAL GRADE: {st_data.get('grade', 'N/A')}")
+    
+    # Standard Barcode
+    curr_y -= 85
+    clean_roll = str(roll_no).strip()
+    try:
+        bc_drawing = createBarcodeDrawing('Code128', value=clean_roll, barWidth=1.2, barHeight=32, humanReadable=True, fontSize=8)
+        renderPDF.draw(bc_drawing, c, 45, curr_y + 15)
+    except Exception:
+        c.setFont("Helvetica-Bold", 10)
+        c.drawString(45, curr_y + 20, f"ROLL: {clean_roll}")
+        
+    # Detailed Scannable QR Code
+    try:
+        tot_m = f"{st_data.get('total_obt', 0)}/{st_data.get('total_full', 0)}"
+        qr_content = f"Name: {st_data.get('name', '').upper()}\nRoll: {roll_no}\nClass: {st_data.get('class', '')}\nDOB: {disp_dob}\nMarks: {tot_m}\nResult: {st_data.get('result', 'PASS')} [{st_data.get('grade', '')}]"
+        qr_obj = qr.QrCodeWidget(qr_content)
+        bounds = qr_obj.getBounds()
+        qr_w = bounds[2] - bounds[0]
+        qr_h = bounds[3] - bounds[1]
+        
+        d_qr = Drawing(85, 85, transform=[85.0/qr_w, 0, 0, 85.0/qr_h, 0, 0])
+        d_qr.add(qr_obj)
+        renderPDF.draw(d_qr, c, 440, curr_y)
+    except Exception:
+        pass
+
+    # Signatures
+    c.setStrokeColorRGB(0.59, 0.25, 0.60)
+    c.setLineWidth(1)
+    
+    c.line(45, 75, 160, 75)
+    c.setFont("Helvetica-Bold", 8)
+    c.setFillColorRGB(0, 0, 0)
+    c.drawString(45, 62, f"Date: {disp_pub_date}")
+    
+    c.line(230, 75, 360, 75)
+    c.drawCentredString(295, 62, "Class Teacher Signature")
+    
+    c.line(430, 75, 560, 75)
+    c.drawCentredString(495, 62, "Headmaster Signature")
+    
+    c.setFont("Helvetica-Oblique", 7)
+    c.setFillColorRGB(0.4, 0.4, 0.4)
+    c.drawCentredString(306, 40, "This is a computer-generated mark sheet verified by the institution.")
+    
+    c.showPage()
     c.save()
 
 # --- MAIN APP START ---
