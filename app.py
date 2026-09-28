@@ -2,10 +2,10 @@ import streamlit as st
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
-# ୧. ପୃଷ୍ଠା ସେଟିଂସ୍
+# 1. Page Configuration
 st.set_page_config(page_title="School Home Portal", page_icon="🏫", layout="wide")
 
-# ୨. କ୍ଲାଉଡ୍ ଡାଟାବେସ୍ କନେକ୍ସନ୍
+# 2. Cloud Database Connection
 @st.cache_resource
 def init_connection():
     try:
@@ -14,7 +14,7 @@ def init_connection():
         st.error(f"Database Connection Error: {e}")
         return None
 
-# ୩. ଡାଟାବେସ୍ ଟେବୁଲ୍ ପ୍ରସ୍ତୁତି
+# 3. Database Tables
 def create_tables():
     conn = init_connection()
     if conn is not None:
@@ -57,35 +57,39 @@ def main():
     if "admin_logged" not in st.session_state:
         st.session_state["admin_logged"] = False
 
-    # 4. Big 3D Modern CSS Styling for Buttons & Cards
+    # Huge 3D Cards & Buttons CSS Styling
     st.markdown("""
         <style>
-        .stButton>button {
-            width: 100%;
-            border-radius: 16px;
-            font-weight: bold;
-            font-size: 18px !important;
-            padding: 20px 25px !important;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15), 0 6px 6px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-            border: none;
-            background: linear-gradient(135deg, #1e3a8a, #2563eb);
-            color: white !important;
-            margin-top: 10px;
-            margin-bottom: 10px;
-        }
-        .stButton>button:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 15px 25px rgba(0,0,0,0.25), 0 8px 10px rgba(0,0,0,0.15);
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
-        }
-        .card-3d {
-            background: linear-gradient(135deg, #ffffff, #f8fafc);
+        .big-card {
+            background: linear-gradient(135deg, #ffffff, #f1f5f9);
             padding: 30px;
             border-radius: 20px;
-            box-shadow: 0 12px 30px rgba(0,0,0,0.08), 0 8px 12px rgba(0,0,0,0.05);
-            border: 1px solid #e2e8f0;
-            margin-bottom: 25px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.12), 0 6px 10px rgba(0,0,0,0.08);
+            border: 2px solid #cbd5e1;
+            text-align: center;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+        .big-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 18px 35px rgba(0,0,0,0.2), 0 8px 12px rgba(0,0,0,0.12);
+            border-color: #2563eb;
+        }
+        .stButton>button {
+            width: 100%;
+            border-radius: 14px;
+            font-weight: bold;
+            font-size: 16px !important;
+            padding: 15px !important;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+            border: none;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white !important;
+        }
+        .stButton>button:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, #1d4ed8, #1e40af);
         }
         </style>
     """, unsafe_allow_html=True)
@@ -102,50 +106,56 @@ def main():
 
     # HOME PAGE
     if st.session_state["nav"] == "Home":
-        col_left, col_right = st.columns([1.5, 1])
+        col_left, col_right = st.columns([1.6, 1])
 
         with col_left:
             st.markdown("""
-                <div class='card-3d' style='border-left: 8px solid #2563eb;'>
+                <div style='background: linear-gradient(135deg, #ffffff, #f8fafc); padding: 30px; border-radius: 20px; box-shadow: 0 12px 30px rgba(0,0,0,0.08); border-left: 8px solid #2563eb; margin-bottom: 25px;'>
                     <h3 style='color: #1e3a8a; margin-top:0;'>🌟 Welcome to Digital School Management</h3>
                     <p style='font-size: 16px; color: #475569;'>Manage your schools, student admissions, attendance, and records securely on the cloud platform with high performance.</p>
                     <p style='font-size: 15px;'><b>✨ Features:</b> Secure Cloud Database, Instant Registration, 3D Interactive Portal.</p>
                 </div>
             """, unsafe_allow_html=True)
             
-            st.markdown("### 📌 Quick Portal Actions (Big 3D Buttons)")
+            st.markdown("### 📌 Quick Portal Actions (Bada Bada 3D Cards)")
             
-            # ତଳେ ଥିବା ୩ଟି ବଟନ୍‌କୁ ପୂରା ବଡ଼ ଏବଂ ଆକର୍ଷକ କରାଗଲା
-            if st.button("🏫 New School Registration Portal"):
-                st.session_state["nav"] = "New School Registration"
-                st.rerun()
-                
-            if st.button("🎓 New Student Registration Portal"):
-                st.session_state["nav"] = "New Student Registration"
-                st.rerun()
-                
-            if st.button("💰 Scholarship Portal & Eligibility"):
-                st.session_state["nav"] = "Scholarship Portal"
-                st.rerun()
+            # ତଳେ ୩ଟି ବଡ଼ 3D କାର୍ଡ ଏବଂ ବଟନ୍
+            c1, c2, c3 = st.columns(3)
+            with c1:
+                st.markdown("<div class='big-card'><h4>🏫</h4><p><b>New School Registration</b></p></div>", unsafe_allow_html=True)
+                if st.button("Open School Reg"):
+                    st.session_state["nav"] = "New School Registration"
+                    st.rerun()
+            with c2:
+                st.markdown("<div class='big-card'><h4>🎓</h4><p><b>New Student Registration</b></p></div>", unsafe_allow_html=True)
+                if st.button("Open Student Reg"):
+                    st.session_state["nav"] = "New Student Registration"
+                    st.rerun()
+            with c3:
+                st.markdown("<div class='big-card'><h4>💰</h4><p><b>Scholarship Portal</b></p></div>", unsafe_allow_html=True)
+                if st.button("Open Scholarship"):
+                    st.session_state["nav"] = "Scholarship Portal"
+                    st.rerun()
 
         with col_right:
             st.markdown("""
-                <div class='card-3d' style='text-align: center;'>
+                <div style='background: linear-gradient(135deg, #ffffff, #f8fafc); padding: 30px; border-radius: 20px; box-shadow: 0 12px 30px rgba(0,0,0,0.08); text-align: center; margin-bottom: 25px;'>
                     <h3 style='color: #1e3a8a; margin-top:0;'>🔐 Login Portal</h3>
                     <hr style='margin: 10px 0 20px 0;'>
                 </div>
             """, unsafe_allow_html=True)
             
-            # ଡାହାଣ ପଟେ ଥିବା ୨ଟି ଲଗଇନ୍ ବଟନ୍‌କୁ ବଡ଼ କରାଗଲା
+            # ଡାହାଣ ପଟେ ୨ଟି ବଡ଼ ଲଗଇନ୍ ବଟନ୍
             if st.button("👤 Admin Login"):
                 st.session_state["nav"] = "Admin Login"
                 st.rerun()
                 
+            st.write("")
             if st.button("🏫 School Login"):
                 st.session_state["nav"] = "School Login"
                 st.rerun()
                 
-            st.markdown("<p style='text-align: center; font-size: 14px; color: gray; margin-top: 25px;'>\"Education is the key to a better tomorrow\"</p>", unsafe_allow_html=True)
+            st.markdown("<p style='text-align: center; font-size: 14px; color: gray; margin-top: 30px;'>\"Education is the key to a better tomorrow\"</p>", unsafe_allow_html=True)
 
     # ADMIN LOGIN PAGE
     elif st.session_state["nav"] == "Admin Login":
