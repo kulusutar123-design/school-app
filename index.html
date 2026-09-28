@@ -137,7 +137,6 @@
         }
         .back-btn:hover { background: #475569; }
 
-        /* Notice Board Style */
         .notice-board {
             background: #fffbeb;
             border: 1px solid #fde68a;
@@ -175,6 +174,28 @@
             margin-bottom: 10px;
         }
         .tab-btn.active-tab { background: #1d4ed8; color: white; }
+
+        /* Modal for Add/Edit School */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            width: 400px;
+            max-width: 90%;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
     </style>
 </head>
 <body id="main-body">
@@ -188,7 +209,6 @@
 
         <!-- Home View -->
         <div id="home-view">
-            <!-- Dynamic Notice Board Display -->
             <div class="notice-board">
                 <h4>📢 Important Notice Board</h4>
                 <p id="display-notice">• New Academic Session 2026-27 registration is now live for all schools.<br>• Scholarship verification will start from coming Monday.</p>
@@ -245,7 +265,7 @@
             <button style="background:#22c55e; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="validateAdmin()">Login 🚀</button>
         </div>
 
-        <!-- Master Admin Dashboard with Settings (Background & Notice Upload) -->
+        <!-- Master Admin Dashboard with Add/Edit School Option -->
         <div id="admin-dashboard" class="content-section">
             <button class="back-btn" onclick="goHome()">🚪 Logout & Home</button>
             <h2 style="color: #0d3b66; margin-bottom: 15px;">👑 Master Admin Dashboard & Settings</h2>
@@ -253,26 +273,35 @@
             <div style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px;">
                 <button class="tab-btn active-tab" onclick="switchTab('schools-tab', this)">🏫 Manage Schools</button>
                 <button class="tab-btn" onclick="switchTab('students-tab', this)">🎓 Manage Students</button>
-                <button class="tab-btn" onclick="switchTab('settings-tab', this)">⚙️ Portal Settings (BG & Notice)</button>
+                <button class="tab-btn" onclick="switchTab('settings-tab', this)">⚙️ Portal Settings</button>
             </div>
 
             <!-- Schools Management Tab -->
             <div id="schools-tab" class="admin-tab-content">
-                <h3>School Approvals & Management</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3>School Approvals & Management</h3>
+                    <button style="background:#16a34a; color:white; border:none; padding:10px 20px; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="openAddSchoolModal()">➕ Add New School</button>
+                </div>
                 <table>
                     <thead>
                         <tr><th>School Name</th><th>School ID</th><th>Status</th><th>Actions</th></tr>
                     </thead>
-                    <tbody>
+                    <tbody id="school-table-body">
                         <tr>
                             <td>DAV Public School</td><td>SCH001</td>
                             <td><span class="badge-approved">Approved</span></td>
-                            <td><button style="background:#2563eb; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">Edit</button> <button style="background:#dc2626; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">Delete</button></td>
+                            <td>
+                                <button style="background:#2563eb; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="openEditSchoolModal('DAV Public School', 'SCH001')">Edit</button> 
+                                <button style="background:#dc2626; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove(); alert('School Deleted Successfully!');">Delete</button>
+                            </td>
                         </tr>
                         <tr>
                             <td>St. Xavier's High School</td><td>SCH002</td>
                             <td><span class="badge-pending">Pending Approval</span></td>
-                            <td><button style="background:#16a34a; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="alert('School Approved!')">Approve ✅</button> <button style="background:#dc2626; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">Reject</button></td>
+                            <td>
+                                <button style="background:#16a34a; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="alert('School Approved Successfully!')">Approve ✅</button> 
+                                <button style="background:#dc2626; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Reject</button>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -288,23 +317,32 @@
                 </div>
             </div>
 
-            <!-- Settings Tab (Background Photo & Notice Board Upload) -->
+            <!-- Settings Tab -->
             <div id="settings-tab" class="admin-tab-content" style="display: none;">
                 <h3>⚙️ Portal Customization Settings</h3>
-                <p style="color: #64748b; margin-bottom: 20px;">Change background photo or update notice board instantly.</p>
-                
                 <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1; margin-bottom:20px;">
                     <h4>🖼️ Upload / Change Background Photo</h4>
-                    <p style="font-size:13px; color:#64748b; margin-bottom:10px;">Select an image file from your device:</p>
                     <input type="file" id="bg-file-input" accept="image/*" style="margin-bottom:10px;"><br>
                     <button style="background:#2563eb; color:white; border:none; padding:8px 20px; border-radius:6px; cursor:pointer;" onclick="changeBackgroundImage()">Update Background 🚀</button>
                 </div>
-
                 <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1;">
                     <h4>📢 Edit / Update Notice Board</h4>
                     <textarea id="notice-input" rows="5" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; margin-bottom:10px;">• New Academic Session 2026-27 registration is now live for all schools.
 • Scholarship verification will start from coming Monday.</textarea>
                     <button style="background:#16a34a; color:white; border:none; padding:8px 20px; border-radius:6px; cursor:pointer;" onclick="updateNoticeBoard()">Save Notice Board 💾</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add / Edit School Modal -->
+        <div id="schoolModal" class="modal">
+            <div class="modal-content">
+                <h3 id="modal-title" style="color:#0d3b66; margin-bottom:15px;">Add New School</h3>
+                <input type="text" id="modal-school-name" placeholder="School Name" style="width:100%; padding:10px; margin-bottom:12px; border:1px solid #cbd5e1; border-radius:6px;">
+                <input type="text" id="modal-school-id" placeholder="School ID (e.g. SCH003)" style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:6px;">
+                <div style="display:flex; justify-content:flex-end; gap:10px;">
+                    <button style="background:#64748b; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="closeSchoolModal()">Cancel</button>
+                    <button style="background:#2563eb; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="saveSchoolData()">Save School 💾</button>
                 </div>
             </div>
         </div>
@@ -390,7 +428,45 @@
             btn.classList.add('active-tab');
         }
 
-        // Dynamic Background Image Uploader
+        // Modal Controls for Add / Edit School
+        let editRow = null;
+        function openAddSchoolModal() {
+            editRow = null;
+            document.getElementById('modal-title').innerText = "Add New School";
+            document.getElementById('modal-school-name').value = "";
+            document.getElementById('modal-school-id').value = "";
+            document.getElementById('schoolModal').style.display = 'flex';
+        }
+        function openEditSchoolModal(name, id) {
+            editRow = event.target.closest('tr');
+            document.getElementById('modal-title').innerText = "Edit School Details";
+            document.getElementById('modal-school-name').value = name;
+            document.getElementById('modal-school-id').value = id;
+            document.getElementById('schoolModal').style.display = 'flex';
+        }
+        function closeSchoolModal() {
+            document.getElementById('schoolModal').style.display = 'none';
+        }
+        function saveSchoolData() {
+            let name = document.getElementById('modal-school-name').value.trim();
+            let id = document.getElementById('modal-school-id').value.trim();
+            if(!name || !id) {
+                alert('Please fill all fields!');
+                return;
+            }
+            let tbody = document.getElementById('school-table-body');
+            if(editRow) {
+                editRow.cells[0].innerText = name;
+                editRow.cells[1].innerText = id;
+                alert('School Updated Successfully! ✏️');
+            } else {
+                let newRow = tbody.insertRow();
+                newRow.innerHTML = `<td>${name}</td><td>${id}</td><td><span class="badge-approved">Approved</span></td><td><button style="background:#2563eb; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="openEditSchoolModal('${name}', '${id}')">Edit</button> <button style="background:#dc2626; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Delete</button></td>`;
+                alert('New School Added Successfully! 🏫');
+            }
+            closeSchoolModal();
+        }
+
         function changeBackgroundImage() {
             const fileInput = document.getElementById('bg-file-input');
             if (fileInput.files && fileInput.files[0]) {
@@ -406,7 +482,6 @@
             }
         }
 
-        // Dynamic Notice Board Updater
         function updateNoticeBoard() {
             const newText = document.getElementById('notice-input').value;
             document.getElementById('display-notice').innerHTML = newText.replace(/\n/g, '<br>');
