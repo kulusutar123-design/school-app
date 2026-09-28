@@ -153,12 +153,15 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 15px;
+            overflow-x: auto;
+            display: block;
         }
         th, td {
             padding: 10px 12px;
             border: 1px solid #cbd5e1;
             text-align: left;
             font-size: 13px;
+            white-space: nowrap;
         }
         th { background: #1e3a8a; color: white; }
         .badge-pending { background: #fef08a; color: #854d0e; padding: 4px 10px; border-radius: 6px; font-weight: bold; }
@@ -193,7 +196,7 @@
             background: white;
             padding: 30px;
             border-radius: 16px;
-            width: 650px;
+            width: 600px;
             max-width: 95%;
             box-shadow: 0 10px 25px rgba(0,0,0,0.3);
             max-height: 90vh;
@@ -220,7 +223,7 @@
         <div id="home-view">
             <div class="notice-board">
                 <h4>📢 Important Notice Board</h4>
-                <p id="display-notice">• Official Marksheet & Multi-Subject Management System is live.<br>• Admins can add/remove subjects and manage student scores dynamically.</p>
+                <p id="display-notice">• Official Marksheet & Multi-Subject Management System is live.<br>• PAN, Aadhaar & Gender fields added successfully.</p>
             </div>
 
             <div class="main-grid">
@@ -228,7 +231,7 @@
                     <div class="welcome-card">
                         <h3>🌟 Welcome to Digital School Management</h3>
                         <p>Manage your schools, student admissions, attendance, and records securely on the cloud platform with high performance.</p>
-                        <p><b>✨ Features:</b> Subject-wise Marks Entry, Official Marksheet Format, Secure Admin Controls.</p>
+                        <p><b>✨ Features:</b> PAN, Aadhaar & Gender Integration, Official Marksheet Format, Secure Admin Controls.</p>
                     </div>
 
                     <div class="section-title">📌 Quick Portal Actions</div>
@@ -323,6 +326,9 @@
                             <th>Father's Name</th>
                             <th>Mother's Name</th>
                             <th>DOB</th>
+                            <th>Gender</th>
+                            <th>PAN No</th>
+                            <th>Aadhaar No</th>
                             <th>School Name</th>
                             <th>Grand Total</th>
                             <th>Actions</th>
@@ -335,6 +341,9 @@
                             <td>ANTARYAMI DAS</td>
                             <td>SHASHIKALA DAS</td>
                             <td>30/09/2010</td>
+                            <td>Female</td>
+                            <td>ABCDE1234F</td>
+                            <td>[Aadhaar Redacted]</td>
                             <td>SRI BAIRAGI SARASWATI SISHU VIDYAMANDIR</td>
                             <td><b>360 / 600</b></td>
                             <td>
@@ -357,7 +366,7 @@
                 <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1;">
                     <h4>📢 Edit / Update Notice Board</h4>
                     <textarea id="notice-input" rows="5" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; margin-bottom:10px;">• Official Marksheet & Multi-Subject Management System is live.
-• Admins can add/remove subjects and manage student scores dynamically.</textarea>
+• PAN, Aadhaar & Gender fields added successfully.</textarea>
                     <button style="background:#16a34a; color:white; border:none; padding:8px 20px; border-radius:6px; cursor:pointer;" onclick="updateNoticeBoard()">Save Notice Board 💾</button>
                 </div>
             </div>
@@ -379,7 +388,7 @@
             </div>
         </div>
 
-        <!-- Add/Edit Student Marksheet Modal with Subject Fields -->
+        <!-- Add/Edit Student Modal with PAN, Aadhaar & Gender -->
         <div id="studentModal" class="modal">
             <div class="modal-content">
                 <h3 id="student-modal-title" style="color:#0d3b66; margin-bottom:15px;">Add Student Marksheet Details</h3>
@@ -390,55 +399,15 @@
                 <input type="text" id="s-fname" placeholder="Father's Name" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
                 <input type="text" id="s-mname" placeholder="Mother's Name" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
                 <input type="text" id="s-dob" placeholder="Date of Birth (DD/MM/YYYY)" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
+                <select id="s-gender" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+                <input type="text" id="s-pan" placeholder="PAN No" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
+                <input type="text" id="s-aadhaar" placeholder="Aadhaar No" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
                 <input type="text" id="s-school" placeholder="Name of the School" style="width:100%; padding:9px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:6px;">
-
-                <h4 style="color:#1e3a8a; margin-bottom:8px; font-size:15px;">Marks Awarded (Subjects)</h4>
-                <div style="font-size:12px; font-weight:bold; color:#64748b; display:grid; grid-template-columns: 1fr 2fr 1fr 1fr; gap:8px; margin-bottom:5px;">
-                    <span>Code</span><span>Subject Name</span><span>Max Marks</span><span>Secured</span>
-                </div>
-                
-                <!-- Subject 1 -->
-                <div class="sub-row">
-                    <input type="text" id="code1" value="FLO" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                    <input type="text" id="name1" value="FIRST LANGUAGE ODIA" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                    <input type="number" id="max1" value="100" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                    <input type="number" id="sec1" value="75" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                </div>
-                <!-- Subject 2 -->
-                <div class="sub-row">
-                    <input type="text" id="code2" value="SLE" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                    <input type="text" id="name2" value="SECOND LANGUAGE ENGLISH" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                    <input type="number" id="max2" value="100" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                    <input type="number" id="sec2" value="69" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                </div>
-                <!-- Subject 3 -->
-                <div class="sub-row">
-                    <input type="text" id="code3" value="TLS" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                    <input type="text" id="name3" value="THIRD LANGUAGE SANSKRIT" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                    <input type="number" id="max3" value="100" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                    <input type="number" id="sec3" value="77" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                </div>
-                <!-- Subject 4 -->
-                <div class="sub-row">
-                    <input type="text" id="code4" value="MTH" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                    <input type="text" id="name4" value="MATHEMATICS" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                    <input type="number" id="max4" value="100" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                    <input type="number" id="sec4" value="38" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                </div>
-                <!-- Subject 5 -->
-                <div class="sub-row">
-                    <input type="text" id="code5" value="GSC" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                    <input type="text" id="name5" value="GENERAL SCIENCE" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                    <input type="number" id="max5" value="100" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                    <input type="number" id="sec5" value="48" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                </div>
-                <!-- Subject 6 -->
-                <div class="sub-row" style="margin-bottom:15px;">
-                    <input type="text" id="code6" value="SSC" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                    <input type="text" id="name6" value="SOCIAL SCIENCE" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                    <input type="number" id="max6" value="100" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                    <input type="number" id="sec6" value="53" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                </div>
 
                 <input type="text" id="s-total" placeholder="Grand Total (e.g. 360 / 600)" style="width:100%; padding:9px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:6px;">
 
@@ -542,6 +511,9 @@
             document.getElementById('s-fname').value = "";
             document.getElementById('s-mname').value = "";
             document.getElementById('s-dob').value = "";
+            document.getElementById('s-gender').value = "";
+            document.getElementById('s-pan').value = "";
+            document.getElementById('s-aadhaar').value = "";
             document.getElementById('s-school').value = "";
             document.getElementById('s-total').value = "";
             document.getElementById('studentModal').style.display = 'flex';
@@ -554,8 +526,11 @@
             document.getElementById('s-fname').value = editStudentRow.cells[2].innerText;
             document.getElementById('s-mname').value = editStudentRow.cells[3].innerText;
             document.getElementById('s-dob').value = editStudentRow.cells[4].innerText;
-            document.getElementById('s-school').value = editStudentRow.cells[5].innerText;
-            document.getElementById('s-total').value = editStudentRow.cells[6].innerText;
+            document.getElementById('s-gender').value = editStudentRow.cells[5].innerText;
+            document.getElementById('s-pan').value = editStudentRow.cells[6].innerText;
+            document.getElementById('s-aadhaar').value = editStudentRow.cells[7].innerText;
+            document.getElementById('s-school').value = editStudentRow.cells[8].innerText;
+            document.getElementById('s-total').value = editStudentRow.cells[9].innerText;
             document.getElementById('studentModal').style.display = 'flex';
         }
         function closeStudentModal() {
@@ -567,6 +542,9 @@
             let fname = document.getElementById('s-fname').value.trim();
             let mname = document.getElementById('s-mname').value.trim();
             let dob = document.getElementById('s-dob').value.trim();
+            let gender = document.getElementById('s-gender').value;
+            let pan = document.getElementById('s-pan').value.trim();
+            let aadhaar = document.getElementById('s-aadhaar').value.trim();
             let school = document.getElementById('s-school').value.trim();
             let total = document.getElementById('s-total').value.trim();
 
@@ -582,12 +560,15 @@
                 editStudentRow.cells[2].innerText = fname;
                 editStudentRow.cells[3].innerText = mname;
                 editStudentRow.cells[4].innerText = dob;
-                editStudentRow.cells[5].innerText = school;
-                editStudentRow.cells[6].innerHTML = `<b>${total}</b>`;
+                editStudentRow.cells[5].innerText = gender;
+                editStudentRow.cells[6].innerText = pan;
+                editStudentRow.cells[7].innerText = aadhaar;
+                editStudentRow.cells[8].innerText = school;
+                editStudentRow.cells[9].innerHTML = `<b>${total}</b>`;
                 alert('Marksheet Updated Successfully! ✏️');
             } else {
                 let newRow = tbody.insertRow();
-                newRow.innerHTML = `<td>${roll}</td><td>${name}</td><td>${fname}</td><td>${mname}</td><td>${dob}</td><td>${school}</td><td><b>${total}</b></td><td><button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openEditStudentModal(this)">Edit</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Delete</button></td>`;
+                newRow.innerHTML = `<td>${roll}</td><td>${name}</td><td>${fname}</td><td>${mname}</td><td>${dob}</td><td>${gender}</td><td>${pan}</td><td>${aadhaar}</td><td>${school}</td><td><b>${total}</b></td><td><button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openEditStudentModal(this)">Edit</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Delete</button></td>`;
                 alert('Marksheet Added Successfully! 🎓');
             }
             closeStudentModal();
