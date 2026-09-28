@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>School Home Portal - Dynamic Subject & Marksheet System</title>
+    <title>School Home Portal - Payment & Approval System</title>
     <style>
         * {
             box-sizing: border-box;
@@ -193,18 +193,11 @@
             background: white;
             padding: 30px;
             border-radius: 16px;
-            width: 650px;
+            width: 600px;
             max-width: 95%;
             box-shadow: 0 10px 25px rgba(0,0,0,0.3);
             max-height: 90vh;
             overflow-y: auto;
-        }
-        .sub-row {
-            display: grid;
-            grid-template-columns: 1fr 2fr 1fr 1fr auto;
-            gap: 8px;
-            margin-bottom: 8px;
-            align-items: center;
         }
     </style>
 </head>
@@ -221,7 +214,7 @@
         <div id="home-view">
             <div class="notice-board">
                 <h4>📢 Important Notice Board</h4>
-                <p id="display-notice">• Official Marksheet & Multi-Subject Management System is live.<br>• Admins can add and remove subjects dynamically.</p>
+                <p id="display-notice">• Official Marksheet & Multi-Subject Management System is live.<br>• Payment Settings & Auto GST Calculation are active.</p>
             </div>
 
             <div class="main-grid">
@@ -229,7 +222,7 @@
                     <div class="welcome-card">
                         <h3>🌟 Welcome to Digital School Management</h3>
                         <p>Manage your schools, student admissions, attendance, and records securely on the cloud platform with high performance.</p>
-                        <p><b>✨ Features:</b> Dynamic Subject Add/Remove, Official Marksheet Format, Secure Admin Controls.</p>
+                        <p><b>✨ Features:</b> Payment Settings with Auto GST, UPI QR Generation, Admin Approval Workflow.</p>
                     </div>
 
                     <div class="section-title">📌 Quick Portal Actions</div>
@@ -275,33 +268,34 @@
             <button style="background:#22c55e; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="validateAdmin()">Login 🚀</button>
         </div>
 
-        <!-- Master Admin Dashboard -->
+        <!-- Master Admin Dashboard with Payment Settings & Approvals -->
         <div id="admin-dashboard" class="content-section">
             <button class="back-btn" onclick="goHome()">🚪 Logout & Home</button>
-            <h2 style="color: #0d3b66; margin-bottom: 15px;">👑 Master Admin Dashboard & Settings</h2>
+            <h2 style="color: #0d3b66; margin-bottom: 15px;">👑 Master Admin Dashboard & Payment Settings</h2>
             
             <div style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px;">
-                <button class="tab-btn active-tab" onclick="switchTab('schools-tab', this)">🏫 Manage Schools</button>
+                <button class="tab-btn active-tab" onclick="switchTab('schools-tab', this)">🏫 School Approvals & Notifications</button>
                 <button class="tab-btn" onclick="switchTab('students-tab', this)">🎓 Manage Students & Marksheet</button>
+                <button class="tab-btn" onclick="switchTab('payment-settings-tab', this)">💳 Payment & GST Settings</button>
                 <button class="tab-btn" onclick="switchTab('settings-tab', this)">⚙️ Portal Settings</button>
             </div>
 
-            <!-- Schools Management Tab -->
+            <!-- Schools Management & Notification Tab -->
             <div id="schools-tab" class="admin-tab-content">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h3>School Approvals & Management</h3>
+                    <h3>🔔 School Registration Notifications & Approvals</h3>
                     <button style="background:#16a34a; color:white; border:none; padding:10px 20px; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="openAddSchoolModal()">➕ Add New School</button>
                 </div>
                 <table>
                     <thead>
-                        <tr><th>School Name</th><th>School ID</th><th>Headmaster</th><th>Mobile No</th><th>Address</th><th>Status</th><th>Actions</th></tr>
+                        <tr><th>School Name</th><th>ID</th><th>Headmaster</th><th>Mobile</th><th>UTR / Payment Ref</th><th>Status</th><th>Actions</th></tr>
                     </thead>
                     <tbody id="school-table-body">
                         <tr>
-                            <td>SRI BAIRAGI SARASWATI SISHU VIDYAMANDIR, ASURALI</td><td>155CB</td><td>ANTARYAMI DAS</td><td>9876543210</td><td>Asurali</td>
+                            <td>SRI BAIRAGI SARASWATI SISHU VIDYAMANDIR</td><td>155CB</td><td>ANTARYAMI DAS</td><td>9876543210</td><td>UTR987654321 (Paid ₹1180)</td>
                             <td><span class="badge-approved">Approved</span></td>
                             <td>
-                                <button style="background:#2563eb; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="openEditSchoolModal('SRI BAIRAGI SARASWATI SISHU VIDYAMANDIR, ASURALI', '155CB', 'ANTARYAMI DAS', '9876543210', 'Asurali')">Edit</button> 
+                                <button style="background:#2563eb; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="openEditSchoolModal('SRI BAIRAGI SARASWATI SISHU VIDYAMANDIR', '155CB', 'ANTARYAMI DAS', '9876543210', 'Asurali')">Edit</button> 
                                 <button style="background:#dc2626; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Delete</button>
                             </td>
                         </tr>
@@ -315,35 +309,13 @@
                     <h3>Official Marksheet & Student Records</h3>
                     <button style="background:#16a34a; color:white; border:none; padding:10px 20px; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="openAddStudentModal()">➕ Add Student Marksheet</button>
                 </div>
-
                 <table>
                     <thead>
-                        <tr>
-                            <th>Roll No</th>
-                            <th>Candidate Name</th>
-                            <th>Father's Name</th>
-                            <th>Mother's Name</th>
-                            <th>DOB</th>
-                            <th>Gender</th>
-                            <th>PAN No</th>
-                            <th>Aadhaar No</th>
-                            <th>School Name</th>
-                            <th>Grand Total</th>
-                            <th>Actions</th>
-                        </tr>
+                        <tr><th>Roll No</th><th>Candidate Name</th><th>Father's Name</th><th>Mother's Name</th><th>DOB</th><th>Gender</th><th>School Name</th><th>Grand Total</th><th>Actions</th></tr>
                     </thead>
                     <tbody id="student-table-body">
                         <tr>
-                            <td>155CB0197</td>
-                            <td>DIBYANSHI DAS</td>
-                            <td>ANTARYAMI DAS</td>
-                            <td>SHASHIKALA DAS</td>
-                            <td>30/09/2010</td>
-                            <td>Female</td>
-                            <td>ABCDE1234F</td>
-                            <td>[Aadhaar Redacted]</td>
-                            <td>SRI BAIRAGI SARASWATI SISHU VIDYAMANDIR</td>
-                            <td><b>360 / 600</b></td>
+                            <td>155CB0197</td><td>DIBYANSHI DAS</td><td>ANTARYAMI DAS</td><td>SHASHIKALA DAS</td><td>30/09/2010</td><td>Female</td><td>SRI BAIRAGI SARASWATI SISHU VIDYAMANDIR</td><td><b>360 / 600</b></td>
                             <td>
                                 <button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openEditStudentModal(this)">Edit</button>
                                 <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove(); alert('Deleted!');">Delete</button>
@@ -351,6 +323,25 @@
                         </tr>
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Payment & GST Settings Tab -->
+            <div id="payment-settings-tab" class="admin-tab-content" style="display: none;">
+                <h3>💳 Payment Gateway & GST Settings</h3>
+                <p style="color: #64748b; margin-bottom: 20px;">Configure your UPI ID, registration base fee, and GST percentage. QR code will auto-update.</p>
+                
+                <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1; max-width:600px;">
+                    <label style="font-weight:bold; display:block; margin-bottom:5px;">Admin UPI ID:</label>
+                    <input type="text" id="set-upi" value="kulu123@upi" style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:6px;">
+
+                    <label style="font-weight:bold; display:block; margin-bottom:5px;">Base Registration Fee (₹):</label>
+                    <input type="number" id="set-base-fee" value="1000" style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:6px;">
+
+                    <label style="font-weight:bold; display:block; margin-bottom:5px;">GST Percentage (%):</label>
+                    <input type="number" id="set-gst" value="18" style="width:100%; padding:10px; margin-bottom:20px; border:1px solid #cbd5e1; border-radius:6px;">
+
+                    <button style="background:#16a34a; color:white; border:none; padding:10px 25px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="savePaymentSettings()">Save Payment Settings 💾</button>
+                </div>
             </div>
 
             <!-- Settings Tab -->
@@ -364,7 +355,7 @@
                 <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1;">
                     <h4>📢 Edit / Update Notice Board</h4>
                     <textarea id="notice-input" rows="5" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; margin-bottom:10px;">• Official Marksheet & Multi-Subject Management System is live.
-• Admins can add and remove subjects dynamically.</textarea>
+• Payment Settings & Auto GST Calculation are active.</textarea>
                     <button style="background:#16a34a; color:white; border:none; padding:8px 20px; border-radius:6px; cursor:pointer;" onclick="updateNoticeBoard()">Save Notice Board 💾</button>
                 </div>
             </div>
@@ -386,56 +377,20 @@
             </div>
         </div>
 
-        <!-- Add/Edit Student Marksheet Modal with Dynamic Subject Add/Remove -->
+        <!-- Add/Edit Student Modal -->
         <div id="studentModal" class="modal">
             <div class="modal-content">
                 <h3 id="student-modal-title" style="color:#0d3b66; margin-bottom:15px;">Add Student Marksheet Details</h3>
-                
-                <h4 style="color:#1e3a8a; margin-bottom:8px; font-size:15px;">Personal Details</h4>
                 <input type="text" id="s-roll" placeholder="Roll No (e.g. 155CB0197)" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
                 <input type="text" id="s-name" placeholder="Candidate Name" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
                 <input type="text" id="s-fname" placeholder="Father's Name" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
                 <input type="text" id="s-mname" placeholder="Mother's Name" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
                 <input type="text" id="s-dob" placeholder="Date of Birth (DD/MM/YYYY)" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
                 <select id="s-gender" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
-                    <option value="">Select Gender</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Other">Other</option>
+                    <option value="">Select Gender</option><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option>
                 </select>
-                <input type="text" id="s-pan" placeholder="PAN No" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
-                <input type="text" id="s-aadhaar" placeholder="Aadhaar No" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
-                <input type="text" id="s-school" placeholder="Name of the School" style="width:100%; padding:9px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:6px;">
-
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <h4 style="color:#1e3a8a; font-size:15px;">Marks Awarded (Subjects)</h4>
-                    <button type="button" style="background:#16a34a; color:white; border:none; padding:4px 10px; border-radius:4px; font-size:12px; cursor:pointer;" onclick="addSubjectRow()">➕ Add Subject</button>
-                </div>
-                
-                <div style="font-size:12px; font-weight:bold; color:#64748b; display:grid; grid-template-columns: 1fr 2fr 1fr 1fr auto; gap:8px; margin-bottom:5px;">
-                    <span>Code</span><span>Subject Name</span><span>Max</span><span>Secured</span><span></span>
-                </div>
-                
-                <!-- Container for dynamic subjects -->
-                <div id="subject-rows-container">
-                    <div class="sub-row">
-                        <input type="text" value="FLO" placeholder="Code" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                        <input type="text" value="FIRST LANGUAGE ODIA" placeholder="Subject Name" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                        <input type="number" value="100" placeholder="Max" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                        <input type="number" value="75" placeholder="Secured" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                        <button type="button" style="background:#dc2626; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('.sub-row').remove()">×</button>
-                    </div>
-                    <div class="sub-row">
-                        <input type="text" value="SLE" placeholder="Code" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                        <input type="text" value="SECOND LANGUAGE ENGLISH" placeholder="Subject Name" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                        <input type="number" value="100" placeholder="Max" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                        <input type="number" value="69" placeholder="Secured" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                        <button type="button" style="background:#dc2626; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('.sub-row').remove()">×</button>
-                    </div>
-                </div>
-
-                <input type="text" id="s-total" placeholder="Grand Total (e.g. 360 / 600)" style="width:100%; padding:9px; margin-top:15px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:6px;">
-
+                <input type="text" id="s-school" placeholder="Name of the School" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
+                <input type="text" id="s-total" placeholder="Grand Total (e.g. 360 / 600)" style="width:100%; padding:9px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:6px;">
                 <div style="display:flex; justify-content:flex-end; gap:10px;">
                     <button style="background:#64748b; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="closeStudentModal()">Cancel</button>
                     <button style="background:#2563eb; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="saveStudentData()">Save Marksheet 💾</button>
@@ -452,10 +407,12 @@
             <button style="background:#3b82f6; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="alert('Login Successful!')">Login ➡️</button>
         </div>
 
-        <!-- School Registration Section -->
+        <!-- School Registration Section with Auto GST & QR Barcode -->
         <div id="school-reg" class="content-section">
             <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
             <h3>📝 New School Registration Portal</h3>
+            <p style="color: #64748b; margin-bottom: 15px;">Register your school. Pay registration fee via QR code and submit UTR for Admin approval.</p>
+            
             <input type="text" id="reg-school-name" placeholder="School Name" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
             <input type="text" id="reg-school-id" placeholder="Create School ID" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
             <input type="text" id="reg-hm-name" placeholder="Headmaster Name" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
@@ -464,12 +421,16 @@
             <input type="password" placeholder="Create Password" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
             
             <div style="background:#f8fafc; border:1px dashed #cbd5e1; padding:20px; border-radius:12px; text-align:center; margin-bottom:20px;">
-                <h4 style="color:#0d3b66; margin-bottom:10px;">💳 Registration Fee Payment (UPI QR Code)</h4>
-                <p style="font-size:14px; color:#64748b; margin-bottom:10px;">Scan QR Code to pay via UPI ID: <b>kulu123@upi</b></p>
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=kulu123@upi&pn=SchoolPortal" alt="QR" style="border:4px solid white; box-shadow:0 4px 10px rgba(0,0,0,0.1); border-radius:8px;">
-                <input type="text" placeholder="Enter UPI UTR Number" style="width:100%; padding:10px; margin-top:15px; border:1px solid #cbd5e1; border-radius:6px;">
+                <h4 style="color:#0d3b66; margin-bottom:10px;">💳 Registration Fee Payment & GST Calculation</h4>
+                <p style="font-size:14px; color:#64748b; margin-bottom:5px;">Base Fee: ₹<span id="display-base-fee">1000</span> + GST (<span id="display-gst-pct">18</span>%): ₹<span id="display-gst-amt">180</span></p>
+                <h3 style="color:#1e3a8a; margin-bottom:15px;">Total Payable: ₹<span id="display-total-fee">1180</span></h3>
+                
+                <p style="font-size:14px; color:#64748b; margin-bottom:10px;">Scan QR Code to pay via UPI: <b id="display-upi">kulu123@upi</b></p>
+                <img id="dynamic-qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=kulu123@upi&pn=SchoolPortal&am=1180&cu=INR" alt="QR" style="border:4px solid white; box-shadow:0 4px 10px rgba(0,0,0,0.1); border-radius:8px;">
+                
+                <input type="text" id="reg-utr" placeholder="Enter UPI UTR Transaction Reference No" style="width:100%; padding:10px; margin-top:15px; border:1px solid #cbd5e1; border-radius:6px;">
             </div>
-            <button style="background:#2563eb; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="submitSchoolRegistration()">Submit Registration ✅</button>
+            <button style="background:#2563eb; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="submitSchoolRegistration()">Submit Registration & Notify Admin ✅</button>
         </div>
 
         <!-- Student Registration Section -->
@@ -495,7 +456,41 @@
     </div>
 
     <script>
+        // Global Payment Settings Configuration
+        let paymentConfig = {
+            upiId: "kulu123@upi",
+            baseFee: 1000,
+            gstPct: 18
+        };
+
+        function updateFeeDisplay() {
+            let gstAmt = (paymentConfig.baseFee * paymentConfig.gstPct) / 100;
+            let totalFee = paymentConfig.baseFee + gstAmt;
+            document.getElementById('display-base-fee').innerText = paymentConfig.baseFee;
+            document.getElementById('display-gst-pct').innerText = paymentConfig.gstPct;
+            document.getElementById('display-gst-amt').innerText = gstAmt;
+            document.getElementById('display-total-fee').innerText = totalFee;
+            document.getElementById('display-upi').innerText = paymentConfig.upiId;
+            document.getElementById('dynamic-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=${paymentConfig.upiId}&pn=SchoolPortal&am=${totalFee}&cu=INR`;
+        }
+
+        function savePaymentSettings() {
+            let upi = document.getElementById('set-upi').value.trim();
+            let base = parseFloat(document.getElementById('set-base-fee').value);
+            let gst = parseFloat(document.getElementById('set-gst').value);
+            if(!upi || isNaN(base) || isNaN(gst)) {
+                alert('Please enter valid payment details!');
+                return;
+            }
+            paymentConfig.upiId = upi;
+            paymentConfig.baseFee = base;
+            paymentConfig.gstPct = gst;
+            updateFeeDisplay();
+            alert('Payment & GST Settings Saved Successfully! 💾');
+        }
+
         function openPage(pageId) {
+            if(pageId === 'school-reg') { updateFeeDisplay(); }
             document.getElementById('home-view').style.display = 'none';
             let sections = document.getElementsByClassName('content-section');
             for (let sec of sections) { sec.classList.remove('active'); }
@@ -519,6 +514,7 @@
         function switchTab(tabId, btn) {
             document.getElementById('schools-tab').style.display = 'none';
             document.getElementById('students-tab').style.display = 'none';
+            document.getElementById('payment-settings-tab').style.display = 'none';
             document.getElementById('settings-tab').style.display = 'none';
             document.getElementById(tabId).style.display = 'block';
             let btns = document.getElementsByClassName('tab-btn');
@@ -526,19 +522,29 @@
             btn.classList.add('active-tab');
         }
 
-        // Add Subject Row dynamically inside modal
-        function addSubjectRow() {
-            let container = document.getElementById('subject-rows-container');
-            let div = document.createElement('div');
-            div.className = 'sub-row';
-            div.innerHTML = `
-                <input type="text" placeholder="Code" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                <input type="text" placeholder="Subject Name" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                <input type="number" placeholder="Max" value="100" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                <input type="number" placeholder="Secured" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                <button type="button" style="background:#dc2626; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('.sub-row').remove()">×</button>
-            `;
-            container.appendChild(div);
+        // Submit School Registration with Notification to Admin
+        function submitSchoolRegistration() {
+            let name = document.getElementById('reg-school-name').value.trim();
+            let id = document.getElementById('reg-school-id').value.trim();
+            let hm = document.getElementById('reg-hm-name').value.trim();
+            let mobile = document.getElementById('reg-hm-mobile').value.trim();
+            let addr = document.getElementById('reg-school-address').value.trim();
+            let utr = document.getElementById('reg-utr').value.trim();
+
+            if(!name || !id || !utr) {
+                alert('Please fill required fields & enter UPI UTR Reference Number!');
+                return;
+            }
+
+            let gstAmt = (paymentConfig.baseFee * paymentConfig.gstPct) / 100;
+            let totalFee = paymentConfig.baseFee + gstAmt;
+
+            let tbody = document.getElementById('school-table-body');
+            let newRow = tbody.insertRow();
+            newRow.innerHTML = `<td>${name}</td><td>${id}</td><td>${hm}</td><td>${mobile}</td><td>${utr} (Paid ₹${totalFee})</td><td><span class="badge-pending">Pending Approval</span></td><td><button style="background:#16a34a; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="alert('School Approved Successfully!')">Approve ✅</button> <button style="background:#dc2626; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Reject</button></td>`;
+            
+            alert('Registration Submitted Successfully! Admin has been notified with payment UTR.');
+            goHome();
         }
 
         // Student Marksheet Modal Controls
@@ -552,8 +558,6 @@
             document.getElementById('s-mname').value = "";
             document.getElementById('s-dob').value = "";
             document.getElementById('s-gender').value = "";
-            document.getElementById('s-pan').value = "";
-            document.getElementById('s-aadhaar').value = "";
             document.getElementById('s-school').value = "";
             document.getElementById('s-total').value = "";
             document.getElementById('studentModal').style.display = 'flex';
@@ -567,10 +571,8 @@
             document.getElementById('s-mname').value = editStudentRow.cells[3].innerText;
             document.getElementById('s-dob').value = editStudentRow.cells[4].innerText;
             document.getElementById('s-gender').value = editStudentRow.cells[5].innerText;
-            document.getElementById('s-pan').value = editStudentRow.cells[6].innerText;
-            document.getElementById('s-aadhaar').value = editStudentRow.cells[7].innerText;
-            document.getElementById('s-school').value = editStudentRow.cells[8].innerText;
-            document.getElementById('s-total').value = editStudentRow.cells[9].innerText;
+            document.getElementById('s-school').value = editStudentRow.cells[6].innerText;
+            document.getElementById('s-total').value = editStudentRow.cells[7].innerText;
             document.getElementById('studentModal').style.display = 'flex';
         }
         function closeStudentModal() {
@@ -583,15 +585,10 @@
             let mname = document.getElementById('s-mname').value.trim();
             let dob = document.getElementById('s-dob').value.trim();
             let gender = document.getElementById('s-gender').value;
-            let pan = document.getElementById('s-pan').value.trim();
-            let aadhaar = document.getElementById('s-aadhaar').value.trim();
             let school = document.getElementById('s-school').value.trim();
             let total = document.getElementById('s-total').value.trim();
 
-            if(!roll || !name) {
-                alert('Please enter Roll No & Candidate Name!');
-                return;
-            }
+            if(!roll || !name) { alert('Please enter Roll No & Candidate Name!'); return; }
 
             let tbody = document.getElementById('student-table-body');
             if(editStudentRow) {
@@ -601,15 +598,13 @@
                 editStudentRow.cells[3].innerText = mname;
                 editStudentRow.cells[4].innerText = dob;
                 editStudentRow.cells[5].innerText = gender;
-                editStudentRow.cells[6].innerText = pan;
-                editStudentRow.cells[7].innerText = aadhaar;
-                editStudentRow.cells[8].innerText = school;
-                editStudentRow.cells[9].innerHTML = `<b>${total}</b>`;
-                alert('Marksheet Updated Successfully! ✏️');
+                editStudentRow.cells[6].innerText = school;
+                editStudentRow.cells[7].innerHTML = `<b>${total}</b>`;
+                alert('Marksheet Updated! ✏️');
             } else {
                 let newRow = tbody.insertRow();
-                newRow.innerHTML = `<td>${roll}</td><td>${name}</td><td>${fname}</td><td>${mname}</td><td>${dob}</td><td>${gender}</td><td>${pan}</td><td>${aadhaar}</td><td>${school}</td><td><b>${total}</b></td><td><button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openEditStudentModal(this)">Edit</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Delete</button></td>`;
-                alert('Marksheet Added Successfully! 🎓');
+                newRow.innerHTML = `<td>${roll}</td><td>${name}</td><td>${fname}</td><td>${mname}</td><td>${dob}</td><td>${gender}</td><td>${school}</td><td><b>${total}</b></td><td><button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openEditStudentModal(this)">Edit</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Delete</button></td>`;
+                alert('Marksheet Added! 🎓');
             }
             closeStudentModal();
         }
@@ -653,29 +648,13 @@
                 editRow.cells[1].innerText = id;
                 editRow.cells[2].innerText = hm;
                 editRow.cells[3].innerText = mobile;
-                editRow.cells[4].innerText = addr;
                 alert('School Updated! ✏️');
             } else {
                 let newRow = tbody.insertRow();
-                newRow.innerHTML = `<td>${name}</td><td>${id}</td><td>${hm}</td><td>${mobile}</td><td>${addr}</td><td><span class="badge-approved">Approved</span></td><td><button style="background:#2563eb; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="openEditSchoolModal('${name}', '${id}', '${hm}', '${mobile}', '${addr}')">Edit</button> <button style="background:#dc2626; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Delete</button></td>`;
+                newRow.innerHTML = `<td>${name}</td><td>${id}</td><td>${hm}</td><td>${mobile}</td><td>Manual (Free)</td><td><span class="badge-approved">Approved</span></td><td><button style="background:#2563eb; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="openEditSchoolModal('${name}', '${id}', '${hm}', '${mobile}', '${addr}')">Edit</button> <button style="background:#dc2626; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Delete</button></td>`;
                 alert('School Added! 🏫');
             }
             closeSchoolModal();
-        }
-
-        function submitSchoolRegistration() {
-            let name = document.getElementById('reg-school-name').value.trim();
-            let id = document.getElementById('reg-school-id').value.trim();
-            let hm = document.getElementById('reg-hm-name').value.trim();
-            let mobile = document.getElementById('reg-hm-mobile').value.trim();
-            let addr = document.getElementById('reg-school-address').value.trim();
-
-            if(!name || !id) { alert('Please fill required fields!'); return; }
-            let tbody = document.getElementById('school-table-body');
-            let newRow = tbody.insertRow();
-            newRow.innerHTML = `<td>${name}</td><td>${id}</td><td>${hm}</td><td>${mobile}</td><td>${addr}</td><td><span class="badge-pending">Pending</span></td><td><button style="background:#16a34a; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="alert('Approved!')">Approve ✅</button> <button style="background:#dc2626; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Reject</button></td>`;
-            alert('School Registered Successfully! Status: Pending.');
-            goHome();
         }
 
         function changeBackgroundImage() {
