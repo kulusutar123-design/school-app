@@ -1,320 +1,330 @@
-import streamlit as st
-import psycopg2
-from psycopg2.extras import RealDictCursor
-
-# 1. Page Configuration
-st.set_page_config(page_title="School Home Portal", page_icon="🏫", layout="wide")
-
-# 2. Cloud Database Connection
-@st.cache_resource
-def init_connection():
-    try:
-        return psycopg2.connect(st.secrets["DATABASE_URL"], sslmode='require')
-    except Exception as e:
-        st.error(f"Database Connection Error: {e}")
-        return None
-
-# 3. Database Tables
-def create_tables():
-    conn = init_connection()
-    if conn is not None:
-        with conn.cursor() as cur:
-            cur.execute("""
-                CREATE TABLE IF NOT EXISTS admin_users (
-                    id SERIAL PRIMARY KEY,
-                    username VARCHAR(50) UNIQUE NOT NULL,
-                    password VARCHAR(50) NOT NULL
-                )
-            """)
-            cur.execute("""
-                CREATE TABLE IF NOT EXISTS schools (
-                    id SERIAL PRIMARY KEY,
-                    school_name VARCHAR(150) NOT NULL,
-                    address TEXT,
-                    school_id VARCHAR(50) UNIQUE NOT NULL,
-                    password VARCHAR(50) NOT NULL
-                )
-            """)
-            cur.execute("""
-                CREATE TABLE IF NOT EXISTS students (
-                    id SERIAL PRIMARY KEY,
-                    student_name VARCHAR(100) NOT NULL,
-                    class_name VARCHAR(50) NOT NULL,
-                    roll_number VARCHAR(50) NOT NULL,
-                    dob DATE
-                )
-            """)
-            cur.execute("SELECT * FROM admin_users WHERE username = 'KULU123'")
-            if not cur.fetchone():
-                cur.execute("INSERT INTO admin_users (username, password) VALUES ('KULU123', 'Admin@2026')")
-            conn.commit()
-
-def main():
-    create_tables()
-
-    if "nav" not in st.session_state:
-        st.session_state["nav"] = "Home"
-    if "admin_logged" not in st.session_state:
-        st.session_state["admin_logged"] = False
-
-    # Professional 3D Custom CSS Styling
-    st.markdown("""
-        <style>
-        /* Admin Login Button - Green Style */
-        .admin-btn button {
-            width: 100%;
-            height: 65px;
-            border-radius: 14px !important;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Home Portal</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #f0f4f8;
+            color: #333;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        /* Header */
+        .header {
+            background: linear-gradient(90deg, #0d3b66, #1d4ed8);
+            padding: 25px 30px;
+            border-radius: 16px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+        .header h2 {
+            font-size: 24px;
+        }
+        .header p {
+            font-style: italic;
+            font-size: 16px;
+        }
+        /* Main Layout */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+        }
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        /* Welcome Card */
+        .welcome-card {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            border-left: 8px solid #2563eb;
+            margin-bottom: 30px;
+        }
+        .welcome-card h3 {
+            color: #1e3a8a;
+            margin-bottom: 12px;
+            font-size: 22px;
+        }
+        .welcome-card p {
+            font-size: 16px;
+            color: #475569;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+        /* Quick Actions - 3 Big Cards */
+        .section-title {
+            font-size: 20px;
+            color: #1e293b;
+            margin-bottom: 15px;
             font-weight: bold;
-            font-size: 18px !important;
-            background: linear-gradient(135deg, #22c55e, #16a34a) !important;
-            color: white !important;
-            box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3) !important;
-            border: none !important;
+        }
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        @media (max-width: 600px) {
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .action-card {
+            background: linear-gradient(135deg, #ffffff, #f8fafc);
+            border: 2px solid #cbd5e1;
+            border-radius: 20px;
+            padding: 30px 15px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
             transition: all 0.3s ease;
         }
-        .admin-btn button:hover {
-            transform: translateY(-2px);
-            background: linear-gradient(135deg, #16a34a, #15803d) !important;
-            box-shadow: 0 12px 25px rgba(34, 197, 94, 0.4) !important;
+        .action-card:hover {
+            transform: translateY(-5px);
+            border-color: #2563eb;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+            background: linear-gradient(135deg, #f0fdf4, #ffffff);
         }
-
-        /* School Login Button - Blue Style */
-        .school-btn button {
+        .action-card .icon {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        .action-card h4 {
+            font-size: 16px;
+            color: #1e3a8a;
+        }
+        /* Login Box (Right Side) */
+        .login-box {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+        .login-box h3 {
+            color: #0d3b66;
+            margin-bottom: 15px;
+        }
+        .login-box hr {
+            border: 0;
+            height: 1px;
+            background: #e2e8f0;
+            margin-bottom: 20px;
+        }
+        /* Big Login Buttons (Green & Blue) */
+        .btn-login {
             width: 100%;
-            height: 65px;
-            border-radius: 14px !important;
+            padding: 18px;
+            border-radius: 14px;
             font-weight: bold;
-            font-size: 18px !important;
-            background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
-            color: white !important;
-            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3) !important;
-            border: none !important;
+            font-size: 18px;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
             transition: all 0.3s ease;
         }
-        .school-btn button:hover {
+        .btn-admin {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);
+        }
+        .btn-admin:hover {
+            background: linear-gradient(135deg, #16a34a, #15803d);
             transform: translateY(-2px);
-            background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
-            box-shadow: 0 12px 25px rgba(59, 130, 246, 0.4) !important;
         }
+        .btn-school {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+        }
+        .btn-school:hover {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            transform: translateY(-2px);
+        }
+        .quote {
+            font-size: 14px;
+            color: #64748b;
+            margin-top: 25px;
+            font-style: italic;
+        }
+        /* Dynamic Content Sections */
+        .content-section {
+            display: none;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            margin-top: 20px;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .back-btn {
+            background: #64748b;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .back-btn:hover {
+            background: #475569;
+        }
+    </style>
+</head>
+<body>
 
-        /* Big 3D Action Cards Styling */
-        .big-action-card button {
-            width: 100% !important;
-            height: 130px !important;
-            border-radius: 20px !important;
-            font-weight: bold !important;
-            font-size: 18px !important;
-            background: linear-gradient(135deg, #ffffff, #f8fafc) !important;
-            color: #1e3a8a !important;
-            box-shadow: 0 12px 30px rgba(0,0,0,0.1) !important;
-            border: 2px solid #cbd5e1 !important;
-            transition: all 0.3s ease;
-        }
-        .big-action-card button:hover {
-            transform: translateY(-4px) !important;
-            border-color: #2563eb !important;
-            box-shadow: 0 18px 35px rgba(0,0,0,0.18) !important;
-            background: linear-gradient(135deg, #f0fdf4, #ffffff) !important;
-        }
-        </style>
-    """, unsafe_allow_html=True)
-
-    # Header Bar
-    st.markdown("""
-        <div style='background: linear-gradient(90deg, #0d3b66, #1d4ed8); padding: 25px; border-radius: 16px; color: white; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 8px 20px rgba(0,0,0,0.2);'>
-            <h2 style='margin:0;'>🏫 SCHOOL HOME PORTAL</h2>
-            <p style='margin: 0; font-style: italic; font-size: 18px;'>Better Education, Brighter Future</p>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h2>🏫 SCHOOL HOME PORTAL</h2>
+            <p>Better Education, Brighter Future</p>
         </div>
-    """, unsafe_allow_html=True)
-    
-    st.write("")
 
-    # HOME PAGE
-    if st.session_state["nav"] == "Home":
-        col_left, col_right = st.columns([1.6, 1])
+        <!-- Home View -->
+        <div id="home-view">
+            <div class="main-grid">
+                <!-- Left Side -->
+                <div>
+                    <div class="welcome-card">
+                        <h3>🌟 Welcome to Digital School Management</h3>
+                        <p>Manage your schools, student admissions, attendance, and records securely on the cloud platform with high performance.</p>
+                        <p><b>✨ Features:</b> Secure Cloud Database, Instant Registration, 3D Interactive Portal.</p>
+                    </div>
 
-        with col_left:
-            st.markdown("""
-                <div style='background: linear-gradient(135deg, #ffffff, #f8fafc); padding: 30px; border-radius: 20px; box-shadow: 0 12px 30px rgba(0,0,0,0.08); border-left: 8px solid #2563eb; margin-bottom: 25px;'>
-                    <h3 style='color: #1e3a8a; margin-top:0;'>🌟 Welcome to Digital School Management</h3>
-                    <p style='font-size: 16px; color: #475569;'>Manage your schools, student admissions, attendance, and records securely on the cloud platform with high performance.</p>
-                    <p style='font-size: 15px;'><b>✨ Features:</b> Secure Cloud Database, Instant Registration, 3D Interactive Portal.</p>
+                    <div class="section-title">📌 Quick Portal Actions</div>
+                    <div class="actions-grid">
+                        <div class="action-card" onclick="openPage('school-reg')">
+                            <div class="icon">🏫</div>
+                            <h4>New School Registration</h4>
+                        </div>
+                        <div class="action-card" onclick="openPage('student-reg')">
+                            <div class="icon">🎓</div>
+                            <h4>New Student Registration</h4>
+                        </div>
+                        <div class="action-card" onclick="openPage('scholarship')">
+                            <div class="icon">💰</div>
+                            <h4>Scholarship Portal</h4>
+                        </div>
+                    </div>
                 </div>
-            """, unsafe_allow_html=True)
-            
-            st.markdown("### 📌 Quick Portal Actions")
-            
-            c1, c2, c3 = st.columns(3)
-            with c1:
-                st.markdown('<div class="big-action-card">', unsafe_allow_html=True)
-                if st.button("🏫\n\nNew School Registration"):
-                    st.session_state["nav"] = "New School Registration"
-                    st.rerun()
-                st.markdown('</div>', unsafe_allow_html=True)
-            with c2:
-                st.markdown('<div class="big-action-card">', unsafe_allow_html=True)
-                if st.button("🎓\n\nNew Student Registration"):
-                    st.session_state["nav"] = "New Student Registration"
-                    st.rerun()
-                st.markdown('</div>', unsafe_allow_html=True)
-            with c3:
-                st.markdown('<div class="big-action-card">', unsafe_allow_html=True)
-                if st.button("💰\n\nScholarship Portal"):
-                    st.session_state["nav"] = "Scholarship Portal"
-                    st.rerun()
-                st.markdown('</div>', unsafe_allow_html=True)
 
-        with col_right:
-            st.markdown("""
-                <div style='background: linear-gradient(135deg, #ffffff, #f8fafc); padding: 25px; border-radius: 20px; box-shadow: 0 12px 30px rgba(0,0,0,0.08); text-align: center; margin-bottom: 20px;'>
-                    <h3 style='color: #1e3a8a; margin-top:0;'>🔐 Login</h3>
-                    <hr style='margin: 8px 0 15px 0;'>
+                <!-- Right Side (Login Box) -->
+                <div>
+                    <div class="login-box">
+                        <h3>🔐 Login Portal</h3>
+                        <hr>
+                        <button class="btn-login btn-admin" onclick="openPage('admin-login')">
+                            👤 Admin Login ➔
+                        </button>
+                        <button class="btn-login btn-school" onclick="openPage('school-login')">
+                            🏫 School Login ➔
+                        </button>
+                        <div class="quote">"Education is the key to a better tomorrow"</div>
+                    </div>
                 </div>
-            """, unsafe_allow_html=True)
-            
-            st.markdown('<div class="admin-btn">', unsafe_allow_html=True)
-            if st.button("👤  Admin Login ➔"):
-                st.session_state["nav"] = "Admin Login"
-                st.rerun()
-            st.markdown('</div>', unsafe_allow_html=True)
-            
-            st.write("")
-            
-            st.markdown('<div class="school-btn">', unsafe_allow_html=True)
-            if st.button("🏫  School Login ➔"):
-                st.session_state["nav"] = "School Login"
-                st.rerun()
-            st.markdown('</div>', unsafe_allow_html=True)
-                
-            st.markdown("<p style='text-align: center; font-size: 14px; color: gray; margin-top: 30px;'>\"Education is the key to a better tomorrow\"</p>", unsafe_allow_html=True)
+            </div>
+        </div>
 
-    # ADMIN LOGIN PAGE
-    elif st.session_state["nav"] == "Admin Login":
-        if st.button("⬅️ Back to Home"):
-            st.session_state["nav"] = "Home"
-            st.rerun()
-            
-        st.subheader("👑 Master Administrator Login")
-        if not st.session_state["admin_logged"]:
-            with st.form("admin_login_form"):
-                u_name = st.text_input("Master Username", placeholder="Enter KULU123")
-                u_pass = st.text_input("Master Password", type="password", placeholder="Enter Admin@2026")
-                submitted = st.form_submit_button("Login 🚀")
-                if submitted:
-                    conn = init_connection()
-                    if conn:
-                        with conn.cursor(cursor_factory=RealDictCursor) as cur:
-                            cur.execute("SELECT * FROM admin_users WHERE username = %s AND password = %s", (u_name, u_pass))
-                            if cur.fetchone():
-                                st.session_state["admin_logged"] = True
-                                st.success("Login safala hela! Dashboard kholuchi...")
-                                st.rerun()
-                            else:
-                                st.error("Bhula Master ID kimbha Password!")
-        else:
-            st.success("You are already logged in as Master Admin (KULU123)!")
-            if st.button("Logout Admin"):
-                st.session_state["admin_logged"] = False
-                st.rerun()
+        <!-- Admin Login Section -->
+        <div id="admin-login" class="content-section">
+            <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
+            <h3>👑 Master Administrator Login</h3>
+            <p style="margin: 15px 0; color: #64748b;">Enter your master credentials to access the full admin dashboard.</p>
+            <input type="text" placeholder="Master Username (KULU123)" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
+            <input type="password" placeholder="Master Password" style="width:100%; padding:12px; margin-bottom:20px; border:1px solid #cbd5e1; border-radius:8px;">
+            <button style="background:#22c55e; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="alert('Login Successful!')">Login 🚀</button>
+        </div>
 
-    # SCHOOL LOGIN PAGE
-    elif st.session_state["nav"] == "School Login":
-        if st.button("⬅️ Back to Home"):
-            st.session_state["nav"] = "Home"
-            st.rerun()
-            
-        st.subheader("🏫 School Portal Login")
-        with st.form("school_login_page_form"):
-            s_id = st.text_input("School ID")
-            s_pass = st.text_input("Password", type="password")
-            s_btn = st.form_submit_button("Login to School ➡️")
-            if s_btn:
-                conn = init_connection()
-                if conn:
-                    with conn.cursor(cursor_factory=RealDictCursor) as cur:
-                        cur.execute("SELECT * FROM schools WHERE school_id = %s AND password = %s", (s_id, s_pass))
-                        if cur.fetchone():
-                            st.success("School Login safala hela!")
-                        else:
-                            st.error("Bhula School ID kimbha Password!")
+        <!-- School Login Section -->
+        <div id="school-login" class="content-section">
+            <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
+            <h3>🏫 School Portal Login</h3>
+            <p style="margin: 15px 0; color: #64748b;">Enter your school ID and password.</p>
+            <input type="text" placeholder="School ID" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
+            <input type="password" placeholder="Password" style="width:100%; padding:12px; margin-bottom:20px; border:1px solid #cbd5e1; border-radius:8px;">
+            <button style="background:#3b82f6; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="alert('School Login Successful!')">Login to School ➡️</button>
+        </div>
 
-    # NEW SCHOOL REGISTRATION
-    elif st.session_state["nav"] == "New School Registration":
-        if st.button("⬅️ Back to Home"):
-            st.session_state["nav"] = "Home"
-            st.rerun()
-            
-        st.subheader("📝 New School Registration Portal")
-        with st.form("school_reg_page", clear_on_submit=True):
-            sch_name = st.text_input("School Name")
-            sch_addr = st.text_input("School Address")
-            sch_id = st.text_input("Create School ID (jeperia: SCH001)")
-            sch_pass = st.text_input("Create Password", type="password")
-            
-            reg_btn = st.form_submit_button("Register School ✅")
-            if reg_btn:
-                if sch_name and sch_id and sch_pass:
-                    conn = init_connection()
-                    if conn:
-                        try:
-                            with conn.cursor() as cur:
-                                cur.execute(
-                                    "INSERT INTO schools (school_name, address, school_id, password) VALUES (%s, %s, %s, %s)",
-                                    (sch_name, sch_addr, sch_id, sch_pass)
-                                )
-                                conn.commit()
-                            st.success(f"'{sch_name}' safalatara sahita register hoi gala!")
-                        except Exception as e:
-                            st.error(f"Error: {e}")
-                else:
-                    st.warning("Samasta field purana karantu!")
+        <!-- New School Registration Section -->
+        <div id="school-reg" class="content-section">
+            <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
+            <h3>📝 New School Registration Portal</h3>
+            <p style="margin: 15px 0; color: #64748b;">Register a new school into the cloud system.</p>
+            <input type="text" placeholder="School Name" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
+            <input type="text" placeholder="School Address" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
+            <input type="text" placeholder="Create School ID (e.g., SCH001)" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
+            <input type="password" placeholder="Create Password" style="width:100%; padding:12px; margin-bottom:20px; border:1px solid #cbd5e1; border-radius:8px;">
+            <button style="background:#2563eb; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="alert('School Registered Successfully!')">Register School ✅</button>
+        </div>
 
-    # NEW STUDENT REGISTRATION
-    elif st.session_state["nav"] == "New Student Registration":
-        if st.button("⬅️ Back to Home"):
-            st.session_state["nav"] = "Home"
-            st.rerun()
-            
-        st.subheader("🎓 New Student Registration Portal")
-        with st.form("student_reg_page", clear_on_submit=True):
-            std_name = st.text_input("Student Name")
-            std_class = st.selectbox("Select Class", ["Class 1", "Class 2", "Class 3", "Class 4", "Class 5", "Class 6", "Class 7", "Class 8", "Class 9", "Class 10"])
-            roll_no = st.text_input("Roll Number")
-            dob = st.date_input("Date of Birth")
-            
-            std_btn = st.form_submit_button("Register Student ✅")
-            if std_btn:
-                if std_name and roll_no:
-                    conn = init_connection()
-                    if conn:
-                        try:
-                            with conn.cursor() as cur:
-                                cur.execute(
-                                    "INSERT INTO students (student_name, class_name, roll_number, dob) VALUES (%s, %s, %s, %s)",
-                                    (std_name, std_class, roll_no, dob)
-                                )
-                                conn.commit()
-                            st.success(f"'{std_name}' admision safala bhabare save hoi gala!")
-                        except Exception as e:
-                            st.error(f"Error: {e}")
-                else:
-                    st.warning("Nama ebong roll number diantu!")
+        <!-- New Student Registration Section -->
+        <div id="student-reg" class="content-section">
+            <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
+            <h3>🎓 New Student Registration Portal</h3>
+            <p style="margin: 15px 0; color: #64748b;">Enroll a new student into the database.</p>
+            <input type="text" placeholder="Student Name" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
+            <select style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
+                <option>Select Class</option>
+                <option>Class 1</option><option>Class 2</option><option>Class 3</option><option>Class 4</option><option>Class 5</option>
+                <option>Class 6</option><option>Class 7</option><option>Class 8</option><option>Class 9</option><option>Class 10</option>
+            </select>
+            <input type="text" placeholder="Roll Number" style="width:100%; padding:12px; margin-bottom:20px; border:1px solid #cbd5e1; border-radius:8px;">
+            <button style="background:#2563eb; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="alert('Student Registered Successfully!')">Register Student ✅</button>
+        </div>
 
-    # SCHOLARSHIP PORTAL
-    elif st.session_state["nav"] == "Scholarship Portal":
-        if st.button("⬅️ Back to Home"):
-            st.session_state["nav"] = "Home"
-            st.rerun()
-            
-        st.subheader("💰 Scholarship Portal & Details")
-        st.info("Eatharu chatrachatrimane scholarship pain abedan kariparibe.")
-        st.text_input("Student Roll Number")
-        st.text_input("Aadhaar / ID Number")
-        st.button("Check Scholarship Eligibility 🔍")
+        <!-- Scholarship Portal Section -->
+        <div id="scholarship" class="content-section">
+            <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
+            <h3>💰 Scholarship Portal & Details</h3>
+            <p style="margin: 15px 0; color: #64748b;">Check scholarship eligibility for students.</p>
+            <input type="text" placeholder="Student Roll Number" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
+            <input type="text" placeholder="Aadhaar / ID Number" style="width:100%; padding:12px; margin-bottom:20px; border:1px solid #cbd5e1; border-radius:8px;">
+            <button style="background:#2563eb; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="alert('Checking Eligibility...')">Check Eligibility 🔍</button>
+        </div>
+    </div>
 
-    st.markdown("---")
-    st.markdown("<p style='text-align: center; color: gray;'>School Management System | Education • Discipline • Success</p>", unsafe_allow_html=True)
+    <script>
+        function openPage(pageId) {
+            document.getElementById('home-view').style.display = 'none';
+            let sections = document.getElementsByClassName('content-section');
+            for (let sec of sections) {
+                sec.classList.remove('active');
+            }
+            document.getElementById(pageId).classList.add('active');
+        }
 
-if __name__ == "__main__":
-    main()
+        function goHome() {
+            let sections = document.getElementsByClassName('content-section');
+            for (let sec of sections) {
+                sec.classList.remove('active');
+            }
+            document.getElementById('home-view').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
