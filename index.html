@@ -12,7 +12,8 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         body {
-            background: linear-gradient(rgba(15, 23, 42, 0.6), rgba(15, 23, 42, 0.6)), url('https://images.unsplash.com/photo-1580582932707-520aed937b7b?q=80&w=1920&auto=format&fit=crop') no-repeat center center fixed;
+            /* NIJA HISABARE BACKGROUND PHOTO LINK ETIHARA CHANGE KARI PARIBA */
+            background: linear-gradient(rgba(15, 23, 42, 0.65), rgba(15, 23, 42, 0.65)), url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1920&auto=format&fit=crop') no-repeat center center fixed;
             background-size: cover;
             color: #333;
             padding: 20px;
@@ -137,19 +138,19 @@
         }
         .back-btn:hover { background: #475569; }
 
-        /* Notice Board */
+        /* Notice Board Custom Style */
         .notice-board {
             background: #fffbeb;
             border: 1px solid #fde68a;
             border-left: 6px solid #f59e0b;
-            padding: 15px 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
+            padding: 18px 22px;
+            border-radius: 14px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
-        .notice-board h4 { color: #b45309; margin-bottom: 5px; }
-        .notice-board p { color: #78350f; font-size: 14px; }
+        .notice-board h4 { color: #b45309; margin-bottom: 6px; font-size: 18px; }
+        .notice-board p { color: #78350f; font-size: 15px; line-height: 1.6; }
 
-        /* Tables & Tabs */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -187,9 +188,10 @@
 
         <!-- Home View -->
         <div id="home-view">
+            <!-- NIJA HISABARE NOTICE BOARD TEXT ETIHARA CHANGE KARI PARIBA -->
             <div class="notice-board">
-                <h4>📢 Latest Notice Board</h4>
-                <p>• New Academic Session 2026-27 registration is now live for all affiliated schools.<br>• Scholarship portal verification will start from next week.</p>
+                <h4>📢 Important Notice Board</h4>
+                <p>• <b>Notice 1:</b> New Academic Session 2026-27 registration is now live for all schools.<br>• <b>Notice 2:</b> Scholarship verification will start from coming Monday.<br>• <b>Notice 3:</b> Contact admin office for any technical queries.</p>
             </div>
 
             <div class="main-grid">
@@ -277,7 +279,7 @@
                             <td>St. Xavier's High School</td>
                             <td>SCH002</td>
                             <td><span class="badge-pending">Pending Approval</span></td>
-                            <td><button style="background:#16a34a; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="alert('School Approved!')">Approve ✅</button> <button style="background:#dc2626; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">Reject</button></td>
+                            <td><button style="background:#16a34a; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="alert('School Approved Successfully!')">Approve ✅</button> <button style="background:#dc2626; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">Reject</button></td>
                         </tr>
                     </tbody>
                 </table>
@@ -306,7 +308,7 @@
                             <td>Rahul Kumar</td>
                             <td>Class 10</td>
                             <td>101</td>
-                            <td><button style="background:#2563eb; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="alert('Edit Student Modal')">Edit Data</button></td>
+                            <td><button style="background:#2563eb; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="alert('Edit Student Data Modal')">Edit Data</button></td>
                         </tr>
                     </tbody>
                 </table>
@@ -384,7 +386,7 @@
                 alert('Admin Login Successful! 👑');
                 openPage('admin-dashboard');
             } else {
-                alert('ଭୁଲ Master ID କିମ୍ବା Password! (Use KULU123 / Admin@2026)');
+                alert('Bhula Master ID kimbha Password! (Use KULU123 / Admin@2026)');
             }
         }
         function switchTab(tabId, btn) {
