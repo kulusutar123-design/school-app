@@ -57,39 +57,28 @@ def main():
     if "admin_logged" not in st.session_state:
         st.session_state["admin_logged"] = False
 
-    # Huge 3D Cards & Buttons CSS Styling
+    # Big 3D Cards CSS Styling (Buttons styled as big 3D interactive cards)
     st.markdown("""
         <style>
-        .big-card {
-            background: linear-gradient(135deg, #ffffff, #f1f5f9);
-            padding: 30px;
+        .stButton>button {
+            width: 100%;
+            height: 130px;
             border-radius: 20px;
+            font-weight: bold;
+            font-size: 18px !important;
+            padding: 20px !important;
             box-shadow: 0 12px 30px rgba(0,0,0,0.12), 0 6px 10px rgba(0,0,0,0.08);
-            border: 2px solid #cbd5e1;
-            text-align: center;
             transition: all 0.3s ease;
-            margin-bottom: 20px;
+            border: 2px solid #cbd5e1;
+            background: linear-gradient(135deg, #ffffff, #f8fafc);
+            color: #1e3a8a !important;
+            text-align: center;
         }
-        .big-card:hover {
+        .stButton>button:hover {
             transform: translateY(-5px);
             box-shadow: 0 18px 35px rgba(0,0,0,0.2), 0 8px 12px rgba(0,0,0,0.12);
             border-color: #2563eb;
-        }
-        .stButton>button {
-            width: 100%;
-            border-radius: 14px;
-            font-weight: bold;
-            font-size: 16px !important;
-            padding: 15px !important;
-            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
-            transition: all 0.3s ease;
-            border: none;
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
-            color: white !important;
-        }
-        .stButton>button:hover {
-            transform: translateY(-2px);
-            background: linear-gradient(135deg, #1d4ed8, #1e40af);
+            background: linear-gradient(135deg, #f0fdf4, #ffffff);
         }
         </style>
     """, unsafe_allow_html=True)
@@ -117,23 +106,20 @@ def main():
                 </div>
             """, unsafe_allow_html=True)
             
-            st.markdown("### 📌 Quick Portal Actions (Bada Bada 3D Cards)")
+            st.markdown("### 📌 Quick Portal Actions (Clickable 3D Cards)")
             
-            # ତଳେ ୩ଟି ବଡ଼ 3D କାର୍ଡ ଏବଂ ବଟନ୍
+            # 3no 3D Card buttons seedha upar hain, niche wale extra buttons hata diye gaye hain
             c1, c2, c3 = st.columns(3)
             with c1:
-                st.markdown("<div class='big-card'><h4>🏫</h4><p><b>New School Registration</b></p></div>", unsafe_allow_html=True)
-                if st.button("Open School Reg"):
+                if st.button("🏫\n\nNew School Registration"):
                     st.session_state["nav"] = "New School Registration"
                     st.rerun()
             with c2:
-                st.markdown("<div class='big-card'><h4>🎓</h4><p><b>New Student Registration</b></p></div>", unsafe_allow_html=True)
-                if st.button("Open Student Reg"):
+                if st.button("🎓\n\nNew Student Registration"):
                     st.session_state["nav"] = "New Student Registration"
                     st.rerun()
             with c3:
-                st.markdown("<div class='big-card'><h4>💰</h4><p><b>Scholarship Portal</b></p></div>", unsafe_allow_html=True)
-                if st.button("Open Scholarship"):
+                if st.button("💰\n\nScholarship Portal"):
                     st.session_state["nav"] = "Scholarship Portal"
                     st.rerun()
 
@@ -145,7 +131,6 @@ def main():
                 </div>
             """, unsafe_allow_html=True)
             
-            # ଡାହାଣ ପଟେ ୨ଟି ବଡ଼ ଲଗଇନ୍ ବଟନ୍
             if st.button("👤 Admin Login"):
                 st.session_state["nav"] = "Admin Login"
                 st.rerun()
