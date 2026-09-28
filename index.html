@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>School Home Portal - 3D Results Search Dashboard</title>
+    <title>School Home Portal - Results Portal</title>
     <style>
         * {
             box-sizing: border-box;
@@ -32,7 +32,6 @@
             align-items: center;
             box-shadow: 0 10px 25px rgba(0,0,0,0.4);
             margin-bottom: 25px;
-            transform: perspective(1000px);
         }
         .header h2 { font-size: 24px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
         .header p { font-style: italic; font-size: 16px; }
@@ -52,87 +51,38 @@
             box-shadow: 0 15px 35px rgba(0,0,0,0.3);
             border-left: 8px solid #2563eb;
             margin-bottom: 25px;
-            transform: perspective(1000px) rotateX(1deg);
         }
         .welcome-card h3 { color: #1e3a8a; margin-bottom: 12px; font-size: 22px; }
         .welcome-card p { font-size: 16px; color: #475569; line-height: 1.5; margin-bottom: 10px; }
         
         .section-title { font-size: 20px; color: #ffffff; margin-bottom: 15px; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
         
-        /* 3D Results Search Card on Home Ground */
-        .results-3d-card {
-            background: linear-gradient(135deg, #ffffff, #f8fafc);
+        /* 3D Results Button Card on Home Ground */
+        .results-btn-card {
+            background: linear-gradient(135deg, #1e3a8a, #2563eb);
             border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.6);
-            border: 1px solid rgba(255,255,255,0.8);
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            border: 2px solid rgba(255,255,255,0.3);
             margin-bottom: 25px;
-            transform: perspective(1000px);
+            color: white;
         }
-        .results-3d-card h3 { color: #0d3b66; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; font-size: 20px; }
-        
-        .search-box-bar {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        .search-box-bar input {
-            flex: 1;
-            padding: 12px 15px;
-            border: 2px solid #cbd5e1;
-            border-radius: 10px;
-            font-size: 15px;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-        .search-box-bar input:focus { border-color: #2563eb; }
-        .search-box-bar button {
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        .results-btn-card h3 { margin-bottom: 10px; font-size: 24px; }
+        .results-btn-card p { margin-bottom: 20px; font-size: 15px; color: #e2e8f0; }
+        .btn-check-results {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
             color: white;
             border: none;
-            padding: 0 25px;
-            border-radius: 10px;
+            padding: 15px 35px;
+            font-size: 18px;
             font-weight: bold;
+            border-radius: 12px;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(37,99,235,0.3);
-            transition: transform 0.2s;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
         }
-        .search-box-bar button:hover { transform: translateY(-2px); }
-
-        .table-3d {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0 8px;
-        }
-        .table-3d th {
-            background: #1e3a8a;
-            color: white;
-            padding: 12px;
-            font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .table-3d th:first-child { border-top-left-radius: 10px; border-bottom-left-radius: 10px; }
-        .table-3d th:last-child { border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
-        
-        .table-3d td {
-            background: #ffffff;
-            padding: 14px 12px;
-            border-top: 1px solid #e2e8f0;
-            border-bottom: 1px solid #e2e8f0;
-            font-size: 13px;
-            font-weight: 500;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
-            transition: all 0.2s ease;
-        }
-        .table-3d tr td:first-child { border-left: 1px solid #e2e8f0; border-top-left-radius: 10px; border-bottom-left-radius: 10px; }
-        .table-3d tr td:last-child { border-right: 1px solid #e2e8f0; border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
-        .table-3d tr:hover td {
-            background: #f1f5f9;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.08);
-        }
+        .btn-check-results:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(34,197,94,0.5); }
 
         .actions-grid {
             display: grid;
@@ -153,7 +103,7 @@
             transition: all 0.3s ease;
         }
         .action-card:hover {
-            transform: translateY(-5px) scale(1.02);
+            transform: translateY(-5px);
             border-color: #2563eb;
             box-shadow: 0 20px 35px rgba(0,0,0,0.3);
             background: #ffffff;
@@ -272,7 +222,7 @@
             background: white;
             padding: 30px;
             border-radius: 20px;
-            width: 650px;
+            width: 550px;
             max-width: 95%;
             box-shadow: 0 25px 50px rgba(0,0,0,0.4);
             max-height: 90vh;
@@ -300,41 +250,14 @@
         <div id="home-view">
             <div class="notice-board">
                 <h4>📢 Important Notice Board</h4>
-                <p id="display-notice">• Official Marksheet & 3D Results Search Dashboard is live.<br>• Enter your Roll No below to view your results instantly.</p>
+                <p id="display-notice">• Official Marksheet & Results Portal is live.<br>• Click the "Check Results 🎯" button below to enter your Roll No and view your marksheet.</p>
             </div>
 
-            <!-- 3D Results Search & Table Card on Home Ground -->
-            <div class="results-3d-card">
-                <h3>🔍 Search Student Results by Roll No</h3>
-                <div class="search-box-bar">
-                    <input type="text" id="home-search-roll" placeholder="Enter Roll No (e.g. 155CB0197)">
-                    <button onclick="searchStudentResult()">Search Result 🔎</button>
-                </div>
-                
-                <table class="table-3d">
-                    <thead>
-                        <tr>
-                            <th>Roll No</th>
-                            <th>Candidate Name</th>
-                            <th>Father's Name</th>
-                            <th>Gender</th>
-                            <th>School</th>
-                            <th>Grand Total</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="home-results-tbody">
-                        <tr>
-                            <td><b>155CB0197</b></td>
-                            <td>DIBYANSHI DAS</td>
-                            <td>ANTARYAMI DAS</td>
-                            <td>Female</td>
-                            <td>SRI BAIRAGI SARASWATI SISHU VIDYAMANDIR</td>
-                            <td><b style="color: #16a34a;">360 / 600</b></td>
-                            <td><button style="background:#2563eb; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="alert('Viewing Marksheet for 155CB0197')">View 📄</button></td>
-                        </tr>
-                    </tbody>
-                </table>
+            <!-- 3D Results Button Card on Home Ground -->
+            <div class="results-btn-card">
+                <h3>🎓 Annual Examination Results 2026</h3>
+                <p>Click below to enter your Roll Number and view official student marksheets instantly.</p>
+                <button class="btn-check-results" onclick="openResultsModal()">Check Results 🎯</button>
             </div>
 
             <div class="main-grid">
@@ -342,7 +265,7 @@
                     <div class="welcome-card">
                         <h3>🌟 Welcome to Digital School Management</h3>
                         <p>Manage your schools, student admissions, attendance, and records securely on the cloud platform with high performance.</p>
-                        <p><b>✨ Features:</b> 3D Interactive Design, Roll No Search, Secure Admin Controls.</p>
+                        <p><b>✨ Features:</b> 3D Results Portal, Roll No Verification, Secure Admin Controls.</p>
                     </div>
 
                     <div class="section-title">📌 Quick Portal Actions</div>
@@ -374,6 +297,23 @@
                         </button>
                         <div class="quote">"Education is the key to a better tomorrow"</div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Roll No Check Modal -->
+        <div id="resultsModal" class="modal">
+            <div class="modal-content" style="text-align: center;">
+                <h3 style="color:#0d3b66; margin-bottom:15px;">🔍 Enter Roll Number for Results</h3>
+                <p style="color:#64748b; font-size:14px; margin-bottom:20px;">Please enter your student Roll No (e.g. 155CB0197) to view your complete marksheet.</p>
+                
+                <input type="text" id="check-roll-input" placeholder="Enter Roll Number" style="width:100%; padding:14px; font-size:16px; border:2px solid #cbd5e1; border-radius:10px; margin-bottom:20px; outline:none; text-align:center;">
+
+                <div id="result-display-area" style="text-align: left; margin-bottom: 20px;"></div>
+
+                <div style="display:flex; justify-content:center; gap:10px;">
+                    <button style="background:#64748b; color:white; border:none; padding:10px 20px; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="closeResultsModal()">Close ❌</button>
+                    <button style="background:#2563eb; color:white; border:none; padding:10px 25px; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="fetchStudentResult()">View Marksheet 📄</button>
                 </div>
             </div>
         </div>
@@ -494,8 +434,8 @@
                 </div>
                 <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1;">
                     <h4>📢 Edit / Update Notice Board</h4>
-                    <textarea id="notice-input" rows="5" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; margin-bottom:10px;">• Official Marksheet & 3D Results Search Dashboard is live.
-• Enter your Roll No below to view your results instantly.</textarea>
+                    <textarea id="notice-input" rows="5" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; margin-bottom:10px;">• Official Marksheet & Results Portal is live.
+• Click the "Check Results 🎯" button below to enter your Roll No and view your marksheet.</textarea>
                     <button style="background:#16a34a; color:white; border:none; padding:8px 20px; border-radius:6px; cursor:pointer;" onclick="updateNoticeBoard()">Save Notice Board 💾</button>
                 </div>
             </div>
@@ -693,23 +633,54 @@
             btn.classList.add('active-tab');
         }
 
-        // Search Student by Roll No on Home Ground
-        function searchStudentResult() {
-            let query = document.getElementById('home-search-roll').value.trim().toLowerCase();
-            let tbody = document.getElementById('home-results-tbody');
+        // Results Modal Functions
+        function openResultsModal() {
+            document.getElementById('check-roll-input').value = "";
+            document.getElementById('result-display-area').innerHTML = "";
+            document.getElementById('resultsModal').style.display = 'flex';
+        }
+        function closeResultsModal() {
+            document.getElementById('resultsModal').style.display = 'none';
+        }
+        function fetchStudentResult() {
+            let roll = document.getElementById('check-roll-input').value.trim();
+            let area = document.getElementById('result-display-area');
+            if(!roll) {
+                alert('Please enter a Roll Number!');
+                return;
+            }
+            // Check in admin student table
+            let tbody = document.getElementById('student-table-body');
             let rows = tbody.getElementsByTagName('tr');
             let found = false;
-            for (let row of rows) {
-                let rollText = row.cells[0].innerText.toLowerCase();
-                if (rollText.includes(query) || query === "") {
-                    row.style.display = "";
+            for(let row of rows) {
+                let rNum = row.cells[0].innerText.trim();
+                if(rNum.toLowerCase() === roll.toLowerCase()) {
+                    let name = row.cells[1].innerText;
+                    let fname = row.cells[2].innerText;
+                    let mname = row.cells[3].innerText;
+                    let dob = row.cells[4].innerText;
+                    let gender = row.cells[5].innerText;
+                    let school = row.cells[8].innerText;
+                    let total = row.cells[9].innerText;
+
+                    area.innerHTML = `
+                        <div style="background:#f1f5f9; padding:15px; border-radius:10px; border-left:5px solid #2563eb; font-size:14px;">
+                            <h4 style="color:#1e3a8a; margin-bottom:8px;">📄 Marksheet Found for Roll: ${roll}</h4>
+                            <p><b>Candidate Name:</b> ${name}</p>
+                            <p><b>Father's Name:</b> ${fname}</p>
+                            <p><b>Mother's Name:</b> ${mname}</p>
+                            <p><b>Date of Birth:</b> ${dob} | <b>Gender:</b> ${gender}</p>
+                            <p><b>School:</b> ${school}</p>
+                            <p style="margin-top:8px; font-size:16px;"><b>Grand Total:</b> <span style="color:#16a34a;">${total}</span></p>
+                        </div>
+                    `;
                     found = true;
-                } else {
-                    row.style.display = "none";
+                    break;
                 }
             }
-            if(!found && query !== "") {
-                alert('No student found with Roll No: ' + query);
+            if(!found) {
+                area.innerHTML = `<p style="color:red; text-align:center; font-weight:bold;">❌ No result found for Roll No: ${roll}</p>`;
             }
         }
 
@@ -794,12 +765,6 @@
             } else {
                 let newRow = tbody.insertRow();
                 newRow.innerHTML = `<td>${roll}</td><td>${name}</td><td>${fname}</td><td>${mname}</td><td>${dob}</td><td>${gender}</td><td>${pan}</td><td>${aadhaar}</td><td>${school}</td><td><b>${total}</b></td><td><button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openEditStudentModal(this)">Edit</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Delete</button></td>`;
-                
-                // Add to Home 3D table
-                let homeTbody = document.getElementById('home-results-tbody');
-                let homeRow = homeTbody.insertRow();
-                homeRow.innerHTML = `<td><b>${roll}</b></td><td>${name}</td><td>${fname}</td><td>${gender}</td><td>${school}</td><td><b style="color: #16a34a;">${total}</b></td><td><button style="background:#2563eb; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="alert('Viewing Marksheet for ${roll}')">View 📄</button></td>`;
-                
                 alert('Marksheet Added Successfully! 🎓');
             }
             closeStudentModal();
