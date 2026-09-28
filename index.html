@@ -193,11 +193,17 @@
             background: white;
             padding: 30px;
             border-radius: 16px;
-            width: 550px;
-            max-width: 90%;
+            width: 650px;
+            max-width: 95%;
             box-shadow: 0 10px 25px rgba(0,0,0,0.3);
             max-height: 90vh;
             overflow-y: auto;
+        }
+        .sub-row {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 8px;
         }
     </style>
 </head>
@@ -222,7 +228,7 @@
                     <div class="welcome-card">
                         <h3>🌟 Welcome to Digital School Management</h3>
                         <p>Manage your schools, student admissions, attendance, and records securely on the cloud platform with high performance.</p>
-                        <p><b>✨ Features:</b> Dynamic Subject Manager, Official Marksheet Format, Secure Admin Controls.</p>
+                        <p><b>✨ Features:</b> Subject-wise Marks Entry, Official Marksheet Format, Secure Admin Controls.</p>
                     </div>
 
                     <div class="section-title">📌 Quick Portal Actions</div>
@@ -302,30 +308,13 @@
                 </table>
             </div>
 
-            <!-- Students & Subjects Management Tab -->
+            <!-- Students & Marksheet Tab -->
             <div id="students-tab" class="admin-tab-content" style="display: none;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                     <h3>Official Marksheet & Student Records</h3>
                     <button style="background:#16a34a; color:white; border:none; padding:10px 20px; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="openAddStudentModal()">➕ Add Student Marksheet</button>
                 </div>
 
-                <!-- Subject Manager (Add / Remove Subjects) -->
-                <div style="background:#f1f5f9; padding:15px; border-radius:10px; margin-bottom:20px;">
-                    <h4>📚 Subject Manager (Add / Remove Subjects)</h4>
-                    <div style="display:flex; gap:10px; margin-top:10px;">
-                        <input type="text" id="new-subject-input" placeholder="Enter Subject Name (e.g. Sanskrit)" style="padding:8px; width:50%; border:1px solid #cbd5e1; border-radius:6px;">
-                        <button style="background:#2563eb; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="addSubjectTag()">Add Subject ➕</button>
-                    </div>
-                    <div id="subject-list" style="margin-top:10px; display:flex; flex-wrap:wrap; gap:8px;">
-                        <span style="background:#e2e8f0; padding:5px 10px; border-radius:6px; font-size:13px;">FIRST LANGUAGE ODIA <button onclick="this.parentElement.remove()" style="border:none; background:none; color:red; cursor:pointer; font-weight:bold;">×</button></span>
-                        <span style="background:#e2e8f0; padding:5px 10px; border-radius:6px; font-size:13px;">SECOND LANGUAGE ENGLISH <button onclick="this.parentElement.remove()" style="border:none; background:none; color:red; cursor:pointer; font-weight:bold;">×</button></span>
-                        <span style="background:#e2e8f0; padding:5px 10px; border-radius:6px; font-size:13px;">MATHEMATICS <button onclick="this.parentElement.remove()" style="border:none; background:none; color:red; cursor:pointer; font-weight:bold;">×</button></span>
-                        <span style="background:#e2e8f0; padding:5px 10px; border-radius:6px; font-size:13px;">GENERAL SCIENCE <button onclick="this.parentElement.remove()" style="border:none; background:none; color:red; cursor:pointer; font-weight:bold;">×</button></span>
-                        <span style="background:#e2e8f0; padding:5px 10px; border-radius:6px; font-size:13px;">SOCIAL SCIENCE <button onclick="this.parentElement.remove()" style="border:none; background:none; color:red; cursor:pointer; font-weight:bold;">×</button></span>
-                    </div>
-                </div>
-
-                <!-- Students Table -->
                 <table>
                     <thead>
                         <tr>
@@ -390,16 +379,67 @@
             </div>
         </div>
 
-        <!-- Add/Edit Student Modal -->
+        <!-- Add/Edit Student Marksheet Modal with Subject Fields -->
         <div id="studentModal" class="modal">
             <div class="modal-content">
                 <h3 id="student-modal-title" style="color:#0d3b66; margin-bottom:15px;">Add Student Marksheet Details</h3>
+                
+                <h4 style="color:#1e3a8a; margin-bottom:8px; font-size:15px;">Personal Details</h4>
                 <input type="text" id="s-roll" placeholder="Roll No (e.g. 155CB0197)" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
                 <input type="text" id="s-name" placeholder="Candidate Name" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
                 <input type="text" id="s-fname" placeholder="Father's Name" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
                 <input type="text" id="s-mname" placeholder="Mother's Name" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
                 <input type="text" id="s-dob" placeholder="Date of Birth (DD/MM/YYYY)" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
-                <input type="text" id="s-school" placeholder="Name of the School" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
+                <input type="text" id="s-school" placeholder="Name of the School" style="width:100%; padding:9px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:6px;">
+
+                <h4 style="color:#1e3a8a; margin-bottom:8px; font-size:15px;">Marks Awarded (Subjects)</h4>
+                <div style="font-size:12px; font-weight:bold; color:#64748b; display:grid; grid-template-columns: 1fr 2fr 1fr 1fr; gap:8px; margin-bottom:5px;">
+                    <span>Code</span><span>Subject Name</span><span>Max Marks</span><span>Secured</span>
+                </div>
+                
+                <!-- Subject 1 -->
+                <div class="sub-row">
+                    <input type="text" id="code1" value="FLO" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
+                    <input type="text" id="name1" value="FIRST LANGUAGE ODIA" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
+                    <input type="number" id="max1" value="100" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
+                    <input type="number" id="sec1" value="75" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
+                </div>
+                <!-- Subject 2 -->
+                <div class="sub-row">
+                    <input type="text" id="code2" value="SLE" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
+                    <input type="text" id="name2" value="SECOND LANGUAGE ENGLISH" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
+                    <input type="number" id="max2" value="100" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
+                    <input type="number" id="sec2" value="69" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
+                </div>
+                <!-- Subject 3 -->
+                <div class="sub-row">
+                    <input type="text" id="code3" value="TLS" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
+                    <input type="text" id="name3" value="THIRD LANGUAGE SANSKRIT" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
+                    <input type="number" id="max3" value="100" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
+                    <input type="number" id="sec3" value="77" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
+                </div>
+                <!-- Subject 4 -->
+                <div class="sub-row">
+                    <input type="text" id="code4" value="MTH" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
+                    <input type="text" id="name4" value="MATHEMATICS" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
+                    <input type="number" id="max4" value="100" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
+                    <input type="number" id="sec4" value="38" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
+                </div>
+                <!-- Subject 5 -->
+                <div class="sub-row">
+                    <input type="text" id="code5" value="GSC" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
+                    <input type="text" id="name5" value="GENERAL SCIENCE" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
+                    <input type="number" id="max5" value="100" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
+                    <input type="number" id="sec5" value="48" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
+                </div>
+                <!-- Subject 6 -->
+                <div class="sub-row" style="margin-bottom:15px;">
+                    <input type="text" id="code6" value="SSC" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
+                    <input type="text" id="name6" value="SOCIAL SCIENCE" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
+                    <input type="number" id="max6" value="100" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
+                    <input type="number" id="sec6" value="53" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
+                </div>
+
                 <input type="text" id="s-total" placeholder="Grand Total (e.g. 360 / 600)" style="width:100%; padding:9px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:6px;">
 
                 <div style="display:flex; justify-content:flex-end; gap:10px;">
@@ -490,19 +530,6 @@
             let btns = document.getElementsByClassName('tab-btn');
             for (let b of btns) { b.classList.remove('active-tab'); }
             btn.classList.add('active-tab');
-        }
-
-        // Add Subject Tag
-        function addSubjectTag() {
-            let sub = document.getElementById('new-subject-input').value.trim();
-            if(!sub) { alert('Enter subject name!'); return; }
-            let list = document.getElementById('subject-list');
-            let span = document.createElement('span');
-            span.style.cssText = "background:#e2e8f0; padding:5px 10px; border-radius:6px; font-size:13px;";
-            span.innerHTML = `${sub} <button onclick="this.parentElement.remove()" style="border:none; background:none; color:red; cursor:pointer; font-weight:bold;">×</button>`;
-            list.appendChild(span);
-            document.getElementById('new-subject-input').value = "";
-            alert('Subject Added Successfully! 📚');
         }
 
         // Student Marksheet Modal Controls
