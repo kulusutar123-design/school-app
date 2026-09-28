@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>School Home Portal - Ultimate Student & Admin Dashboard</title>
+    <title>School Home Portal - Multi-Subject Student Dashboard</title>
     <style>
         * {
             box-sizing: border-box;
@@ -19,7 +19,7 @@
             min-height: 100vh;
         }
         .container {
-            max-width: 1350px;
+            max-width: 1400px;
             margin: 0 auto;
         }
         .header {
@@ -196,7 +196,7 @@
             background: white;
             padding: 30px;
             border-radius: 16px;
-            width: 500px;
+            width: 550px;
             max-width: 90%;
             box-shadow: 0 10px 25px rgba(0,0,0,0.3);
             max-height: 90vh;
@@ -217,7 +217,7 @@
         <div id="home-view">
             <div class="notice-board">
                 <h4>📢 Important Notice Board</h4>
-                <p id="display-notice">• New Academic Session 2026-27 registration is now live for all schools.<br>• Scholarship verification will start from coming Monday.</p>
+                <p id="display-notice">• New Academic Session 2026-27 registration is now live for all schools.<br>• Multi-subject student marks entry is now enabled.</p>
             </div>
 
             <div class="main-grid">
@@ -225,7 +225,7 @@
                     <div class="welcome-card">
                         <h3>🌟 Welcome to Digital School Management</h3>
                         <p>Manage your schools, student admissions, attendance, and records securely on the cloud platform with high performance.</p>
-                        <p><b>✨ Features:</b> Secure Cloud Database, Instant Registration, 3D Interactive Portal.</p>
+                        <p><b>✨ Features:</b> Secure Cloud Database, Instant Registration, Multi-Subject Marks Portal.</p>
                     </div>
 
                     <div class="section-title">📌 Quick Portal Actions</div>
@@ -308,24 +308,26 @@
             <!-- Students & Subjects Management Tab -->
             <div id="students-tab" class="admin-tab-content" style="display: none;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h3>Student Records & Subject Management</h3>
+                    <h3>Student Records & Multi-Subject Marks</h3>
                     <button style="background:#16a34a; color:white; border:none; padding:10px 20px; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="openAddStudentModal()">➕ Add New Student</button>
                 </div>
 
                 <!-- Subject Manager -->
                 <div style="background:#f1f5f9; padding:15px; border-radius:10px; margin-bottom:20px;">
-                    <h4>📚 Available Subjects (Add / Remove)</h4>
+                    <h4>📚 Subject Manager (Add / Remove Subjects)</h4>
                     <div style="display:flex; gap:10px; margin-top:10px;">
-                        <input type="text" id="new-subject-input" placeholder="Enter Subject Name (e.g. Science)" style="padding:8px; width:50%; border:1px solid #cbd5e1; border-radius:6px;">
-                        <button style="background:#2563eb; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="addSubject()">Add Subject ➕</button>
+                        <input type="text" id="new-subject-input" placeholder="Enter Subject Name (e.g. History)" style="padding:8px; width:50%; border:1px solid #cbd5e1; border-radius:6px;">
+                        <button style="background:#2563eb; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="addSubjectTag()">Add Subject ➕</button>
                     </div>
                     <div id="subject-list" style="margin-top:10px; display:flex; flex-wrap:wrap; gap:8px;">
-                        <span style="background:#e2e8f0; padding:5px 10px; border-radius:6px; font-size:13px;">Mathematics <button onclick="this.parentElement.remove()" style="border:none; background:none; color:red; cursor:pointer; font-weight:bold;">×</button></span>
                         <span style="background:#e2e8f0; padding:5px 10px; border-radius:6px; font-size:13px;">English <button onclick="this.parentElement.remove()" style="border:none; background:none; color:red; cursor:pointer; font-weight:bold;">×</button></span>
+                        <span style="background:#e2e8f0; padding:5px 10px; border-radius:6px; font-size:13px;">Odia <button onclick="this.parentElement.remove()" style="border:none; background:none; color:red; cursor:pointer; font-weight:bold;">×</button></span>
+                        <span style="background:#e2e8f0; padding:5px 10px; border-radius:6px; font-size:13px;">Mathematics <button onclick="this.parentElement.remove()" style="border:none; background:none; color:red; cursor:pointer; font-weight:bold;">×</button></span>
+                        <span style="background:#e2e8f0; padding:5px 10px; border-radius:6px; font-size:13px;">Science <button onclick="this.parentElement.remove()" style="border:none; background:none; color:red; cursor:pointer; font-weight:bold;">×</button></span>
                     </div>
                 </div>
 
-                <!-- Students Table -->
+                <!-- Students Table with All Subjects -->
                 <table>
                     <thead>
                         <tr>
@@ -335,9 +337,11 @@
                             <th>PAN No</th>
                             <th>Aadhaar No</th>
                             <th>Mobile No</th>
-                            <th>Subject</th>
-                            <th>Full Mark</th>
-                            <th>Mark Secured</th>
+                            <th>English (Sec/Full)</th>
+                            <th>Odia (Sec/Full)</th>
+                            <th>Math (Sec/Full)</th>
+                            <th>Science (Sec/Full)</th>
+                            <th>Total Marks</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -349,12 +353,14 @@
                             <td>ABCDE1234F</td>
                             <td>1234 5678 9012</td>
                             <td>9876543210</td>
-                            <td>Mathematics</td>
-                            <td>100</td>
-                            <td>85</td>
+                            <td>80 / 100</td>
+                            <td>85 / 100</td>
+                            <td>90 / 100</td>
+                            <td>88 / 100</td>
+                            <td><b>343 / 400</b></td>
                             <td>
                                 <button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openEditStudentModal(this)">Edit</button>
-                                <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove(); alert('Student Deleted!');">Delete</button>
+                                <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove(); alert('Deleted!');">Delete</button>
                             </td>
                         </tr>
                     </tbody>
@@ -394,19 +400,26 @@
             </div>
         </div>
 
-        <!-- Add/Edit Student Modal -->
+        <!-- Add/Edit Student Modal with All Subjects Marks -->
         <div id="studentModal" class="modal">
             <div class="modal-content">
-                <h3 id="student-modal-title" style="color:#0d3b66; margin-bottom:15px;">Add New Student</h3>
+                <h3 id="student-modal-title" style="color:#0d3b66; margin-bottom:15px;">Add New Student Marks</h3>
                 <input type="text" id="s-name" placeholder="Student Name" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
                 <input type="text" id="s-mname" placeholder="Mother Name" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
                 <input type="text" id="s-fname" placeholder="Father Name" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
                 <input type="text" id="s-pan" placeholder="PAN No" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
                 <input type="text" id="s-aadhaar" placeholder="Aadhaar No" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
                 <input type="text" id="s-mobile" placeholder="Mobile No" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
-                <input type="text" id="s-subject" placeholder="Subject Name" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
-                <input type="number" id="s-fullmark" placeholder="Full Mark" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
-                <input type="number" id="s-securedmark" placeholder="Mark Secured" style="width:100%; padding:9px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:6px;">
+                
+                <h4 style="color:#1e3a8a; margin:10px 0 5px 0; font-size:14px;">Enter Marks (Secured / Full)</h4>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+                    <input type="text" id="s-eng" placeholder="English (e.g. 80/100)" style="padding:8px; border:1px solid #cbd5e1; border-radius:6px;">
+                    <input type="text" id="s-odia" placeholder="Odia (e.g. 85/100)" style="padding:8px; border:1px solid #cbd5e1; border-radius:6px;">
+                    <input type="text" id="s-math" placeholder="Math (e.g. 90/100)" style="padding:8px; border:1px solid #cbd5e1; border-radius:6px;">
+                    <input type="text" id="s-sci" placeholder="Science (e.g. 88/100)" style="padding:8px; border:1px solid #cbd5e1; border-radius:6px;">
+                </div>
+                <input type="text" id="s-total" placeholder="Total Marks (e.g. 343 / 400)" style="width:100%; padding:9px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:6px;">
+
                 <div style="display:flex; justify-content:flex-end; gap:10px;">
                     <button style="background:#64748b; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="closeStudentModal()">Cancel</button>
                     <button style="background:#2563eb; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="saveStudentData()">Save Student 💾</button>
@@ -498,8 +511,8 @@
             btn.classList.add('active-tab');
         }
 
-        // Subject Add Function
-        function addSubject() {
+        // Add Subject Tag
+        function addSubjectTag() {
             let sub = document.getElementById('new-subject-input').value.trim();
             if(!sub) { alert('Enter subject name!'); return; }
             let list = document.getElementById('subject-list');
@@ -515,30 +528,34 @@
         let editStudentRow = null;
         function openAddStudentModal() {
             editStudentRow = null;
-            document.getElementById('student-modal-title').innerText = "Add New Student";
+            document.getElementById('student-modal-title').innerText = "Add New Student Marks";
             document.getElementById('s-name').value = "";
             document.getElementById('s-mname').value = "";
             document.getElementById('s-fname').value = "";
             document.getElementById('s-pan').value = "";
             document.getElementById('s-aadhaar').value = "";
             document.getElementById('s-mobile').value = "";
-            document.getElementById('s-subject').value = "";
-            document.getElementById('s-fullmark').value = "";
-            document.getElementById('s-securedmark').value = "";
+            document.getElementById('s-eng').value = "";
+            document.getElementById('s-odia').value = "";
+            document.getElementById('s-math').value = "";
+            document.getElementById('s-sci').value = "";
+            document.getElementById('s-total').value = "";
             document.getElementById('studentModal').style.display = 'flex';
         }
         function openEditStudentModal(btn) {
             editStudentRow = btn.closest('tr');
-            document.getElementById('student-modal-title').innerText = "Edit Student Records";
+            document.getElementById('student-modal-title').innerText = "Edit Student Records & Marks";
             document.getElementById('s-name').value = editStudentRow.cells[0].innerText;
             document.getElementById('s-mname').value = editStudentRow.cells[1].innerText;
             document.getElementById('s-fname').value = editStudentRow.cells[2].innerText;
             document.getElementById('s-pan').value = editStudentRow.cells[3].innerText;
             document.getElementById('s-aadhaar').value = editStudentRow.cells[4].innerText;
             document.getElementById('s-mobile').value = editStudentRow.cells[5].innerText;
-            document.getElementById('s-subject').value = editStudentRow.cells[6].innerText;
-            document.getElementById('s-fullmark').value = editStudentRow.cells[7].innerText;
-            document.getElementById('s-securedmark').value = editStudentRow.cells[8].innerText;
+            document.getElementById('s-eng').value = editStudentRow.cells[6].innerText;
+            document.getElementById('s-odia').value = editStudentRow.cells[7].innerText;
+            document.getElementById('s-math').value = editStudentRow.cells[8].innerText;
+            document.getElementById('s-sci').value = editStudentRow.cells[9].innerText;
+            document.getElementById('s-total').value = editStudentRow.cells[10].innerText;
             document.getElementById('studentModal').style.display = 'flex';
         }
         function closeStudentModal() {
@@ -551,12 +568,14 @@
             let pan = document.getElementById('s-pan').value.trim();
             let aadhaar = document.getElementById('s-aadhaar').value.trim();
             let mobile = document.getElementById('s-mobile').value.trim();
-            let subject = document.getElementById('s-subject').value.trim();
-            let fullmark = document.getElementById('s-fullmark').value.trim();
-            let securedmark = document.getElementById('s-securedmark').value.trim();
+            let eng = document.getElementById('s-eng').value.trim();
+            let odia = document.getElementById('s-odia').value.trim();
+            let math = document.getElementById('s-math').value.trim();
+            let sci = document.getElementById('s-sci').value.trim();
+            let total = document.getElementById('s-total').value.trim();
 
-            if(!name || !mobile || !subject) {
-                alert('Please fill required fields!');
+            if(!name || !mobile) {
+                alert('Please enter student name & mobile!');
                 return;
             }
 
@@ -568,14 +587,16 @@
                 editStudentRow.cells[3].innerText = pan;
                 editStudentRow.cells[4].innerText = aadhaar;
                 editStudentRow.cells[5].innerText = mobile;
-                editStudentRow.cells[6].innerText = subject;
-                editStudentRow.cells[7].innerText = fullmark;
-                editStudentRow.cells[8].innerText = securedmark;
+                editStudentRow.cells[6].innerText = eng;
+                editStudentRow.cells[7].innerText = odia;
+                editStudentRow.cells[8].innerText = math;
+                editStudentRow.cells[9].innerText = sci;
+                editStudentRow.cells[10].innerHTML = `<b>${total}</b>`;
                 alert('Student Updated Successfully! ✏️');
             } else {
                 let newRow = tbody.insertRow();
-                newRow.innerHTML = `<td>${name}</td><td>${mname}</td><td>${fname}</td><td>${pan}</td><td>${aadhaar}</td><td>${mobile}</td><td>${subject}</td><td>${fullmark}</td><td>${securedmark}</td><td><button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openEditStudentModal(this)">Edit</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Delete</button></td>`;
-                alert('New Student Added Successfully! 🎓');
+                newRow.innerHTML = `<td>${name}</td><td>${mname}</td><td>${fname}</td><td>${pan}</td><td>${aadhaar}</td><td>${mobile}</td><td>${eng}</td><td>${odia}</td><td>${math}</td><td>${sci}</td><td><b>${total}</b></td><td><button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openEditStudentModal(this)">Edit</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Delete</button></td>`;
+                alert('Student Added Successfully! 🎓');
             }
             closeStudentModal();
         }
