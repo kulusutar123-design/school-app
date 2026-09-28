@@ -57,7 +57,7 @@ def main():
     if "admin_logged" not in st.session_state:
         st.session_state["admin_logged"] = False
 
-    # Exact Photo Style CSS Styling (Green Admin Button, Blue School Button & 3D Cards)
+    # Professional 3D Custom CSS Styling
     st.markdown("""
         <style>
         /* Admin Login Button - Green Style */
@@ -98,23 +98,23 @@ def main():
             box-shadow: 0 12px 25px rgba(59, 130, 246, 0.4) !important;
         }
 
-        /* Quick Action 3D Cards */
-        .action-card button {
-            width: 100%;
-            height: 140px;
+        /* Big 3D Action Cards Styling */
+        .big-action-card button {
+            width: 100% !important;
+            height: 130px !important;
             border-radius: 20px !important;
-            font-weight: bold;
-            font-size: 17px !important;
+            font-weight: bold !important;
+            font-size: 18px !important;
             background: linear-gradient(135deg, #ffffff, #f8fafc) !important;
             color: #1e3a8a !important;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.08) !important;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.1) !important;
             border: 2px solid #cbd5e1 !important;
             transition: all 0.3s ease;
         }
-        .action-card button:hover {
-            transform: translateY(-4px);
+        .big-action-card button:hover {
+            transform: translateY(-4px) !important;
             border-color: #2563eb !important;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.15) !important;
+            box-shadow: 0 18px 35px rgba(0,0,0,0.18) !important;
             background: linear-gradient(135deg, #f0fdf4, #ffffff) !important;
         }
         </style>
@@ -147,19 +147,19 @@ def main():
             
             c1, c2, c3 = st.columns(3)
             with c1:
-                st.markdown('<div class="action-card">', unsafe_allow_html=True)
+                st.markdown('<div class="big-action-card">', unsafe_allow_html=True)
                 if st.button("🏫\n\nNew School Registration"):
                     st.session_state["nav"] = "New School Registration"
                     st.rerun()
                 st.markdown('</div>', unsafe_allow_html=True)
             with c2:
-                st.markdown('<div class="action-card">', unsafe_allow_html=True)
+                st.markdown('<div class="big-action-card">', unsafe_allow_html=True)
                 if st.button("🎓\n\nNew Student Registration"):
                     st.session_state["nav"] = "New Student Registration"
                     st.rerun()
                 st.markdown('</div>', unsafe_allow_html=True)
             with c3:
-                st.markdown('<div class="action-card">', unsafe_allow_html=True)
+                st.markdown('<div class="big-action-card">', unsafe_allow_html=True)
                 if st.button("💰\n\nScholarship Portal"):
                     st.session_state["nav"] = "Scholarship Portal"
                     st.rerun()
@@ -173,7 +173,6 @@ def main():
                 </div>
             """, unsafe_allow_html=True)
             
-            # Admin Login Button (Green)
             st.markdown('<div class="admin-btn">', unsafe_allow_html=True)
             if st.button("👤  Admin Login ➔"):
                 st.session_state["nav"] = "Admin Login"
@@ -182,7 +181,6 @@ def main():
             
             st.write("")
             
-            # School Login Button (Blue)
             st.markdown('<div class="school-btn">', unsafe_allow_html=True)
             if st.button("🏫  School Login ➔"):
                 st.session_state["nav"] = "School Login"
