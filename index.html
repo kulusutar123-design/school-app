@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>School Home Portal - Advanced Admin Dashboard</title>
+    <title>School Home Portal - Ultimate Student & Admin Dashboard</title>
     <style>
         * {
             box-sizing: border-box;
@@ -19,7 +19,7 @@
             min-height: 100vh;
         }
         .container {
-            max-width: 1300px;
+            max-width: 1350px;
             margin: 0 auto;
         }
         .header {
@@ -153,12 +153,15 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 15px;
+            overflow-x: auto;
+            display: block;
         }
         th, td {
-            padding: 12px;
+            padding: 10px 12px;
             border: 1px solid #cbd5e1;
             text-align: left;
-            font-size: 14px;
+            font-size: 13px;
+            white-space: nowrap;
         }
         th { background: #1e3a8a; color: white; }
         .badge-pending { background: #fef08a; color: #854d0e; padding: 4px 10px; border-radius: 6px; font-weight: bold; }
@@ -176,7 +179,7 @@
         }
         .tab-btn.active-tab { background: #1d4ed8; color: white; }
 
-        /* Modal for Add/Edit School */
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -193,7 +196,7 @@
             background: white;
             padding: 30px;
             border-radius: 16px;
-            width: 450px;
+            width: 500px;
             max-width: 90%;
             box-shadow: 0 10px 25px rgba(0,0,0,0.3);
             max-height: 90vh;
@@ -275,7 +278,7 @@
             
             <div style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px;">
                 <button class="tab-btn active-tab" onclick="switchTab('schools-tab', this)">🏫 Manage Schools</button>
-                <button class="tab-btn" onclick="switchTab('students-tab', this)">🎓 Manage Students</button>
+                <button class="tab-btn" onclick="switchTab('students-tab', this)">🎓 Manage Students & Subjects</button>
                 <button class="tab-btn" onclick="switchTab('settings-tab', this)">⚙️ Portal Settings</button>
             </div>
 
@@ -287,53 +290,75 @@
                 </div>
                 <table>
                     <thead>
-                        <tr>
-                            <th>School Name</th>
-                            <th>School ID</th>
-                            <th>Headmaster / Headmistress</th>
-                            <th>Mobile No</th>
-                            <th>Address</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
+                        <tr><th>School Name</th><th>School ID</th><th>Headmaster</th><th>Mobile No</th><th>Address</th><th>Status</th><th>Actions</th></tr>
                     </thead>
                     <tbody id="school-table-body">
                         <tr>
-                            <td>DAV Public School</td>
-                            <td>SCH001</td>
-                            <td>Dr. R. K. Sharma</td>
-                            <td>9876543210</td>
-                            <td>Cuttack, Odisha</td>
+                            <td>DAV Public School</td><td>SCH001</td><td>Dr. R. K. Sharma</td><td>9876543210</td><td>Cuttack</td>
                             <td><span class="badge-approved">Approved</span></td>
                             <td>
-                                <button style="background:#2563eb; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="openEditSchoolModal('DAV Public School', 'SCH001', 'Dr. R. K. Sharma', '9876543210', 'Cuttack, Odisha')">Edit</button> 
-                                <button style="background:#dc2626; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove(); alert('School Deleted!');">Delete</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>St. Xavier's High School</td>
-                            <td>SCH002</td>
-                            <td>Mr. A. Mohanty</td>
-                            <td>9123456789</td>
-                            <td>Bhubaneswar</td>
-                            <td><span class="badge-pending">Pending</span></td>
-                            <td>
-                                <button style="background:#16a34a; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="alert('School Approved Successfully!')">Approve ✅</button> 
-                                <button style="background:#dc2626; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Reject</button>
+                                <button style="background:#2563eb; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="openEditSchoolModal('DAV Public School', 'SCH001', 'Dr. R. K. Sharma', '9876543210', 'Cuttack')">Edit</button> 
+                                <button style="background:#dc2626; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove(); alert('Deleted!');">Delete</button>
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
-            <!-- Students Tab -->
+            <!-- Students & Subjects Management Tab -->
             <div id="students-tab" class="admin-tab-content" style="display: none;">
-                <h3>Student Data & Subject Management</h3>
-                <div style="background:#f1f5f9; padding:15px; border-radius:10px; margin-bottom:15px;">
-                    <h4>📚 Add New Subject</h4>
-                    <input type="text" id="new-sub" placeholder="Enter Subject Name" style="padding:8px; width:60%; margin-right:10px; border:1px solid #cbd5e1; border-radius:6px;">
-                    <button style="background:#2563eb; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="alert('Subject Added!')">Add Subject ➕</button>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3>Student Records & Subject Management</h3>
+                    <button style="background:#16a34a; color:white; border:none; padding:10px 20px; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="openAddStudentModal()">➕ Add New Student</button>
                 </div>
+
+                <!-- Subject Manager -->
+                <div style="background:#f1f5f9; padding:15px; border-radius:10px; margin-bottom:20px;">
+                    <h4>📚 Available Subjects (Add / Remove)</h4>
+                    <div style="display:flex; gap:10px; margin-top:10px;">
+                        <input type="text" id="new-subject-input" placeholder="Enter Subject Name (e.g. Science)" style="padding:8px; width:50%; border:1px solid #cbd5e1; border-radius:6px;">
+                        <button style="background:#2563eb; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="addSubject()">Add Subject ➕</button>
+                    </div>
+                    <div id="subject-list" style="margin-top:10px; display:flex; flex-wrap:wrap; gap:8px;">
+                        <span style="background:#e2e8f0; padding:5px 10px; border-radius:6px; font-size:13px;">Mathematics <button onclick="this.parentElement.remove()" style="border:none; background:none; color:red; cursor:pointer; font-weight:bold;">×</button></span>
+                        <span style="background:#e2e8f0; padding:5px 10px; border-radius:6px; font-size:13px;">English <button onclick="this.parentElement.remove()" style="border:none; background:none; color:red; cursor:pointer; font-weight:bold;">×</button></span>
+                    </div>
+                </div>
+
+                <!-- Students Table -->
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Student Name</th>
+                            <th>Mother Name</th>
+                            <th>Father Name</th>
+                            <th>PAN No</th>
+                            <th>Aadhaar No</th>
+                            <th>Mobile No</th>
+                            <th>Subject</th>
+                            <th>Full Mark</th>
+                            <th>Mark Secured</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="student-table-body">
+                        <tr>
+                            <td>Rahul Kumar</td>
+                            <td>Sita Devi</td>
+                            <td>Ram Kumar</td>
+                            <td>ABCDE1234F</td>
+                            <td>1234 5678 9012</td>
+                            <td>9876543210</td>
+                            <td>Mathematics</td>
+                            <td>100</td>
+                            <td>85</td>
+                            <td>
+                                <button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openEditStudentModal(this)">Edit</button>
+                                <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove(); alert('Student Deleted!');">Delete</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
 
             <!-- Settings Tab -->
@@ -353,18 +378,38 @@
             </div>
         </div>
 
-        <!-- Add / Edit School Modal -->
+        <!-- Add/Edit School Modal -->
         <div id="schoolModal" class="modal">
             <div class="modal-content">
                 <h3 id="modal-title" style="color:#0d3b66; margin-bottom:15px;">Add New School</h3>
                 <input type="text" id="modal-school-name" placeholder="School Name" style="width:100%; padding:10px; margin-bottom:12px; border:1px solid #cbd5e1; border-radius:6px;">
-                <input type="text" id="modal-school-id" placeholder="School ID (e.g. SCH003)" style="width:100%; padding:10px; margin-bottom:12px; border:1px solid #cbd5e1; border-radius:6px;">
-                <input type="text" id="modal-hm-name" placeholder="Headmaster / Headmistress Name" style="width:100%; padding:10px; margin-bottom:12px; border:1px solid #cbd5e1; border-radius:6px;">
-                <input type="text" id="modal-hm-mobile" placeholder="Headmaster Mobile No" style="width:100%; padding:10px; margin-bottom:12px; border:1px solid #cbd5e1; border-radius:6px;">
-                <input type="text" id="modal-school-address" placeholder="School Address" style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:6px;">
+                <input type="text" id="modal-school-id" placeholder="School ID" style="width:100%; padding:10px; margin-bottom:12px; border:1px solid #cbd5e1; border-radius:6px;">
+                <input type="text" id="modal-hm-name" placeholder="Headmaster Name" style="width:100%; padding:10px; margin-bottom:12px; border:1px solid #cbd5e1; border-radius:6px;">
+                <input type="text" id="modal-hm-mobile" placeholder="Mobile No" style="width:100%; padding:10px; margin-bottom:12px; border:1px solid #cbd5e1; border-radius:6px;">
+                <input type="text" id="modal-school-address" placeholder="Address" style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:6px;">
                 <div style="display:flex; justify-content:flex-end; gap:10px;">
                     <button style="background:#64748b; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="closeSchoolModal()">Cancel</button>
-                    <button style="background:#2563eb; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="saveSchoolData()">Save School 💾</button>
+                    <button style="background:#2563eb; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="saveSchoolData()">Save 💾</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add/Edit Student Modal -->
+        <div id="studentModal" class="modal">
+            <div class="modal-content">
+                <h3 id="student-modal-title" style="color:#0d3b66; margin-bottom:15px;">Add New Student</h3>
+                <input type="text" id="s-name" placeholder="Student Name" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
+                <input type="text" id="s-mname" placeholder="Mother Name" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
+                <input type="text" id="s-fname" placeholder="Father Name" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
+                <input type="text" id="s-pan" placeholder="PAN No" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
+                <input type="text" id="s-aadhaar" placeholder="Aadhaar No" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
+                <input type="text" id="s-mobile" placeholder="Mobile No" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
+                <input type="text" id="s-subject" placeholder="Subject Name" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
+                <input type="number" id="s-fullmark" placeholder="Full Mark" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
+                <input type="number" id="s-securedmark" placeholder="Mark Secured" style="width:100%; padding:9px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:6px;">
+                <div style="display:flex; justify-content:flex-end; gap:10px;">
+                    <button style="background:#64748b; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="closeStudentModal()">Cancel</button>
+                    <button style="background:#2563eb; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="saveStudentData()">Save Student 💾</button>
                 </div>
             </div>
         </div>
@@ -378,15 +423,13 @@
             <button style="background:#3b82f6; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="alert('Login Successful!')">Login ➡️</button>
         </div>
 
-        <!-- School Registration Section with Detailed Fields & UPI QR -->
+        <!-- School Registration Section -->
         <div id="school-reg" class="content-section">
             <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
             <h3>📝 New School Registration Portal</h3>
-            <p style="color: #64748b; margin-bottom: 15px;">Register your school. Status will be <b>Pending</b> until admin approves.</p>
-            
             <input type="text" id="reg-school-name" placeholder="School Name" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
             <input type="text" id="reg-school-id" placeholder="Create School ID" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
-            <input type="text" id="reg-hm-name" placeholder="Headmaster / Headmistress Name" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
+            <input type="text" id="reg-hm-name" placeholder="Headmaster Name" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
             <input type="text" id="reg-hm-mobile" placeholder="Headmaster Mobile No" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
             <input type="text" id="reg-school-address" placeholder="School Address" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
             <input type="password" placeholder="Create Password" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
@@ -405,11 +448,12 @@
             <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
             <h3>🎓 New Student Registration Portal</h3>
             <input type="text" placeholder="Student Name" style="width:100%; padding:12px; margin:15px 0; border:1px solid #cbd5e1; border-radius:8px;">
-            <select style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
-                <option>Select Class</option><option>Class 1</option><option>Class 2</option><option>Class 3</option><option>Class 4</option><option>Class 5</option><option>Class 6</option><option>Class 7</option><option>Class 8</option><option>Class 9</option><option>Class 10</option>
-            </select>
-            <input type="text" placeholder="Roll Number" style="width:100%; padding:12px; margin-bottom:20px; border:1px solid #cbd5e1; border-radius:8px;">
-            <button style="background:#2563eb; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="alert('Student Registered!')">Register Student ✅</button>
+            <input type="text" placeholder="Mother Name" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
+            <input type="text" placeholder="Father Name" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
+            <input type="text" placeholder="PAN No" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
+            <input type="text" placeholder="Aadhaar No" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
+            <input type="text" placeholder="Mobile No" style="width:100%; padding:12px; margin-bottom:20px; border:1px solid #cbd5e1; border-radius:8px;">
+            <button style="background:#2563eb; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="alert('Student Registered Successfully!')">Register Student ✅</button>
         </div>
 
         <!-- Scholarship Section -->
@@ -454,7 +498,89 @@
             btn.classList.add('active-tab');
         }
 
-        // Modal Controls for Add / Edit School
+        // Subject Add Function
+        function addSubject() {
+            let sub = document.getElementById('new-subject-input').value.trim();
+            if(!sub) { alert('Enter subject name!'); return; }
+            let list = document.getElementById('subject-list');
+            let span = document.createElement('span');
+            span.style.cssText = "background:#e2e8f0; padding:5px 10px; border-radius:6px; font-size:13px;";
+            span.innerHTML = `${sub} <button onclick="this.parentElement.remove()" style="border:none; background:none; color:red; cursor:pointer; font-weight:bold;">×</button>`;
+            list.appendChild(span);
+            document.getElementById('new-subject-input').value = "";
+            alert('Subject Added Successfully! 📚');
+        }
+
+        // Student Modal Controls
+        let editStudentRow = null;
+        function openAddStudentModal() {
+            editStudentRow = null;
+            document.getElementById('student-modal-title').innerText = "Add New Student";
+            document.getElementById('s-name').value = "";
+            document.getElementById('s-mname').value = "";
+            document.getElementById('s-fname').value = "";
+            document.getElementById('s-pan').value = "";
+            document.getElementById('s-aadhaar').value = "";
+            document.getElementById('s-mobile').value = "";
+            document.getElementById('s-subject').value = "";
+            document.getElementById('s-fullmark').value = "";
+            document.getElementById('s-securedmark').value = "";
+            document.getElementById('studentModal').style.display = 'flex';
+        }
+        function openEditStudentModal(btn) {
+            editStudentRow = btn.closest('tr');
+            document.getElementById('student-modal-title').innerText = "Edit Student Records";
+            document.getElementById('s-name').value = editStudentRow.cells[0].innerText;
+            document.getElementById('s-mname').value = editStudentRow.cells[1].innerText;
+            document.getElementById('s-fname').value = editStudentRow.cells[2].innerText;
+            document.getElementById('s-pan').value = editStudentRow.cells[3].innerText;
+            document.getElementById('s-aadhaar').value = editStudentRow.cells[4].innerText;
+            document.getElementById('s-mobile').value = editStudentRow.cells[5].innerText;
+            document.getElementById('s-subject').value = editStudentRow.cells[6].innerText;
+            document.getElementById('s-fullmark').value = editStudentRow.cells[7].innerText;
+            document.getElementById('s-securedmark').value = editStudentRow.cells[8].innerText;
+            document.getElementById('studentModal').style.display = 'flex';
+        }
+        function closeStudentModal() {
+            document.getElementById('studentModal').style.display = 'none';
+        }
+        function saveStudentData() {
+            let name = document.getElementById('s-name').value.trim();
+            let mname = document.getElementById('s-mname').value.trim();
+            let fname = document.getElementById('s-fname').value.trim();
+            let pan = document.getElementById('s-pan').value.trim();
+            let aadhaar = document.getElementById('s-aadhaar').value.trim();
+            let mobile = document.getElementById('s-mobile').value.trim();
+            let subject = document.getElementById('s-subject').value.trim();
+            let fullmark = document.getElementById('s-fullmark').value.trim();
+            let securedmark = document.getElementById('s-securedmark').value.trim();
+
+            if(!name || !mobile || !subject) {
+                alert('Please fill required fields!');
+                return;
+            }
+
+            let tbody = document.getElementById('student-table-body');
+            if(editStudentRow) {
+                editStudentRow.cells[0].innerText = name;
+                editStudentRow.cells[1].innerText = mname;
+                editStudentRow.cells[2].innerText = fname;
+                editStudentRow.cells[3].innerText = pan;
+                editStudentRow.cells[4].innerText = aadhaar;
+                editStudentRow.cells[5].innerText = mobile;
+                editStudentRow.cells[6].innerText = subject;
+                editStudentRow.cells[7].innerText = fullmark;
+                editStudentRow.cells[8].innerText = securedmark;
+                alert('Student Updated Successfully! ✏️');
+            } else {
+                let newRow = tbody.insertRow();
+                newRow.innerHTML = `<td>${name}</td><td>${mname}</td><td>${fname}</td><td>${pan}</td><td>${aadhaar}</td><td>${mobile}</td><td>${subject}</td><td>${fullmark}</td><td>${securedmark}</td><td><button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openEditStudentModal(this)">Edit</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Delete</button></td>`;
+                alert('New Student Added Successfully! 🎓');
+            }
+            closeStudentModal();
+        }
+
+        // School Modal Controls
         let editRow = null;
         function openAddSchoolModal() {
             editRow = null;
@@ -486,10 +612,7 @@
             let mobile = document.getElementById('modal-hm-mobile').value.trim();
             let addr = document.getElementById('modal-school-address').value.trim();
 
-            if(!name || !id || !hm || !mobile || !addr) {
-                alert('Please fill all school details!');
-                return;
-            }
+            if(!name || !id) { alert('Please fill school name & ID!'); return; }
             let tbody = document.getElementById('school-table-body');
             if(editRow) {
                 editRow.cells[0].innerText = name;
@@ -497,16 +620,15 @@
                 editRow.cells[2].innerText = hm;
                 editRow.cells[3].innerText = mobile;
                 editRow.cells[4].innerText = addr;
-                alert('School Updated Successfully! ✏️');
+                alert('School Updated! ✏️');
             } else {
                 let newRow = tbody.insertRow();
                 newRow.innerHTML = `<td>${name}</td><td>${id}</td><td>${hm}</td><td>${mobile}</td><td>${addr}</td><td><span class="badge-approved">Approved</span></td><td><button style="background:#2563eb; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="openEditSchoolModal('${name}', '${id}', '${hm}', '${mobile}', '${addr}')">Edit</button> <button style="background:#dc2626; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Delete</button></td>`;
-                alert('New School Added Successfully! 🏫');
+                alert('School Added! 🏫');
             }
             closeSchoolModal();
         }
 
-        // Submit School Registration from Public Form with Pending Status
         function submitSchoolRegistration() {
             let name = document.getElementById('reg-school-name').value.trim();
             let id = document.getElementById('reg-school-id').value.trim();
@@ -514,16 +636,11 @@
             let mobile = document.getElementById('reg-hm-mobile').value.trim();
             let addr = document.getElementById('reg-school-address').value.trim();
 
-            if(!name || !id || !hm || !mobile || !addr) {
-                alert('Please fill all registration fields!');
-                return;
-            }
-
+            if(!name || !id) { alert('Please fill required fields!'); return; }
             let tbody = document.getElementById('school-table-body');
             let newRow = tbody.insertRow();
-            newRow.innerHTML = `<td>${name}</td><td>${id}</td><td>${hm}</td><td>${mobile}</td><td>${addr}</td><td><span class="badge-pending">Pending</span></td><td><button style="background:#16a34a; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="alert('School Approved!')">Approve ✅</button> <button style="background:#dc2626; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Reject</button></td>`;
-            
-            alert('School Registered Successfully! Status: Pending Approval.');
+            newRow.innerHTML = `<td>${name}</td><td>${id}</td><td>${hm}</td><td>${mobile}</td><td>${addr}</td><td><span class="badge-pending">Pending</span></td><td><button style="background:#16a34a; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="alert('Approved!')">Approve ✅</button> <button style="background:#dc2626; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Reject</button></td>`;
+            alert('School Registered Successfully! Status: Pending.');
             goHome();
         }
 
@@ -534,7 +651,7 @@
                 reader.onload = function(e) {
                     document.body.style.background = `linear-gradient(rgba(15, 23, 42, 0.65), rgba(15, 23, 42, 0.65)), url('${e.target.result}') no-repeat center center fixed`;
                     document.body.style.backgroundSize = 'cover';
-                    alert('Background Photo Updated Successfully! 🖼️');
+                    alert('Background Updated Successfully! 🖼️');
                 }
                 reader.readAsDataURL(fileInput.files[0]);
             } else {
