@@ -135,6 +135,22 @@
             margin-bottom: 20px;
         }
         .back-btn:hover { background: #475569; }
+        /* Dashboard Cards */
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .metric-card {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .metric-card h4 { color: #64748b; font-size: 14px; margin-bottom: 8px; }
+        .metric-card h2 { color: #0d3b66; font-size: 28px; }
     </style>
 </head>
 <body>
@@ -145,6 +161,7 @@
             <p>Better Education, Brighter Future</p>
         </div>
 
+        <!-- Home View -->
         <div id="home-view">
             <div class="main-grid">
                 <div>
@@ -187,14 +204,38 @@
             </div>
         </div>
 
+        <!-- Admin Login Section -->
         <div id="admin-login" class="content-section">
             <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
             <h3>👑 Master Administrator Login</h3>
-            <input type="text" placeholder="Master Username (KULU123)" style="width:100%; padding:12px; margin:15px 0; border:1px solid #cbd5e1; border-radius:8px;">
-            <input type="password" placeholder="Master Password" style="width:100%; padding:12px; margin-bottom:20px; border:1px solid #cbd5e1; border-radius:8px;">
-            <button style="background:#22c55e; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="alert('Login Successful!')">Login 🚀</button>
+            <p style="margin: 10px 0 20px 0; color: #64748b;">Username: <b>KULU123</b> | Password: <b>Admin@2026</b></p>
+            <input type="text" id="admin-user" placeholder="Master Username" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
+            <input type="password" id="admin-pass" placeholder="Master Password" style="width:100%; padding:12px; margin-bottom:20px; border:1px solid #cbd5e1; border-radius:8px;">
+            <button style="background:#22c55e; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="validateAdmin()">Login 🚀</button>
         </div>
 
+        <!-- Admin Dashboard Section -->
+        <div id="admin-dashboard" class="content-section">
+            <button class="back-btn" onclick="goHome()">🚪 Logout & Home</button>
+            <h2 style="color: #0d3b66; margin-bottom: 10px;">👑 Master Admin Dashboard</h2>
+            <p style="color: #64748b; margin-bottom: 20px;">Welcome back, <b>KULU123</b>! You have full access to the system.</p>
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <h4>Total Registered Schools</h4>
+                    <h2>12</h2>
+                </div>
+                <div class="metric-card">
+                    <h4>Total Students Enrolled</h4>
+                    <h2>480</h2>
+                </div>
+                <div class="metric-card">
+                    <h4>System Status</h4>
+                    <h2 style="color: #22c55e;">Online ✅</h2>
+                </div>
+            </div>
+        </div>
+
+        <!-- School Login Section -->
         <div id="school-login" class="content-section">
             <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
             <h3>🏫 School Portal Login</h3>
@@ -203,6 +244,7 @@
             <button style="background:#3b82f6; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="alert('School Login Successful!')">Login ➡️</button>
         </div>
 
+        <!-- New School Registration Section -->
         <div id="school-reg" class="content-section">
             <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
             <h3>📝 New School Registration Portal</h3>
@@ -210,9 +252,10 @@
             <input type="text" placeholder="School Address" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
             <input type="text" placeholder="Create School ID" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
             <input type="password" placeholder="Create Password" style="width:100%; padding:12px; margin-bottom:20px; border:1px solid #cbd5e1; border-radius:8px;">
-            <button style="background:#2563eb; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="alert('Registered!')">Register School ✅</button>
+            <button style="background:#2563eb; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="alert('School Registered Successfully!')">Register School ✅</button>
         </div>
 
+        <!-- New Student Registration Section -->
         <div id="student-reg" class="content-section">
             <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
             <h3>🎓 New Student Registration Portal</h3>
@@ -221,15 +264,16 @@
                 <option>Select Class</option><option>Class 1</option><option>Class 2</option><option>Class 3</option><option>Class 4</option><option>Class 5</option><option>Class 6</option><option>Class 7</option><option>Class 8</option><option>Class 9</option><option>Class 10</option>
             </select>
             <input type="text" placeholder="Roll Number" style="width:100%; padding:12px; margin-bottom:20px; border:1px solid #cbd5e1; border-radius:8px;">
-            <button style="background:#2563eb; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="alert('Registered!')">Register Student ✅</button>
+            <button style="background:#2563eb; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="alert('Student Registered Successfully!')">Register Student ✅</button>
         </div>
 
+        <!-- Scholarship Portal Section -->
         <div id="scholarship" class="content-section">
             <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
             <h3>💰 Scholarship Portal</h3>
             <input type="text" placeholder="Student Roll Number" style="width:100%; padding:12px; margin:15px 0; border:1px solid #cbd5e1; border-radius:8px;">
             <input type="text" placeholder="Aadhaar / ID Number" style="width:100%; padding:12px; margin-bottom:20px; border:1px solid #cbd5e1; border-radius:8px;">
-            <button style="background:#2563eb; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="alert('Checking...')">Check Eligibility 🔍</button>
+            <button style="background:#2563eb; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="alert('Checking Eligibility...')">Check Eligibility 🔍</button>
         </div>
     </div>
 
@@ -244,6 +288,16 @@
             let sections = document.getElementsByClassName('content-section');
             for (let sec of sections) { sec.classList.remove('active'); }
             document.getElementById('home-view').style.display = 'block';
+        }
+        function validateAdmin() {
+            let u = document.getElementById('admin-user').value.trim();
+            let p = document.getElementById('admin-pass').value.trim();
+            if (u === 'KULU123' && p === 'Admin@2026') {
+                alert('Admin Login Successful! 👑');
+                openPage('admin-dashboard');
+            } else {
+                alert('ଭୁଲ Master ID କିମ୍ବା Password! (Use KULU123 / Admin@2026)');
+            }
         }
     </script>
 </body>
