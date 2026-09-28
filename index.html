@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>School Home Portal - Advanced Dashboard</title>
+    <title>School Home Portal - Dynamic Admin Dashboard</title>
     <style>
         * {
             box-sizing: border-box;
@@ -12,7 +12,6 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         body {
-            /* NIJA HISABARE BACKGROUND PHOTO LINK ETIHARA CHANGE KARI PARIBA */
             background: linear-gradient(rgba(15, 23, 42, 0.65), rgba(15, 23, 42, 0.65)), url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1920&auto=format&fit=crop') no-repeat center center fixed;
             background-size: cover;
             color: #333;
@@ -138,7 +137,7 @@
         }
         .back-btn:hover { background: #475569; }
 
-        /* Notice Board Custom Style */
+        /* Notice Board Style */
         .notice-board {
             background: #fffbeb;
             border: 1px solid #fde68a;
@@ -149,7 +148,7 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
         .notice-board h4 { color: #b45309; margin-bottom: 6px; font-size: 18px; }
-        .notice-board p { color: #78350f; font-size: 15px; line-height: 1.6; }
+        .notice-board p { color: #78350f; font-size: 15px; line-height: 1.6; white-space: pre-line; }
 
         table {
             width: 100%;
@@ -173,11 +172,12 @@
             border-radius: 8px;
             cursor: pointer;
             margin-right: 10px;
+            margin-bottom: 10px;
         }
         .tab-btn.active-tab { background: #1d4ed8; color: white; }
     </style>
 </head>
-<body>
+<body id="main-body">
 
     <div class="container">
         <!-- Header -->
@@ -188,10 +188,10 @@
 
         <!-- Home View -->
         <div id="home-view">
-            <!-- NIJA HISABARE NOTICE BOARD TEXT ETIHARA CHANGE KARI PARIBA -->
+            <!-- Dynamic Notice Board Display -->
             <div class="notice-board">
                 <h4>📢 Important Notice Board</h4>
-                <p>• <b>Notice 1:</b> New Academic Session 2026-27 registration is now live for all schools.<br>• <b>Notice 2:</b> Scholarship verification will start from coming Monday.<br>• <b>Notice 3:</b> Contact admin office for any technical queries.</p>
+                <p id="display-notice">• New Academic Session 2026-27 registration is now live for all schools.<br>• Scholarship verification will start from coming Monday.</p>
             </div>
 
             <div class="main-grid">
@@ -245,73 +245,67 @@
             <button style="background:#22c55e; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="validateAdmin()">Login 🚀</button>
         </div>
 
-        <!-- Master Admin Dashboard -->
+        <!-- Master Admin Dashboard with Settings (Background & Notice Upload) -->
         <div id="admin-dashboard" class="content-section">
             <button class="back-btn" onclick="goHome()">🚪 Logout & Home</button>
             <h2 style="color: #0d3b66; margin-bottom: 15px;">👑 Master Admin Dashboard & Settings</h2>
             
-            <div style="margin-bottom: 20px;">
-                <button class="tab-btn active-tab" onclick="switchTab('schools-tab', this)">🏫 Manage Schools (Approve/Edit/Delete)</button>
-                <button class="tab-btn" onclick="switchTab('students-tab', this)">🎓 Manage Students & Subjects</button>
+            <div style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px;">
+                <button class="tab-btn active-tab" onclick="switchTab('schools-tab', this)">🏫 Manage Schools</button>
+                <button class="tab-btn" onclick="switchTab('students-tab', this)">🎓 Manage Students</button>
+                <button class="tab-btn" onclick="switchTab('settings-tab', this)">⚙️ Portal Settings (BG & Notice)</button>
             </div>
 
             <!-- Schools Management Tab -->
             <div id="schools-tab" class="admin-tab-content">
                 <h3>School Approvals & Management</h3>
-                <p style="color: #64748b; margin-bottom: 15px;">Approve new school registrations, edit details, or delete records.</p>
                 <table>
                     <thead>
-                        <tr>
-                            <th>School Name</th>
-                            <th>School ID</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
+                        <tr><th>School Name</th><th>School ID</th><th>Status</th><th>Actions</th></tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>DAV Public School</td>
-                            <td>SCH001</td>
+                            <td>DAV Public School</td><td>SCH001</td>
                             <td><span class="badge-approved">Approved</span></td>
                             <td><button style="background:#2563eb; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">Edit</button> <button style="background:#dc2626; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">Delete</button></td>
                         </tr>
                         <tr>
-                            <td>St. Xavier's High School</td>
-                            <td>SCH002</td>
+                            <td>St. Xavier's High School</td><td>SCH002</td>
                             <td><span class="badge-pending">Pending Approval</span></td>
-                            <td><button style="background:#16a34a; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="alert('School Approved Successfully!')">Approve ✅</button> <button style="background:#dc2626; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">Reject</button></td>
+                            <td><button style="background:#16a34a; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="alert('School Approved!')">Approve ✅</button> <button style="background:#dc2626; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">Reject</button></td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
-            <!-- Students & Subjects Management Tab -->
+            <!-- Students Tab -->
             <div id="students-tab" class="admin-tab-content" style="display: none;">
                 <h3>Student Data & Subject Management</h3>
-                <p style="color: #64748b; margin-bottom: 15px;">Add/Remove subjects or edit student records.</p>
                 <div style="background:#f1f5f9; padding:15px; border-radius:10px; margin-bottom:15px;">
                     <h4>📚 Add New Subject</h4>
-                    <input type="text" id="new-sub" placeholder="Enter Subject Name (e.g. Computer Science)" style="padding:8px; width:60%; margin-right:10px; border:1px solid #cbd5e1; border-radius:6px;">
-                    <button style="background:#2563eb; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="alert('Subject Added Successfully!')">Add Subject ➕</button>
+                    <input type="text" id="new-sub" placeholder="Enter Subject Name" style="padding:8px; width:60%; margin-right:10px; border:1px solid #cbd5e1; border-radius:6px;">
+                    <button style="background:#2563eb; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="alert('Subject Added!')">Add Subject ➕</button>
                 </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Student Name</th>
-                            <th>Class</th>
-                            <th>Roll No</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Rahul Kumar</td>
-                            <td>Class 10</td>
-                            <td>101</td>
-                            <td><button style="background:#2563eb; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="alert('Edit Student Data Modal')">Edit Data</button></td>
-                        </tr>
-                    </tbody>
-                </table>
+            </div>
+
+            <!-- Settings Tab (Background Photo & Notice Board Upload) -->
+            <div id="settings-tab" class="admin-tab-content" style="display: none;">
+                <h3>⚙️ Portal Customization Settings</h3>
+                <p style="color: #64748b; margin-bottom: 20px;">Change background photo or update notice board instantly.</p>
+                
+                <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1; margin-bottom:20px;">
+                    <h4>🖼️ Upload / Change Background Photo</h4>
+                    <p style="font-size:13px; color:#64748b; margin-bottom:10px;">Select an image file from your device:</p>
+                    <input type="file" id="bg-file-input" accept="image/*" style="margin-bottom:10px;"><br>
+                    <button style="background:#2563eb; color:white; border:none; padding:8px 20px; border-radius:6px; cursor:pointer;" onclick="changeBackgroundImage()">Update Background 🚀</button>
+                </div>
+
+                <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1;">
+                    <h4>📢 Edit / Update Notice Board</h4>
+                    <textarea id="notice-input" rows="5" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; margin-bottom:10px;">• New Academic Session 2026-27 registration is now live for all schools.
+• Scholarship verification will start from coming Monday.</textarea>
+                    <button style="background:#16a34a; color:white; border:none; padding:8px 20px; border-radius:6px; cursor:pointer;" onclick="updateNoticeBoard()">Save Notice Board 💾</button>
+                </div>
             </div>
         </div>
 
@@ -321,15 +315,13 @@
             <h3>🏫 School Portal Login</h3>
             <input type="text" placeholder="School ID" style="width:100%; padding:12px; margin:15px 0; border:1px solid #cbd5e1; border-radius:8px;">
             <input type="password" placeholder="Password" style="width:100%; padding:12px; margin-bottom:20px; border:1px solid #cbd5e1; border-radius:8px;">
-            <button style="background:#3b82f6; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="alert('School Login Successful!')">Login ➡️</button>
+            <button style="background:#3b82f6; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="alert('Login Successful!')">Login ➡️</button>
         </div>
 
-        <!-- New School Registration Section with UPI QR Code -->
+        <!-- School Registration Section -->
         <div id="school-reg" class="content-section">
             <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
             <h3>📝 New School Registration Portal</h3>
-            <p style="color: #64748b; margin-bottom: 15px;">Register your school. Status will be <b>Pending</b> until admin approves.</p>
-            
             <input type="text" placeholder="School Name" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
             <input type="text" placeholder="School Address" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
             <input type="text" placeholder="Create School ID" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
@@ -338,14 +330,13 @@
             <div style="background:#f8fafc; border:1px dashed #cbd5e1; padding:20px; border-radius:12px; text-align:center; margin-bottom:20px;">
                 <h4 style="color:#0d3b66; margin-bottom:10px;">💳 Registration Fee Payment (UPI QR Code)</h4>
                 <p style="font-size:14px; color:#64748b; margin-bottom:10px;">Scan QR Code to pay via UPI ID: <b>kulu123@upi</b></p>
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=kulu123@upi&pn=SchoolPortal" alt="UPI QR Code" style="border:4px solid white; box-shadow:0 4px 10px rgba(0,0,0,0.1); border-radius:8px;">
-                <input type="text" placeholder="Enter UPI Transaction Reference No (UTR)" style="width:100%; padding:10px; margin-top:15px; border:1px solid #cbd5e1; border-radius:6px;">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=kulu123@upi&pn=SchoolPortal" alt="QR" style="border:4px solid white; box-shadow:0 4px 10px rgba(0,0,0,0.1); border-radius:8px;">
+                <input type="text" placeholder="Enter UPI UTR Number" style="width:100%; padding:10px; margin-top:15px; border:1px solid #cbd5e1; border-radius:6px;">
             </div>
-
-            <button style="background:#2563eb; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="alert('School Registered Successfully! Status: Pending Approval.')">Submit Registration ✅</button>
+            <button style="background:#2563eb; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="alert('Submitted! Pending Admin Approval.')">Submit Registration ✅</button>
         </div>
 
-        <!-- New Student Registration Section -->
+        <!-- Student Registration Section -->
         <div id="student-reg" class="content-section">
             <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
             <h3>🎓 New Student Registration Portal</h3>
@@ -354,15 +345,15 @@
                 <option>Select Class</option><option>Class 1</option><option>Class 2</option><option>Class 3</option><option>Class 4</option><option>Class 5</option><option>Class 6</option><option>Class 7</option><option>Class 8</option><option>Class 9</option><option>Class 10</option>
             </select>
             <input type="text" placeholder="Roll Number" style="width:100%; padding:12px; margin-bottom:20px; border:1px solid #cbd5e1; border-radius:8px;">
-            <button style="background:#2563eb; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="alert('Student Registered Successfully!')">Register Student ✅</button>
+            <button style="background:#2563eb; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="alert('Student Registered!')">Register Student ✅</button>
         </div>
 
-        <!-- Scholarship Portal Section -->
+        <!-- Scholarship Section -->
         <div id="scholarship" class="content-section">
             <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
             <h3>💰 Scholarship Portal</h3>
-            <input type="text" placeholder="Student Roll Number" style="width:100%; padding:12px; margin:15px 0; border:1px solid #cbd5e1; border-radius:8px;">
-            <input type="text" placeholder="Aadhaar / ID Number" style="width:100%; padding:12px; margin-bottom:20px; border:1px solid #cbd5e1; border-radius:8px;">
+            <input type="text" placeholder="Roll Number" style="width:100%; padding:12px; margin:15px 0; border:1px solid #cbd5e1; border-radius:8px;">
+            <input type="text" placeholder="Aadhaar Number" style="width:100%; padding:12px; margin-bottom:20px; border:1px solid #cbd5e1; border-radius:8px;">
             <button style="background:#2563eb; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="alert('Checking Eligibility...')">Check Eligibility 🔍</button>
         </div>
     </div>
@@ -386,16 +377,40 @@
                 alert('Admin Login Successful! 👑');
                 openPage('admin-dashboard');
             } else {
-                alert('Bhula Master ID kimbha Password! (Use KULU123 / Admin@2026)');
+                alert('Bhula Master ID kimbha Password!');
             }
         }
         function switchTab(tabId, btn) {
             document.getElementById('schools-tab').style.display = 'none';
             document.getElementById('students-tab').style.display = 'none';
+            document.getElementById('settings-tab').style.display = 'none';
             document.getElementById(tabId).style.display = 'block';
             let btns = document.getElementsByClassName('tab-btn');
             for (let b of btns) { b.classList.remove('active-tab'); }
             btn.classList.add('active-tab');
+        }
+
+        // Dynamic Background Image Uploader
+        function changeBackgroundImage() {
+            const fileInput = document.getElementById('bg-file-input');
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.body.style.background = `linear-gradient(rgba(15, 23, 42, 0.65), rgba(15, 23, 42, 0.65)), url('${e.target.result}') no-repeat center center fixed`;
+                    document.body.style.backgroundSize = 'cover';
+                    alert('Background Photo Updated Successfully! 🖼️');
+                }
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                alert('Please select an image file first.');
+            }
+        }
+
+        // Dynamic Notice Board Updater
+        function updateNoticeBoard() {
+            const newText = document.getElementById('notice-input').value;
+            document.getElementById('display-notice').innerHTML = newText.replace(/\n/g, '<br>');
+            alert('Notice Board Updated Successfully! 📢');
         }
     </script>
 </body>
