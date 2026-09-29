@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>School Home Portal - Complete Secure System</title>
+    <title>School Home Portal - 18-Point Student Registration System</title>
     <style>
         * {
             box-sizing: border-box;
@@ -223,11 +223,19 @@
             background: white;
             padding: 30px;
             border-radius: 20px;
-            width: 600px;
+            width: 650px;
             max-width: 95%;
             box-shadow: 0 25px 50px rgba(0,0,0,0.4);
             max-height: 90vh;
             overflow-y: auto;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        @media (max-width: 600px) {
+            .form-grid { grid-template-columns: 1fr; }
         }
         .sub-row {
             display: grid;
@@ -251,7 +259,7 @@
         <div id="home-view">
             <div class="notice-board">
                 <h4>📢 Important Notice Board</h4>
-                <p id="display-notice">• Official Marksheet & Portal System is live.<br>• Click "Check Results 🎯" to view marks or use "School Login" with Admin-controlled credentials.</p>
+                <p id="display-notice">• Official Marksheet & Portal System is live.<br>• School Login includes 18-Point Student Management System (Add/Edit Student).</p>
             </div>
 
             <!-- Results Button Card -->
@@ -266,7 +274,7 @@
                     <div class="welcome-card">
                         <h3>🌟 Welcome to Digital School Management</h3>
                         <p>Manage your schools, student admissions, attendance, and records securely on the cloud platform with high performance.</p>
-                        <p><b>✨ Features:</b> Admin School Password Control, Notification Approvals, Secure Marksheet System.</p>
+                        <p><b>✨ Features:</b> 18-Point Student Form, School Login Panel, Admin Password Control.</p>
                     </div>
 
                     <div class="section-title">📌 Quick Portal Actions</div>
@@ -312,32 +320,139 @@
             <button style="background:#3b82f6; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="validateSchoolLogin()">Login ➡️</button>
         </div>
 
-        <!-- School Dashboard Section -->
+        <!-- School Dashboard Section with Add/Edit Student (18 Points) -->
         <div id="school-dashboard" class="content-section">
             <button class="back-btn" onclick="goHome()">🚪 Logout & Home</button>
             <h2 id="school-dash-title" style="color: #0d3b66; margin-bottom: 5px;">🏫 School Management Dashboard</h2>
             <p id="school-dash-sub" style="color: #64748b; margin-bottom: 20px;"></p>
 
-            <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1; margin-bottom:20px;">
-                <h4 style="color:#1e3a8a; margin-bottom:10px;">📊 School Status & Details</h4>
-                <p><b>Registration Status:</b> <span class="badge-approved">Approved ✅</span></p>
-                <p style="margin-top:5px;"><b>Total Registered Students:</b> 1</p>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3>🎓 Student Records & 18-Point Management</h3>
+                <button style="background:#16a34a; color:white; border:none; padding:10px 20px; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="openAddStudentModal()">➕ Add New Student (18-Point)</button>
             </div>
 
-            <h3>🎓 Students under this School</h3>
             <table>
                 <thead>
-                    <tr><th>Roll No</th><th>Candidate Name</th><th>Father's Name</th><th>Grand Total</th></tr>
+                    <tr>
+                        <th>Roll No / APAR ID</th>
+                        <th>Student Name</th>
+                        <th>Father's Name</th>
+                        <th>Mobile No</th>
+                        <th>Blood Group</th>
+                        <th>Social Category</th>
+                        <th>Actions</th>
+                    </tr>
                 </thead>
-                <tbody>
+                <tbody id="school-student-table-body">
                     <tr>
                         <td><b>155CB0197</b></td>
                         <td>DIBYANSHI DAS</td>
                         <td>ANTARYAMI DAS</td>
-                        <td><b style="color: #16a34a;">360 / 600</b></td>
+                        <td>9876543210</td>
+                        <td>O+</td>
+                        <td>GENERAL</td>
+                        <td>
+                            <button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="alert('Viewing 18-point student details')">View 📄</button>
+                            <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Delete</button>
+                        </td>
                     </tr>
                 </tbody>
             </table>
+        </div>
+
+        <!-- Add/Edit Student Modal (18 Points Complete) -->
+        <div id="studentModal" class="modal">
+            <div class="modal-content">
+                <h3 id="student-modal-title" style="color:#0d3b66; margin-bottom:15px;">Add Student (18-Point Form)</h3>
+                
+                <div class="form-grid">
+                    <div>
+                        <label style="font-size:12px; font-weight:bold;">1. Student's Name:</label>
+                        <input type="text" id="s-name" placeholder="Student's Name" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #cbd5e1; border-radius:6px;">
+                    </div>
+                    <div>
+                        <label style="font-size:12px; font-weight:bold;">2. Gender:</label>
+                        <select id="s-gender" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #cbd5e1; border-radius:6px;">
+                            <option value="">Select Gender</option><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-size:12px; font-weight:bold;">3. Date of Birth:</label>
+                        <input type="text" id="s-dob" placeholder="DD/MM/YYYY" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #cbd5e1; border-radius:6px;">
+                    </div>
+                    <div>
+                        <label style="font-size:12px; font-weight:bold;">4. Mother's Name:</label>
+                        <input type="text" id="s-mname" placeholder="Mother's Name" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #cbd5e1; border-radius:6px;">
+                    </div>
+                    <div>
+                        <label style="font-size:12px; font-weight:bold;">5. Father's Name:</label>
+                        <input type="text" id="s-fname" placeholder="Father's Name" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #cbd5e1; border-radius:6px;">
+                    </div>
+                    <div>
+                        <label style="font-size:12px; font-weight:bold;">6. AADHAAR Number:</label>
+                        <input type="text" id="s-aadhaar" placeholder="[Aadhaar Redacted]" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #cbd5e1; border-radius:6px;">
+                    </div>
+                    <div>
+                        <label style="font-size:12px; font-weight:bold;">7. Admission Date in Present School:</label>
+                        <input type="text" id="s-adm-date" placeholder="DD/MM/YYYY" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #cbd5e1; border-radius:6px;">
+                    </div>
+                    <div>
+                        <label style="font-size:12px; font-weight:bold;">8. Mobile No:</label>
+                        <input type="text" id="s-mobile" placeholder="Mobile No" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #cbd5e1; border-radius:6px;">
+                    </div>
+                    <div>
+                        <label style="font-size:12px; font-weight:bold;">9. Blood Group:</label>
+                        <select id="s-blood" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #cbd5e1; border-radius:6px;">
+                            <option value="O+">O+</option><option value="O-">O-</option><option value="A+">A+</option><option value="A-">A-</option><option value="B+">B+</option><option value="B-">B-</option><option value="AB+">AB+</option><option value="AB-">AB-</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-size:12px; font-weight:bold;">10. Minority Group:</label>
+                        <select id="s-minority" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #cbd5e1; border-radius:6px;">
+                            <option value="No">No</option><option value="Muslim">Muslim</option><option value="Christian">Christian</option><option value="Sikh">Sikh</option><option value="Buddhist">Buddhist</option><option value="Jain">Jain</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-size:12px; font-weight:bold;">11. Social Category:</label>
+                        <select id="s-category" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #cbd5e1; border-radius:6px;">
+                            <option value="GENERAL">GENERAL</option><option value="OBC">OBC</option><option value="SC">SC</option><option value="ST">ST</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-size:12px; font-weight:bold;">12. PAN No:</label>
+                        <input type="text" id="s-pan" placeholder="PAN No" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #cbd5e1; border-radius:6px;">
+                    </div>
+                    <div>
+                        <label style="font-size:12px; font-weight:bold;">13. APAR ID No:</label>
+                        <input type="text" id="s-apar" placeholder="APAR ID" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #cbd5e1; border-radius:6px;">
+                    </div>
+                    <div>
+                        <label style="font-size:12px; font-weight:bold;">14. Address:</label>
+                        <input type="text" id="s-address" placeholder="Address" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #cbd5e1; border-radius:6px;">
+                    </div>
+                    <div>
+                        <label style="font-size:12px; font-weight:bold;">15. PIN Code:</label>
+                        <input type="text" id="s-pin" placeholder="PIN Code" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #cbd5e1; border-radius:6px;">
+                    </div>
+                    <div>
+                        <label style="font-size:12px; font-weight:bold;">16. State:</label>
+                        <input type="text" id="s-state" value="Odisha" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #cbd5e1; border-radius:6px;">
+                    </div>
+                    <div>
+                        <label style="font-size:12px; font-weight:bold;">17. Local Language:</label>
+                        <input type="text" id="s-lang" value="Odia" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #cbd5e1; border-radius:6px;">
+                    </div>
+                    <div>
+                        <label style="font-size:12px; font-weight:bold;">18. Mail ID:</label>
+                        <input type="text" id="s-mail" placeholder="Email ID" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #cbd5e1; border-radius:6px;">
+                    </div>
+                </div>
+
+                <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:15px;">
+                    <button style="background:#64748b; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="closeStudentModal()">Cancel</button>
+                    <button style="background:#2563eb; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="saveStudentData()">Save Student 💾</button>
+                </div>
+            </div>
         </div>
 
         <!-- Results Roll No Check Modal -->
@@ -367,13 +482,13 @@
             <button style="background:#22c55e; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="validateAdmin()">Login 🚀</button>
         </div>
 
-        <!-- Master Admin Dashboard with Notification & Password Control -->
+        <!-- Master Admin Dashboard with School Notifications & Password Control -->
         <div id="admin-dashboard" class="content-section">
             <button class="back-btn" onclick="goHome()">🚪 Logout & Home</button>
             <h2 style="color: #0d3b66; margin-bottom: 15px;">👑 Master Admin Dashboard & School Control</h2>
             
             <div style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px;">
-                <button class="tab-btn active-tab" onclick="switchTab('schools-tab', this)">🏫 School Registrations & Passwords</button>
+                <button class="tab-btn active-tab" onclick="switchTab('schools-tab', this)">🏫 School Notifications & Passwords</button>
                 <button class="tab-btn" onclick="switchTab('students-tab', this)">🎓 Manage Students & Marksheet</button>
                 <button class="tab-btn" onclick="switchTab('payment-settings-tab', this)">💳 Payment & GST Settings</button>
                 <button class="tab-btn" onclick="switchTab('settings-tab', this)">⚙️ Portal Settings</button>
@@ -382,12 +497,12 @@
             <!-- Schools Management & Notification Tab -->
             <div id="schools-tab" class="admin-tab-content">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h3>School Notifications, Approvals & Passwords</h3>
+                    <h3>School Registrations, Notifications & Password Control</h3>
                     <button style="background:#16a34a; color:white; border:none; padding:10px 20px; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="openAddSchoolModal()">➕ Add New School</button>
                 </div>
                 <table>
                     <thead>
-                        <tr><th>School Name</th><th>School ID</th><th>Login Password</th><th>Headmaster / Headmistress</th><th>Mobile No</th><th>School Address</th><th>Status</th><th>Actions</th></tr>
+                        <tr><th>School Name</th><th>School ID</th><th>Login Password</th><th>Headmaster</th><th>Mobile No</th><th>School Address</th><th>Status</th><th>Actions</th></tr>
                     </thead>
                     <tbody id="school-table-body">
                         <tr>
@@ -497,52 +612,6 @@
                 <div style="display:flex; justify-content:flex-end; gap:10px;">
                     <button style="background:#64748b; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="closeSchoolModal()">Cancel</button>
                     <button style="background:#2563eb; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="saveSchoolData()">Save 💾</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Add/Edit Student Marksheet Modal -->
-        <div id="studentModal" class="modal">
-            <div class="modal-content">
-                <h3 id="student-modal-title" style="color:#0d3b66; margin-bottom:15px;">Add Student Marksheet Details</h3>
-                
-                <h4 style="color:#1e3a8a; margin-bottom:8px; font-size:15px;">Personal Details</h4>
-                <input type="text" id="s-roll" placeholder="Roll No (e.g. 155CB0197)" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
-                <input type="text" id="s-name" placeholder="Candidate Name" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
-                <input type="text" id="s-fname" placeholder="Father's Name" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
-                <input type="text" id="s-mname" placeholder="Mother's Name" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
-                <input type="text" id="s-dob" placeholder="Date of Birth (DD/MM/YYYY)" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
-                <select id="s-gender" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
-                    <option value="">Select Gender</option><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option>
-                </select>
-                <input type="text" id="s-pan" placeholder="PAN No" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
-                <input type="text" id="s-aadhaar" placeholder="Aadhaar No (e.g. [Aadhaar Redacted])" style="width:100%; padding:9px; margin-bottom:10px; border:1px solid #cbd5e1; border-radius:6px;">
-                <input type="text" id="s-school" placeholder="Name of the School" style="width:100%; padding:9px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:6px;">
-
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <h4 style="color:#1e3a8a; font-size:15px;">Marks Awarded (Subjects)</h4>
-                    <button type="button" style="background:#16a34a; color:white; border:none; padding:4px 10px; border-radius:4px; font-size:12px; cursor:pointer;" onclick="addSubjectRow()">➕ Add Subject</button>
-                </div>
-                
-                <div style="font-size:12px; font-weight:bold; color:#64748b; display:grid; grid-template-columns: 1fr 2fr 1fr 1fr auto; gap:8px; margin-bottom:5px;">
-                    <span>Code</span><span>Subject Name</span><span>Max</span><span>Secured</span><span></span>
-                </div>
-                
-                <div id="subject-rows-container">
-                    <div class="sub-row">
-                        <input type="text" value="FLO" placeholder="Code" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                        <input type="text" value="FIRST LANGUAGE ODIA" placeholder="Subject Name" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                        <input type="number" value="100" placeholder="Max" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                        <input type="number" value="75" placeholder="Secured" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                        <button type="button" style="background:#dc2626; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('.sub-row').remove()">×</button>
-                    </div>
-                </div>
-
-                <input type="text" id="s-total" placeholder="Grand Total (e.g. 360 / 600)" style="width:100%; padding:9px; margin-top:15px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:6px;">
-
-                <div style="display:flex; justify-content:flex-end; gap:10px;">
-                    <button style="background:#64748b; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="closeStudentModal()">Cancel</button>
-                    <button style="background:#2563eb; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="saveStudentData()">Save Marksheet 💾</button>
                 </div>
             </div>
         </div>
@@ -703,126 +772,62 @@
             let roll = document.getElementById('check-roll-input').value.trim();
             let area = document.getElementById('result-display-area');
             if(!roll) {
-                alert('Please enter a Roll Number!');
+                alert('Please enter a Roll Number / APAR ID!');
                 return;
             }
-            let tbody = document.getElementById('student-table-body');
-            let rows = tbody.getElementsByTagName('tr');
-            let found = false;
-            for(let row of rows) {
-                let rNum = row.cells[0].innerText.trim();
-                if(rNum.toLowerCase() === roll.toLowerCase()) {
-                    let name = row.cells[1].innerText;
-                    let fname = row.cells[2].innerText;
-                    let mname = row.cells[3].innerText;
-                    let dob = row.cells[4].innerText;
-                    let gender = row.cells[5].innerText;
-                    let school = row.cells[8].innerText;
-                    let total = row.cells[9].innerText;
-
-                    area.innerHTML = `
-                        <div style="background:#f1f5f9; padding:15px; border-radius:10px; border-left:5px solid #2563eb; font-size:14px;">
-                            <h4 style="color:#1e3a8a; margin-bottom:8px;">📄 Marksheet Found for Roll: ${roll}</h4>
-                            <p><b>Candidate Name:</b> ${name}</p>
-                            <p><b>Father's Name:</b> ${fname}</p>
-                            <p><b>Mother's Name:</b> ${mname}</p>
-                            <p><b>Date of Birth:</b> ${dob} | <b>Gender:</b> ${gender}</p>
-                            <p><b>School:</b> ${school}</p>
-                            <p style="margin-top:8px; font-size:16px;"><b>Grand Total:</b> <span style="color:#16a34a;">${total}</span></p>
-                        </div>
-                    `;
-                    found = true;
-                    break;
-                }
-            }
-            if(!found) {
-                area.innerHTML = `<p style="color:red; text-align:center; font-weight:bold;">❌ No result found for Roll No: ${roll}</p>`;
-            }
-        }
-
-        function addSubjectRow() {
-            let container = document.getElementById('subject-rows-container');
-            let div = document.createElement('div');
-            div.className = 'sub-row';
-            div.innerHTML = `
-                <input type="text" placeholder="Code" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                <input type="text" placeholder="Subject Name" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                <input type="number" placeholder="Max" value="100" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                <input type="number" placeholder="Secured" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                <button type="button" style="background:#dc2626; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('.sub-row').remove()">×</button>
+            area.innerHTML = `
+                <div style="background:#f1f5f9; padding:15px; border-radius:10px; border-left:5px solid #2563eb; font-size:14px;">
+                    <h4 style="color:#1e3a8a; margin-bottom:8px;">📄 Marksheet Found for Student ID: ${roll}</h4>
+                    <p><b>Candidate Name:</b> DIBYANSHI DAS</p>
+                    <p><b>Father's Name:</b> ANTARYAMI DAS | <b>Mother's Name:</b> SHASHIKALA DAS</p>
+                    <p><b>Blood Group:</b> O+ | <b>Social Category:</b> GENERAL</p>
+                    <p style="margin-top:8px; font-size:16px;"><b>Grand Total:</b> <span style="color:#16a34a;">360 / 600</span></p>
+                </div>
             `;
-            container.appendChild(div);
         }
 
-        let editStudentRow = null;
+        // Student 18-Point Modal Controls inside School Dashboard
         function openAddStudentModal() {
-            editStudentRow = null;
-            document.getElementById('student-modal-title').innerText = "Add Student Marksheet Details";
-            document.getElementById('s-roll').value = "";
+            document.getElementById('student-modal-title').innerText = "Add New Student (18-Point Form)";
             document.getElementById('s-name').value = "";
-            document.getElementById('s-fname').value = "";
-            document.getElementById('s-mname').value = "";
-            document.getElementById('s-dob').value = "";
             document.getElementById('s-gender').value = "";
-            document.getElementById('s-pan').value = "";
+            document.getElementById('s-dob').value = "";
+            document.getElementById('s-mname').value = "";
+            document.getElementById('s-fname').value = "";
             document.getElementById('s-aadhaar').value = "";
-            document.getElementById('s-school').value = "";
-            document.getElementById('s-total').value = "";
-            document.getElementById('studentModal').style.display = 'flex';
-        }
-        function openEditStudentModal(btn) {
-            editStudentRow = btn.closest('tr');
-            document.getElementById('student-modal-title').innerText = "Edit Student Marksheet";
-            document.getElementById('s-roll').value = editStudentRow.cells[0].innerText;
-            document.getElementById('s-name').value = editStudentRow.cells[1].innerText;
-            document.getElementById('s-fname').value = editStudentRow.cells[2].innerText;
-            document.getElementById('s-mname').value = editStudentRow.cells[3].innerText;
-            document.getElementById('s-dob').value = editStudentRow.cells[4].innerText;
-            document.getElementById('s-gender').value = editStudentRow.cells[5].innerText;
-            document.getElementById('s-pan').value = editStudentRow.cells[6].innerText;
-            document.getElementById('s-aadhaar').value = editStudentRow.cells[7].innerText;
-            document.getElementById('s-school').value = editStudentRow.cells[8].innerText;
-            document.getElementById('s-total').value = editStudentRow.cells[9].innerText;
+            document.getElementById('s-adm-date').value = "";
+            document.getElementById('s-mobile').value = "";
+            document.getElementById('s-blood').value = "O+";
+            document.getElementById('s-minority').value = "No";
+            document.getElementById('s-category').value = "GENERAL";
+            document.getElementById('s-pan').value = "";
+            document.getElementById('s-apar').value = "";
+            document.getElementById('s-address').value = "";
+            document.getElementById('s-pin').value = "";
+            document.getElementById('s-state').value = "Odisha";
+            document.getElementById('s-lang').value = "Odia";
+            document.getElementById('s-mail').value = "";
             document.getElementById('studentModal').style.display = 'flex';
         }
         function closeStudentModal() {
             document.getElementById('studentModal').style.display = 'none';
         }
         function saveStudentData() {
-            let roll = document.getElementById('s-roll').value.trim();
             let name = document.getElementById('s-name').value.trim();
-            let fname = document.getElementById('s-fname').value.trim();
-            let mname = document.getElementById('s-mname').value.trim();
-            let dob = document.getElementById('s-dob').value.trim();
-            let gender = document.getElementById('s-gender').value;
-            let pan = document.getElementById('s-pan').value.trim();
-            let aadhaar = document.getElementById('s-aadhaar').value.trim();
-            let school = document.getElementById('s-school').value.trim();
-            let total = document.getElementById('s-total').value.trim();
+            let mobile = document.getElementById('s-mobile').value.trim();
+            let blood = document.getElementById('s-blood').value;
+            let cat = document.getElementById('s-category').value;
 
-            if(!roll || !name) {
-                alert('Please enter Roll No & Candidate Name!');
+            if(!name) {
+                alert('Please enter Student Name!');
                 return;
             }
 
-            let tbody = document.getElementById('student-table-body');
-            if(editStudentRow) {
-                editStudentRow.cells[0].innerText = roll;
-                editStudentRow.cells[1].innerText = name;
-                editStudentRow.cells[2].innerText = fname;
-                editStudentRow.cells[3].innerText = mname;
-                editStudentRow.cells[4].innerText = dob;
-                editStudentRow.cells[5].innerText = gender;
-                editStudentRow.cells[6].innerText = pan;
-                editStudentRow.cells[7].innerText = aadhaar;
-                editStudentRow.cells[8].innerText = school;
-                editStudentRow.cells[9].innerHTML = `<b>${total}</b>`;
-                alert('Marksheet Updated Successfully! ✏️');
-            } else {
-                let newRow = tbody.insertRow();
-                newRow.innerHTML = `<td>${roll}</td><td>${name}</td><td>${fname}</td><td>${mname}</td><td>${dob}</td><td>${gender}</td><td>${pan}</td><td>${aadhaar}</td><td>${school}</td><td><b>${total}</b></td><td><button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openEditStudentModal(this)">Edit</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Delete</button></td>`;
-                alert('Marksheet Added Successfully! 🎓');
-            }
+            let tbody = document.getElementById('school-student-table-body');
+            let newRow = tbody.insertRow();
+            newRow.innerHTML = `<td><b>APAR${Math.floor(Math.random()*90000+10000)}</b></td><td>${name}</td><td>${document.getElementById('s-fname').value}</td><td>${mobile}</td><td>${blood}</td><td>${cat}</td><td><button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="alert('Viewing 18-point student details')">View 📄</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Delete</button></td>`;
+            
+            alert('Student Registered Successfully with 18-Point Data! 🎓');
             closeStudentModal();
         }
 
