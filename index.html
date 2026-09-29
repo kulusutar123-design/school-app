@@ -266,7 +266,7 @@
                     <div class="welcome-card">
                         <h3>🌟 Welcome to Digital School Management</h3>
                         <p>Manage your schools, student admissions, attendance, and records securely on the cloud platform with high performance.</p>
-                        <p><b>✨ Features:</b> Headmaster & Mobile Records, Admin Password Control, Secure Marksheet System.</p>
+                        <p><b>✨ Features:</b> Admin School Password Control, Notification Approvals, Secure Marksheet System.</p>
                     </div>
 
                     <div class="section-title">📌 Quick Portal Actions</div>
@@ -367,22 +367,22 @@
             <button style="background:#22c55e; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="validateAdmin()">Login 🚀</button>
         </div>
 
-        <!-- Master Admin Dashboard with Complete Details -->
+        <!-- Master Admin Dashboard with Notification & Password Control -->
         <div id="admin-dashboard" class="content-section">
             <button class="back-btn" onclick="goHome()">🚪 Logout & Home</button>
             <h2 style="color: #0d3b66; margin-bottom: 15px;">👑 Master Admin Dashboard & School Control</h2>
             
             <div style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px;">
-                <button class="tab-btn active-tab" onclick="switchTab('schools-tab', this)">🏫 Manage Schools & Passwords</button>
+                <button class="tab-btn active-tab" onclick="switchTab('schools-tab', this)">🏫 School Registrations & Passwords</button>
                 <button class="tab-btn" onclick="switchTab('students-tab', this)">🎓 Manage Students & Marksheet</button>
                 <button class="tab-btn" onclick="switchTab('payment-settings-tab', this)">💳 Payment & GST Settings</button>
                 <button class="tab-btn" onclick="switchTab('settings-tab', this)">⚙️ Portal Settings</button>
             </div>
 
-            <!-- Schools Management Tab with Headmaster & Mobile -->
+            <!-- Schools Management & Notification Tab -->
             <div id="schools-tab" class="admin-tab-content">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h3>School Approvals & Admin Password Control</h3>
+                    <h3>School Notifications, Approvals & Passwords</h3>
                     <button style="background:#16a34a; color:white; border:none; padding:10px 20px; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="openAddSchoolModal()">➕ Add New School</button>
                 </div>
                 <table>
@@ -397,7 +397,7 @@
                             <td>ANTARYAMI DAS</td>
                             <td>9876543210</td>
                             <td>Asurali</td>
-                            <td><span class="badge-approved">Approved</span></td>
+                            <td><span class="badge-approved">Approved ✅</span></td>
                             <td>
                                 <button style="background:#2563eb; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="openEditSchoolModal('SRI BAIRAGI SARASWATI SISHU VIDYAMANDIR, ASURALI', '155CB', 'ANTARYAMI DAS', '9876543210', 'Asurali')">Edit</button> 
                                 <button style="background:#dc2626; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Delete</button>
@@ -673,7 +673,7 @@
             if(matchedSchool) {
                 alert('School Login Successful! 🏫');
                 document.getElementById('school-dash-title').innerText = `🏫 ${matchedSchool.name}`;
-                document.getElementById('school-dash-sub').innerText = `School ID: ${matchedSchool.id} | Headmaster: ${matchedSchool.hm} | Mobile: ${matchedSchool.mobile}`;
+                document.getElementById('school-dash-sub').innerText = `School ID: ${matchedSchool.id} | Headmaster: ${matchedSchool.hm} | Mobile: ${matchedSchool.mobile} | Address: ${matchedSchool.addr}`;
                 openPage('school-dashboard');
             } else {
                 alert('Invalid School ID or Password! Check Admin Dashboard for correct password.');
@@ -868,7 +868,7 @@
                 alert('School Updated! ✏️');
             } else {
                 let newRow = tbody.insertRow();
-                newRow.innerHTML = `<td>${name}</td><td><b>${id}</b></td><td><input type="text" value="school123" onchange="updateSchoolPassword('${id}', this.value)" style="padding:5px; border:1px solid #cbd5e1; border-radius:4px; width:100px;"></td><td>${hm}</td><td>${mobile}</td><td>${addr}</td><td><span class="badge-approved">Approved</span></td><td><button style="background:#2563eb; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="openEditSchoolModal('${name}', '${id}', '${hm}', '${mobile}', '${addr}')">Edit</button> <button style="background:#dc2626; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Delete</button></td>`;
+                newRow.innerHTML = `<td>${name}</td><td><b>${id}</b></td><td><input type="text" value="school123" onchange="updateSchoolPassword('${id}', this.value)" style="padding:5px; border:1px solid #cbd5e1; border-radius:4px; width:100px;"></td><td>${hm}</td><td>${mobile}</td><td>${addr}</td><td><span class="badge-approved">Approved ✅</span></td><td><button style="background:#2563eb; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="openEditSchoolModal('${name}', '${id}', '${hm}', '${mobile}', '${addr}')">Edit</button> <button style="background:#dc2626; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Delete</button></td>`;
                 
                 registeredSchools.push({ id: id, name: name, pass: "school123", hm: hm, mobile: mobile, addr: addr });
                 alert('School Added & Password Generated! 🏫');
@@ -891,11 +891,11 @@
 
             let tbody = document.getElementById('school-table-body');
             let newRow = tbody.insertRow();
-            newRow.innerHTML = `<td>${name}</td><td><b>${id}</b></td><td><input type="text" value="${pass}" onchange="updateSchoolPassword('${id}', this.value)" style="padding:5px; border:1px solid #cbd5e1; border-radius:4px; width:100px;"></td><td>${hm}</td><td>${mobile}</td><td>${addr}</td><td><span class="badge-pending">Pending</span></td><td><button style="background:#16a34a; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="alert('School Approved Successfully!')">Approve ✅</button> <button style="background:#dc2626; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Reject</button></td>`;
+            newRow.innerHTML = `<td>${name}</td><td><b>${id}</b></td><td><input type="text" value="${pass}" onchange="updateSchoolPassword('${id}', this.value)" style="padding:5px; border:1px solid #cbd5e1; border-radius:4px; width:100px;"></td><td>${hm}</td><td>${mobile}</td><td>${addr}</td><td><span class="badge-pending">Pending ⏳</span></td><td><button style="background:#16a34a; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="alert('School Approved Successfully!')">Approve ✅</button> <button style="background:#dc2626; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Reject</button></td>`;
             
             registeredSchools.push({ id: id, name: name, pass: pass, hm: hm, mobile: mobile, addr: addr });
 
-            alert('Registration Submitted Successfully! Admin can now control/change your password from the dashboard.');
+            alert('Registration Submitted Successfully! Admin has been notified with payment UTR and credentials.');
             goHome();
         }
 
