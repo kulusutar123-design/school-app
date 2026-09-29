@@ -203,7 +203,6 @@
         }
         .tab-btn.active-tab { background: #1d4ed8; color: white; }
 
-        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -300,17 +299,17 @@
             </div>
         </div>
 
-        <!-- School Login Section (Fully Functional) -->
+        <!-- School Login Section (Working) -->
         <div id="school-login" class="content-section">
             <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
             <h3>🏫 School Portal Login</h3>
             <p style="color: #64748b; margin-bottom: 20px;">Enter your registered School ID and Password to access your dashboard.</p>
             <input type="text" id="school-login-id" placeholder="Enter School ID (e.g. 155CB)" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
             <input type="password" id="school-login-pass" placeholder="Enter Password" style="width:100%; padding:12px; margin-bottom:20px; border:1px solid #cbd5e1; border-radius:8px;">
-            <button style="background:#3b82f6; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="validateSchoolLogin()">Login to School Panel ➡️</button>
+            <button style="background:#3b82f6; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="validateSchoolLogin()">Login ➡️</button>
         </div>
 
-        <!-- School Dashboard Section (After School Login) -->
+        <!-- School Dashboard Section -->
         <div id="school-dashboard" class="content-section">
             <button class="back-btn" onclick="goHome()">🚪 Logout & Home</button>
             <h2 id="school-dash-title" style="color: #0d3b66; margin-bottom: 10px;">🏫 School Management Dashboard</h2>
@@ -595,7 +594,6 @@
             gstPct: 18
         };
 
-        // Store registered schools dynamically in memory for login verification
         let registeredSchools = [
             { id: "155CB", name: "SRI BAIRAGI SARASWATI SISHU VIDYAMANDIR", pass: "school123", hm: "ANTARYAMI DAS" }
         ];
@@ -639,7 +637,6 @@
             document.getElementById('home-view').style.display = 'block';
         }
 
-        // Validate Master Admin Login
         function validateAdmin() {
             let u = document.getElementById('admin-user').value.trim();
             let p = document.getElementById('admin-pass').value.trim();
@@ -651,7 +648,7 @@
             }
         }
 
-        // Validate School Login
+        // Fixed School Login Validation Function
         function validateSchoolLogin() {
             let schoolId = document.getElementById('school-login-id').value.trim();
             let pass = document.getElementById('school-login-pass').value.trim();
@@ -679,7 +676,6 @@
             btn.classList.add('active-tab');
         }
 
-        // Results Modal Functions
         function openResultsModal() {
             document.getElementById('check-roll-input').value = "";
             document.getElementById('result-display-area').innerHTML = "";
@@ -858,9 +854,7 @@
                 let newRow = tbody.insertRow();
                 newRow.innerHTML = `<td>${name}</td><td>${id}</td><td>${hm}</td><td>${mobile}</td><td>Manual (Free)</td><td><span class="badge-approved">Approved</span></td><td><button style="background:#2563eb; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="openEditSchoolModal('${name}', '${id}', '${hm}', '${mobile}', '${addr}')">Edit</button> <button style="background:#dc2626; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Delete</button></td>`;
                 
-                // Add to registered schools list for login
                 registeredSchools.push({ id: id, name: name, pass: "school123", hm: hm });
-
                 alert('School Added & Registered for Login! 🏫');
             }
             closeSchoolModal();
@@ -883,7 +877,6 @@
             let newRow = tbody.insertRow();
             newRow.innerHTML = `<td>${name}</td><td>${id}</td><td>${hm}</td><td>${mobile}</td><td>${utr} (Paid ₹${totalFee})</td><td><span class="badge-pending">Pending Approval</span></td><td><button style="background:#16a34a; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="alert('School Approved Successfully!')">Approve ✅</button> <button style="background:#dc2626; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Reject</button></td>`;
             
-            // Push to registered schools
             registeredSchools.push({ id: id, name: name, pass: pass, hm: hm });
 
             alert('Registration Submitted Successfully! Admin has been notified.');
