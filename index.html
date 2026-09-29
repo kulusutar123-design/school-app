@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>School Home Portal - School Login System</title>
+    <title>School Home Portal - Admin Controlled School Passwords</title>
     <style>
         * {
             box-sizing: border-box;
@@ -248,7 +248,7 @@
         <div id="home-view">
             <div class="notice-board">
                 <h4>📢 Important Notice Board</h4>
-                <p id="display-notice">• Official Marksheet & School Login Portal is live.<br>• Click "Check Results 🎯" to view marks or use "School Login" to access your school panel.</p>
+                <p id="display-notice">• Official Marksheet & School Login Portal is live.<br>• Click "Check Results 🎯" to view marks or use "School Login" with Admin-controlled credentials.</p>
             </div>
 
             <!-- Results Button Card -->
@@ -263,7 +263,7 @@
                     <div class="welcome-card">
                         <h3>🌟 Welcome to Digital School Management</h3>
                         <p>Manage your schools, student admissions, attendance, and records securely on the cloud platform with high performance.</p>
-                        <p><b>✨ Features:</b> School Portal Login, 3D Results Lookup, Secure Admin Controls.</p>
+                        <p><b>✨ Features:</b> Admin-Controlled School Passwords, 3D Results Lookup, Secure Admin Controls.</p>
                     </div>
 
                     <div class="section-title">📌 Quick Portal Actions</div>
@@ -299,11 +299,11 @@
             </div>
         </div>
 
-        <!-- School Login Section (Working) -->
+        <!-- School Login Section -->
         <div id="school-login" class="content-section">
             <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
             <h3>🏫 School Portal Login</h3>
-            <p style="color: #64748b; margin-bottom: 20px;">Enter your registered School ID and Password to access your dashboard.</p>
+            <p style="color: #64748b; margin-bottom: 20px;">Enter School ID and Password provided/controlled by Master Admin.</p>
             <input type="text" id="school-login-id" placeholder="Enter School ID (e.g. 155CB)" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
             <input type="password" id="school-login-pass" placeholder="Enter Password" style="width:100%; padding:12px; margin-bottom:20px; border:1px solid #cbd5e1; border-radius:8px;">
             <button style="background:#3b82f6; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="validateSchoolLogin()">Login ➡️</button>
@@ -364,31 +364,35 @@
             <button style="background:#22c55e; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="validateAdmin()">Login 🚀</button>
         </div>
 
-        <!-- Master Admin Dashboard -->
+        <!-- Master Admin Dashboard with School Credential Control -->
         <div id="admin-dashboard" class="content-section">
             <button class="back-btn" onclick="goHome()">🚪 Logout & Home</button>
-            <h2 style="color: #0d3b66; margin-bottom: 15px;">👑 Master Admin Dashboard & Settings</h2>
+            <h2 style="color: #0d3b66; margin-bottom: 15px;">👑 Master Admin Dashboard & School Control</h2>
             
             <div style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px;">
-                <button class="tab-btn active-tab" onclick="switchTab('schools-tab', this)">🏫 School Approvals & Payments</button>
+                <button class="tab-btn active-tab" onclick="switchTab('schools-tab', this)">🏫 Manage Schools & Passwords</button>
                 <button class="tab-btn" onclick="switchTab('students-tab', this)">🎓 Manage Students & Marksheet</button>
                 <button class="tab-btn" onclick="switchTab('payment-settings-tab', this)">💳 Payment & GST Settings</button>
                 <button class="tab-btn" onclick="switchTab('settings-tab', this)">⚙️ Portal Settings</button>
             </div>
 
-            <!-- Schools Management Tab -->
+            <!-- Schools Management & Credential Control Tab -->
             <div id="schools-tab" class="admin-tab-content">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h3>School Approvals & Notifications</h3>
+                    <h3>School Approvals & Admin Password Control</h3>
                     <button style="background:#16a34a; color:white; border:none; padding:10px 20px; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="openAddSchoolModal()">➕ Add New School</button>
                 </div>
                 <table>
                     <thead>
-                        <tr><th>School Name</th><th>ID</th><th>Headmaster</th><th>Mobile</th><th>UTR Ref</th><th>Status</th><th>Actions</th></tr>
+                        <tr><th>School Name</th><th>School ID</th><th>Login Password</th><th>Headmaster</th><th>Mobile</th><th>Status</th><th>Actions</th></tr>
                     </thead>
                     <tbody id="school-table-body">
                         <tr>
-                            <td>SRI BAIRAGI SARASWATI SISHU VIDYAMANDIR</td><td>155CB</td><td>ANTARYAMI DAS</td><td>9876543210</td><td>UTR987654321 (Paid ₹1180)</td>
+                            <td>SRI BAIRAGI SARASWATI SISHU VIDYAMANDIR</td>
+                            <td><b>155CB</b></td>
+                            <td><input type="text" value="school123" onchange="updateSchoolPassword('155CB', this.value)" style="padding:5px; border:1px solid #cbd5e1; border-radius:4px; width:110px;"></td>
+                            <td>ANTARYAMI DAS</td>
+                            <td>9876543210</td>
                             <td><span class="badge-approved">Approved</span></td>
                             <td>
                                 <button style="background:#2563eb; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="openEditSchoolModal('SRI BAIRAGI SARASWATI SISHU VIDYAMANDIR', '155CB', 'ANTARYAMI DAS', '9876543210', 'Asurali')">Edit</button> 
@@ -471,7 +475,7 @@
                 <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1;">
                     <h4>📢 Edit / Update Notice Board</h4>
                     <textarea id="notice-input" rows="5" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; margin-bottom:10px;">• Official Marksheet & School Login Portal is live.
-• Click "Check Results 🎯" to view marks or use "School Login" to access your school panel.</textarea>
+• Admin can control and update school passwords directly from the dashboard.</textarea>
                     <button style="background:#16a34a; color:white; border:none; padding:8px 20px; border-radius:6px; cursor:pointer;" onclick="updateNoticeBoard()">Save Notice Board 💾</button>
                 </div>
             </div>
@@ -594,9 +598,18 @@
             gstPct: 18
         };
 
+        // Admin Controlled School Credentials Store
         let registeredSchools = [
             { id: "155CB", name: "SRI BAIRAGI SARASWATI SISHU VIDYAMANDIR", pass: "school123", hm: "ANTARYAMI DAS" }
         ];
+
+        function updateSchoolPassword(schoolId, newPass) {
+            let school = registeredSchools.find(s => s.id.toLowerCase() === schoolId.toLowerCase());
+            if(school) {
+                school.pass = newPass;
+                alert(`Password updated successfully for School ID: ${schoolId}`);
+            }
+        }
 
         function updateFeeDisplay() {
             let gstAmt = (paymentConfig.baseFee * paymentConfig.gstPct) / 100;
@@ -648,7 +661,6 @@
             }
         }
 
-        // Fixed School Login Validation Function
         function validateSchoolLogin() {
             let schoolId = document.getElementById('school-login-id').value.trim();
             let pass = document.getElementById('school-login-pass').value.trim();
@@ -661,7 +673,7 @@
                 document.getElementById('school-dash-sub').innerText = `School ID: ${matchedSchool.id} | Headmaster: ${matchedSchool.hm}`;
                 openPage('school-dashboard');
             } else {
-                alert('Invalid School ID or Password! (Default test ID: 155CB / Pass: school123)');
+                alert('Invalid School ID or Password! Check Admin Dashboard for correct password.');
             }
         }
 
@@ -847,15 +859,15 @@
             if(editRow) {
                 editRow.cells[0].innerText = name;
                 editRow.cells[1].innerText = id;
-                editRow.cells[2].innerText = hm;
-                editRow.cells[3].innerText = mobile;
+                editRow.cells[3].innerText = hm;
+                editRow.cells[4].innerText = mobile;
                 alert('School Updated! ✏️');
             } else {
                 let newRow = tbody.insertRow();
-                newRow.innerHTML = `<td>${name}</td><td>${id}</td><td>${hm}</td><td>${mobile}</td><td>Manual (Free)</td><td><span class="badge-approved">Approved</span></td><td><button style="background:#2563eb; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="openEditSchoolModal('${name}', '${id}', '${hm}', '${mobile}', '${addr}')">Edit</button> <button style="background:#dc2626; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Delete</button></td>`;
+                newRow.innerHTML = `<td>${name}</td><td><b>${id}</b></td><td><input type="text" value="school123" onchange="updateSchoolPassword('${id}', this.value)" style="padding:5px; border:1px solid #cbd5e1; border-radius:4px; width:110px;"></td><td>${hm}</td><td>${mobile}</td><td><span class="badge-approved">Approved</span></td><td><button style="background:#2563eb; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="openEditSchoolModal('${name}', '${id}', '${hm}', '${mobile}', '${addr}')">Edit</button> <button style="background:#dc2626; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Delete</button></td>`;
                 
                 registeredSchools.push({ id: id, name: name, pass: "school123", hm: hm });
-                alert('School Added & Registered for Login! 🏫');
+                alert('School Added & Password Generated! 🏫');
             }
             closeSchoolModal();
         }
@@ -875,11 +887,11 @@
 
             let tbody = document.getElementById('school-table-body');
             let newRow = tbody.insertRow();
-            newRow.innerHTML = `<td>${name}</td><td>${id}</td><td>${hm}</td><td>${mobile}</td><td>${utr} (Paid ₹${totalFee})</td><td><span class="badge-pending">Pending Approval</span></td><td><button style="background:#16a34a; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="alert('School Approved Successfully!')">Approve ✅</button> <button style="background:#dc2626; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Reject</button></td>`;
+            newRow.innerHTML = `<td>${name}</td><td><b>${id}</b></td><td><input type="text" value="${pass}" onchange="updateSchoolPassword('${id}', this.value)" style="padding:5px; border:1px solid #cbd5e1; border-radius:4px; width:110px;"></td><td>${hm}</td><td>${mobile}</td><td><span class="badge-pending">Pending</span></td><td><button style="background:#16a34a; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="alert('School Approved Successfully!')">Approve ✅</button> <button style="background:#dc2626; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Reject</button></td>`;
             
             registeredSchools.push({ id: id, name: name, pass: pass, hm: hm });
 
-            alert('Registration Submitted Successfully! Admin has been notified.');
+            alert('Registration Submitted Successfully! Admin can now control/change your password from the dashboard.');
             goHome();
         }
 
