@@ -3,27 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>School Home Portal - Automated Admission System</title>
+    <title>School Home Portal - Complete System</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body {
-            background: linear-gradient(rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.7)), url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1920&auto=format&fit=crop') no-repeat center center fixed;
-            background-size: cover; color: #333; padding: 20px; min-height: 100vh;
-        }
+        body { background: linear-gradient(rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.7)), url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1920&auto=format&fit=crop') no-repeat center center fixed; background-size: cover; color: #333; padding: 20px; min-height: 100vh; }
         .container { max-width: 1400px; margin: 0 auto; }
-        .header {
-            background: linear-gradient(90deg, #0d3b66, #1d4ed8); padding: 25px 30px; border-radius: 16px; color: white;
-            display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 25px rgba(0,0,0,0.4); margin-bottom: 25px;
-        }
+        .header { background: linear-gradient(90deg, #0d3b66, #1d4ed8); padding: 25px 30px; border-radius: 16px; color: white; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 25px rgba(0,0,0,0.4); margin-bottom: 25px; }
         .header h2 { font-size: 24px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
         .header p { font-style: italic; font-size: 16px; }
         
         .main-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 25px; }
         @media (max-width: 768px) { .main-grid { grid-template-columns: 1fr; } }
         
-        .welcome-card, .results-btn-card, .login-box, .content-section {
-            background: rgba(255, 255, 255, 0.98); border-radius: 20px; padding: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); margin-bottom: 25px;
-        }
+        .welcome-card, .results-btn-card, .login-box, .content-section { background: rgba(255, 255, 255, 0.98); border-radius: 20px; padding: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); margin-bottom: 25px; }
         .welcome-card { border-left: 8px solid #2563eb; }
         .welcome-card h3 { color: #1e3a8a; margin-bottom: 12px; font-size: 22px; }
         .welcome-card p { font-size: 16px; color: #475569; line-height: 1.5; margin-bottom: 10px; }
@@ -67,7 +59,9 @@
 
         /* Modal */
         .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(5px); justify-content: center; align-items: center; }
-        .modal-content { background: white; padding: 30px; border-radius: 20px; width: 600px; max-width: 95%; box-shadow: 0 25px 50px rgba(0,0,0,0.4); max-height: 90vh; overflow-y: auto; }
+        .modal-content { background: white; padding: 30px; border-radius: 20px; width: 750px; max-width: 95%; box-shadow: 0 25px 50px rgba(0,0,0,0.4); max-height: 90vh; overflow-y: auto; }
+        
+        .sub-row { display: grid; grid-template-columns: 1fr 2fr 1fr 1fr auto; gap: 8px; margin-bottom: 8px; align-items: center; }
 
         /* Print Specific Styles */
         @media print {
@@ -91,7 +85,7 @@
         <div id="home-view">
             <div class="notice-board">
                 <h4>📢 Important Notice Board</h4>
-                <p id="display-notice">• Official Marksheet & Portal System is live.<br>• New Student Registration includes Payment Verifications & School Approvals.</p>
+                <p id="display-notice">• Official Marksheet & Portal System is live.<br>• School Dashboard includes 18-Point Add/Edit Student with Multi-Subject Support!</p>
             </div>
 
             <div class="results-btn-card">
@@ -105,7 +99,7 @@
                     <div class="welcome-card">
                         <h3>🌟 Welcome to Digital School Management</h3>
                         <p>Manage your schools, student admissions, and records securely on the cloud platform.</p>
-                        <p><b>✨ Features:</b> Smart Admission, Timer based Payments, Roll No Generation.</p>
+                        <p><b>✨ Features:</b> Full School Dashboard, 18-Point Student Editing, Subject Control, Secure Admin Panel.</p>
                     </div>
 
                     <div class="section-title">📌 Quick Portal Actions</div>
@@ -132,14 +126,13 @@
             </div>
         </div>
 
-        <!-- NEW STUDENT REGISTRATION FLOW -->
+        <!-- 1. PUBLIC NEW STUDENT REGISTRATION FLOW -->
         <div id="student-reg" class="content-section">
             <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
             
-            <!-- Step 1: Form -->
             <div id="student-form-step">
-                <h3 style="color: #0d3b66; margin-bottom:15px;">🎓 Student Application Form (18-Point)</h3>
-                <p style="color: #64748b; margin-bottom: 20px;">Fields marked with <span class="req">*</span> are compulsory.</p>
+                <h3 style="color: #0d3b66; margin-bottom:15px;">🎓 Public Student Application Form (18-Point)</h3>
+                <p style="color: #64748b; margin-bottom: 20px;">Fields marked with <span class="req">*</span> are compulsory for public registration.</p>
                 
                 <div class="form-grid">
                     <div><label>1. Student's Name <span class="req">*</span></label><input type="text" id="reg-s-name" class="input-box"></div>
@@ -171,7 +164,7 @@
                 <button style="background:#2563eb; color:white; width:100%; padding:15px; border:none; border-radius:8px; font-weight:bold; font-size:16px; margin-top:20px; cursor:pointer;" onclick="validateStudentForm()">Next ➡️ Proceed to Payment</button>
             </div>
 
-            <!-- Step 2: Payment System -->
+            <!-- Payment System -->
             <div id="student-payment-step" style="display:none; text-align:center;">
                 <h3 style="color:#0d3b66; margin-bottom:10px;">💳 Application Fee Payment</h3>
                 <p style="color:#dc2626; font-weight:bold; font-size:18px; margin-bottom:15px;">⏳ Time Left: <span id="payment-timer">30</span> Seconds</p>
@@ -186,7 +179,7 @@
             </div>
         </div>
 
-        <!-- Step 3: Hard Copy / Receipt Section -->
+        <!-- Receipt Section -->
         <div id="student-receipt-section" class="content-section" style="background:white;">
             <div style="border:2px solid #0d3b66; padding:30px; border-radius:12px; position:relative;">
                 <h2 style="text-align:center; color:#0d3b66; margin-bottom:10px;">🏫 OFFICIAL ADMISSION RECEIPT</h2>
@@ -211,7 +204,7 @@
             </div>
         </div>
 
-        <!-- School Login Section -->
+        <!-- 2. SCHOOL LOGIN SECTION -->
         <div id="school-login" class="content-section">
             <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
             <h3>🏫 School Portal Login</h3>
@@ -221,7 +214,7 @@
             <button class="btn-login btn-school" onclick="validateSchoolLogin()">Login ➡️</button>
         </div>
 
-        <!-- School Dashboard Section -->
+        <!-- 3. SCHOOL DASHBOARD -->
         <div id="school-dashboard" class="content-section">
             <button class="back-btn" onclick="goHome()">🚪 Logout</button>
             <h2 id="school-dash-title" style="color: #0d3b66; margin-bottom: 5px;">🏫 School Dashboard</h2>
@@ -232,23 +225,29 @@
                 <button class="tab-btn" onclick="switchSchoolTab('school-pending-tab', this)" style="position:relative;">🔔 Admission Requests <span id="notif-badge" style="background:red; color:white; border-radius:50%; padding:2px 6px; font-size:12px; display:none;">1</span></button>
             </div>
 
-            <!-- Tab: Enrolled Students -->
+            <!-- Tab 1: Enrolled Students -->
             <div id="school-enrolled-tab" class="school-tab-content">
-                <h3>🎓 Approved Students & Records</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3>🎓 Approved Students & Records</h3>
+                    <button style="background:#16a34a; color:white; border:none; padding:10px 20px; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="openSchoolStudentModal()">➕ Add Student & Marks</button>
+                </div>
                 <table>
                     <thead>
-                        <tr><th>Roll No</th><th>Student Name</th><th>Father's Name</th><th>Mobile No</th><th>Gender</th><th>Actions</th></tr>
+                        <tr><th>Roll No</th><th>Student Name</th><th>Father's Name</th><th>Mobile No</th><th>Total Marks</th><th>Actions</th></tr>
                     </thead>
                     <tbody id="school-student-table-body">
                         <tr>
-                            <td><b>155CB0197</b></td><td>DIBYANSHI DAS</td><td>ANTARYAMI DAS</td><td>9876543210</td><td>Female</td>
-                            <td><button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px;">View</button></td>
+                            <td><b>155CB0197</b></td><td>DIBYANSHI DAS</td><td>ANTARYAMI DAS</td><td>9876543210</td><td><b style="color:#16a34a;">360 / 600</b></td>
+                            <td>
+                                <button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openEditSchoolStudentModal(this)">Edit</button>
+                                <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Delete</button>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
-            <!-- Tab: Pending Admissions -->
+            <!-- Tab 2: Pending Admissions -->
             <div id="school-pending-tab" class="school-tab-content" style="display:none;">
                 <h3>🔔 New Admission Applications</h3>
                 <table>
@@ -259,6 +258,63 @@
                         <!-- Pending apps will generate here -->
                     </tbody>
                 </table>
+            </div>
+        </div>
+
+        <!-- Add/Edit Student Modal for SCHOOL DASHBOARD (18 Points + Subjects) -->
+        <div id="schoolStudentModal" class="modal">
+            <div class="modal-content">
+                <h3 id="ss-modal-title" style="color:#0d3b66; margin-bottom:15px;">Add Student & Marksheet (18-Point)</h3>
+                
+                <h4 style="color:#1e3a8a; margin-bottom:8px; font-size:15px; border-bottom:1px solid #cbd5e1; padding-bottom:5px;">Personal Details</h4>
+                <div class="form-grid" style="margin-bottom: 20px;">
+                    <div><label style="font-size:12px; font-weight:bold;">Roll No:</label><input type="text" id="ss-roll" placeholder="Roll No" class="input-box"></div>
+                    <div><label style="font-size:12px; font-weight:bold;">1. Student Name:</label><input type="text" id="ss-name" placeholder="Name" class="input-box"></div>
+                    <div><label style="font-size:12px; font-weight:bold;">2. Gender:</label><select id="ss-gender" class="input-box"><option value="Male">Male</option><option value="Female">Female</option></select></div>
+                    <div><label style="font-size:12px; font-weight:bold;">3. DOB:</label><input type="text" id="ss-dob" placeholder="DD/MM/YYYY" class="input-box"></div>
+                    <div><label style="font-size:12px; font-weight:bold;">4. Mother's Name:</label><input type="text" id="ss-mname" class="input-box"></div>
+                    <div><label style="font-size:12px; font-weight:bold;">5. Father's Name:</label><input type="text" id="ss-fname" class="input-box"></div>
+                    <div><label style="font-size:12px; font-weight:bold;">6. AADHAAR:</label><input type="text" id="ss-aadhaar" placeholder="[Aadhaar Redacted]" class="input-box"></div>
+                    <div><label style="font-size:12px; font-weight:bold;">7. Adm Date:</label><input type="text" id="ss-admdate" placeholder="DD/MM/YYYY" class="input-box"></div>
+                    <div><label style="font-size:12px; font-weight:bold;">8. Mobile:</label><input type="text" id="ss-mobile" class="input-box"></div>
+                    <div><label style="font-size:12px; font-weight:bold;">9. Blood Group:</label><select id="ss-blood" class="input-box"><option value="O+">O+</option><option value="B+">B+</option></select></div>
+                    <div><label style="font-size:12px; font-weight:bold;">10. Minority:</label><select id="ss-minority" class="input-box"><option value="No">No</option><option value="Muslim">Muslim</option></select></div>
+                    <div><label style="font-size:12px; font-weight:bold;">11. Category:</label><select id="ss-category" class="input-box"><option value="GENERAL">GENERAL</option><option value="SC">SC</option></select></div>
+                    <div><label style="font-size:12px; font-weight:bold;">12. PAN No:</label><input type="text" id="ss-pan" class="input-box"></div>
+                    <div><label style="font-size:12px; font-weight:bold;">13. APAR ID:</label><input type="text" id="ss-apar" class="input-box"></div>
+                    <div><label style="font-size:12px; font-weight:bold;">14. Address:</label><input type="text" id="ss-address" class="input-box"></div>
+                    <div><label style="font-size:12px; font-weight:bold;">15. PIN:</label><input type="text" id="ss-pin" class="input-box"></div>
+                    <div><label style="font-size:12px; font-weight:bold;">16. State:</label><select id="ss-state" class="input-box"><option value="Odisha">Odisha</option></select></div>
+                    <div><label style="font-size:12px; font-weight:bold;">17. Language:</label><select id="ss-lang" class="input-box"><option value="Odia">Odia</option><option value="Hindi">Hindi</option></select></div>
+                    <div style="grid-column: span 2;"><label style="font-size:12px; font-weight:bold;">18. Mail ID:</label><input type="text" id="ss-mail" class="input-box"></div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <h4 style="color:#1e3a8a; font-size:15px; border-bottom:1px solid #cbd5e1; padding-bottom:5px; width:100%;">Marks Awarded (Subjects) 
+                        <button type="button" style="background:#16a34a; color:white; border:none; padding:4px 10px; border-radius:4px; font-size:12px; cursor:pointer; float:right;" onclick="addSchoolSubjectRow()">➕ Add Subject</button>
+                    </h4>
+                </div>
+                
+                <div style="font-size:12px; font-weight:bold; color:#64748b; display:grid; grid-template-columns: 1fr 2fr 1fr 1fr auto; gap:8px; margin-bottom:5px;">
+                    <span>Code</span><span>Subject Name</span><span>Max</span><span>Secured</span><span></span>
+                </div>
+                
+                <div id="ss-subject-container">
+                    <div class="sub-row">
+                        <input type="text" value="FLO" placeholder="Code" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
+                        <input type="text" value="FIRST LANGUAGE ODIA" placeholder="Subject Name" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
+                        <input type="number" value="100" placeholder="Max" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
+                        <input type="number" value="75" placeholder="Secured" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
+                        <button type="button" style="background:#dc2626; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('.sub-row').remove()">×</button>
+                    </div>
+                </div>
+
+                <input type="text" id="ss-total" placeholder="Grand Total (e.g. 360 / 600)" class="input-box" style="margin-top:15px; margin-bottom:15px; font-weight:bold;">
+
+                <div style="display:flex; justify-content:flex-end; gap:10px;">
+                    <button style="background:#64748b; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="closeSchoolStudentModal()">Cancel</button>
+                    <button style="background:#2563eb; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="saveSchoolStudentData()">Save Student 💾</button>
+                </div>
             </div>
         </div>
 
@@ -308,7 +364,7 @@
 
     </div>
 
-    <!-- Modals -->
+    <!-- Results Modals -->
     <div id="resultsModal" class="modal">
         <div class="modal-content" style="text-align: center;">
             <h3 style="color:#0d3b66; margin-bottom:15px;">🔍 Check Results</h3>
@@ -338,10 +394,10 @@
             let sections = document.getElementsByClassName('content-section');
             for (let sec of sections) { sec.classList.remove('active'); }
             document.getElementById('home-view').style.display = 'block';
-            clearInterval(paymentTimerInterval); // stop any running timer
+            clearInterval(paymentTimerInterval);
         }
 
-        // --- NEW STUDENT ADMISSION FLOW ---
+        // --- PUBLIC NEW STUDENT ADMISSION FLOW ---
         function openStudentRegistration() {
             document.getElementById('student-form-step').style.display = 'block';
             document.getElementById('student-payment-step').style.display = 'none';
@@ -349,7 +405,6 @@
         }
 
         function validateStudentForm() {
-            // Check Compulsory fields (*)
             let reqIds = ['reg-s-name', 'reg-s-gender', 'reg-s-dob', 'reg-s-mname', 'reg-s-fname', 'reg-s-aadhaar', 'reg-s-mobile', 'reg-s-blood', 'reg-s-minority', 'reg-s-category', 'reg-s-address', 'reg-s-pin', 'reg-s-state', 'reg-s-lang', 'reg-s-mail', 'reg-s-school'];
             
             for(let id of reqIds) {
@@ -358,12 +413,9 @@
                     return;
                 }
             }
-
-            // Move to Payment Step
             document.getElementById('student-form-step').style.display = 'none';
             document.getElementById('student-payment-step').style.display = 'block';
 
-            // Start 30 sec timer
             let timeLeft = 30;
             document.getElementById('payment-timer').innerText = timeLeft;
             clearInterval(paymentTimerInterval);
@@ -384,7 +436,6 @@
 
             clearInterval(paymentTimerInterval);
 
-            // Save to pending list
             let newApp = {
                 appId: Math.floor(Math.random() * 90000 + 10000),
                 name: document.getElementById('reg-s-name').value,
@@ -397,9 +448,7 @@
             };
             pendingApplications.push(newApp);
 
-            // Generate Receipt
             document.getElementById('student-reg').classList.remove('active');
-            
             let d = new Date();
             document.getElementById('rec-app-id').innerText = newApp.appId;
             document.getElementById('rec-date').innerText = d.toLocaleDateString();
@@ -409,12 +458,10 @@
             document.getElementById('rec-utr').innerText = utr;
 
             document.getElementById('student-receipt-section').classList.add('active');
-
-            // Update School Notification Badge
             updateNotificationBadge();
         }
 
-        // --- SCHOOL LOGIN & DASHBOARD ---
+        // --- SCHOOL DASHBOARD & LOGIN ---
         function validateSchoolLogin() {
             let sId = document.getElementById('school-login-id').value.trim();
             let pass = document.getElementById('school-login-pass').value.trim();
@@ -427,9 +474,7 @@
                 renderPendingApplications(match.id);
                 switchSchoolTab('school-enrolled-tab', document.getElementsByClassName('tab-btn')[0]);
                 openPage('school-dashboard');
-            } else {
-                alert('Invalid School ID or Password!');
-            }
+            } else { alert('Invalid School ID or Password!'); }
         }
 
         function switchSchoolTab(tabId, btn) {
@@ -446,9 +491,7 @@
             if(pendingApplications.length > 0) {
                 badge.innerText = pendingApplications.length;
                 badge.style.display = 'inline-block';
-            } else {
-                badge.style.display = 'none';
-            }
+            } else { badge.style.display = 'none'; }
         }
 
         function renderPendingApplications(schoolId) {
@@ -460,11 +503,10 @@
                 let app = relevantApps[i];
                 let row = tbody.insertRow();
                 row.innerHTML = `
-                    <td><b>APP-${app.appId}</b></td>
-                    <td>${app.name}</td>
-                    <td><span style="color:#16a34a; font-weight:bold;">${app.utr} (₹500 Paid)</span></td>
+                    <td><b>APP-${app.appId}</b></td><td>${app.name}</td>
+                    <td><span style="color:#16a34a; font-weight:bold;">${app.utr}</span></td>
                     <td>
-                        <button style="background:#16a34a; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="approveApplication(${app.appId})">Check & Approve ✅</button>
+                        <button style="background:#16a34a; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="approveApplication(${app.appId})">Assign Roll & Approve ✅</button>
                         <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="rejectApplication(${app.appId})">Reject ❌</button>
                     </td>
                 `;
@@ -476,45 +518,102 @@
             let index = pendingApplications.findIndex(a => a.appId === appId);
             if(index > -1) {
                 let app = pendingApplications[index];
-                
-                // Prompt Headmaster to Assign Roll No
-                let assignedRoll = prompt(`Payment Confirmed for ${app.name}.\nPlease ASSIGN A ROLL NUMBER for this student:`, "e.g. 155CB0198");
-                
+                let assignedRoll = prompt(`Payment Confirmed for ${app.name}.\nASSIGN A ROLL NUMBER:`, "e.g. 155CB0198");
                 if(assignedRoll && assignedRoll.trim() !== "") {
-                    // Add to Main Enrolled Table
                     let mainTbody = document.getElementById('school-student-table-body');
                     let newRow = mainTbody.insertRow();
-                    newRow.innerHTML = `<td><b>${assignedRoll}</b></td><td>${app.name}</td><td>${app.fname}</td><td>${app.mobile}</td><td>${app.gender}</td><td><button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px;">View</button></td>`;
-                    
-                    // Remove from pending
+                    newRow.innerHTML = `<td><b>${assignedRoll}</b></td><td>${app.name}</td><td>${app.fname}</td><td>${app.mobile}</td><td><b style="color:#16a34a;">N/A</b></td><td><button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openEditSchoolStudentModal(this)">Edit</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Delete</button></td>`;
                     pendingApplications.splice(index, 1);
-                    alert(`Student Approved & Saved to My Students! Assigned Roll No: ${assignedRoll}`);
-                    renderPendingApplications(app.schoolId); // Refresh table
-                } else {
-                    alert("Roll No is required to approve the admission.");
-                }
+                    alert(`Student Approved & Saved to My Students!`);
+                    renderPendingApplications(app.schoolId); 
+                } else { alert("Roll No is required to approve the admission."); }
             }
         }
 
         function rejectApplication(appId) {
-            if(confirm("Are you sure you want to reject this admission application?")) {
+            if(confirm("Are you sure you want to reject this admission?")) {
                 let index = pendingApplications.findIndex(a => a.appId === appId);
                 if(index > -1) {
                     let sId = pendingApplications[index].schoolId;
                     pendingApplications.splice(index, 1);
-                    alert("Application Rejected.");
                     renderPendingApplications(sId);
                 }
             }
+        }
+
+        // --- SCHOOL ADD/EDIT STUDENT 18-POINT MODAL ---
+        let editSchoolStudentRow = null;
+        
+        function openSchoolStudentModal() {
+            editSchoolStudentRow = null;
+            document.getElementById('ss-modal-title').innerText = "Add New Student & Marks";
+            document.getElementById('ss-roll').value = "";
+            document.getElementById('ss-name').value = "";
+            document.getElementById('ss-fname').value = "";
+            document.getElementById('ss-mobile').value = "";
+            document.getElementById('ss-total').value = "";
+            document.getElementById('schoolStudentModal').style.display = 'flex';
+        }
+        
+        function openEditSchoolStudentModal(btn) {
+            editSchoolStudentRow = btn.closest('tr');
+            document.getElementById('ss-modal-title').innerText = "Edit Student & Marks";
+            document.getElementById('ss-roll').value = editSchoolStudentRow.cells[0].innerText;
+            document.getElementById('ss-name').value = editSchoolStudentRow.cells[1].innerText;
+            document.getElementById('ss-fname').value = editSchoolStudentRow.cells[2].innerText;
+            document.getElementById('ss-mobile').value = editSchoolStudentRow.cells[3].innerText;
+            document.getElementById('ss-total').value = editSchoolStudentRow.cells[4].innerText;
+            document.getElementById('schoolStudentModal').style.display = 'flex';
+        }
+
+        function closeSchoolStudentModal() {
+            document.getElementById('schoolStudentModal').style.display = 'none';
+        }
+
+        function addSchoolSubjectRow() {
+            let container = document.getElementById('ss-subject-container');
+            let div = document.createElement('div');
+            div.className = 'sub-row';
+            div.innerHTML = `
+                <input type="text" placeholder="Code" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
+                <input type="text" placeholder="Subject Name" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
+                <input type="number" placeholder="Max" value="100" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
+                <input type="number" placeholder="Secured" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
+                <button type="button" style="background:#dc2626; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('.sub-row').remove()">×</button>
+            `;
+            container.appendChild(div);
+        }
+
+        function saveSchoolStudentData() {
+            let roll = document.getElementById('ss-roll').value.trim();
+            let name = document.getElementById('ss-name').value.trim();
+            let fname = document.getElementById('ss-fname').value.trim();
+            let mobile = document.getElementById('ss-mobile').value.trim();
+            let total = document.getElementById('ss-total').value.trim();
+
+            if(!roll || !name) { alert('Roll No & Student Name are required!'); return; }
+
+            let tbody = document.getElementById('school-student-table-body');
+            if(editSchoolStudentRow) {
+                editSchoolStudentRow.cells[0].innerHTML = `<b>${roll}</b>`;
+                editSchoolStudentRow.cells[1].innerText = name;
+                editSchoolStudentRow.cells[2].innerText = fname;
+                editSchoolStudentRow.cells[3].innerText = mobile;
+                editSchoolStudentRow.cells[4].innerHTML = `<b style="color:#16a34a;">${total}</b>`;
+                alert('Student Updated Successfully! ✏️');
+            } else {
+                let newRow = tbody.insertRow();
+                newRow.innerHTML = `<td><b>${roll}</b></td><td>${name}</td><td>${fname}</td><td>${mobile}</td><td><b style="color:#16a34a;">${total}</b></td><td><button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openEditSchoolStudentModal(this)">Edit</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Delete</button></td>`;
+                alert('New Student Added Successfully! 🎓');
+            }
+            closeSchoolStudentModal();
         }
 
         // --- ADMIN CONTROLS ---
         function validateAdmin() {
             let u = document.getElementById('admin-user').value.trim();
             let p = document.getElementById('admin-pass').value.trim();
-            if (u === 'KULU123' && p === 'Admin@2026') {
-                openPage('admin-dashboard');
-            } else { alert('Invalid Admin Credentials!'); }
+            if (u === 'KULU123' && p === 'Admin@2026') { openPage('admin-dashboard'); } else { alert('Invalid Admin Credentials!'); }
         }
         function switchAdminTab(tabId, btn) {
             let contents = document.getElementsByClassName('admin-tab-content');
@@ -531,7 +630,7 @@
 
         // Search Results
         function openResultsModal() { document.getElementById('resultsModal').style.display='flex'; }
-        function fetchStudentResult() { alert("Results fetched securely based on Roll No."); }
+        function fetchStudentResult() { alert("Results fetched securely."); }
     </script>
 </body>
 </html>
