@@ -67,7 +67,7 @@
         
         .sub-row { display: grid; grid-template-columns: 1fr 2fr 1fr 1fr auto; gap: 8px; margin-bottom: 8px; align-items: center; }
 
-        /* ================= ORIGINAL CERTIFICATE DESIGN ================= */
+        /* ================= CERTIFICATE DESIGN ================= */
         #marksheet-print-area {
             display: none;
             width: 210mm; /* A4 width */
@@ -96,7 +96,7 @@
             left: 50%;
             transform: translate(-50%, -50%);
             opacity: 0.05;
-            font-size: 150px;
+            font-size: 100px;
             font-weight: bold;
             color: #3b0764;
             z-index: 1;
@@ -113,16 +113,16 @@
         }
 
         .cert-header h1 {
-            font-size: 24px;
+            font-size: 26px;
             margin: 0;
             color: #4c1d95;
             text-transform: uppercase;
         }
 
         .cert-header h2 {
-            font-size: 18px;
-            margin: 5px 0;
-            color: #4c1d95;
+            font-size: 16px;
+            margin-top: 10px;
+            color: #3b0764;
         }
 
         .cert-top-info {
@@ -155,20 +155,9 @@
             margin-bottom: 15px;
         }
 
-        .cert-details .row {
-            display: flex;
-            margin-bottom: 5px;
-        }
-
-        .cert-details .label {
-            width: 150px;
-            font-weight: bold;
-        }
-
-        .cert-details .value {
-            font-weight: bold;
-            text-transform: uppercase;
-        }
+        .cert-details .row { display: flex; margin-bottom: 5px; }
+        .cert-details .label { width: 150px; font-weight: bold; }
+        .cert-details .value { font-weight: bold; text-transform: uppercase; }
 
         .cert-table {
             width: 100%;
@@ -185,10 +174,7 @@
             font-weight: bold;
         }
 
-        .cert-table th {
-            background-color: #f3e8ff;
-            color: #4c1d95;
-        }
+        .cert-table th { background-color: #f3e8ff; color: #4c1d95; }
 
         .cert-footer-info {
             display: flex;
@@ -256,7 +242,7 @@
         <div id="home-view">
             <div class="notice-board">
                 <h4>📢 Important Notice Board</h4>
-                <p id="display-notice">• Official Marksheet & Portal System is live.<br>• NEW: Original Board Style PDF/Print Marksheet Available!</p>
+                <p id="display-notice">• Official Marksheet & Portal System is live.<br>• Certificate Header updated to display Specific School Name!</p>
             </div>
 
             <div class="results-btn-card">
@@ -270,7 +256,7 @@
                     <div class="welcome-card">
                         <h3>🌟 Welcome to Digital School Management</h3>
                         <p>Manage your schools, student admissions, and records securely on the cloud platform.</p>
-                        <p><b>✨ Features:</b> 100% Original Certificate Print, Auto Grade, Admin Profile & Recovery.</p>
+                        <p><b>✨ Features:</b> Custom School Header on Certificate, 100% DB Safety, OTP Verified.</p>
                     </div>
 
                     <div class="section-title">📌 Quick Portal Actions</div>
@@ -444,16 +430,7 @@
                 
                 <select id="school-login-state" class="input-box" style="margin-bottom:15px;">
                     <option value="">-- Select Registered State --</option>
-                    <option value="Odisha">Odisha</option>
-                    <option value="West Bengal">West Bengal</option>
-                    <option value="Andhra Pradesh">Andhra Pradesh</option>
-                    <option value="Bihar">Bihar</option>
-                    <option value="Chhattisgarh">Chhattisgarh</option>
-                    <option value="Jharkhand">Jharkhand</option>
-                    <option value="Madhya Pradesh">Madhya Pradesh</option>
-                    <option value="Maharashtra">Maharashtra</option>
-                    <option value="Tamil Nadu">Tamil Nadu</option>
-                    <option value="Delhi">Delhi</option>
+                    <option value="Odisha">Odisha</option><option value="West Bengal">West Bengal</option><option value="Andhra Pradesh">Andhra Pradesh</option>
                 </select>
                 
                 <input type="text" id="school-login-id" placeholder="Enter School Code (e.g. 155CB)" class="input-box" style="margin-bottom:15px;">
@@ -510,7 +487,7 @@
                         <tr><th>Roll No</th><th>Student Name</th><th>Father's Name</th><th>Total Marks</th><th>% & Grade</th><th>Status</th><th>Actions (Edit/Print/Delete)</th></tr>
                     </thead>
                     <tbody id="school-student-table-body">
-                        <!-- Loaded dynamically -->
+                        <!-- Loaded dynamically from studentDataStore -->
                     </tbody>
                 </table>
             </div>
@@ -649,7 +626,7 @@
                 <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1;">
                     <h4>📢 Edit / Update Notice Board</h4>
                     <textarea id="notice-input" rows="5" class="input-box" style="margin-bottom:10px;">• Official Marksheet & Portal System is live.
-• Added: 100% Original Certificate PDF/Print feature!</textarea>
+• Fixed: Certificate Header displays Specific School Name. 100% Data Safe.</textarea>
                     <button style="background:#16a34a; color:white; border:none; padding:8px 20px; border-radius:6px; cursor:pointer;" onclick="updateNoticeBoard()">Save Notice Board 💾</button>
                 </div>
             </div>
@@ -697,13 +674,6 @@
                     <div class="sub-row">
                         <input type="text" value="FLO" placeholder="Code" class="input-box sub-code" style="padding:6px;">
                         <input type="text" value="FIRST LANGUAGE ODIA" placeholder="Subject Name" class="input-box sub-name" style="padding:6px;">
-                        <input type="number" value="100" placeholder="Max" class="input-box sub-max" style="padding:6px;" oninput="calculateAutoMarks()">
-                        <input type="number" value="" placeholder="Secured" class="input-box sub-sec" style="padding:6px;" oninput="calculateAutoMarks()">
-                        <button type="button" style="background:#dc2626; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('.sub-row').remove(); calculateAutoMarks();">Delete</button>
-                    </div>
-                    <div class="sub-row">
-                        <input type="text" value="SLE" placeholder="Code" class="input-box sub-code" style="padding:6px;">
-                        <input type="text" value="SECOND LANGUAGE ENGLISH" placeholder="Subject Name" class="input-box sub-name" style="padding:6px;">
                         <input type="number" value="100" placeholder="Max" class="input-box sub-max" style="padding:6px;" oninput="calculateAutoMarks()">
                         <input type="number" value="" placeholder="Secured" class="input-box sub-sec" style="padding:6px;" oninput="calculateAutoMarks()">
                         <button type="button" style="background:#dc2626; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('.sub-row').remove(); calculateAutoMarks();">Delete</button>
@@ -783,39 +753,29 @@
         <!-- PRINTABLE MARKSHEET SECTION (ORIGINAL BOARD DESIGN) -->
         <div id="marksheet-print-area">
             <div class="cert-border">
-                <!-- Watermark -->
-                <div class="cert-watermark">BOARD OF<br>SECONDARY<br>EDUCATION<br>ODISHA</div>
+                <div class="cert-watermark" id="pm-watermark">SCHOOL<br>MARKSHEET</div>
 
-                <!-- Header -->
                 <div class="cert-header">
-                    <img src="https://upload.wikimedia.org/wikipedia/en/thumb/f/f2/Board_of_Secondary_Education%2C_Odisha_logo.png/220px-Board_of_Secondary_Education%2C_Odisha_logo.png" alt="Board Logo" style="width: 80px; height: 80px; position:absolute; top:20px; left:50%; transform:translateX(-50%);">
-                    <br><br><br><br>
-                    <h1>Board of Secondary Education, Odisha</h1>
-                    <h2 style="font-family: Arial, sans-serif;">ମାଧ୍ୟମିକ ଶିକ୍ଷା ପରିଷଦ, ଓଡ଼ିଶା</h2>
+                    <h1 id="pm-header-school-name" style="font-size: 26px; margin: 0; color: #4c1d95; text-transform: uppercase;">SCHOOL NAME HERE</h1>
                     <h2 style="font-size: 16px; margin-top:10px; color:#3b0764;">HIGH SCHOOL CERTIFICATE EXAMINATION - 2026</h2>
                     <h2 style="font-family: Arial, sans-serif; font-size:14px; color:#3b0764;">ଉଚ୍ଚ ବିଦ୍ୟାଳୟ ପ୍ରମାଣପତ୍ର ପରୀକ୍ଷା - ୨୦୨୬</h2>
                     <h2 style="font-size: 14px; margin-top:5px; color:#3b0764;">CERTIFICATE-CUM-MARK SHEET</h2>
                     <h2 style="font-family: Arial, sans-serif; font-size:14px; color:#3b0764;">ପ୍ରାପ୍ତାଙ୍କ ସମ୍ବଳିତ ପ୍ରମାଣପତ୍ର</h2>
                 </div>
 
-                <!-- Top Info -->
                 <div class="cert-top-info">
                     <div>
                         <p>ରୋଲ୍ ନଂ / ROLL NO : <span id="pm-roll" style="color:black;"></span></p>
-                        <p>ଜିଲ୍ଲା / DISTRICT : <span style="color:black;">BHADRAK</span></p>
+                        <p>ଜିଲ୍ଲା / DISTRICT : <span style="color:black;">DISTRICT</span></p>
                     </div>
                     <div style="text-align:right;">
                         <p>କ୍ରମିକ ନଂ / SL NO : <span style="color:black;">261122001</span></p>
-                        <p>ବିଦ୍ୟାଳୟ କୋଡ୍ / SCHOOL CODE : <span style="color:black;">155CB</span></p>
+                        <p>ବିଦ୍ୟାଳୟ କୋଡ୍ / SCHOOL CODE : <span style="color:black;">CODE</span></p>
                     </div>
                 </div>
 
-                <!-- Photo -->
-                <div class="cert-photo-area">
-                    Photo Not Available
-                </div>
+                <div class="cert-photo-area">Photo Not Available</div>
 
-                <!-- Personal Details -->
                 <div class="cert-details">
                     <div class="row">
                         <div class="label">ପ୍ରମାଣ କରାଯାଉଛି ଯେ<br>Certify that</div>
@@ -834,11 +794,7 @@
                         <div class="value" id="pm-dob"></div>
                     </div>
                     <div class="row" style="margin-top:10px;">
-                        <div class="value" style="width:100%; border-bottom:1px dashed #4c1d95; padding-bottom:5px;" id="pm-school">SRI BAIRAGI SARASWATI SISHU VIDYAMANDIR, ASURALI</div>
-                    </div>
-                    <div class="row" style="margin-top:5px; font-size:12px;">
-                        <div style="width:50%;">ବ୍ଲକ୍/Block: <span class="value">DHAMNAGAR</span></div>
-                        <div style="width:50%; text-align:right;">ଜିଲ୍ଲା/District: <span class="value">BHADRAK</span></div>
+                        <div class="value" style="width:100%; border-bottom:1px dashed #4c1d95; padding-bottom:5px;" id="pm-school">SCHOOL NAME</div>
                     </div>
                     <div class="row" style="margin-top:5px; color:#4c1d95; font-size:12px;">
                         ଫେବୃଆରୀ ୨୦୨୬ ରେ ଅନୁଷ୍ଠିତ ମାଧ୍ୟମିକ ଉଚ୍ଚ ବିଦ୍ୟାଳୟ ପ୍ରମାଣପତ୍ର ପରୀକ୍ଷାରେ ଉତ୍ତୀର୍ଣ୍ଣ ହୋଇଛନ୍ତି।<br>
@@ -846,59 +802,37 @@
                     </div>
                 </div>
 
-                <!-- Marks Table -->
                 <table class="cert-table" id="pm-marks-table">
                     <thead>
                         <tr><th colspan="4">ବିଷୟ ଏବଂ ପ୍ରାପ୍ତାଙ୍କ<br>SUBJECTS AND MARKS SECURED</th></tr>
-                        <tr>
-                            <th>ବିଷୟ କୋଡ୍<br>SUBJECT CODE</th>
-                            <th>ବିଷୟ<br>SUBJECT</th>
-                            <th>ମୋଟାଙ୍କ<br>FULL MARKS</th>
-                            <th>ପ୍ରାପ୍ତାଙ୍କ<br>MARKS SECURED</th>
-                        </tr>
+                        <tr><th>ବିଷୟ କୋଡ୍<br>SUBJECT CODE</th><th>ବିଷୟ<br>SUBJECT</th><th>ମୋଟାଙ୍କ<br>FULL MARKS</th><th>ପ୍ରାପ୍ତାଙ୍କ<br>MARKS SECURED</th></tr>
                     </thead>
                     <tbody id="pm-marks-body">
                         <!-- Filled by JS -->
                     </tbody>
                     <tfoot>
-                        <tr>
-                            <th colspan="2" style="text-align:right;">ମୋଟ / TOTAL</th>
-                            <th id="pm-total-max">600</th>
-                            <th id="pm-total-sec"></th>
-                        </tr>
+                        <tr><th colspan="2" style="text-align:right;">ମୋଟ / TOTAL</th><th id="pm-total-max">600</th><th id="pm-total-sec"></th></tr>
                     </tfoot>
                 </table>
 
-                <div style="text-align:center; font-weight:bold; font-size:12px; margin-bottom:15px; text-transform:uppercase;" id="pm-words">
-                    ( FOUR HUNDRED AND FIFTY )
-                </div>
+                <div style="text-align:center; font-weight:bold; font-size:12px; margin-bottom:15px; text-transform:uppercase;" id="pm-words"></div>
 
-                <!-- Footer Info -->
                 <div class="cert-footer-info">
                     <div>
-                        <img id="pm-barcode" src="https://barcode.tec-it.com/barcode.ashx?data=155CB0197&code=Code128&translate-esc=on" alt="Barcode" style="height:40px; margin-bottom:5px;">
+                        <img id="pm-barcode" src="" alt="Barcode" style="height:40px; margin-bottom:5px;">
                         <p style="font-size:10px; color:#4c1d95;">ଫଳାଫଳ ପ୍ରକାଶନ ତାରିଖ<br>DATE OF PUBLICATION OF RESULTS<br><b style="font-size:12px;">02/05/2026</b></p>
                     </div>
                     <div>
                         <p style="color:#4c1d95; font-size:12px; text-align:center; margin-bottom:5px;">ଗ୍ରେଡ୍<br>GRADE</p>
                         <div class="cert-grade-box" id="pm-grade"></div>
                     </div>
-                    <div>
-                        <img id="pm-qr" src="" alt="QR Code" style="height:70px; width:70px; border:1px solid #4c1d95;">
-                    </div>
+                    <div><img id="pm-qr" src="" alt="QR Code" style="height:70px; width:70px; border:1px solid #4c1d95;"></div>
                 </div>
 
                 <div class="cert-signatures">
-                    <div>
-                        <p>Controller of Examinations</p>
-                        <p style="font-family: Arial, sans-serif;">ପରୀକ୍ଷା ନିୟନ୍ତ୍ରକ</p>
-                    </div>
-                    <div>
-                        <p>Secretary</p>
-                        <p style="font-family: Arial, sans-serif;">ସମ୍ପାଦକ</p>
-                    </div>
+                    <div><p>Controller of Examinations</p><p style="font-family: Arial, sans-serif;">ପରୀକ୍ଷା ନିୟନ୍ତ୍ରକ</p></div>
+                    <div><p>Secretary</p><p style="font-family: Arial, sans-serif;">ସମ୍ପାଦକ</p></div>
                 </div>
-
             </div>
             
             <div class="no-print" style="text-align:center; margin-top:30px;">
@@ -991,14 +925,16 @@
         // --- NEW: PRINT / PDF FEATURE (ORIGINAL DESIGN) ---
         function printStudent(roll) {
             let student = studentDataStore.find(s => s.roll === roll);
-            if(!student) return;
+            if(!student) { alert("Student data not found for printing!"); return; }
+
+            document.getElementById('pm-header-school-name').innerText = student.school || "SCHOOL NAME";
+            document.getElementById('pm-school').innerText = student.school || "N/A";
 
             document.getElementById('pm-roll').innerText = student.roll;
             document.getElementById('pm-name').innerText = student.name;
             document.getElementById('pm-fname').innerText = student.fname;
             document.getElementById('pm-mname').innerText = student.mname || "N/A";
             document.getElementById('pm-dob').innerText = student.dob || "N/A";
-            document.getElementById('pm-school').innerText = student.school || "N/A";
             
             document.getElementById('pm-total-max').innerText = student.max;
             document.getElementById('pm-total-sec').innerText = student.total;
@@ -1007,15 +943,18 @@
             
             document.getElementById('pm-barcode').src = `https://barcode.tec-it.com/barcode.ashx?data=${student.roll}&code=Code128&translate-esc=on`;
             
-            // Dynamic QR based on student details
             let qrData = `Name: ${student.name}%0ARoll: ${student.roll}%0ATotal: ${student.total}/${student.max}%0AGrade: ${student.grade}`;
             document.getElementById('pm-qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${qrData}`;
 
             let tbody = document.getElementById('pm-marks-body');
             tbody.innerHTML = "";
-            student.subjects.forEach(sub => {
-                tbody.innerHTML += `<tr><td>${sub.code}</td><td style="text-align:left;">${sub.name}</td><td>${sub.max}</td><td>${sub.sec}</td></tr>`;
-            });
+            if (student.subjects && student.subjects.length > 0) {
+                student.subjects.forEach(sub => {
+                    tbody.innerHTML += `<tr><td>${sub.code}</td><td style="text-align:left;">${sub.name}</td><td>${sub.max}</td><td>${sub.sec}</td></tr>`;
+                });
+            } else {
+                 tbody.innerHTML = `<tr><td colspan="4">Marks detailed breakdown not available.</td></tr>`;
+            }
 
             let sections = document.getElementsByClassName('content-section');
             for (let sec of sections) { sec.classList.remove('active'); }
@@ -1029,7 +968,7 @@
         function saveAsPDF() {
             const element = document.getElementById('marksheet-print-area');
             const btnDiv = element.querySelector('.no-print');
-            btnDiv.style.display = 'none'; // Hide buttons for PDF
+            btnDiv.style.display = 'none'; 
 
             const opt = {
                 margin: 0,
@@ -1040,7 +979,7 @@
             };
 
             html2pdf().set(opt).from(element).save().then(() => {
-                btnDiv.style.display = 'block'; // Show buttons again
+                btnDiv.style.display = 'block'; 
             });
         }
 
@@ -1160,6 +1099,9 @@
         function verifyAdminOTP() { if(document.getElementById('admin-reset-otp').value.trim() === adminGenOtp) { alert("OTP Verified!"); document.getElementById('admin-otp-div').style.display = 'none'; document.getElementById('admin-newpass-div').style.display = 'block'; } else { alert("Invalid OTP!"); } }
         function saveNewAdminPassword() { let newPass = document.getElementById('admin-new-pass-input').value.trim(); if(!newPass) { alert("Enter a new password!"); return; } adminProfile.pass = newPass; saveLocalData(); alert("Admin Password updated successfully! Please login with new password."); cancelAdminForgot(); }
         function saveAdminProfile() { adminProfile.name = document.getElementById('prof-admin-name').value.trim(); adminProfile.user = document.getElementById('prof-admin-user').value.trim(); adminProfile.email = document.getElementById('prof-admin-email').value.trim(); saveLocalData(); document.getElementById('display-admin-user').innerText = adminProfile.user; alert("Admin Profile Data Saved!"); }
+        function sendAdminProfileOTP() { profGenOtp = Math.floor(100000 + Math.random() * 900000).toString(); alert(`Simulation: OTP sent to ${adminProfile.email}.\nOTP is: ${profGenOtp}`); document.getElementById('prof-otp-div').style.display = 'block'; }
+        function verifyAdminProfileOTP() { if(document.getElementById('prof-otp-input').value.trim() === profGenOtp) { alert("OTP Verified! You can now enter a new password."); document.getElementById('prof-otp-div').style.display = 'none'; document.getElementById('prof-newpass-div').style.display = 'block'; } else { alert("Invalid OTP!"); } }
+        function updateAdminPasswordFromProfile() { let newPass = document.getElementById('prof-new-pass').value.trim(); if(!newPass) { alert("Enter a new password!"); return; } adminProfile.pass = newPass; saveLocalData(); alert("Admin Password Changed Successfully!"); document.getElementById('prof-newpass-div').style.display = 'none'; }
         function switchAdminTab(tabId, btn) { let contents = document.getElementsByClassName('admin-tab-content'); for(let c of contents) { c.style.display = 'none'; } document.getElementById(tabId).style.display = 'block'; let btns = document.getElementById('admin-dashboard').getElementsByClassName('tab-btn'); for(let b of btns) { b.classList.remove('active-tab'); } btn.classList.add('active-tab'); }
         function updateAdminFeeDisplay() { let gstAmt = (adminPaymentConfig.baseFee * adminPaymentConfig.gstPct) / 100; let totalFee = adminPaymentConfig.baseFee + gstAmt; if(document.getElementById('display-base-fee')){ document.getElementById('display-base-fee').innerText = adminPaymentConfig.baseFee; document.getElementById('display-gst-pct').innerText = adminPaymentConfig.gstPct; document.getElementById('display-gst-amt').innerText = gstAmt; document.getElementById('display-total-fee').innerText = totalFee; document.getElementById('display-upi').innerText = adminPaymentConfig.upiId; document.getElementById('dynamic-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=${adminPaymentConfig.upiId}&pn=SchoolPortal&am=${totalFee}&cu=INR`; } }
         function openSchoolRegistration() { document.getElementById('school-form-step').style.display = 'block'; document.getElementById('school-payment-step').style.display = 'none'; isSchoolOtpVerified = false; document.getElementById('school-otp-div').style.display = 'none'; document.getElementById('school-pass-div').style.display = 'none'; openPage('school-reg'); }
@@ -1167,7 +1109,7 @@
         function verifyRegSchoolOTP() { let entered = document.getElementById('reg-school-otp').value.trim(); if(entered === generatedSchoolOtp) { isSchoolOtpVerified = true; alert("OTP Verified Successfully!"); document.getElementById('school-otp-div').style.display = 'none'; document.getElementById('school-pass-div').style.display = 'block'; } else { alert("Invalid OTP! Try again."); } }
         function validateSchoolForm() { let reqIds = ['reg-school-name', 'reg-school-id', 'reg-hm-name', 'reg-hm-mobile', 'reg-school-state', 'reg-school-email']; for(let id of reqIds) { if(!document.getElementById(id).value.trim()) { alert('Please fill all Mandatory (*) Fields!'); return; } } if(!isSchoolOtpVerified) { alert("You must Verify Email OTP to proceed!"); return; } if(!document.getElementById('reg-school-pass').value.trim()) { alert("Please Create a Password!"); return; } document.getElementById('school-form-step').style.display = 'none'; document.getElementById('school-payment-step').style.display = 'block'; let timeLeft = 30; document.getElementById('school-payment-timer').innerText = timeLeft; clearInterval(schoolPaymentTimerInterval); schoolPaymentTimerInterval = setInterval(() => { timeLeft--; document.getElementById('school-payment-timer').innerText = timeLeft; if(timeLeft <= 0) { clearInterval(schoolPaymentTimerInterval); alert("Payment Timeout!"); goHome(); } }, 1000); }
         function submitSchoolRegistration() { let utr = document.getElementById('reg-school-utr').value.trim(); if(!utr) { alert("Please enter Transaction ID to verify payment!"); return; } clearInterval(schoolPaymentTimerInterval); let newSchool = { id: document.getElementById('reg-school-id').value.trim(), name: document.getElementById('reg-school-name').value.trim(), hm: document.getElementById('reg-hm-name').value.trim(), mobile: document.getElementById('reg-hm-mobile').value.trim(), state: document.getElementById('reg-school-state').value, email: document.getElementById('reg-school-email').value.trim(), pass: document.getElementById('reg-school-pass').value.trim(), utr: utr, status: "Pending", upi: "", baseFee: 500, hasGst: false, gstPct: 0 }; registeredSchools.push(newSchool); saveLocalData(); renderAdminSchoolsTable(); updatePublicSchoolDropdown(); document.getElementById('school-reg').classList.remove('active'); let d = new Date(); document.getElementById('rec-app-id').innerText = "SCH-" + Math.floor(Math.random()*9000+1000); document.getElementById('rec-date').innerText = d.toLocaleDateString(); document.getElementById('receipt-title').innerText = "🏫 SCHOOL REGISTRATION RECEIPT"; document.getElementById('receipt-sub').innerText = "Awaiting Master Admin Approval."; document.getElementById('rec-name').innerText = newSchool.name + " (" + newSchool.id + ")"; document.getElementById('rec-info').innerText = `HM: ${newSchool.hm} | Mobile: ${newSchool.mobile}`; document.getElementById('rec-school').parentElement.style.display = 'none'; document.getElementById('rec-utr').innerText = utr; document.getElementById('rec-amt').innerText = "1180 (Reg Fee)"; document.getElementById('receipt-section').classList.add('active'); alert('School Registered Successfully! Application sent to Master Admin for approval.'); }
-        function renderAdminSchoolsTable() { let tbody = document.getElementById('school-table-body'); tbody.innerHTML = ""; let pendingCount = 0; registeredSchools.forEach(s => { let statusHtml = ""; let actionsHtml = ""; if(s.status === "Pending") { pendingCount++; statusHtml = `<span style="background:#fef08a; color:#854d0e; padding:4px 10px; border-radius:6px; font-weight:bold;">Pending ⏳</span>`; actionsHtml = `<button style="background:#f59e0b; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openVerifyEditSchool('${s.id}')">Verify/Edit ✏️️</button> <button style="background:#16a34a; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="approveSchool('${s.id}')">Approve ✅</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="rejectSchool('${s.id}')">Reject ❌</button>`; } else { statusHtml = `<span class="badge-approved">Approved ✅</span>`; actionsHtml = `<button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openSchoolPaymentSetup('${s.id}')">💳 Set Payment</button> <button style="background:#f59e0b; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openVerifyEditSchool('${s.id}')">Edit ✏️</button>`; } tbody.innerHTML += `<tr><td>${s.name}</td><td><b>${s.id}</b></td><td><input type="text" value="${s.pass}" onchange="updateSchoolPassword('${s.id}', this.value)" style="padding:5px; width:90px;"></td><td>${s.hm}</td><td>${s.state || "N/A"}</td><td><b style="color:#16a34a;">${s.utr || "N/A"}</b></td><td>${statusHtml}</td><td>${actionsHtml}</td></tr>`; }); let badge = document.getElementById('admin-notif-badge'); if(pendingCount > 0) { badge.innerText = pendingCount; badge.style.display = 'inline-block'; } else { badge.style.display = 'none'; } }
+        function renderAdminSchoolsTable() { let tbody = document.getElementById('school-table-body'); tbody.innerHTML = ""; let pendingCount = 0; registeredSchools.forEach(s => { let statusHtml = ""; let actionsHtml = ""; if(s.status === "Pending") { pendingCount++; statusHtml = `<span style="background:#fef08a; color:#854d0e; padding:4px 10px; border-radius:6px; font-weight:bold;">Pending ⏳</span>`; actionsHtml = `<button style="background:#f59e0b; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openVerifyEditSchool('${s.id}')">Verify/Edit ✏️</button> <button style="background:#16a34a; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="approveSchool('${s.id}')">Approve ✅</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="rejectSchool('${s.id}')">Reject ❌</button>`; } else { statusHtml = `<span class="badge-approved">Approved ✅</span>`; actionsHtml = `<button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; margin-right:4px;" onclick="openSchoolPaymentSetup('${s.id}')">💳 Set Payment</button> <button style="background:#f59e0b; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openVerifyEditSchool('${s.id}')">Edit ✏️</button>`; } tbody.innerHTML += `<tr><td>${s.name}</td><td><b>${s.id}</b></td><td><input type="text" value="${s.pass}" onchange="updateSchoolPassword('${s.id}', this.value)" style="padding:5px; width:90px;"></td><td>${s.hm}</td><td>${s.state || "N/A"}</td><td><b style="color:#16a34a;">${s.utr || "N/A"}</b></td><td>${statusHtml}</td><td>${actionsHtml}</td></tr>`; }); let badge = document.getElementById('admin-notif-badge'); if(pendingCount > 0) { badge.innerText = pendingCount; badge.style.display = 'inline-block'; } else { badge.style.display = 'none'; } }
         function approveSchool(id) { let school = registeredSchools.find(s => s.id === id); if(school) { school.status = "Approved"; saveLocalData(); renderAdminSchoolsTable(); updatePublicSchoolDropdown(); alert(`School "${school.name}" Approved successfully!`); } }
         function rejectSchool(id) { if(confirm("Are you sure you want to Reject and Delete this school?")) { registeredSchools = registeredSchools.filter(s => s.id !== id); saveLocalData(); renderAdminSchoolsTable(); updatePublicSchoolDropdown(); } }
         function openVerifyEditSchool(id) { let school = registeredSchools.find(s => s.id === id); if(school) { document.getElementById('edit-sch-old-id').value = school.id; document.getElementById('edit-sch-name').value = school.name; document.getElementById('edit-sch-id').value = school.id; document.getElementById('edit-sch-hm').value = school.hm || ""; document.getElementById('edit-sch-mobile').value = school.mobile || ""; document.getElementById('edit-sch-state').value = school.state || "Odisha"; document.getElementById('editSchoolModal').style.display = 'flex'; } }
@@ -1186,10 +1128,8 @@
         function updateNotificationBadge() { let badge = document.getElementById('notif-badge'); if(!badge) return; if(pendingApplications.length > 0) { badge.innerText = pendingApplications.length; badge.style.display = 'inline-block'; } else { badge.style.display = 'none'; } }
         function renderPendingApplications(schoolId) { let tbody = document.getElementById('school-pending-table-body'); tbody.innerHTML = ""; let relevantApps = pendingApplications.filter(app => app.schoolId === schoolId); for(let i=0; i<relevantApps.length; i++) { let app = relevantApps[i]; let row = tbody.insertRow(); row.innerHTML = `<td><b>APP-${app.appId}</b></td><td>${app.name}</td><td><span style="color:#16a34a; font-weight:bold;">${app.utr}</span></td><td><button style="background:#16a34a; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="approveApplication(${app.appId})">Assign Roll & Approve ✅</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="rejectApplication(${app.appId})">Reject ❌</button></td>`; } updateNotificationBadge(); }
         function approveApplication(appId) { let index = pendingApplications.findIndex(a => a.appId === appId); if(index > -1) { let app = pendingApplications[index]; let assignedRoll = prompt(`ASSIGN A ROLL NUMBER:`, "e.g. 155CB0198"); if(assignedRoll && assignedRoll.trim() !== "") { 
-            
             let newStudent = { roll: assignedRoll, name: app.name, fname: app.fname, mname: "", dob: "", mobile: app.mobile, school: app.schoolName, total: 0, max: 0, grade: "-", status: "Fail", subjects: [] };
             studentDataStore.push(newStudent);
-            
             pendingApplications.splice(index, 1); saveLocalData(); refreshTablesFromStore(); alert(`Student Approved! Assigned Roll No: ${assignedRoll}`); renderPendingApplications(app.schoolId); 
         } else { alert("Roll No is required to approve."); } } }
         function rejectApplication(appId) { if(confirm("Are you sure?")) { let index = pendingApplications.findIndex(a => a.appId === appId); if(index > -1) { let sId = pendingApplications[index].schoolId; pendingApplications.splice(index, 1); saveLocalData(); renderPendingApplications(sId); } } }
