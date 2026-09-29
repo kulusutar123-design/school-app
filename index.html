@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>School Home Portal - Results Portal</title>
+    <title>School Home Portal - School Login System</title>
     <style>
         * {
             box-sizing: border-box;
@@ -57,7 +57,6 @@
         
         .section-title { font-size: 20px; color: #ffffff; margin-bottom: 15px; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
         
-        /* 3D Results Button Card on Home Ground */
         .results-btn-card {
             background: linear-gradient(135deg, #1e3a8a, #2563eb);
             border-radius: 20px;
@@ -250,10 +249,10 @@
         <div id="home-view">
             <div class="notice-board">
                 <h4>📢 Important Notice Board</h4>
-                <p id="display-notice">• Official Marksheet & Results Portal is live.<br>• Click the "Check Results 🎯" button below to enter your Roll No and view your marksheet.</p>
+                <p id="display-notice">• Official Marksheet & School Login Portal is live.<br>• Click "Check Results 🎯" to view marks or use "School Login" to access your school panel.</p>
             </div>
 
-            <!-- 3D Results Button Card on Home Ground -->
+            <!-- Results Button Card -->
             <div class="results-btn-card">
                 <h3>🎓 Annual Examination Results 2026</h3>
                 <p>Click below to enter your Roll Number and view official student marksheets instantly.</p>
@@ -265,7 +264,7 @@
                     <div class="welcome-card">
                         <h3>🌟 Welcome to Digital School Management</h3>
                         <p>Manage your schools, student admissions, attendance, and records securely on the cloud platform with high performance.</p>
-                        <p><b>✨ Features:</b> 3D Results Portal, Roll No Verification, Secure Admin Controls.</p>
+                        <p><b>✨ Features:</b> School Portal Login, 3D Results Lookup, Secure Admin Controls.</p>
                     </div>
 
                     <div class="section-title">📌 Quick Portal Actions</div>
@@ -299,6 +298,44 @@
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- School Login Section (Fully Functional) -->
+        <div id="school-login" class="content-section">
+            <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
+            <h3>🏫 School Portal Login</h3>
+            <p style="color: #64748b; margin-bottom: 20px;">Enter your registered School ID and Password to access your dashboard.</p>
+            <input type="text" id="school-login-id" placeholder="Enter School ID (e.g. 155CB)" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
+            <input type="password" id="school-login-pass" placeholder="Enter Password" style="width:100%; padding:12px; margin-bottom:20px; border:1px solid #cbd5e1; border-radius:8px;">
+            <button style="background:#3b82f6; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="validateSchoolLogin()">Login to School Panel ➡️</button>
+        </div>
+
+        <!-- School Dashboard Section (After School Login) -->
+        <div id="school-dashboard" class="content-section">
+            <button class="back-btn" onclick="goHome()">🚪 Logout & Home</button>
+            <h2 id="school-dash-title" style="color: #0d3b66; margin-bottom: 10px;">🏫 School Management Dashboard</h2>
+            <p id="school-dash-sub" style="color: #64748b; margin-bottom: 20px;"></p>
+
+            <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1; margin-bottom:20px;">
+                <h4 style="color:#1e3a8a; margin-bottom:10px;">📊 School Status & Details</h4>
+                <p><b>Registration Status:</b> <span class="badge-approved">Approved ✅</span></p>
+                <p style="margin-top:5px;"><b>Total Registered Students:</b> 1</p>
+            </div>
+
+            <h3>🎓 Students under this School</h3>
+            <table>
+                <thead>
+                    <tr><th>Roll No</th><th>Candidate Name</th><th>Father's Name</th><th>Grand Total</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><b>155CB0197</b></td>
+                        <td>DIBYANSHI DAS</td>
+                        <td>ANTARYAMI DAS</td>
+                        <td><b style="color: #16a34a;">360 / 600</b></td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
 
         <!-- Results Roll No Check Modal -->
@@ -434,8 +471,8 @@
                 </div>
                 <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1;">
                     <h4>📢 Edit / Update Notice Board</h4>
-                    <textarea id="notice-input" rows="5" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; margin-bottom:10px;">• Official Marksheet & Results Portal is live.
-• Click the "Check Results 🎯" button below to enter your Roll No and view your marksheet.</textarea>
+                    <textarea id="notice-input" rows="5" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; margin-bottom:10px;">• Official Marksheet & School Login Portal is live.
+• Click "Check Results 🎯" to view marks or use "School Login" to access your school panel.</textarea>
                     <button style="background:#16a34a; color:white; border:none; padding:8px 20px; border-radius:6px; cursor:pointer;" onclick="updateNoticeBoard()">Save Notice Board 💾</button>
                 </div>
             </div>
@@ -492,13 +529,6 @@
                         <input type="number" value="75" placeholder="Secured" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
                         <button type="button" style="background:#dc2626; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('.sub-row').remove()">×</button>
                     </div>
-                    <div class="sub-row">
-                        <input type="text" value="SLE" placeholder="Code" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                        <input type="text" value="SECOND LANGUAGE ENGLISH" placeholder="Subject Name" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                        <input type="number" value="100" placeholder="Max" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                        <input type="number" value="69" placeholder="Secured" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
-                        <button type="button" style="background:#dc2626; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('.sub-row').remove()">×</button>
-                    </div>
                 </div>
 
                 <input type="text" id="s-total" placeholder="Grand Total (e.g. 360 / 600)" style="width:100%; padding:9px; margin-top:15px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:6px;">
@@ -510,27 +540,18 @@
             </div>
         </div>
 
-        <!-- School Login Section -->
-        <div id="school-login" class="content-section">
-            <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
-            <h3>🏫 School Portal Login</h3>
-            <input type="text" placeholder="School ID" style="width:100%; padding:12px; margin:15px 0; border:1px solid #cbd5e1; border-radius:8px;">
-            <input type="password" placeholder="Password" style="width:100%; padding:12px; margin-bottom:20px; border:1px solid #cbd5e1; border-radius:8px;">
-            <button style="background:#3b82f6; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="alert('Login Successful!')">Login ➡️</button>
-        </div>
-
-        <!-- School Registration Section with Auto GST & QR Barcode -->
+        <!-- School Registration Section -->
         <div id="school-reg" class="content-section">
             <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
             <h3>📝 New School Registration Portal</h3>
             <p style="color: #64748b; margin-bottom: 15px;">Register your school. Pay registration fee via QR code and submit UTR for Admin approval.</p>
             
             <input type="text" id="reg-school-name" placeholder="School Name" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
-            <input type="text" id="reg-school-id" placeholder="Create School ID" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
+            <input type="text" id="reg-school-id" placeholder="Create School ID (e.g. 155CB)" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
             <input type="text" id="reg-hm-name" placeholder="Headmaster Name" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
             <input type="text" id="reg-hm-mobile" placeholder="Mobile No" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
             <input type="text" id="reg-school-address" placeholder="School Address" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
-            <input type="password" placeholder="Create Password" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
+            <input type="password" id="reg-school-pass" placeholder="Create Password" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
             
             <div style="background:#f8fafc; border:1px dashed #cbd5e1; padding:20px; border-radius:12px; text-align:center; margin-bottom:20px;">
                 <h4 style="color:#0d3b66; margin-bottom:10px;">💳 Registration Fee Payment & GST Calculation</h4>
@@ -574,6 +595,11 @@
             gstPct: 18
         };
 
+        // Store registered schools dynamically in memory for login verification
+        let registeredSchools = [
+            { id: "155CB", name: "SRI BAIRAGI SARASWATI SISHU VIDYAMANDIR", pass: "school123", hm: "ANTARYAMI DAS" }
+        ];
+
         function updateFeeDisplay() {
             let gstAmt = (paymentConfig.baseFee * paymentConfig.gstPct) / 100;
             let totalFee = paymentConfig.baseFee + gstAmt;
@@ -612,6 +638,8 @@
             for (let sec of sections) { sec.classList.remove('active'); }
             document.getElementById('home-view').style.display = 'block';
         }
+
+        // Validate Master Admin Login
         function validateAdmin() {
             let u = document.getElementById('admin-user').value.trim();
             let p = document.getElementById('admin-pass').value.trim();
@@ -622,6 +650,24 @@
                 alert('Bhula Master ID kimbha Password!');
             }
         }
+
+        // Validate School Login
+        function validateSchoolLogin() {
+            let schoolId = document.getElementById('school-login-id').value.trim();
+            let pass = document.getElementById('school-login-pass').value.trim();
+
+            let matchedSchool = registeredSchools.find(s => s.id.toLowerCase() === schoolId.toLowerCase() && s.pass === pass);
+
+            if(matchedSchool) {
+                alert('School Login Successful! 🏫');
+                document.getElementById('school-dash-title').innerText = `🏫 ${matchedSchool.name}`;
+                document.getElementById('school-dash-sub').innerText = `School ID: ${matchedSchool.id} | Headmaster: ${matchedSchool.hm}`;
+                openPage('school-dashboard');
+            } else {
+                alert('Invalid School ID or Password! (Default test ID: 155CB / Pass: school123)');
+            }
+        }
+
         function switchTab(tabId, btn) {
             document.getElementById('schools-tab').style.display = 'none';
             document.getElementById('students-tab').style.display = 'none';
@@ -649,7 +695,6 @@
                 alert('Please enter a Roll Number!');
                 return;
             }
-            // Check in admin student table
             let tbody = document.getElementById('student-table-body');
             let rows = tbody.getElementsByTagName('tr');
             let found = false;
@@ -812,7 +857,11 @@
             } else {
                 let newRow = tbody.insertRow();
                 newRow.innerHTML = `<td>${name}</td><td>${id}</td><td>${hm}</td><td>${mobile}</td><td>Manual (Free)</td><td><span class="badge-approved">Approved</span></td><td><button style="background:#2563eb; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="openEditSchoolModal('${name}', '${id}', '${hm}', '${mobile}', '${addr}')">Edit</button> <button style="background:#dc2626; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Delete</button></td>`;
-                alert('School Added! 🏫');
+                
+                // Add to registered schools list for login
+                registeredSchools.push({ id: id, name: name, pass: "school123", hm: hm });
+
+                alert('School Added & Registered for Login! 🏫');
             }
             closeSchoolModal();
         }
@@ -823,15 +872,20 @@
             let hm = document.getElementById('reg-hm-name').value.trim();
             let mobile = document.getElementById('reg-hm-mobile').value.trim();
             let addr = document.getElementById('reg-school-address').value.trim();
+            let pass = document.getElementById('reg-school-pass').value.trim();
             let utr = document.getElementById('reg-utr').value.trim();
 
-            if(!name || !id || !utr) { alert('Please fill required fields & enter UTR!'); return; }
+            if(!name || !id || !utr || !pass) { alert('Please fill all required fields & password!'); return; }
             let gstAmt = (paymentConfig.baseFee * paymentConfig.gstPct) / 100;
             let totalFee = paymentConfig.baseFee + gstAmt;
 
             let tbody = document.getElementById('school-table-body');
             let newRow = tbody.insertRow();
             newRow.innerHTML = `<td>${name}</td><td>${id}</td><td>${hm}</td><td>${mobile}</td><td>${utr} (Paid ₹${totalFee})</td><td><span class="badge-pending">Pending Approval</span></td><td><button style="background:#16a34a; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="alert('School Approved Successfully!')">Approve ✅</button> <button style="background:#dc2626; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Reject</button></td>`;
+            
+            // Push to registered schools
+            registeredSchools.push({ id: id, name: name, pass: pass, hm: hm });
+
             alert('Registration Submitted Successfully! Admin has been notified.');
             goHome();
         }
