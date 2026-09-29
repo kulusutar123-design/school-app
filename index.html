@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>School Home Portal - 18-Point Student Registration System</title>
+    <title>School Home Portal - Complete 18-Point System with State & Language Dropdowns</title>
     <style>
         * {
             box-sizing: border-box;
@@ -223,7 +223,7 @@
             background: white;
             padding: 30px;
             border-radius: 20px;
-            width: 650px;
+            width: 700px;
             max-width: 95%;
             box-shadow: 0 25px 50px rgba(0,0,0,0.4);
             max-height: 90vh;
@@ -236,13 +236,6 @@
         }
         @media (max-width: 600px) {
             .form-grid { grid-template-columns: 1fr; }
-        }
-        .sub-row {
-            display: grid;
-            grid-template-columns: 1fr 2fr 1fr 1fr auto;
-            gap: 8px;
-            margin-bottom: 8px;
-            align-items: center;
         }
     </style>
 </head>
@@ -259,7 +252,7 @@
         <div id="home-view">
             <div class="notice-board">
                 <h4>📢 Important Notice Board</h4>
-                <p id="display-notice">• Official Marksheet & Portal System is live.<br>• School Login includes 18-Point Student Management System (Add/Edit Student).</p>
+                <p id="display-notice">• Official Marksheet & Portal System is live.<br>• 18-Point Student Form includes State and Local Language selection dropdowns.</p>
             </div>
 
             <!-- Results Button Card -->
@@ -274,7 +267,7 @@
                     <div class="welcome-card">
                         <h3>🌟 Welcome to Digital School Management</h3>
                         <p>Manage your schools, student admissions, attendance, and records securely on the cloud platform with high performance.</p>
-                        <p><b>✨ Features:</b> 18-Point Student Form, School Login Panel, Admin Password Control.</p>
+                        <p><b>✨ Features:</b> 18-Point Form with State & Language Dropdowns, School Login, Secure Admin Controls.</p>
                     </div>
 
                     <div class="section-title">📌 Quick Portal Actions</div>
@@ -320,7 +313,7 @@
             <button style="background:#3b82f6; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="validateSchoolLogin()">Login ➡️</button>
         </div>
 
-        <!-- School Dashboard Section with Add/Edit Student (18 Points) -->
+        <!-- School Dashboard Section -->
         <div id="school-dashboard" class="content-section">
             <button class="back-btn" onclick="goHome()">🚪 Logout & Home</button>
             <h2 id="school-dash-title" style="color: #0d3b66; margin-bottom: 5px;">🏫 School Management Dashboard</h2>
@@ -334,23 +327,25 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Roll No / APAR ID</th>
+                        <th>APAR ID</th>
                         <th>Student Name</th>
                         <th>Father's Name</th>
                         <th>Mobile No</th>
                         <th>Blood Group</th>
                         <th>Social Category</th>
+                        <th>State & Language</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="school-student-table-body">
                     <tr>
-                        <td><b>155CB0197</b></td>
+                        <td><b>APAR10245</b></td>
                         <td>DIBYANSHI DAS</td>
                         <td>ANTARYAMI DAS</td>
                         <td>9876543210</td>
                         <td>O+</td>
                         <td>GENERAL</td>
+                        <td>Odisha (Odia)</td>
                         <td>
                             <button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="alert('Viewing 18-point student details')">View 📄</button>
                             <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Delete</button>
@@ -360,7 +355,7 @@
             </table>
         </div>
 
-        <!-- Add/Edit Student Modal (18 Points Complete) -->
+        <!-- Add/Edit Student Modal (18 Points with State & Language Dropdowns) -->
         <div id="studentModal" class="modal">
             <div class="modal-content">
                 <h3 id="student-modal-title" style="color:#0d3b66; margin-bottom:15px;">Add Student (18-Point Form)</h3>
@@ -436,11 +431,55 @@
                     </div>
                     <div>
                         <label style="font-size:12px; font-weight:bold;">16. State:</label>
-                        <input type="text" id="s-state" value="Odisha" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #cbd5e1; border-radius:6px;">
+                        <select id="s-state" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #cbd5e1; border-radius:6px;">
+                            <option value="Odisha">Odisha</option>
+                            <option value="Andhra Pradesh">Andhra Pradesh</option>
+                            <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                            <option value="Assam">Assam</option>
+                            <option value="Bihar">Bihar</option>
+                            <option value="Chhattisgarh">Chhattisgarh</option>
+                            <option value="Goa">Goa</option>
+                            <option value="Gujarat">Gujarat</option>
+                            <option value="Haryana">Haryana</option>
+                            <option value="Himachal Pradesh">Himachal Pradesh</option>
+                            <option value="Jharkhand">Jharkhand</option>
+                            <option value="Karnataka">Karnataka</option>
+                            <option value="Kerala">Kerala</option>
+                            <option value="Madhya Pradesh">Madhya Pradesh</option>
+                            <option value="Maharashtra">Maharashtra</option>
+                            <option value="Manipur">Manipur</option>
+                            <option value="Meghalaya">Meghalaya</option>
+                            <option value="Mizoram">Mizoram</option>
+                            <option value="Nagaland">Nagaland</option>
+                            <option value="Punjab">Punjab</option>
+                            <option value="Rajasthan">Rajasthan</option>
+                            <option value="Sikkim">Sikkim</option>
+                            <option value="Tamil Nadu">Tamil Nadu</option>
+                            <option value="Telangana">Telangana</option>
+                            <option value="Tripura">Tripura</option>
+                            <option value="Uttar Pradesh">Uttar Pradesh</option>
+                            <option value="Uttarakhand">Uttarakhand</option>
+                            <option value="West Bengal">West Bengal</option>
+                            <option value="Delhi">Delhi</option>
+                        </select>
                     </div>
                     <div>
                         <label style="font-size:12px; font-weight:bold;">17. Local Language:</label>
-                        <input type="text" id="s-lang" value="Odia" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #cbd5e1; border-radius:6px;">
+                        <select id="s-lang" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #cbd5e1; border-radius:6px;">
+                            <option value="Odia">Odia</option>
+                            <option value="Hindi">Hindi</option>
+                            <option value="Bengali">Bengali</option>
+                            <option value="Telugu">Telugu</option>
+                            <option value="Marathi">Marathi</option>
+                            <option value="Tamil">Tamil</option>
+                            <option value="Gujarati">Gujarati</option>
+                            <option value="Urdu">Urdu</option>
+                            <option value="Kannada">Kannada</option>
+                            <option value="Malayalam">Malayalam</option>
+                            <option value="Punjabi">Punjabi</option>
+                            <option value="Assamese">Assamese</option>
+                            <option value="English">English</option>
+                        </select>
                     </div>
                     <div>
                         <label style="font-size:12px; font-weight:bold;">18. Mail ID:</label>
@@ -482,19 +521,19 @@
             <button style="background:#22c55e; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="validateAdmin()">Login 🚀</button>
         </div>
 
-        <!-- Master Admin Dashboard with School Notifications & Password Control -->
+        <!-- Master Admin Dashboard -->
         <div id="admin-dashboard" class="content-section">
             <button class="back-btn" onclick="goHome()">🚪 Logout & Home</button>
             <h2 style="color: #0d3b66; margin-bottom: 15px;">👑 Master Admin Dashboard & School Control</h2>
             
             <div style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px;">
-                <button class="tab-btn active-tab" onclick="switchTab('schools-tab', this)">🏫 School Notifications & Passwords</button>
+                <button class="tab-btn active-tab" onclick="switchTab('schools-tab', this)">🏫 School Registrations & Passwords</button>
                 <button class="tab-btn" onclick="switchTab('students-tab', this)">🎓 Manage Students & Marksheet</button>
                 <button class="tab-btn" onclick="switchTab('payment-settings-tab', this)">💳 Payment & GST Settings</button>
                 <button class="tab-btn" onclick="switchTab('settings-tab', this)">⚙️ Portal Settings</button>
             </div>
 
-            <!-- Schools Management & Notification Tab -->
+            <!-- Schools Management Tab -->
             <div id="schools-tab" class="admin-tab-content">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                     <h3>School Registrations, Notifications & Password Control</h3>
@@ -817,6 +856,8 @@
             let mobile = document.getElementById('s-mobile').value.trim();
             let blood = document.getElementById('s-blood').value;
             let cat = document.getElementById('s-category').value;
+            let state = document.getElementById('s-state').value;
+            let lang = document.getElementById('s-lang').value;
 
             if(!name) {
                 alert('Please enter Student Name!');
@@ -825,9 +866,9 @@
 
             let tbody = document.getElementById('school-student-table-body');
             let newRow = tbody.insertRow();
-            newRow.innerHTML = `<td><b>APAR${Math.floor(Math.random()*90000+10000)}</b></td><td>${name}</td><td>${document.getElementById('s-fname').value}</td><td>${mobile}</td><td>${blood}</td><td>${cat}</td><td><button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="alert('Viewing 18-point student details')">View 📄</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Delete</button></td>`;
+            newRow.innerHTML = `<td><b>APAR${Math.floor(Math.random()*90000+10000)}</b></td><td>${name}</td><td>${document.getElementById('s-fname').value}</td><td>${mobile}</td><td>${blood}</td><td>${cat}</td><td>${state} (${lang})</td><td><button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="alert('Viewing 18-point student details')">View 📄</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Delete</button></td>`;
             
-            alert('Student Registered Successfully with 18-Point Data! 🎓');
+            alert('Student Registered Successfully with State & Language Dropdowns! 🎓');
             closeStudentModal();
         }
 
@@ -900,7 +941,7 @@
             
             registeredSchools.push({ id: id, name: name, pass: pass, hm: hm, mobile: mobile, addr: addr });
 
-            alert('Registration Submitted Successfully! Admin has been notified with payment UTR and credentials.');
+            alert('Registration Submitted Successfully! Admin has been notified.');
             goHome();
         }
 
