@@ -90,7 +90,7 @@
         <div id="home-view">
             <div class="notice-board">
                 <h4>📢 Important Notice Board</h4>
-                <p id="display-notice">• Official Marksheet & Portal System is live.<br>• School to Admin Real-Time Database Sync is Active! No data loss.</p>
+                <p id="display-notice">• Official Marksheet & Portal System is live.<br>• Added: State-based School Login Security! Select your registered state to login.</p>
             </div>
 
             <div class="results-btn-card">
@@ -104,7 +104,7 @@
                     <div class="welcome-card">
                         <h3>🌟 Welcome to Digital School Management</h3>
                         <p>Manage your schools, student admissions, and records securely on the cloud platform.</p>
-                        <p><b>✨ Features:</b> Admin & School Full Control (Edit/Delete), 18-Point Form, Auto Database Sync.</p>
+                        <p><b>✨ Features:</b> State-based Secure Login, Full Admin Control, School Print/Edit Restored, Auto-Save System.</p>
                     </div>
 
                     <div class="section-title">📌 Quick Portal Actions</div>
@@ -147,7 +147,16 @@
                     <div style="grid-column: span 2;"><label>5. STATE <span class="req">*</span></label>
                         <select id="reg-school-state" class="input-box">
                             <option value="">-- Select State --</option>
-                            <option value="Odisha">Odisha</option><option value="West Bengal">West Bengal</option><option value="Andhra Pradesh">Andhra Pradesh</option>
+                            <option value="Odisha">Odisha</option>
+                            <option value="West Bengal">West Bengal</option>
+                            <option value="Andhra Pradesh">Andhra Pradesh</option>
+                            <option value="Bihar">Bihar</option>
+                            <option value="Chhattisgarh">Chhattisgarh</option>
+                            <option value="Jharkhand">Jharkhand</option>
+                            <option value="Madhya Pradesh">Madhya Pradesh</option>
+                            <option value="Maharashtra">Maharashtra</option>
+                            <option value="Tamil Nadu">Tamil Nadu</option>
+                            <option value="Delhi">Delhi</option>
                         </select>
                     </div>
                     
@@ -269,14 +278,29 @@
             </div>
         </div>
 
-        <!-- 3. SCHOOL LOGIN SECTION -->
+        <!-- 3. SCHOOL LOGIN SECTION (UPDATED WITH STATE DROPDOWN) -->
         <div id="school-login" class="content-section">
             <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
             
             <div id="school-login-area">
                 <h3>🏫 School Portal Login</h3>
-                <p style="color: #64748b; margin-bottom: 20px;">Enter School ID and Password.</p>
-                <input type="text" id="school-login-id" placeholder="Enter School ID (e.g. 155CB)" class="input-box" style="margin-bottom:15px;">
+                <p style="color: #64748b; margin-bottom: 20px;">Select your Registered State, then enter School ID and Password.</p>
+                
+                <select id="school-login-state" class="input-box" style="margin-bottom:15px;">
+                    <option value="">-- Select Registered State --</option>
+                    <option value="Odisha">Odisha</option>
+                    <option value="West Bengal">West Bengal</option>
+                    <option value="Andhra Pradesh">Andhra Pradesh</option>
+                    <option value="Bihar">Bihar</option>
+                    <option value="Chhattisgarh">Chhattisgarh</option>
+                    <option value="Jharkhand">Jharkhand</option>
+                    <option value="Madhya Pradesh">Madhya Pradesh</option>
+                    <option value="Maharashtra">Maharashtra</option>
+                    <option value="Tamil Nadu">Tamil Nadu</option>
+                    <option value="Delhi">Delhi</option>
+                </select>
+                
+                <input type="text" id="school-login-id" placeholder="Enter School Code (e.g. 155CB)" class="input-box" style="margin-bottom:15px;">
                 <input type="password" id="school-login-pass" placeholder="Enter Password" class="input-box" style="margin-bottom:15px;">
                 <p style="text-align:right; font-size:14px; margin-bottom:15px;"><a href="#" onclick="openSchoolForgotPassword()" style="color:#2563eb;">Forgot Password?</a></p>
                 <button class="btn-login btn-school" onclick="validateSchoolLogin()">Login ➡️</button>
@@ -469,7 +493,7 @@
                 <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1;">
                     <h4>📢 Edit / Update Notice Board</h4>
                     <textarea id="notice-input" rows="5" class="input-box" style="margin-bottom:10px;">• Official Marksheet & Portal System is live.
-• Database auto-sync is 100% complete.</textarea>
+• Added: State-based School Login Security! Select your registered state to login.</textarea>
                     <button style="background:#16a34a; color:white; border:none; padding:8px 20px; border-radius:6px; cursor:pointer;" onclick="updateNoticeBoard()">Save Notice Board 💾</button>
                 </div>
             </div>
@@ -568,24 +592,13 @@
                 <h3 style="color:#0d3b66; margin-bottom:10px;">💳 Set School Payment Gateway</h3>
                 <p id="sp-school-name" style="color:#1e3a8a; font-weight:bold; margin-bottom:15px;"></p>
                 <input type="hidden" id="sp-school-id">
-                
                 <label style="font-size:12px; font-weight:bold;">School UPI ID:</label>
-                <input type="text" id="sp-upi" placeholder="e.g. school123@upi" class="input-box" style="margin-bottom:12px;">
-                
+                <input type="text" id="sp-upi" class="input-box" style="margin-bottom:12px;">
                 <label style="font-size:12px; font-weight:bold;">Admission Base Fee (₹):</label>
-                <input type="number" id="sp-fee" placeholder="500" class="input-box" style="margin-bottom:12px;">
-                
+                <input type="number" id="sp-fee" class="input-box" style="margin-bottom:12px;">
                 <label style="font-size:12px; font-weight:bold;">GST Option:</label>
-                <select id="sp-gst-opt" class="input-box" style="margin-bottom:12px;" onchange="toggleGstInput()">
-                    <option value="none">No GST</option>
-                    <option value="percent">Apply GST %</option>
-                </select>
-                
-                <div id="sp-gst-div" style="display:none;">
-                    <label style="font-size:12px; font-weight:bold;">GST Percentage (%):</label>
-                    <input type="number" id="sp-gst-pct" placeholder="18" class="input-box" style="margin-bottom:12px;">
-                </div>
-                
+                <select id="sp-gst-opt" class="input-box" style="margin-bottom:12px;" onchange="toggleGstInput()"><option value="none">No GST</option><option value="percent">Apply GST %</option></select>
+                <div id="sp-gst-div" style="display:none;"><label style="font-size:12px; font-weight:bold;">GST Percentage (%):</label><input type="number" id="sp-gst-pct" class="input-box" style="margin-bottom:12px;"></div>
                 <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px;">
                     <button style="background:#64748b; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="document.getElementById('schoolPaymentModal').style.display='none'">Cancel</button>
                     <button style="background:#22c55e; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="saveSchoolPaymentSetup()">Save Payment Setup 💾</button>
@@ -593,7 +606,7 @@
             </div>
         </div>
 
-        <!-- NEW: PRINTABLE MARKSHEET SECTION (PDF GENERATION VIEW) -->
+        <!-- PRINTABLE MARKSHEET SECTION (PDF GENERATION VIEW) -->
         <div id="marksheet-print-area" style="display:none; padding:40px; border:3px solid #0d3b66; border-radius:10px; background:white;">
             <div style="text-align:center; border-bottom:2px solid #0d3b66; padding-bottom:15px; margin-bottom:20px;">
                 <h1 style="color:#0d3b66; margin-bottom:5px;">🎓 OFFICIAL STUDENT MARKSHEET</h1>
@@ -671,7 +684,6 @@
         }
 
         window.onload = function() {
-            // Restore Tables with Auto-Fix for missing Edit/Print/Delete buttons
             if(localStorage.getItem('schoolStudentTableBody')) { 
                 document.getElementById('school-student-table-body').innerHTML = localStorage.getItem('schoolStudentTableBody'); 
             } else { 
@@ -711,7 +723,7 @@
             updatePublicSchoolDropdown(); renderAdminSchoolsTable(); updateAdminFeeDisplay();
         }
 
-        // --- NEW: PRINT / PDF FEATURE ---
+        // --- PRINT / PDF FEATURE ---
         function printStudent(btn) {
             let row = btn.closest('tr');
             document.getElementById('pm-roll').innerText = row.cells[0].innerText;
@@ -788,7 +800,6 @@
 
             if(!roll || !name) { alert('Roll No & Student Name are required!'); return; }
 
-            // Determine adding/editing school name
             let activeSchoolName = "Added Manually";
             if(document.getElementById('school-dashboard').classList.contains('active')) {
                 activeSchoolName = document.getElementById('school-dash-title').innerText.replace('🏫 ', '');
@@ -803,20 +814,18 @@
                     currentEditRow.cells[4].innerHTML = `<b style="color:#16a34a;">${total}</b>`; 
                 }
                 
-                // Perfect Sync: Update corresponding row in Admin table based on Roll No
                 let adminRows = document.getElementById('student-table-body-admin').rows;
                 for(let i=0; i<adminRows.length; i++){
                     if(adminRows[i].cells[0].innerText === roll) {
                         adminRows[i].cells[1].innerText = name; adminRows[i].cells[2].innerText = fname; adminRows[i].cells[4].innerHTML = `<b style="color:#16a34a;">${total}</b>`;
                     }
                 }
-                alert('Student Updated Successfully! ✏️️');
+                alert('Student Updated Successfully! ✏');
             } else {
                 if(document.getElementById('school-dashboard').classList.contains('active')) {
                     let tbody = document.getElementById('school-student-table-body'); let newRow = tbody.insertRow(); newRow.setAttribute('data-mobile', mobile);
                     newRow.innerHTML = `<td><b>${roll}</b></td><td>${name}</td><td>${fname}</td><td><b style="color:#16a34a;">${total}</b></td><td>${pctGrade}</td><td>${statHtml}</td><td><button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; margin-right:4px;" onclick="openAddEditStudentModal(this)">Edit</button> <button style="background:#1e3a8a; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; margin-right:4px;" onclick="printStudent(this)">Print / PDF</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove(); saveLocalData();">Delete</button></td>`;
                     
-                    // Add to Admin Table instantly
                     let adminTbody = document.getElementById('student-table-body-admin'); let adminRow = adminTbody.insertRow();
                     adminRow.innerHTML = `<td><b>${roll}</b></td><td>${name}</td><td>${fname}</td><td>${activeSchoolName}</td><td><b style="color:#16a34a;">${total}</b></td><td><button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; margin-right:4px;" onclick="openAddEditStudentModal(this)">Edit</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove(); saveLocalData();">Delete</button></td>`;
                 } else if(document.getElementById('admin-dashboard').classList.contains('active')){
@@ -826,6 +835,24 @@
                 alert('New Student Added Successfully! 🎓');
             }
             saveLocalData(); document.getElementById('universalStudentModal').style.display='none';
+        }
+
+        // --- NEW: STATE-BASED SECURE SCHOOL LOGIN ---
+        function validateSchoolLogin() {
+            let state = document.getElementById('school-login-state').value;
+            let sId = document.getElementById('school-login-id').value.trim();
+            let pass = document.getElementById('school-login-pass').value.trim();
+            
+            if(!state) { alert("Please select your registered State!"); return; }
+
+            let match = registeredSchools.find(s => s.id.toLowerCase() === sId.toLowerCase() && s.pass === pass && s.state === state);
+            
+            if(match) {
+                if(match.status !== "Approved") { alert("Your School Registration is still pending Master Admin Approval. You cannot login yet."); return; }
+                document.getElementById('school-dash-title').innerText = `🏫 ${match.name}`; document.getElementById('school-dash-sub').innerText = `ID: ${match.id} | HM: ${match.hm}`;
+                renderPendingApplications(match.id); switchSchoolTab('school-enrolled-tab', document.getElementById('school-dashboard').getElementsByClassName('tab-btn')[0]);
+                openPage('school-dashboard');
+            } else { alert('Invalid State, School ID, or Password!'); }
         }
 
         function validateAdmin() { let u = document.getElementById('admin-user').value.trim(); let p = document.getElementById('admin-pass').value.trim(); if (u === adminProfile.user && p === adminProfile.pass) { document.getElementById('admin-user').value = ""; document.getElementById('admin-pass').value = ""; openPage('admin-dashboard'); } else { alert('Invalid Admin Username or Password!'); } }
@@ -854,7 +881,6 @@
         function openStudentRegistration() { document.getElementById('student-form-step').style.display = 'block'; document.getElementById('student-payment-step').style.display = 'none'; openPage('student-reg'); }
         function validateStudentForm() { let reqIds = ['reg-s-name', 'reg-s-gender', 'reg-s-dob', 'reg-s-mname', 'reg-s-fname', 'reg-s-aadhaar', 'reg-s-mobile', 'reg-s-blood', 'reg-s-minority', 'reg-s-category', 'reg-s-address', 'reg-s-pin', 'reg-s-state', 'reg-s-lang', 'reg-s-mail', 'reg-s-school']; for(let id of reqIds) { if(!document.getElementById(id).value.trim()) { alert('Please fill all Mandatory (*) Fields correctly!'); return; } } let sId = document.getElementById('reg-s-school').value; let school = registeredSchools.find(s => s.id === sId); let upi = school.upi || "default@upi"; let fee = school.baseFee || 500; let gst = school.hasGst ? fee * (school.gstPct / 100) : 0; currentStudentFeeTotal = fee + gst; document.getElementById('spay-school-name').innerText = school.name; document.getElementById('display-stu-fee').innerText = fee; document.getElementById('display-stu-gst').innerText = gst; document.getElementById('display-stu-total').innerText = currentStudentFeeTotal; document.getElementById('display-stu-upi').innerText = upi; document.getElementById('stu-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=${upi}&pn=SchoolAdmission&am=${currentStudentFeeTotal}&cu=INR`; document.getElementById('student-form-step').style.display = 'none'; document.getElementById('student-payment-step').style.display = 'block'; let timeLeft = 30; document.getElementById('payment-timer').innerText = timeLeft; clearInterval(paymentTimerInterval); paymentTimerInterval = setInterval(() => { timeLeft--; document.getElementById('payment-timer').innerText = timeLeft; if(timeLeft <= 0) { clearInterval(paymentTimerInterval); alert("Payment Timeout!"); goHome(); } }, 1000); }
         function submitStudentApplication() { let utr = document.getElementById('student-utr').value.trim(); if(!utr) { alert("Please enter Transaction ID to verify payment!"); return; } clearInterval(paymentTimerInterval); let newApp = { appId: Math.floor(Math.random() * 90000 + 10000), name: document.getElementById('reg-s-name').value, fname: document.getElementById('reg-s-fname').value, mobile: document.getElementById('reg-s-mobile').value, gender: document.getElementById('reg-s-gender').value, schoolId: document.getElementById('reg-s-school').value, schoolName: document.getElementById('reg-s-school').options[document.getElementById('reg-s-school').selectedIndex].text, utr: utr, amt: currentStudentFeeTotal }; pendingApplications.push(newApp); saveLocalData(); document.getElementById('student-reg').classList.remove('active'); document.getElementById('receipt-title').innerText = "🏫 OFFICIAL ADMISSION RECEIPT"; document.getElementById('receipt-sub').innerText = "Submit this Hard Copy to your Respective School"; document.getElementById('rec-school').parentElement.style.display = 'block'; document.getElementById('rec-app-id').innerText = newApp.appId; document.getElementById('rec-date').innerText = new Date().toLocaleDateString(); document.getElementById('rec-name').innerText = newApp.name; document.getElementById('rec-fname').innerText = newApp.fname; document.getElementById('rec-info').innerText = `Mobile: ${newApp.mobile}`; document.getElementById('rec-school').innerText = newApp.schoolName; document.getElementById('rec-utr').innerText = utr; document.getElementById('rec-amt').innerText = newApp.amt; document.getElementById('receipt-section').classList.add('active'); updateNotificationBadge(); }
-        function validateSchoolLogin() { let sId = document.getElementById('school-login-id').value.trim(); let pass = document.getElementById('school-login-pass').value.trim(); let match = registeredSchools.find(s => s.id.toLowerCase() === sId.toLowerCase() && s.pass === pass); if(match) { if(match.status !== "Approved") { alert("Your School Registration is still pending Master Admin Approval."); return; } document.getElementById('school-dash-title').innerText = `🏫 ${match.name}`; document.getElementById('school-dash-sub').innerText = `ID: ${match.id} | HM: ${match.hm}`; renderPendingApplications(match.id); switchSchoolTab('school-enrolled-tab', document.getElementById('school-dashboard').getElementsByClassName('tab-btn')[0]); openPage('school-dashboard'); } else { alert('Invalid School ID or Password!'); } }
         function openSchoolForgotPassword() { document.getElementById('school-login-area').style.display = 'none'; document.getElementById('school-forgot-area').style.display = 'block'; }
         function cancelSchoolForgot() { document.getElementById('school-forgot-area').style.display = 'none'; document.getElementById('school-login-area').style.display = 'block'; document.getElementById('school-login-otp-div').style.display = 'none'; document.getElementById('school-newpass-div').style.display = 'none'; resettingSchoolId = ""; }
         function sendSchoolLoginOTP() { let email = document.getElementById('school-reset-email').value.trim(); if(!email) { alert("Please enter your registered School Email!"); return; } let school = registeredSchools.find(s => s.email && s.email.toLowerCase() === email.toLowerCase()); if(!school) { alert("This email is not registered or approved!"); return; } resettingSchoolId = school.id; schLoginGenOtp = Math.floor(100000 + Math.random() * 900000).toString(); alert(`Simulation: OTP sent to ${email}.\nOTP is: ${schLoginGenOtp}`); document.getElementById('school-login-otp-div').style.display = 'block'; }
