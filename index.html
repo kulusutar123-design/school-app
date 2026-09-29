@@ -85,7 +85,7 @@
         <div id="home-view">
             <div class="notice-board">
                 <h4>📢 Important Notice Board</h4>
-                <p id="display-notice">• Official Marksheet & Portal System is live.<br>• New Feature: OTP based School Registration & Admin Approval system active.</p>
+                <p id="display-notice">• Official Marksheet & Portal System is live.<br>• Added: Admin Profile, OTP Verification for Forgot Password.</p>
             </div>
 
             <div class="results-btn-card">
@@ -99,7 +99,7 @@
                     <div class="welcome-card">
                         <h3>🌟 Welcome to Digital School Management</h3>
                         <p>Manage your schools, student admissions, and records securely on the cloud platform.</p>
-                        <p><b>✨ Features:</b> OTP Registration, Admin Payment Approvals, Complete Auto-Save DB.</p>
+                        <p><b>✨ Features:</b> Admin Forgot Password via OTP, Profile Management, Full DB Save.</p>
                     </div>
 
                     <div class="section-title">📌 Quick Portal Actions</div>
@@ -146,7 +146,6 @@
                         </select>
                     </div>
                     
-                    <!-- OTP & Password Section -->
                     <div style="grid-column: span 2; background: #f1f5f9; padding: 15px; border-radius: 8px; border: 1px solid #cbd5e1;">
                         <label>6. MAIL ID <span class="req">*</span></label>
                         <div style="display:flex; gap:10px; margin-bottom:10px;">
@@ -168,7 +167,6 @@
                         </div>
                     </div>
                 </div>
-                
                 <button style="background:#2563eb; color:white; width:100%; padding:15px; border:none; border-radius:8px; font-weight:bold; font-size:16px; margin-top:20px; cursor:pointer;" onclick="validateSchoolForm()">Next ➡️ Proceed to Payment</button>
             </div>
 
@@ -176,15 +174,12 @@
             <div id="school-payment-step" style="display:none; text-align:center;">
                 <h3 style="color:#0d3b66; margin-bottom:10px;">💳 School Registration Fee Payment</h3>
                 <p style="color:#dc2626; font-weight:bold; font-size:18px; margin-bottom:15px;">⏳ Time Left: <span id="school-payment-timer">30</span> Seconds</p>
-                
                 <div style="background:#f8fafc; border:1px dashed #cbd5e1; padding:25px; border-radius:12px; margin-bottom:20px; display:inline-block;">
                     <h4 style="color:#0d3b66; margin-bottom:10px;">Payment to Master Admin</h4>
                     <p style="font-size:14px; color:#64748b; margin-bottom:5px;">Base Fee: ₹<span id="display-base-fee">1000</span> + GST (<span id="display-gst-pct">18</span>%): ₹<span id="display-gst-amt">180</span></p>
                     <h3 style="color:#1e3a8a; margin-bottom:15px;">Total Payable: ₹<span id="display-total-fee">1180</span></h3>
-                    
                     <p style="font-size:14px; color:#64748b; margin-bottom:10px;">Scan QR Code to pay via Admin UPI: <b id="display-upi">kulu123@upi</b></p>
                     <img id="dynamic-qr-img" src="" alt="Admin QR" style="border:4px solid white; box-shadow:0 4px 10px rgba(0,0,0,0.1); border-radius:8px;">
-                    
                     <input type="text" id="reg-school-utr" placeholder="Enter UPI UTR Transaction ID" class="input-box" style="margin-top:15px; text-align:center; font-weight:bold;">
                 </div>
                 <br>
@@ -236,10 +231,8 @@
                     <h4 id="spay-school-name" style="color:#0d3b66; margin-bottom:10px;"></h4>
                     <p style="font-size:14px; color:#64748b; margin-bottom:5px;">Base Fee: ₹<span id="display-stu-fee"></span> + GST: ₹<span id="display-stu-gst"></span></p>
                     <h3 style="color:#1e3a8a; margin-bottom:15px;">Total Payable: ₹<span id="display-stu-total"></span></h3>
-                    
                     <p style="color:#64748b; margin-bottom:10px;">Scan QR Code to pay to School UPI: <b id="display-stu-upi"></b></p>
                     <img id="stu-qr-img" src="" alt="QR" style="border:4px solid white; box-shadow:0 4px 10px rgba(0,0,0,0.1); border-radius:8px;">
-                    
                     <input type="text" id="student-utr" placeholder="Enter UPI Transaction ID here" class="input-box" style="margin-top:15px; text-align:center; font-weight:bold;">
                 </div>
                 <br>
@@ -292,7 +285,6 @@
                 <button class="tab-btn" onclick="switchSchoolTab('school-pending-tab', this)" style="position:relative;">🔔 Admission Requests <span id="notif-badge" style="background:red; color:white; border-radius:50%; padding:2px 6px; font-size:12px; display:none;">1</span></button>
             </div>
 
-            <!-- Tab 1: Enrolled Students -->
             <div id="school-enrolled-tab" class="school-tab-content">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                     <h3>🎓 Approved Students & Records</h3>
@@ -308,7 +300,6 @@
                 </table>
             </div>
 
-            <!-- Tab 2: Pending Admissions -->
             <div id="school-pending-tab" class="school-tab-content" style="display:none;">
                 <h3>🔔 New Admission Applications</h3>
                 <table>
@@ -322,14 +313,44 @@
             </div>
         </div>
 
-        <!-- 5. ADMIN LOGIN SECTION -->
+        <!-- 5. ADMIN LOGIN SECTION (WITH FORGOT PASSWORD VIA OTP) -->
         <div id="admin-login" class="content-section">
             <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
-            <h3>👑 Master Administrator Login</h3>
-            <p style="margin: 10px 0 20px 0; color: #64748b;">Username: <b>KULU123</b> | Password: <b>Admin@2026</b></p>
-            <input type="text" id="admin-user" placeholder="Master Username" class="input-box" style="margin-bottom:15px;">
-            <input type="password" id="admin-pass" placeholder="Master Password" class="input-box" style="margin-bottom:20px;">
-            <button class="btn-login btn-admin" onclick="validateAdmin()">Login 🚀</button>
+            
+            <div id="admin-login-area">
+                <h3>👑 Master Administrator Login</h3>
+                <p style="margin: 10px 0 20px 0; color: #64748b;">Username: <b id="display-admin-user">KULU123</b></p>
+                <input type="text" id="admin-user" placeholder="Master Username" class="input-box" style="margin-bottom:15px;">
+                <input type="password" id="admin-pass" placeholder="Master Password" class="input-box" style="margin-bottom:15px;">
+                <p style="text-align:right; font-size:14px; margin-bottom:15px;"><a href="#" onclick="openAdminForgotPassword()" style="color:#2563eb;">Forgot Username / Password?</a></p>
+                <button class="btn-login btn-admin" onclick="validateAdmin()">Login 🚀</button>
+            </div>
+
+            <!-- Admin Forgot Password / OTP Flow -->
+            <div id="admin-forgot-area" style="display:none; background:#f1f5f9; padding:20px; border-radius:12px; border:1px solid #cbd5e1;">
+                <h4 style="color:#0d3b66; margin-bottom:10px;">🔐 Reset Admin Credentials</h4>
+                <p style="font-size:14px; color:#64748b; margin-bottom:15px;">Enter your registered Admin Email to receive an OTP.</p>
+                
+                <div style="display:flex; gap:10px; margin-bottom:10px;">
+                    <input type="email" id="admin-reset-email" placeholder="Enter Admin Email" class="input-box" style="flex:1;">
+                    <button style="background:#0d3b66; color:white; border:none; padding:10px 15px; border-radius:6px; cursor:pointer;" onclick="sendAdminOTP()">Send OTP</button>
+                </div>
+                
+                <div id="admin-otp-div" style="display:none; margin-bottom:10px;">
+                    <label style="color:#b45309; font-size:12px; font-weight:bold;">Enter OTP:</label>
+                    <div style="display:flex; gap:10px; margin-top:5px;">
+                        <input type="text" id="admin-reset-otp" placeholder="6-digit OTP" class="input-box" style="flex:1; border-color:#f59e0b;">
+                        <button style="background:#f59e0b; color:white; border:none; padding:10px 15px; border-radius:6px; cursor:pointer; font-weight:bold;" onclick="verifyAdminOTP()">Verify OTP ✅</button>
+                    </div>
+                </div>
+
+                <div id="admin-newpass-div" style="display:none;">
+                    <label style="color:#166534; font-size:12px; font-weight:bold;">Set New Password:</label>
+                    <input type="password" id="admin-new-pass-input" placeholder="New Password" class="input-box" style="margin-top:5px; margin-bottom:10px; border-color:#16a34a;">
+                    <button style="background:#16a34a; color:white; border:none; width:100%; padding:10px 15px; border-radius:6px; cursor:pointer; font-weight:bold;" onclick="saveNewAdminPassword()">Update Password & Login</button>
+                </div>
+                <button style="background:transparent; color:#64748b; border:none; margin-top:15px; cursor:pointer; text-decoration:underline;" onclick="cancelAdminForgot()">Cancel</button>
+            </div>
         </div>
 
         <!-- 6. MASTER ADMIN DASHBOARD -->
@@ -341,6 +362,7 @@
                 <button class="tab-btn active-tab" onclick="switchAdminTab('schools-tab', this)" style="position:relative;">🏫 School Approvals <span id="admin-notif-badge" style="background:red; color:white; border-radius:50%; padding:2px 6px; font-size:12px; display:none;">1</span></button>
                 <button class="tab-btn" onclick="switchAdminTab('students-tab-admin', this)">🎓 All Students DB</button>
                 <button class="tab-btn" onclick="switchAdminTab('payment-settings-tab', this)">💳 Global Payments</button>
+                <button class="tab-btn" onclick="switchAdminTab('admin-profile-tab', this)">👤 Admin Profile & Security</button>
                 <button class="tab-btn" onclick="switchAdminTab('settings-tab', this)">⚙️ Portal Settings</button>
             </div>
 
@@ -375,7 +397,7 @@
                 </table>
             </div>
 
-            <!-- Global Payment Settings (Master Admin) -->
+            <!-- Global Payment Settings -->
             <div id="payment-settings-tab" class="admin-tab-content" style="display:none;">
                 <h3>💳 Master Admin Payment Settings (For School Registration)</h3>
                 <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1; max-width:600px;">
@@ -386,6 +408,36 @@
                     <label style="font-weight:bold; display:block; margin-bottom:5px;">GST Percentage (%):</label>
                     <input type="number" id="set-gst" value="18" class="input-box" style="margin-bottom:20px;">
                     <button style="background:#16a34a; color:white; border:none; padding:10px 25px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="saveAdminPaymentSettings()">Save Global Payment 💾</button>
+                </div>
+            </div>
+
+            <!-- Admin Profile & Security -->
+            <div id="admin-profile-tab" class="admin-tab-content" style="display:none;">
+                <h3>👤 Admin Profile & Security</h3>
+                <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1; max-width:600px; margin-bottom:20px;">
+                    <h4 style="color:#0d3b66; margin-bottom:15px;">Personal Data</h4>
+                    <label style="font-weight:bold; display:block; margin-bottom:5px;">Admin Name:</label>
+                    <input type="text" id="prof-admin-name" class="input-box" style="margin-bottom:15px;">
+                    <label style="font-weight:bold; display:block; margin-bottom:5px;">Admin Username:</label>
+                    <input type="text" id="prof-admin-user" class="input-box" style="margin-bottom:15px;">
+                    <label style="font-weight:bold; display:block; margin-bottom:5px;">Admin Email (For OTP verification):</label>
+                    <input type="email" id="prof-admin-email" class="input-box" style="margin-bottom:15px;">
+                    <button style="background:#2563eb; color:white; border:none; padding:10px 25px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="saveAdminProfile()">Save Personal Data 💾</button>
+                </div>
+
+                <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1; max-width:600px;">
+                    <h4 style="color:#dc2626; margin-bottom:15px;">🔐 Change Password (Requires OTP)</h4>
+                    <button style="background:#0d3b66; color:white; border:none; padding:10px 15px; border-radius:6px; cursor:pointer; margin-bottom:15px;" onclick="sendAdminProfileOTP()">Send OTP to Email</button>
+                    
+                    <div id="prof-otp-div" style="display:none; margin-bottom:15px;">
+                        <input type="text" id="prof-otp-input" placeholder="Enter OTP" class="input-box" style="margin-bottom:10px;">
+                        <button style="background:#f59e0b; color:white; border:none; padding:10px 15px; border-radius:6px; cursor:pointer;" onclick="verifyAdminProfileOTP()">Verify OTP</button>
+                    </div>
+
+                    <div id="prof-newpass-div" style="display:none;">
+                        <input type="password" id="prof-new-pass" placeholder="Enter New Password" class="input-box" style="margin-bottom:10px;">
+                        <button style="background:#16a34a; color:white; border:none; padding:10px 25px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="updateAdminPasswordFromProfile()">Update Password 💾</button>
+                    </div>
                 </div>
             </div>
 
@@ -400,7 +452,7 @@
                 <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1;">
                     <h4>📢 Edit / Update Notice Board</h4>
                     <textarea id="notice-input" rows="5" class="input-box" style="margin-bottom:10px;">• Official Marksheet & Portal System is live.
-• Everything is Auto-Saved. Admin & School both can Add, Edit, Delete Students & Subjects.</textarea>
+• Added: Admin Profile, OTP Verification for Forgot Password.</textarea>
                     <button style="background:#16a34a; color:white; border:none; padding:8px 20px; border-radius:6px; cursor:pointer;" onclick="updateNoticeBoard()">Save Notice Board 💾</button>
                 </div>
             </div>
@@ -434,7 +486,6 @@
                     <div style="grid-column: span 2;"><label style="font-size:12px; font-weight:bold;">18. Mail ID:</label><input type="text" id="us-mail" class="input-box"></div>
                 </div>
 
-                <!-- SUBJECT ADD / EDIT / DELETE -->
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                     <h4 style="color:#1e3a8a; font-size:15px; border-bottom:1px solid #cbd5e1; padding-bottom:5px; width:100%;">Marks Awarded (Subjects) 
                         <button type="button" style="background:#16a34a; color:white; border:none; padding:4px 10px; border-radius:4px; font-size:12px; cursor:pointer; float:right;" onclick="addUniversalSubjectRow()">➕ Add Subject</button>
@@ -527,6 +578,7 @@
 
     <script>
         // --- LOCAL STORAGE DATA MANAGEMENT ---
+        let adminProfile = JSON.parse(localStorage.getItem('adminProfile')) || { name: "Master Admin", user: "KULU123", email: "admin@portal.com", pass: "Admin@2026" };
         let adminPaymentConfig = JSON.parse(localStorage.getItem('adminPaymentConfig')) || { upiId: "kulu123@upi", baseFee: 1000, gstPct: 18 };
         
         let defaultSchool = { id: "155CB", name: "SRI BAIRAGI SARASWATI SISHU VIDYAMANDIR", pass: "school123", hm: "ANTARYAMI DAS", mobile: "9876543210", state: "Odisha", email: "school@gmail.com", status: "Approved", utr: "MANUAL", upi: "school155@upi", baseFee: 500, hasGst: true, gstPct: 18 };
@@ -534,13 +586,12 @@
         let registeredSchools = JSON.parse(localStorage.getItem('registeredSchools')) || [defaultSchool];
         let pendingApplications = JSON.parse(localStorage.getItem('pendingApplications')) || [];
         
-        let schoolPaymentTimerInterval;
-        let paymentTimerInterval;
-        let currentStudentFeeTotal = 0;
-        let isSchoolOtpVerified = false;
-        let generatedSchoolOtp = "";
+        let schoolPaymentTimerInterval; let paymentTimerInterval; let currentStudentFeeTotal = 0;
+        let isSchoolOtpVerified = false; let generatedSchoolOtp = "";
+        let adminGenOtp = ""; let profGenOtp = "";
 
         function saveLocalData() {
+            localStorage.setItem('adminProfile', JSON.stringify(adminProfile));
             localStorage.setItem('adminPaymentConfig', JSON.stringify(adminPaymentConfig));
             localStorage.setItem('registeredSchools', JSON.stringify(registeredSchools));
             localStorage.setItem('pendingApplications', JSON.stringify(pendingApplications));
@@ -549,20 +600,17 @@
         }
 
         window.onload = function() {
-            if(localStorage.getItem('schoolStudentTableBody')) {
-                document.getElementById('school-student-table-body').innerHTML = localStorage.getItem('schoolStudentTableBody');
-            } else {
-                document.getElementById('school-student-table-body').innerHTML = `<tr><td><b>155CB0197</b></td><td>DIBYANSHI DAS</td><td>ANTARYAMI DAS</td><td>9876543210</td><td><b style="color:#16a34a;">360 / 600</b></td><td><button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openAddEditStudentModal(this)">Edit</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove(); saveLocalData();">Delete</button></td></tr>`;
-            }
-            if(localStorage.getItem('adminStudentTableBody')) {
-                document.getElementById('student-table-body-admin').innerHTML = localStorage.getItem('adminStudentTableBody');
-            } else {
-                document.getElementById('student-table-body-admin').innerHTML = `<tr><td><b>155CB0197</b></td><td>DIBYANSHI DAS</td><td>ANTARYAMI DAS</td><td>SRI BAIRAGI SARASWATI SISHU VIDYAMANDIR</td><td><b style="color:#16a34a;">360 / 600</b></td><td><button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openAddEditStudentModal(this)">Edit</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove(); saveLocalData();">Delete</button></td></tr>`;
-            }
+            // Load tables
+            if(localStorage.getItem('schoolStudentTableBody')) { document.getElementById('school-student-table-body').innerHTML = localStorage.getItem('schoolStudentTableBody'); }
+            if(localStorage.getItem('adminStudentTableBody')) { document.getElementById('student-table-body-admin').innerHTML = localStorage.getItem('adminStudentTableBody'); }
 
-            updatePublicSchoolDropdown();
-            renderAdminSchoolsTable();
-            updateAdminFeeDisplay();
+            // Load Admin Profile UI
+            document.getElementById('display-admin-user').innerText = adminProfile.user;
+            document.getElementById('prof-admin-name').value = adminProfile.name;
+            document.getElementById('prof-admin-user').value = adminProfile.user;
+            document.getElementById('prof-admin-email').value = adminProfile.email;
+
+            updatePublicSchoolDropdown(); renderAdminSchoolsTable(); updateAdminFeeDisplay();
         }
 
         function openPage(pageId) {
@@ -575,11 +623,89 @@
             let sections = document.getElementsByClassName('content-section');
             for (let sec of sections) { sec.classList.remove('active'); }
             document.getElementById('home-view').style.display = 'block';
-            clearInterval(paymentTimerInterval);
-            clearInterval(schoolPaymentTimerInterval);
+            clearInterval(paymentTimerInterval); clearInterval(schoolPaymentTimerInterval);
         }
 
-        // --- 1. NEW SCHOOL REGISTRATION FLOW (OTP + PAYMENT) ---
+        // --- ADMIN LOGIN, FORGOT PASSWORD & PROFILE ---
+        function validateAdmin() {
+            let u = document.getElementById('admin-user').value.trim();
+            let p = document.getElementById('admin-pass').value.trim();
+            if (u === adminProfile.user && p === adminProfile.pass) { 
+                document.getElementById('admin-user').value = ""; document.getElementById('admin-pass').value = "";
+                openPage('admin-dashboard'); 
+            } else { alert('Invalid Admin Username or Password!'); }
+        }
+
+        function openAdminForgotPassword() {
+            document.getElementById('admin-login-area').style.display = 'none';
+            document.getElementById('admin-forgot-area').style.display = 'block';
+        }
+        function cancelAdminForgot() {
+            document.getElementById('admin-forgot-area').style.display = 'none';
+            document.getElementById('admin-login-area').style.display = 'block';
+        }
+
+        function sendAdminOTP() {
+            let email = document.getElementById('admin-reset-email').value.trim();
+            if(email !== adminProfile.email) { alert("Email does not match registered Admin Email!"); return; }
+            adminGenOtp = Math.floor(100000 + Math.random() * 900000).toString();
+            alert(`Simulation: OTP sent to ${email}.\nOTP is: ${adminGenOtp}`);
+            document.getElementById('admin-otp-div').style.display = 'block';
+        }
+        function verifyAdminOTP() {
+            if(document.getElementById('admin-reset-otp').value.trim() === adminGenOtp) {
+                alert("OTP Verified!");
+                document.getElementById('admin-otp-div').style.display = 'none';
+                document.getElementById('admin-newpass-div').style.display = 'block';
+            } else { alert("Invalid OTP!"); }
+        }
+        function saveNewAdminPassword() {
+            let newPass = document.getElementById('admin-new-pass-input').value.trim();
+            if(!newPass) { alert("Enter a new password!"); return; }
+            adminProfile.pass = newPass; saveLocalData();
+            alert("Admin Password updated successfully! Please login with new password.");
+            cancelAdminForgot();
+        }
+
+        function saveAdminProfile() {
+            adminProfile.name = document.getElementById('prof-admin-name').value.trim();
+            adminProfile.user = document.getElementById('prof-admin-user').value.trim();
+            adminProfile.email = document.getElementById('prof-admin-email').value.trim();
+            saveLocalData();
+            document.getElementById('display-admin-user').innerText = adminProfile.user;
+            alert("Admin Profile Data Saved!");
+        }
+
+        function sendAdminProfileOTP() {
+            profGenOtp = Math.floor(100000 + Math.random() * 900000).toString();
+            alert(`Simulation: OTP sent to ${adminProfile.email}.\nOTP is: ${profGenOtp}`);
+            document.getElementById('prof-otp-div').style.display = 'block';
+        }
+        function verifyAdminProfileOTP() {
+            if(document.getElementById('prof-otp-input').value.trim() === profGenOtp) {
+                alert("OTP Verified! You can now enter a new password.");
+                document.getElementById('prof-otp-div').style.display = 'none';
+                document.getElementById('prof-newpass-div').style.display = 'block';
+            } else { alert("Invalid OTP!"); }
+        }
+        function updateAdminPasswordFromProfile() {
+            let newPass = document.getElementById('prof-new-pass').value.trim();
+            if(!newPass) { alert("Enter a new password!"); return; }
+            adminProfile.pass = newPass; saveLocalData();
+            alert("Admin Password Changed Successfully!");
+            document.getElementById('prof-newpass-div').style.display = 'none';
+        }
+
+        function switchAdminTab(tabId, btn) {
+            let contents = document.getElementsByClassName('admin-tab-content');
+            for(let c of contents) { c.style.display = 'none'; }
+            document.getElementById(tabId).style.display = 'block';
+            let btns = document.getElementById('admin-dashboard').getElementsByClassName('tab-btn');
+            for(let b of btns) { b.classList.remove('active-tab'); }
+            btn.classList.add('active-tab');
+        }
+
+        // --- PUBLIC NEW SCHOOL REGISTRATION FLOW ---
         function updateAdminFeeDisplay() {
             let gstAmt = (adminPaymentConfig.baseFee * adminPaymentConfig.gstPct) / 100;
             let totalFee = adminPaymentConfig.baseFee + gstAmt;
@@ -600,7 +726,6 @@
             document.getElementById('school-pass-div').style.display = 'none';
             openPage('school-reg');
         }
-
         function sendSchoolOTP() {
             let email = document.getElementById('reg-school-email').value.trim();
             if(!email) { alert("Please enter Mail ID first!"); return; }
@@ -611,35 +736,27 @@
         function verifySchoolOTP() {
             let entered = document.getElementById('reg-school-otp').value.trim();
             if(entered === generatedSchoolOtp) {
-                isSchoolOtpVerified = true;
-                alert("OTP Verified Successfully!");
+                isSchoolOtpVerified = true; alert("OTP Verified Successfully!");
                 document.getElementById('school-otp-div').style.display = 'none';
                 document.getElementById('school-pass-div').style.display = 'block';
-            } else {
-                alert("Invalid OTP! Try again.");
-            }
+            } else { alert("Invalid OTP! Try again."); }
         }
-
         function validateSchoolForm() {
             let reqIds = ['reg-school-name', 'reg-school-id', 'reg-hm-name', 'reg-hm-mobile', 'reg-school-state', 'reg-school-email'];
-            for(let id of reqIds) {
-                if(!document.getElementById(id).value.trim()) { alert('Please fill all Mandatory (*) Fields correctly!'); return; }
-            }
+            for(let id of reqIds) { if(!document.getElementById(id).value.trim()) { alert('Please fill all Mandatory (*) Fields!'); return; } }
             if(!isSchoolOtpVerified) { alert("You must Verify Email OTP to proceed!"); return; }
             if(!document.getElementById('reg-school-pass').value.trim()) { alert("Please Create a Password!"); return; }
 
             document.getElementById('school-form-step').style.display = 'none';
             document.getElementById('school-payment-step').style.display = 'block';
 
-            let timeLeft = 30; 
-            document.getElementById('school-payment-timer').innerText = timeLeft;
+            let timeLeft = 30; document.getElementById('school-payment-timer').innerText = timeLeft;
             clearInterval(schoolPaymentTimerInterval);
             schoolPaymentTimerInterval = setInterval(() => {
                 timeLeft--; document.getElementById('school-payment-timer').innerText = timeLeft;
                 if(timeLeft <= 0) { clearInterval(schoolPaymentTimerInterval); alert("Payment Timeout!"); goHome(); }
             }, 1000);
         }
-
         function submitSchoolRegistration() {
             let utr = document.getElementById('reg-school-utr').value.trim();
             if(!utr) { alert("Please enter Transaction ID to verify payment!"); return; }
@@ -653,15 +770,11 @@
                 state: document.getElementById('reg-school-state').value,
                 email: document.getElementById('reg-school-email').value.trim(),
                 pass: document.getElementById('reg-school-pass').value.trim(),
-                utr: utr,
-                status: "Pending", // Requires Admin Approval
-                upi: "", baseFee: 500, hasGst: false, gstPct: 0
+                utr: utr, status: "Pending", upi: "", baseFee: 500, hasGst: false, gstPct: 0
             };
-            
             registeredSchools.push(newSchool);
             saveLocalData(); renderAdminSchoolsTable(); updatePublicSchoolDropdown();
 
-            // Generate App Receipt
             document.getElementById('school-reg').classList.remove('active');
             let d = new Date();
             document.getElementById('rec-app-id').innerText = "SCH-" + Math.floor(Math.random()*9000+1000);
@@ -670,14 +783,13 @@
             document.getElementById('receipt-sub').innerText = "Awaiting Master Admin Approval.";
             document.getElementById('rec-name').innerText = newSchool.name + " (" + newSchool.id + ")";
             document.getElementById('rec-info').innerText = `HM: ${newSchool.hm} | Mobile: ${newSchool.mobile}`;
-            document.getElementById('rec-school').parentElement.style.display = 'none'; // hide target school for this receipt
+            document.getElementById('rec-school').parentElement.style.display = 'none'; 
             document.getElementById('rec-utr').innerText = utr;
             document.getElementById('rec-amt').innerText = "1180 (Reg Fee)";
 
             document.getElementById('receipt-section').classList.add('active');
             alert('School Registered Successfully! Application sent to Master Admin for approval.');
         }
-
 
         // --- ADMIN CONTROLS FOR SCHOOLS ---
         function renderAdminSchoolsTable() {
@@ -686,54 +798,31 @@
             let pendingCount = 0;
 
             registeredSchools.forEach(s => {
-                let statusHtml = "";
-                let actionsHtml = "";
-                
+                let statusHtml = ""; let actionsHtml = "";
                 if(s.status === "Pending") {
                     pendingCount++;
                     statusHtml = `<span style="background:#fef08a; color:#854d0e; padding:4px 10px; border-radius:6px; font-weight:bold;">Pending ⏳</span>`;
-                    actionsHtml = `
-                        <button style="background:#f59e0b; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openVerifyEditSchool('${s.id}')">Verify/Edit ✏️</button>
-                        <button style="background:#16a34a; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="approveSchool('${s.id}')">Approve ✅</button>
-                        <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="rejectSchool('${s.id}')">Reject ❌</button>
-                    `;
+                    actionsHtml = `<button style="background:#f59e0b; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openVerifyEditSchool('${s.id}')">Verify/Edit ✏️</button> <button style="background:#16a34a; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="approveSchool('${s.id}')">Approve ✅</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="rejectSchool('${s.id}')">Reject ❌</button>`;
                 } else {
                     statusHtml = `<span class="badge-approved">Approved ✅</span>`;
                     actionsHtml = `<button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openSchoolPaymentSetup('${s.id}')">💳 Set Payment</button> <button style="background:#f59e0b; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openVerifyEditSchool('${s.id}')">Edit ✏️</button>`;
                 }
 
-                tbody.innerHTML += `<tr>
-                    <td>${s.name}</td><td><b>${s.id}</b></td>
-                    <td><input type="text" value="${s.pass}" onchange="updateSchoolPassword('${s.id}', this.value)" style="padding:5px; width:90px;"></td>
-                    <td>${s.hm}</td><td>${s.state || "N/A"}</td>
-                    <td><b style="color:#16a34a;">${s.utr || "N/A"}</b></td>
-                    <td>${statusHtml}</td>
-                    <td>${actionsHtml}</td>
-                </tr>`;
+                tbody.innerHTML += `<tr><td>${s.name}</td><td><b>${s.id}</b></td><td><input type="text" value="${s.pass}" onchange="updateSchoolPassword('${s.id}', this.value)" style="padding:5px; width:90px;"></td><td>${s.hm}</td><td>${s.state || "N/A"}</td><td><b style="color:#16a34a;">${s.utr || "N/A"}</b></td><td>${statusHtml}</td><td>${actionsHtml}</td></tr>`;
             });
-
-            // Update Admin Notification Badge
             let badge = document.getElementById('admin-notif-badge');
-            if(pendingCount > 0) { badge.innerText = pendingCount; badge.style.display = 'inline-block'; } 
-            else { badge.style.display = 'none'; }
+            if(pendingCount > 0) { badge.innerText = pendingCount; badge.style.display = 'inline-block'; } else { badge.style.display = 'none'; }
         }
 
         function approveSchool(id) {
             let school = registeredSchools.find(s => s.id === id);
-            if(school) {
-                school.status = "Approved";
-                saveLocalData(); renderAdminSchoolsTable(); updatePublicSchoolDropdown();
-                alert(`School "${school.name}" Approved successfully! They can now login.`);
-            }
+            if(school) { school.status = "Approved"; saveLocalData(); renderAdminSchoolsTable(); updatePublicSchoolDropdown(); alert(`School "${school.name}" Approved successfully!`); }
         }
-
         function rejectSchool(id) {
-            if(confirm("Are you sure you want to Reject and Delete this school application?")) {
-                registeredSchools = registeredSchools.filter(s => s.id !== id);
-                saveLocalData(); renderAdminSchoolsTable(); updatePublicSchoolDropdown();
+            if(confirm("Are you sure you want to Reject and Delete this school?")) {
+                registeredSchools = registeredSchools.filter(s => s.id !== id); saveLocalData(); renderAdminSchoolsTable(); updatePublicSchoolDropdown();
             }
         }
-
         function openVerifyEditSchool(id) {
             let school = registeredSchools.find(s => s.id === id);
             if(school) {
@@ -746,7 +835,6 @@
                 document.getElementById('editSchoolModal').style.display = 'flex';
             }
         }
-
         function saveEditedSchool() {
             let oldId = document.getElementById('edit-sch-old-id').value;
             let school = registeredSchools.find(s => s.id === oldId);
@@ -757,8 +845,7 @@
                 school.mobile = document.getElementById('edit-sch-mobile').value.trim();
                 school.state = document.getElementById('edit-sch-state').value;
                 saveLocalData(); renderAdminSchoolsTable(); updatePublicSchoolDropdown();
-                document.getElementById('editSchoolModal').style.display = 'none';
-                alert("School details verified and updated!");
+                document.getElementById('editSchoolModal').style.display = 'none'; alert("School details updated!");
             }
         }
 
@@ -767,11 +854,7 @@
             let select = document.getElementById('reg-s-school');
             if(!select) return;
             select.innerHTML = '<option value="">-- Choose School --</option>';
-            registeredSchools.forEach(s => { 
-                if(s.status === "Approved") {
-                    select.innerHTML += `<option value="${s.id}">${s.name} (${s.id})</option>`; 
-                }
-            });
+            registeredSchools.forEach(s => { if(s.status === "Approved") { select.innerHTML += `<option value="${s.id}">${s.name} (${s.id})</option>`; } });
         }
         function openStudentRegistration() {
             document.getElementById('student-form-step').style.display = 'block';
@@ -780,9 +863,7 @@
         }
         function validateStudentForm() {
             let reqIds = ['reg-s-name', 'reg-s-gender', 'reg-s-dob', 'reg-s-mname', 'reg-s-fname', 'reg-s-aadhaar', 'reg-s-mobile', 'reg-s-blood', 'reg-s-minority', 'reg-s-category', 'reg-s-address', 'reg-s-pin', 'reg-s-state', 'reg-s-lang', 'reg-s-mail', 'reg-s-school'];
-            for(let id of reqIds) {
-                if(!document.getElementById(id).value.trim()) { alert('Please fill all Mandatory (*) Fields correctly!'); return; }
-            }
+            for(let id of reqIds) { if(!document.getElementById(id).value.trim()) { alert('Please fill all Mandatory (*) Fields!'); return; } }
 
             let sId = document.getElementById('reg-s-school').value;
             let school = registeredSchools.find(s => s.id === sId);
@@ -809,7 +890,7 @@
         }
         function submitStudentApplication() {
             let utr = document.getElementById('student-utr').value.trim();
-            if(!utr) { alert("Please enter Transaction ID to verify payment!"); return; }
+            if(!utr) { alert("Please enter Transaction ID!"); return; }
             clearInterval(paymentTimerInterval);
 
             let newApp = {
@@ -822,7 +903,6 @@
             pendingApplications.push(newApp); saveLocalData();
 
             document.getElementById('student-reg').classList.remove('active');
-            
             document.getElementById('receipt-title').innerText = "🏫 OFFICIAL ADMISSION RECEIPT";
             document.getElementById('receipt-sub').innerText = "Submit this Hard Copy to your Respective School";
             document.getElementById('rec-school').parentElement.style.display = 'block';
@@ -847,10 +927,7 @@
             let match = registeredSchools.find(s => s.id.toLowerCase() === sId.toLowerCase() && s.pass === pass);
             
             if(match) {
-                if(match.status !== "Approved") {
-                    alert("Your School Registration is still pending Master Admin Approval. You cannot login yet.");
-                    return;
-                }
+                if(match.status !== "Approved") { alert("Your School Registration is still pending Master Admin Approval."); return; }
                 document.getElementById('school-dash-title').innerText = `🏫 ${match.name}`;
                 document.getElementById('school-dash-sub').innerText = `ID: ${match.id} | HM: ${match.hm}`;
                 renderPendingApplications(match.id);
@@ -909,9 +986,8 @@
             }
         }
 
-        // --- UNIVERSAL ADD/EDIT STUDENT MODAL (For both Admin & School) ---
+        // --- UNIVERSAL ADD/EDIT STUDENT MODAL ---
         let currentEditRow = null;
-        
         function openAddEditStudentModal(btn) {
             document.getElementById('universalStudentModal').style.display = 'flex';
             if(btn) {
@@ -927,28 +1003,24 @@
                 document.getElementById('us-fname').value = ""; document.getElementById('us-total').value = "";
             }
         }
-
         function addUniversalSubjectRow() {
             let container = document.getElementById('us-subject-container');
-            let div = document.createElement('div');
-            div.className = 'sub-row';
+            let div = document.createElement('div'); div.className = 'sub-row';
             div.innerHTML = `<input type="text" placeholder="Code" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;"><input type="text" placeholder="Subject Name" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;"><input type="number" placeholder="Max" value="100" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;"><input type="number" placeholder="Secured" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;"><button type="button" style="background:#dc2626; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('.sub-row').remove();">Delete</button>`;
             container.appendChild(div);
         }
-
         function saveUniversalStudentData() {
             let roll = document.getElementById('us-roll').value.trim();
             let name = document.getElementById('us-name').value.trim();
             let fname = document.getElementById('us-fname').value.trim();
             let total = document.getElementById('us-total').value.trim();
-
             if(!roll || !name) { alert('Roll No & Student Name are required!'); return; }
 
             if(currentEditRow) {
                 currentEditRow.cells[0].innerHTML = `<b>${roll}</b>`;
                 currentEditRow.cells[1].innerText = name;
                 currentEditRow.cells[2].innerText = fname;
-                alert('Student & Subjects Updated Successfully! ✏️');
+                alert('Student Updated Successfully! ✏️');
             } else {
                 if(document.getElementById('school-dashboard').classList.contains('active')) {
                     let tbody = document.getElementById('school-student-table-body');
@@ -959,27 +1031,10 @@
                     let newRow = tbody.insertRow();
                     newRow.innerHTML = `<td><b>${roll}</b></td><td>${name}</td><td>${fname}</td><td>Added Manually</td><td><b style="color:#16a34a;">${total}</b></td><td><button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openAddEditStudentModal(this)">Edit</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove(); saveLocalData();">Delete</button></td>`;
                 }
-                alert('New Student & Subjects Added Successfully! 🎓');
+                alert('New Student Added Successfully! 🎓');
             }
             saveLocalData(); document.getElementById('universalStudentModal').style.display='none';
         }
-
-        // --- ADMIN CONTROLS ---
-        function validateAdmin() {
-            let u = document.getElementById('admin-user').value.trim();
-            let p = document.getElementById('admin-pass').value.trim();
-            if (u === 'KULU123' && p === 'Admin@2026') { openPage('admin-dashboard'); } else { alert('Invalid Admin Credentials!'); }
-        }
-        function switchAdminTab(tabId, btn) {
-            let contents = document.getElementsByClassName('admin-tab-content');
-            for(let c of contents) { c.style.display = 'none'; }
-            document.getElementById(tabId).style.display = 'block';
-            let btns = document.getElementById('admin-dashboard').getElementsByClassName('tab-btn');
-            for(let b of btns) { b.classList.remove('active-tab'); }
-            btn.classList.add('active-tab');
-        }
-
-        function updateSchoolPassword(schoolId, newPass) { let school = registeredSchools.find(s => s.id === schoolId); if(school) { school.pass = newPass; saveLocalData(); alert(`Password updated!`); } }
 
         function openSchoolPaymentSetup(id) {
             let school = registeredSchools.find(s => s.id === id);
@@ -1019,7 +1074,6 @@
         function changeBackgroundImage() { alert('Background Updated Successfully! 🖼️'); }
         function updateNoticeBoard() { document.getElementById('display-notice').innerHTML = document.getElementById('notice-input').value.replace(/\n/g, '<br>'); alert('Notice Board Updated! 📢'); }
 
-        // Search Results
         function openResultsModal() { document.getElementById('resultsModal').style.display='flex'; }
         function fetchStudentResult() { alert("Results fetched securely."); }
     </script>
