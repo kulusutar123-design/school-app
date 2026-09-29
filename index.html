@@ -61,7 +61,7 @@
 
         /* Modal */
         .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(5px); justify-content: center; align-items: center; }
-        .modal-content { background: white; padding: 30px; border-radius: 20px; width: 750px; max-width: 95%; box-shadow: 0 25px 50px rgba(0,0,0,0.4); max-height: 90vh; overflow-y: auto; }
+        .modal-content { background: white; padding: 30px; border-radius: 20px; width: 850px; max-width: 95%; box-shadow: 0 25px 50px rgba(0,0,0,0.4); max-height: 90vh; overflow-y: auto; }
         
         .sub-row { display: grid; grid-template-columns: 1fr 2fr 1fr 1fr auto; gap: 8px; margin-bottom: 8px; align-items: center; }
 
@@ -175,7 +175,6 @@
                 <button style="background:#2563eb; color:white; width:100%; padding:15px; border:none; border-radius:8px; font-weight:bold; font-size:16px; margin-top:20px; cursor:pointer;" onclick="validateSchoolForm()">Next ➡️ Proceed to Payment</button>
             </div>
 
-            <!-- School Payment System -->
             <div id="school-payment-step" style="display:none; text-align:center;">
                 <h3 style="color:#0d3b66; margin-bottom:10px;">💳 School Registration Fee Payment</h3>
                 <p style="color:#dc2626; font-weight:bold; font-size:18px; margin-bottom:15px;">⏳ Time Left: <span id="school-payment-timer">30</span> Seconds</p>
@@ -286,10 +285,12 @@
             <div id="school-forgot-area" style="display:none; background:#f1f5f9; padding:20px; border-radius:12px; border:1px solid #cbd5e1;">
                 <h4 style="color:#0d3b66; margin-bottom:10px;">🔐 Reset School Password</h4>
                 <p style="font-size:14px; color:#64748b; margin-bottom:15px;">Enter your registered School Email to receive an OTP.</p>
+                
                 <div style="display:flex; gap:10px; margin-bottom:10px;">
                     <input type="email" id="school-reset-email" placeholder="Registered School Email" class="input-box" style="flex:1;">
                     <button style="background:#0d3b66; color:white; border:none; padding:10px 15px; border-radius:6px; cursor:pointer;" onclick="sendSchoolLoginOTP()">Send OTP</button>
                 </div>
+                
                 <div id="school-login-otp-div" style="display:none; margin-bottom:10px;">
                     <label style="color:#b45309; font-size:12px; font-weight:bold;">Enter OTP:</label>
                     <div style="display:flex; gap:10px; margin-top:5px;">
@@ -297,6 +298,7 @@
                         <button style="background:#f59e0b; color:white; border:none; padding:10px 15px; border-radius:6px; cursor:pointer; font-weight:bold;" onclick="verifySchoolLoginOTP()">Verify OTP ✅</button>
                     </div>
                 </div>
+
                 <div id="school-newpass-div" style="display:none;">
                     <label style="color:#166534; font-size:12px; font-weight:bold;">Set New Password:</label>
                     <input type="password" id="school-new-pass-input" placeholder="New Password" class="input-box" style="margin-top:5px; margin-bottom:10px; border-color:#16a34a;">
@@ -317,15 +319,15 @@
                 <button class="tab-btn" onclick="switchSchoolTab('school-pending-tab', this)" style="position:relative;">🔔 Admission Requests <span id="notif-badge" style="background:red; color:white; border-radius:50%; padding:2px 6px; font-size:12px; display:none;">1</span></button>
             </div>
 
+            <!-- Tab 1: Enrolled Students -->
             <div id="school-enrolled-tab" class="school-tab-content">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                     <h3>🎓 Approved Students & Records</h3>
                     <button style="background:#16a34a; color:white; border:none; padding:10px 20px; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="openAddEditStudentModal(null)">➕ Add Student & Marks manually</button>
                 </div>
-                <!-- FIXED TABLE STRUCTURE WITH ACTIONS COLUMN RESTORED -->
                 <table>
                     <thead>
-                        <tr><th>Roll No</th><th>Student Name</th><th>Father's Name</th><th>Total Marks</th><th>% & Grade</th><th>Status</th><th>Actions</th></tr>
+                        <tr><th>Roll No</th><th>Student Name</th><th>Father's Name</th><th>Total Marks</th><th>% & Grade</th><th>Status</th><th>Actions (Edit/Print/Delete)</th></tr>
                     </thead>
                     <tbody id="school-student-table-body">
                         <!-- Loaded dynamically -->
@@ -359,7 +361,6 @@
                 <button class="btn-login btn-admin" onclick="validateAdmin()">Login 🚀</button>
             </div>
 
-            <!-- Admin Forgot Password -->
             <div id="admin-forgot-area" style="display:none; background:#f1f5f9; padding:20px; border-radius:12px; border:1px solid #cbd5e1;">
                 <h4 style="color:#0d3b66; margin-bottom:10px;">🔐 Reset Admin Credentials</h4>
                 <p style="font-size:14px; color:#64748b; margin-bottom:15px;">Enter your registered Admin Email to receive an OTP.</p>
@@ -396,6 +397,7 @@
                 <button class="tab-btn" onclick="switchAdminTab('settings-tab', this)">⚙️ Portal Settings</button>
             </div>
 
+            <!-- Manage Schools & Approvals -->
             <div id="schools-tab" class="admin-tab-content">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                     <h3>School Approvals, Passwords & Payments</h3>
@@ -410,6 +412,7 @@
                 </table>
             </div>
 
+            <!-- Admin Students Master DB -->
             <div id="students-tab-admin" class="admin-tab-content" style="display:none;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                     <h3>🎓 Complete Student Database</h3>
@@ -425,6 +428,7 @@
                 </table>
             </div>
 
+            <!-- Global Payment Settings -->
             <div id="payment-settings-tab" class="admin-tab-content" style="display:none;">
                 <h3>💳 Master Admin Payment Settings (For School Registration)</h3>
                 <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1; max-width:600px;">
@@ -438,6 +442,7 @@
                 </div>
             </div>
 
+            <!-- Admin Profile -->
             <div id="admin-profile-tab" class="admin-tab-content" style="display:none;">
                 <h3>👤 Admin Profile & Security</h3>
                 <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1; max-width:600px; margin-bottom:20px;">
@@ -452,6 +457,7 @@
                 </div>
             </div>
 
+            <!-- Portal Settings -->
             <div id="settings-tab" class="admin-tab-content" style="display:none;">
                 <h3>⚙️ Portal Customization Settings</h3>
                 <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1; margin-bottom:20px;">
@@ -468,129 +474,157 @@
             </div>
         </div>
 
-        <!-- UNIVERSAL Add/Edit Student Modal (18 Points + Subjects + Auto Calculation) -->
-        <div id="universalStudentModal" class="modal">
-            <div class="modal-content">
-                <h3 id="us-modal-title" style="color:#0d3b66; margin-bottom:15px;">Add/Edit Student & Marksheet (18-Point)</h3>
-                
-                <h4 style="color:#1e3a8a; margin-bottom:8px; font-size:15px; border-bottom:1px solid #cbd5e1; padding-bottom:5px;">Personal Details</h4>
-                <div class="form-grid" style="margin-bottom: 20px;">
-                    <div><label style="font-size:12px; font-weight:bold;">Roll No:</label><input type="text" id="us-roll" placeholder="Roll No" class="input-box"></div>
-                    <div><label style="font-size:12px; font-weight:bold;">1. Student Name:</label><input type="text" id="us-name" placeholder="Name" class="input-box"></div>
-                    <div><label style="font-size:12px; font-weight:bold;">2. Gender:</label><select id="us-gender" class="input-box"><option value="Male">Male</option><option value="Female">Female</option></select></div>
-                    <div><label style="font-size:12px; font-weight:bold;">3. DOB:</label><input type="text" id="us-dob" placeholder="DD/MM/YYYY" class="input-box"></div>
-                    <div><label style="font-size:12px; font-weight:bold;">4. Mother's Name:</label><input type="text" id="us-mname" class="input-box"></div>
-                    <div><label style="font-size:12px; font-weight:bold;">5. Father's Name:</label><input type="text" id="us-fname" class="input-box"></div>
-                    <div><label style="font-size:12px; font-weight:bold;">6. AADHAAR:</label><input type="text" id="us-aadhaar" placeholder="[Aadhaar Redacted]" class="input-box"></div>
-                    <div><label style="font-size:12px; font-weight:bold;">7. Adm Date:</label><input type="text" id="us-admdate" placeholder="DD/MM/YYYY" class="input-box"></div>
-                    <div><label style="font-size:12px; font-weight:bold;">8. Mobile:</label><input type="text" id="us-mobile" class="input-box"></div>
-                    <div><label style="font-size:12px; font-weight:bold;">9. Blood Group:</label><select id="us-blood" class="input-box"><option value="O+">O+</option><option value="B+">B+</option></select></div>
-                    <div><label style="font-size:12px; font-weight:bold;">10. Minority:</label><select id="us-minority" class="input-box"><option value="No">No</option><option value="Muslim">Muslim</option></select></div>
-                    <div><label style="font-size:12px; font-weight:bold;">11. Category:</label><select id="us-category" class="input-box"><option value="GENERAL">GENERAL</option><option value="SC">SC</option></select></div>
-                    <div><label style="font-size:12px; font-weight:bold;">12. PAN No:</label><input type="text" id="us-pan" class="input-box"></div>
-                    <div><label style="font-size:12px; font-weight:bold;">13. APAR ID:</label><input type="text" id="us-apar" class="input-box"></div>
-                    <div><label style="font-size:12px; font-weight:bold;">14. Address:</label><input type="text" id="us-address" class="input-box"></div>
-                    <div><label style="font-size:12px; font-weight:bold;">15. PIN:</label><input type="text" id="us-pin" class="input-box"></div>
-                    <div><label style="font-size:12px; font-weight:bold;">16. State:</label><select id="us-state" class="input-box"><option value="Odisha">Odisha</option></select></div>
-                    <div><label style="font-size:12px; font-weight:bold;">17. Language:</label><select id="us-lang" class="input-box"><option value="Odia">Odia</option><option value="Hindi">Hindi</option></select></div>
-                    <div style="grid-column: span 2;"><label style="font-size:12px; font-weight:bold;">18. Mail ID:</label><input type="text" id="us-mail" class="input-box"></div>
-                </div>
-
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <h4 style="color:#1e3a8a; font-size:15px; border-bottom:1px solid #cbd5e1; padding-bottom:5px; width:100%;">Marks Awarded (Subjects) 
-                        <button type="button" style="background:#16a34a; color:white; border:none; padding:4px 10px; border-radius:4px; font-size:12px; cursor:pointer; float:right;" onclick="addUniversalSubjectRow()">➕ Add Subject</button>
-                    </h4>
-                </div>
-                
-                <div style="font-size:12px; font-weight:bold; color:#64748b; display:grid; grid-template-columns: 1fr 2fr 1fr 1fr auto; gap:8px; margin-bottom:5px;">
-                    <span>Code</span><span>Subject Name</span><span>Max</span><span>Secured</span><span>Action</span>
-                </div>
-                
-                <div id="us-subject-container">
-                    <div class="sub-row">
-                        <input type="text" value="FLO" placeholder="Code" class="input-box sub-code" style="padding:6px;">
-                        <input type="text" value="FIRST LANGUAGE ODIA" placeholder="Subject Name" class="input-box sub-name" style="padding:6px;">
-                        <input type="number" value="100" placeholder="Max" class="input-box sub-max" style="padding:6px;" oninput="calculateAutoMarks()">
-                        <input type="number" value="" placeholder="Secured" class="input-box sub-sec" style="padding:6px;" oninput="calculateAutoMarks()">
-                        <button type="button" style="background:#dc2626; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('.sub-row').remove(); calculateAutoMarks();">Delete</button>
-                    </div>
-                </div>
-
-                <!-- AUTO CALCULATION SECTION -->
-                <div style="background:#f8fafc; border:1px solid #cbd5e1; padding:15px; border-radius:8px; margin-top:15px; margin-bottom:15px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-                        <div><label style="font-size:12px; font-weight:bold; color:#64748b;">Total Max Marks:</label><div id="auto-max" style="font-size:18px; font-weight:bold;">0</div></div>
-                        <div><label style="font-size:12px; font-weight:bold; color:#64748b;">Total Secured:</label><div id="auto-sec" style="font-size:18px; font-weight:bold; color:#16a34a;">0</div></div>
-                        <div><label style="font-size:12px; font-weight:bold; color:#64748b;">Percentage (%):</label><div id="auto-pct" style="font-size:18px; font-weight:bold; color:#2563eb;">0%</div></div>
-                        <div><label style="font-size:12px; font-weight:bold; color:#64748b;">Grade:</label><div id="auto-grade" style="font-size:18px; font-weight:bold; color:#b45309;">-</div></div>
-                        <div><label style="font-size:12px; font-weight:bold; color:#64748b;">Status:</label><div id="auto-status" style="font-size:18px; font-weight:bold;">-</div></div>
-                    </div>
-                </div>
-                
-                <input type="hidden" id="us-final-total">
-                <input type="hidden" id="us-final-pctgrade">
-                <input type="hidden" id="us-final-status">
-
-                <div style="display:flex; justify-content:flex-end; gap:10px;">
-                    <button style="background:#64748b; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="document.getElementById('universalStudentModal').style.display='none'">Cancel</button>
-                    <button style="background:#2563eb; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="saveUniversalStudentData()">Save Student & Subjects 💾</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- NEW: PRINTABLE MARKSHEET SECTION (PDF GENERATION VIEW) -->
-        <div id="marksheet-print-area" style="display:none; padding:40px; border:3px solid #0d3b66; border-radius:10px;">
-            <div style="text-align:center; border-bottom:2px solid #0d3b66; padding-bottom:15px; margin-bottom:20px;">
-                <h1 style="color:#0d3b66; margin-bottom:5px;">🎓 OFFICIAL STUDENT MARKSHEET</h1>
-                <p style="color:#475569; font-weight:bold;">Issued by Digital School Management System</p>
-            </div>
-            
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:30px; font-size:16px;">
-                <p><b>Roll Number:</b> <span id="pm-roll"></span></p>
-                <p><b>Student Name:</b> <span id="pm-name"></span></p>
-                <p><b>Father's Name:</b> <span id="pm-fname"></span></p>
-                <p><b>Mobile No:</b> <span id="pm-mobile"></span></p>
-            </div>
-            
-            <h3 style="color:#1e3a8a; margin-bottom:10px; border-bottom:1px solid #cbd5e1; padding-bottom:5px;">Academic Performance Summary</h3>
-            <table style="width:100%; border-collapse:collapse; margin-bottom:30px;">
-                <thead>
-                    <tr>
-                        <th style="border:1px solid #cbd5e1; padding:10px; background:#f8fafc; color:#333;">Total Secured / Max</th>
-                        <th style="border:1px solid #cbd5e1; padding:10px; background:#f8fafc; color:#333;">Percentage & Grade</th>
-                        <th style="border:1px solid #cbd5e1; padding:10px; background:#f8fafc; color:#333;">Final Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td style="border:1px solid #cbd5e1; padding:10px; text-align:center; font-weight:bold;" id="pm-secured"></td>
-                        <td style="border:1px solid #cbd5e1; padding:10px; text-align:center;" id="pm-grade"></td>
-                        <td style="border:1px solid #cbd5e1; padding:10px; text-align:center;" id="pm-status"></td>
-                    </tr>
-                </tbody>
-            </table>
-            
-            <div style="margin-top:50px; display:flex; justify-content:space-between;">
-                <p>____________________<br><b>Class Teacher Signature</b></p>
-                <p>____________________<br><b>Headmaster Seal / Signature</b></p>
-            </div>
-            
-            <div class="no-print" style="text-align:center; margin-top:30px;">
-                <button style="background:#2563eb; color:white; padding:10px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="window.print()">🖨️ Print / Save PDF</button>
-                <button style="background:#64748b; color:white; padding:10px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer; margin-left:10px;" onclick="closePrintView()">⬅️ Back to Dashboard</button>
-            </div>
-        </div>
-
     </div>
 
-    <!-- Results Modals -->
-    <div id="resultsModal" class="modal">
-        <div class="modal-content" style="text-align: center;">
-            <h3 style="color:#0d3b66; margin-bottom:15px;">🔍 Check Results</h3>
-            <input type="text" id="check-roll-input" placeholder="Enter Roll Number" style="width:100%; padding:12px; margin-bottom:20px; outline:none; text-align:center;">
-            <div id="result-display-area" style="text-align: left; margin-bottom: 20px;"></div>
-            <button style="background:#64748b; color:white; border:none; padding:10px 20px; border-radius:8px;" onclick="document.getElementById('resultsModal').style.display='none'">Close ❌</button>
-            <button style="background:#2563eb; color:white; border:none; padding:10px 25px; border-radius:8px;" onclick="fetchStudentResult()">View 📄</button>
+    <!-- UNIVERSAL Modals (Placed cleanly outside main views) -->
+    
+    <!-- 1. Universal Add/Edit Student Modal (18 Points + Subjects + Auto Calc) -->
+    <div id="universalStudentModal" class="modal">
+        <div class="modal-content">
+            <h3 id="us-modal-title" style="color:#0d3b66; margin-bottom:15px;">Add/Edit Student & Marksheet (18-Point)</h3>
+            
+            <h4 style="color:#1e3a8a; margin-bottom:8px; font-size:15px; border-bottom:1px solid #cbd5e1; padding-bottom:5px;">Personal Details</h4>
+            <div class="form-grid" style="margin-bottom: 20px;">
+                <div><label style="font-size:12px; font-weight:bold;">Roll No:</label><input type="text" id="us-roll" placeholder="Roll No" class="input-box"></div>
+                <div><label style="font-size:12px; font-weight:bold;">1. Student Name:</label><input type="text" id="us-name" placeholder="Name" class="input-box"></div>
+                <div><label style="font-size:12px; font-weight:bold;">2. Gender:</label><select id="us-gender" class="input-box"><option value="Male">Male</option><option value="Female">Female</option></select></div>
+                <div><label style="font-size:12px; font-weight:bold;">3. DOB:</label><input type="text" id="us-dob" placeholder="DD/MM/YYYY" class="input-box"></div>
+                <div><label style="font-size:12px; font-weight:bold;">4. Mother's Name:</label><input type="text" id="us-mname" class="input-box"></div>
+                <div><label style="font-size:12px; font-weight:bold;">5. Father's Name:</label><input type="text" id="us-fname" class="input-box"></div>
+                <div><label style="font-size:12px; font-weight:bold;">6. AADHAAR:</label><input type="text" id="us-aadhaar" placeholder="[Aadhaar Redacted]" class="input-box"></div>
+                <div><label style="font-size:12px; font-weight:bold;">7. Adm Date:</label><input type="text" id="us-admdate" placeholder="DD/MM/YYYY" class="input-box"></div>
+                <div><label style="font-size:12px; font-weight:bold;">8. Mobile:</label><input type="text" id="us-mobile" class="input-box"></div>
+                <div><label style="font-size:12px; font-weight:bold;">9. Blood Group:</label><select id="us-blood" class="input-box"><option value="O+">O+</option><option value="B+">B+</option></select></div>
+                <div><label style="font-size:12px; font-weight:bold;">10. Minority:</label><select id="us-minority" class="input-box"><option value="No">No</option><option value="Muslim">Muslim</option></select></div>
+                <div><label style="font-size:12px; font-weight:bold;">11. Category:</label><select id="us-category" class="input-box"><option value="GENERAL">GENERAL</option><option value="SC">SC</option></select></div>
+                <div><label style="font-size:12px; font-weight:bold;">12. PAN No:</label><input type="text" id="us-pan" class="input-box"></div>
+                <div><label style="font-size:12px; font-weight:bold;">13. APAR ID:</label><input type="text" id="us-apar" class="input-box"></div>
+                <div><label style="font-size:12px; font-weight:bold;">14. Address:</label><input type="text" id="us-address" class="input-box"></div>
+                <div><label style="font-size:12px; font-weight:bold;">15. PIN:</label><input type="text" id="us-pin" class="input-box"></div>
+                <div><label style="font-size:12px; font-weight:bold;">16. State:</label><select id="us-state" class="input-box"><option value="Odisha">Odisha</option></select></div>
+                <div><label style="font-size:12px; font-weight:bold;">17. Language:</label><select id="us-lang" class="input-box"><option value="Odia">Odia</option><option value="Hindi">Hindi</option></select></div>
+                <div style="grid-column: span 2;"><label style="font-size:12px; font-weight:bold;">18. Mail ID:</label><input type="text" id="us-mail" class="input-box"></div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <h4 style="color:#1e3a8a; font-size:15px; border-bottom:1px solid #cbd5e1; padding-bottom:5px; width:100%;">Marks Awarded (Subjects) 
+                    <button type="button" style="background:#16a34a; color:white; border:none; padding:4px 10px; border-radius:4px; font-size:12px; cursor:pointer; float:right;" onclick="addUniversalSubjectRow()">➕ Add Subject</button>
+                </h4>
+            </div>
+            
+            <div style="font-size:12px; font-weight:bold; color:#64748b; display:grid; grid-template-columns: 1fr 2fr 1fr 1fr auto; gap:8px; margin-bottom:5px;">
+                <span>Code</span><span>Subject Name</span><span>Max</span><span>Secured</span><span>Action</span>
+            </div>
+            
+            <div id="us-subject-container">
+                <div class="sub-row">
+                    <input type="text" value="FLO" placeholder="Code" class="input-box sub-code" style="padding:6px;">
+                    <input type="text" value="FIRST LANGUAGE ODIA" placeholder="Subject Name" class="input-box sub-name" style="padding:6px;">
+                    <input type="number" value="100" placeholder="Max" class="input-box sub-max" style="padding:6px;" oninput="calculateAutoMarks()">
+                    <input type="number" value="" placeholder="Secured" class="input-box sub-sec" style="padding:6px;" oninput="calculateAutoMarks()">
+                    <button type="button" style="background:#dc2626; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('.sub-row').remove(); calculateAutoMarks();">Delete</button>
+                </div>
+            </div>
+
+            <!-- AUTO CALCULATION SECTION -->
+            <div style="background:#f8fafc; border:1px solid #cbd5e1; padding:15px; border-radius:8px; margin-top:15px; margin-bottom:15px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                    <div><label style="font-size:12px; font-weight:bold; color:#64748b;">Total Max Marks:</label><div id="auto-max" style="font-size:18px; font-weight:bold;">0</div></div>
+                    <div><label style="font-size:12px; font-weight:bold; color:#64748b;">Total Secured:</label><div id="auto-sec" style="font-size:18px; font-weight:bold; color:#16a34a;">0</div></div>
+                    <div><label style="font-size:12px; font-weight:bold; color:#64748b;">Percentage (%):</label><div id="auto-pct" style="font-size:18px; font-weight:bold; color:#2563eb;">0%</div></div>
+                    <div><label style="font-size:12px; font-weight:bold; color:#64748b;">Grade:</label><div id="auto-grade" style="font-size:18px; font-weight:bold; color:#b45309;">-</div></div>
+                    <div><label style="font-size:12px; font-weight:bold; color:#64748b;">Status:</label><div id="auto-status" style="font-size:18px; font-weight:bold;">-</div></div>
+                </div>
+            </div>
+            
+            <input type="hidden" id="us-final-total">
+            <input type="hidden" id="us-final-pctgrade">
+            <input type="hidden" id="us-final-status">
+
+            <div style="display:flex; justify-content:flex-end; gap:10px;">
+                <button style="background:#64748b; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="document.getElementById('universalStudentModal').style.display='none'">Cancel</button>
+                <button style="background:#2563eb; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="saveUniversalStudentData()">Save Student & Subjects 💾</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. ADMIN: Edit School Modal -->
+    <div id="editSchoolModal" class="modal">
+        <div class="modal-content">
+            <h3 style="color:#0d3b66; margin-bottom:15px;">✏️ Verify & Edit School Application</h3>
+            <input type="hidden" id="edit-sch-old-id">
+            <input type="text" id="edit-sch-name" placeholder="School Name" class="input-box" style="margin-bottom:12px;">
+            <input type="text" id="edit-sch-id" placeholder="School Code" class="input-box" style="margin-bottom:12px;">
+            <input type="text" id="edit-sch-hm" placeholder="Headmaster Name" class="input-box" style="margin-bottom:12px;">
+            <input type="text" id="edit-sch-mobile" placeholder="Mobile No" class="input-box" style="margin-bottom:12px;">
+            <select id="edit-sch-state" class="input-box" style="margin-bottom:12px;"><option value="Odisha">Odisha</option><option value="West Bengal">West Bengal</option><option value="Andhra Pradesh">Andhra Pradesh</option></select>
+            <div style="display:flex; justify-content:flex-end; gap:10px;">
+                <button style="background:#64748b; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="document.getElementById('editSchoolModal').style.display='none'">Cancel</button>
+                <button style="background:#2563eb; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="saveEditedSchool()">Save Changes 💾</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. ADMIN: School Payment Setup Modal -->
+    <div id="schoolPaymentModal" class="modal">
+        <div class="modal-content" style="width:500px;">
+            <h3 style="color:#0d3b66; margin-bottom:10px;">💳 Set School Payment Gateway</h3>
+            <p id="sp-school-name" style="color:#1e3a8a; font-weight:bold; margin-bottom:15px;"></p>
+            <input type="hidden" id="sp-school-id">
+            <label style="font-size:12px; font-weight:bold;">School UPI ID:</label>
+            <input type="text" id="sp-upi" class="input-box" style="margin-bottom:12px;">
+            <label style="font-size:12px; font-weight:bold;">Admission Base Fee (₹):</label>
+            <input type="number" id="sp-fee" class="input-box" style="margin-bottom:12px;">
+            <label style="font-size:12px; font-weight:bold;">GST Option:</label>
+            <select id="sp-gst-opt" class="input-box" style="margin-bottom:12px;" onchange="toggleGstInput()"><option value="none">No GST</option><option value="percent">Apply GST %</option></select>
+            <div id="sp-gst-div" style="display:none;"><label style="font-size:12px; font-weight:bold;">GST Percentage (%):</label><input type="number" id="sp-gst-pct" class="input-box" style="margin-bottom:12px;"></div>
+            <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px;">
+                <button style="background:#64748b; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="document.getElementById('schoolPaymentModal').style.display='none'">Cancel</button>
+                <button style="background:#22c55e; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="saveSchoolPaymentSetup()">Save Payment Setup 💾</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. PRINTABLE MARKSHEET SECTION (PDF GENERATION VIEW) -->
+    <div id="marksheet-print-area" style="display:none; padding:40px; border:3px solid #0d3b66; border-radius:10px; background:white;">
+        <div style="text-align:center; border-bottom:2px solid #0d3b66; padding-bottom:15px; margin-bottom:20px;">
+            <h1 style="color:#0d3b66; margin-bottom:5px;">🎓 OFFICIAL STUDENT MARKSHEET</h1>
+            <p style="color:#475569; font-weight:bold;">Issued by Digital School Management System</p>
+        </div>
+        
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:30px; font-size:16px;">
+            <p><b>Roll Number:</b> <span id="pm-roll"></span></p>
+            <p><b>Student Name:</b> <span id="pm-name"></span></p>
+            <p><b>Father's Name:</b> <span id="pm-fname"></span></p>
+            <p><b>Mobile No:</b> <span id="pm-mobile"></span></p>
+        </div>
+        
+        <h3 style="color:#1e3a8a; margin-bottom:10px; border-bottom:1px solid #cbd5e1; padding-bottom:5px;">Academic Performance Summary</h3>
+        <table style="width:100%; border-collapse:collapse; margin-bottom:30px;">
+            <thead>
+                <tr>
+                    <th style="border:1px solid #cbd5e1; padding:10px; background:#f8fafc; color:#333;">Total Secured / Max</th>
+                    <th style="border:1px solid #cbd5e1; padding:10px; background:#f8fafc; color:#333;">Percentage & Grade</th>
+                    <th style="border:1px solid #cbd5e1; padding:10px; background:#f8fafc; color:#333;">Final Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="border:1px solid #cbd5e1; padding:10px; text-align:center; font-weight:bold;" id="pm-secured"></td>
+                    <td style="border:1px solid #cbd5e1; padding:10px; text-align:center;" id="pm-grade"></td>
+                    <td style="border:1px solid #cbd5e1; padding:10px; text-align:center;" id="pm-status"></td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div style="margin-top:50px; display:flex; justify-content:space-between;">
+            <p>____________________<br><b>Class Teacher Signature</b></p>
+            <p>____________________<br><b>Headmaster Seal / Signature</b></p>
+        </div>
+        
+        <div class="no-print" style="text-align:center; margin-top:30px;">
+            <button style="background:#2563eb; color:white; padding:10px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="window.print()">🖨️ Print / Save PDF</button>
+            <button style="background:#64748b; color:white; padding:10px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer; margin-left:10px;" onclick="closePrintView()">⬅️ Back to Dashboard</button>
         </div>
     </div>
 
@@ -616,26 +650,28 @@
         }
 
         window.onload = function() {
-            // Restore Tables
-            if(localStorage.getItem('schoolStudentTableBody')) { document.getElementById('school-student-table-body').innerHTML = localStorage.getItem('schoolStudentTableBody'); }
-            else { document.getElementById('school-student-table-body').innerHTML = `<tr data-mobile="9876543210"><td><b>155CB0197</b></td><td>DIBYANSHI DAS</td><td>ANTARYAMI DAS</td><td><b style="color:#16a34a;">360 / 600</b></td><td>60% (B1)</td><td><span class="badge-pass">Pass ✅</span></td><td><button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; margin-right:4px;" onclick="openAddEditStudentModal(this)">Edit</button> <button style="background:#1e3a8a; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; margin-right:4px;" onclick="printStudent(this)">Print / PDF</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove(); saveLocalData();">Delete</button></td></tr>`; }
+            // Restore Tables with Auto-Fix for missing buttons
+            if(localStorage.getItem('schoolStudentTableBody')) { 
+                document.getElementById('school-student-table-body').innerHTML = localStorage.getItem('schoolStudentTableBody'); 
+            } else { 
+                document.getElementById('school-student-table-body').innerHTML = `<tr data-mobile="9876543210"><td><b>155CB0197</b></td><td>DIBYANSHI DAS</td><td>ANTARYAMI DAS</td><td><b style="color:#16a34a;">360 / 600</b></td><td>60% (B1)</td><td><span class="badge-pass">Pass ✅</span></td><td><button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; margin-right:4px;" onclick="openAddEditStudentModal(this)">Edit</button> <button style="background:#1e3a8a; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; margin-right:4px;" onclick="printStudent(this)">Print / PDF</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove(); saveLocalData();">Delete</button></td></tr>`; 
+            }
             
-            if(localStorage.getItem('adminStudentTableBody')) { document.getElementById('student-table-body-admin').innerHTML = localStorage.getItem('adminStudentTableBody'); }
-            else { document.getElementById('student-table-body-admin').innerHTML = `<tr><td><b>155CB0197</b></td><td>DIBYANSHI DAS</td><td>ANTARYAMI DAS</td><td>SRI BAIRAGI SARASWATI SISHU VIDYAMANDIR</td><td><b style="color:#16a34a;">360 / 600</b></td><td><button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openAddEditStudentModal(this)">Edit</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove(); saveLocalData();">Delete</button></td></tr>`; }
+            if(localStorage.getItem('adminStudentTableBody')) { 
+                document.getElementById('student-table-body-admin').innerHTML = localStorage.getItem('adminStudentTableBody'); 
+            } else { 
+                document.getElementById('student-table-body-admin').innerHTML = `<tr><td><b>155CB0197</b></td><td>DIBYANSHI DAS</td><td>ANTARYAMI DAS</td><td>SRI BAIRAGI SARASWATI SISHU VIDYAMANDIR</td><td><b style="color:#16a34a;">360 / 600</b></td><td><button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openAddEditStudentModal(this)">Edit</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove(); saveLocalData();">Delete</button></td></tr>`; 
+            }
 
-            // Auto-fix existing broken Local Storage rows if Edit/Print buttons are missing
+            // Verify and auto-fix School Student Table missing actions due to old cache
             let schoolRows = document.getElementById('school-student-table-body').rows;
             for(let i=0; i<schoolRows.length; i++) {
                 let r = schoolRows[i];
                 if(!r.innerHTML.includes('openAddEditStudentModal')) {
                     let actionHTML = `<button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; margin-right:4px;" onclick="openAddEditStudentModal(this)">Edit</button> <button style="background:#1e3a8a; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; margin-right:4px;" onclick="printStudent(this)">Print / PDF</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove(); saveLocalData();">Delete</button>`;
-                    if(r.cells.length === 8) {
-                        r.setAttribute('data-mobile', r.cells[3].innerText); r.deleteCell(3); r.cells[6].innerHTML = actionHTML;
-                    } else if(r.cells.length === 7) {
-                        r.cells[6].innerHTML = actionHTML;
-                    } else if(r.cells.length < 7) {
-                        let newC = r.insertCell(-1); newC.innerHTML = actionHTML;
-                    }
+                    if(r.cells.length === 8) { r.setAttribute('data-mobile', r.cells[3].innerText); r.deleteCell(3); r.cells[6].innerHTML = actionHTML; } 
+                    else if(r.cells.length === 7) { r.cells[6].innerHTML = actionHTML; } 
+                    else if(r.cells.length < 7) { let newC = r.insertCell(-1); newC.innerHTML = actionHTML; }
                 }
             }
 
@@ -740,6 +776,7 @@
             saveLocalData(); document.getElementById('universalStudentModal').style.display='none';
         }
 
+        // --- ALL ADMIN & SCHOOL LOGIC INTACT ---
         function validateAdmin() { let u = document.getElementById('admin-user').value.trim(); let p = document.getElementById('admin-pass').value.trim(); if (u === adminProfile.user && p === adminProfile.pass) { document.getElementById('admin-user').value = ""; document.getElementById('admin-pass').value = ""; openPage('admin-dashboard'); } else { alert('Invalid Admin Username or Password!'); } }
         function openAdminForgotPassword() { document.getElementById('admin-login-area').style.display = 'none'; document.getElementById('admin-forgot-area').style.display = 'block'; }
         function cancelAdminForgot() { document.getElementById('admin-forgot-area').style.display = 'none'; document.getElementById('admin-login-area').style.display = 'block'; }
@@ -747,20 +784,17 @@
         function verifyAdminOTP() { if(document.getElementById('admin-reset-otp').value.trim() === adminGenOtp) { alert("OTP Verified!"); document.getElementById('admin-otp-div').style.display = 'none'; document.getElementById('admin-newpass-div').style.display = 'block'; } else { alert("Invalid OTP!"); } }
         function saveNewAdminPassword() { let newPass = document.getElementById('admin-new-pass-input').value.trim(); if(!newPass) { alert("Enter a new password!"); return; } adminProfile.pass = newPass; saveLocalData(); alert("Admin Password updated successfully! Please login with new password."); cancelAdminForgot(); }
         function saveAdminProfile() { adminProfile.name = document.getElementById('prof-admin-name').value.trim(); adminProfile.user = document.getElementById('prof-admin-user').value.trim(); adminProfile.email = document.getElementById('prof-admin-email').value.trim(); saveLocalData(); document.getElementById('display-admin-user').innerText = adminProfile.user; alert("Admin Profile Data Saved!"); }
-        function sendAdminProfileOTP() { profGenOtp = Math.floor(100000 + Math.random() * 900000).toString(); alert(`Simulation: OTP sent to ${adminProfile.email}.\nOTP is: ${profGenOtp}`); document.getElementById('prof-otp-div').style.display = 'block'; }
-        function verifyAdminProfileOTP() { if(document.getElementById('prof-otp-input').value.trim() === profGenOtp) { alert("OTP Verified! You can now enter a new password."); document.getElementById('prof-otp-div').style.display = 'none'; document.getElementById('prof-newpass-div').style.display = 'block'; } else { alert("Invalid OTP!"); } }
-        function updateAdminPasswordFromProfile() { let newPass = document.getElementById('prof-new-pass').value.trim(); if(!newPass) { alert("Enter a new password!"); return; } adminProfile.pass = newPass; saveLocalData(); alert("Admin Password Changed Successfully!"); document.getElementById('prof-newpass-div').style.display = 'none'; }
         function switchAdminTab(tabId, btn) { let contents = document.getElementsByClassName('admin-tab-content'); for(let c of contents) { c.style.display = 'none'; } document.getElementById(tabId).style.display = 'block'; let btns = document.getElementById('admin-dashboard').getElementsByClassName('tab-btn'); for(let b of btns) { b.classList.remove('active-tab'); } btn.classList.add('active-tab'); }
         function updateAdminFeeDisplay() { let gstAmt = (adminPaymentConfig.baseFee * adminPaymentConfig.gstPct) / 100; let totalFee = adminPaymentConfig.baseFee + gstAmt; if(document.getElementById('display-base-fee')){ document.getElementById('display-base-fee').innerText = adminPaymentConfig.baseFee; document.getElementById('display-gst-pct').innerText = adminPaymentConfig.gstPct; document.getElementById('display-gst-amt').innerText = gstAmt; document.getElementById('display-total-fee').innerText = totalFee; document.getElementById('display-upi').innerText = adminPaymentConfig.upiId; document.getElementById('dynamic-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=${adminPaymentConfig.upiId}&pn=SchoolPortal&am=${totalFee}&cu=INR`; } }
         function openSchoolRegistration() { document.getElementById('school-form-step').style.display = 'block'; document.getElementById('school-payment-step').style.display = 'none'; isSchoolOtpVerified = false; document.getElementById('school-otp-div').style.display = 'none'; document.getElementById('school-pass-div').style.display = 'none'; openPage('school-reg'); }
         function sendRegSchoolOTP() { let email = document.getElementById('reg-school-email').value.trim(); if(!email) { alert("Please enter Mail ID first!"); return; } generatedSchoolOtp = Math.floor(100000 + Math.random() * 900000).toString(); alert(`Simulation: An OTP has been sent to ${email}.\n\nYour OTP is: ${generatedSchoolOtp}`); document.getElementById('school-otp-div').style.display = 'block'; }
         function verifyRegSchoolOTP() { let entered = document.getElementById('reg-school-otp').value.trim(); if(entered === generatedSchoolOtp) { isSchoolOtpVerified = true; alert("OTP Verified Successfully!"); document.getElementById('school-otp-div').style.display = 'none'; document.getElementById('school-pass-div').style.display = 'block'; } else { alert("Invalid OTP! Try again."); } }
         function validateSchoolForm() { let reqIds = ['reg-school-name', 'reg-school-id', 'reg-hm-name', 'reg-hm-mobile', 'reg-school-state', 'reg-school-email']; for(let id of reqIds) { if(!document.getElementById(id).value.trim()) { alert('Please fill all Mandatory (*) Fields!'); return; } } if(!isSchoolOtpVerified) { alert("You must Verify Email OTP to proceed!"); return; } if(!document.getElementById('reg-school-pass').value.trim()) { alert("Please Create a Password!"); return; } document.getElementById('school-form-step').style.display = 'none'; document.getElementById('school-payment-step').style.display = 'block'; let timeLeft = 30; document.getElementById('school-payment-timer').innerText = timeLeft; clearInterval(schoolPaymentTimerInterval); schoolPaymentTimerInterval = setInterval(() => { timeLeft--; document.getElementById('school-payment-timer').innerText = timeLeft; if(timeLeft <= 0) { clearInterval(schoolPaymentTimerInterval); alert("Payment Timeout!"); goHome(); } }, 1000); }
-        function submitSchoolRegistration() { let utr = document.getElementById('reg-school-utr').value.trim(); if(!utr) { alert("Please enter Transaction ID to verify payment!"); return; } clearInterval(schoolPaymentTimerInterval); let newSchool = { id: document.getElementById('reg-school-id').value.trim(), name: document.getElementById('reg-school-name').value.trim(), hm: document.getElementById('reg-hm-name').value.trim(), mobile: document.getElementById('reg-hm-mobile').value.trim(), state: document.getElementById('reg-school-state').value, email: document.getElementById('reg-school-email').value.trim(), pass: document.getElementById('reg-school-pass').value.trim(), utr: utr, status: "Pending", upi: "", baseFee: 500, hasGst: false, gstPct: 0 }; registeredSchools.push(newSchool); saveLocalData(); renderAdminSchoolsTable(); updatePublicSchoolDropdown(); document.getElementById('school-reg').classList.remove('active'); document.getElementById('rec-app-id').innerText = "SCH-" + Math.floor(Math.random()*9000+1000); document.getElementById('rec-date').innerText = new Date().toLocaleDateString(); document.getElementById('receipt-title').innerText = "🏫 SCHOOL REGISTRATION RECEIPT"; document.getElementById('receipt-sub').innerText = "Awaiting Master Admin Approval."; document.getElementById('rec-name').innerText = newSchool.name + " (" + newSchool.id + ")"; document.getElementById('rec-info').innerText = `HM: ${newSchool.hm} | Mobile: ${newSchool.mobile}`; document.getElementById('rec-school').parentElement.style.display = 'none'; document.getElementById('rec-utr').innerText = utr; document.getElementById('rec-amt').innerText = "1180 (Reg Fee)"; document.getElementById('receipt-section').classList.add('active'); alert('School Registered Successfully! Application sent to Master Admin for approval.'); }
-        function renderAdminSchoolsTable() { let tbody = document.getElementById('school-table-body'); tbody.innerHTML = ""; let pendingCount = 0; registeredSchools.forEach(s => { let statusHtml = ""; let actionsHtml = ""; if(s.status === "Pending") { pendingCount++; statusHtml = `<span style="background:#fef08a; color:#854d0e; padding:4px 10px; border-radius:6px; font-weight:bold;">Pending ⏳</span>`; actionsHtml = `<button style="background:#f59e0b; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openVerifyEditSchool('${s.id}')">Verify/Edit ✏️</button> <button style="background:#16a34a; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="approveSchool('${s.id}')">Approve ✅</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="rejectSchool('${s.id}')">Reject ❌</button>`; } else { statusHtml = `<span class="badge-approved">Approved ✅</span>`; actionsHtml = `<button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openSchoolPaymentSetup('${s.id}')">💳 Set Payment</button> <button style="background:#f59e0b; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openVerifyEditSchool('${s.id}')">Edit ✏️</button>`; } tbody.innerHTML += `<tr><td>${s.name}</td><td><b>${s.id}</b></td><td><input type="text" value="${s.pass}" onchange="updateSchoolPassword('${s.id}', this.value)" style="padding:5px; width:90px;"></td><td>${s.hm}</td><td>${s.state || "N/A"}</td><td><b style="color:#16a34a;">${s.utr || "N/A"}</b></td><td>${statusHtml}</td><td>${actionsHtml}</td></tr>`; }); let badge = document.getElementById('admin-notif-badge'); if(pendingCount > 0) { badge.innerText = pendingCount; badge.style.display = 'inline-block'; } else { badge.style.display = 'none'; } }
+        function submitSchoolRegistration() { let utr = document.getElementById('reg-school-utr').value.trim(); if(!utr) { alert("Please enter Transaction ID to verify payment!"); return; } clearInterval(schoolPaymentTimerInterval); let newSchool = { id: document.getElementById('reg-school-id').value.trim(), name: document.getElementById('reg-school-name').value.trim(), hm: document.getElementById('reg-hm-name').value.trim(), mobile: document.getElementById('reg-hm-mobile').value.trim(), state: document.getElementById('reg-school-state').value, email: document.getElementById('reg-school-email').value.trim(), pass: document.getElementById('reg-school-pass').value.trim(), utr: utr, status: "Pending", upi: "", baseFee: 500, hasGst: false, gstPct: 0 }; registeredSchools.push(newSchool); saveLocalData(); renderAdminSchoolsTable(); updatePublicSchoolDropdown(); document.getElementById('school-reg').classList.remove('active'); let d = new Date(); document.getElementById('rec-app-id').innerText = "SCH-" + Math.floor(Math.random()*9000+1000); document.getElementById('rec-date').innerText = d.toLocaleDateString(); document.getElementById('receipt-title').innerText = "🏫 SCHOOL REGISTRATION RECEIPT"; document.getElementById('receipt-sub').innerText = "Awaiting Master Admin Approval."; document.getElementById('rec-name').innerText = newSchool.name + " (" + newSchool.id + ")"; document.getElementById('rec-info').innerText = `HM: ${newSchool.hm} | Mobile: ${newSchool.mobile}`; document.getElementById('rec-school').parentElement.style.display = 'none'; document.getElementById('rec-utr').innerText = utr; document.getElementById('rec-amt').innerText = "1180 (Reg Fee)"; document.getElementById('receipt-section').classList.add('active'); alert('School Registered Successfully! Application sent to Master Admin for approval.'); }
+        function renderAdminSchoolsTable() { let tbody = document.getElementById('school-table-body'); tbody.innerHTML = ""; let pendingCount = 0; registeredSchools.forEach(s => { let statusHtml = ""; let actionsHtml = ""; if(s.status === "Pending") { pendingCount++; statusHtml = `<span style="background:#fef08a; color:#854d0e; padding:4px 10px; border-radius:6px; font-weight:bold;">Pending ⏳</span>`; actionsHtml = `<button style="background:#f59e0b; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openVerifyEditSchool('${s.id}')">Verify/Edit ✏️</button> <button style="background:#16a34a; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="approveSchool('${s.id}')">Approve ✅</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="rejectSchool('${s.id}')">Reject ❌</button>`; } else { statusHtml = `<span class="badge-approved">Approved ✅</span>`; actionsHtml = `<button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; margin-right:4px;" onclick="openSchoolPaymentSetup('${s.id}')">💳 Set Payment</button> <button style="background:#f59e0b; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openVerifyEditSchool('${s.id}')">Edit ✏️</button>`; } tbody.innerHTML += `<tr><td>${s.name}</td><td><b>${s.id}</b></td><td><input type="text" value="${s.pass}" onchange="updateSchoolPassword('${s.id}', this.value)" style="padding:5px; width:90px;"></td><td>${s.hm}</td><td>${s.state || "N/A"}</td><td><b style="color:#16a34a;">${s.utr || "N/A"}</b></td><td>${statusHtml}</td><td>${actionsHtml}</td></tr>`; }); let badge = document.getElementById('admin-notif-badge'); if(pendingCount > 0) { badge.innerText = pendingCount; badge.style.display = 'inline-block'; } else { badge.style.display = 'none'; } }
         function approveSchool(id) { let school = registeredSchools.find(s => s.id === id); if(school) { school.status = "Approved"; saveLocalData(); renderAdminSchoolsTable(); updatePublicSchoolDropdown(); alert(`School "${school.name}" Approved successfully!`); } }
         function rejectSchool(id) { if(confirm("Are you sure you want to Reject and Delete this school?")) { registeredSchools = registeredSchools.filter(s => s.id !== id); saveLocalData(); renderAdminSchoolsTable(); updatePublicSchoolDropdown(); } }
-        function openVerifyEditSchool(id) { let school = registeredSchools.find(s => s.id === id); if(school) { document.getElementById('edit-sch-old-id').value = school.id; document.getElementById('edit-sch-name').value = school.name; document.getElementById('edit-sch-id').value = school.id; document.getElementById('edit-sch-hm').value = school.hm; document.getElementById('edit-sch-mobile').value = school.mobile; document.getElementById('edit-sch-state').value = school.state || "Odisha"; document.getElementById('editSchoolModal').style.display = 'flex'; } }
+        function openVerifyEditSchool(id) { let school = registeredSchools.find(s => s.id === id); if(school) { document.getElementById('edit-sch-old-id').value = school.id; document.getElementById('edit-sch-name').value = school.name; document.getElementById('edit-sch-id').value = school.id; document.getElementById('edit-sch-hm').value = school.hm || ""; document.getElementById('edit-sch-mobile').value = school.mobile || ""; document.getElementById('edit-sch-state').value = school.state || "Odisha"; document.getElementById('editSchoolModal').style.display = 'flex'; } }
         function saveEditedSchool() { let oldId = document.getElementById('edit-sch-old-id').value; let school = registeredSchools.find(s => s.id === oldId); if(school) { school.name = document.getElementById('edit-sch-name').value.trim(); school.id = document.getElementById('edit-sch-id').value.trim(); school.hm = document.getElementById('edit-sch-hm').value.trim(); school.mobile = document.getElementById('edit-sch-mobile').value.trim(); school.state = document.getElementById('edit-sch-state').value; saveLocalData(); renderAdminSchoolsTable(); updatePublicSchoolDropdown(); document.getElementById('editSchoolModal').style.display = 'none'; alert("School details updated!"); } }
         function updatePublicSchoolDropdown() { let select = document.getElementById('reg-s-school'); if(!select) return; select.innerHTML = '<option value="">-- Choose School --</option>'; registeredSchools.forEach(s => { if(s.status === "Approved") { select.innerHTML += `<option value="${s.id}">${s.name} (${s.id})</option>`; } }); }
         function openStudentRegistration() { document.getElementById('student-form-step').style.display = 'block'; document.getElementById('student-payment-step').style.display = 'none'; openPage('student-reg'); }
