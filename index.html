@@ -46,7 +46,7 @@
         .notice-board { background: #fffbeb; border: 1px solid #fde68a; border-left: 6px solid #f59e0b; padding: 18px 22px; border-radius: 14px; margin-bottom: 25px; }
         
         table { width: 100%; border-collapse: collapse; margin-top: 15px; display: block; overflow-x: auto; white-space: nowrap; }
-        th, td { padding: 10px 12px; border: 1px solid #cbd5e1; text-align: left; font-size: 13px; }
+        th, td { padding: 10px 12px; border: 1px solid #cbd5e1; text-align: left; font-size: 13px; vertical-align: middle; }
         th { background: #1e3a8a; color: white; }
         .badge-pending { background: #fef08a; color: #854d0e; padding: 4px 10px; border-radius: 6px; font-weight: bold; }
         .badge-approved { background: #dcfce7; color: #166534; padding: 4px 10px; border-radius: 6px; font-weight: bold; }
@@ -67,163 +67,57 @@
         
         .sub-row { display: grid; grid-template-columns: 1fr 2fr 1fr 1fr auto; gap: 8px; margin-bottom: 8px; align-items: center; }
 
-        /* ================= CERTIFICATE DESIGN ================= */
+        /* ================= CERTIFICATE DESIGN (FULL WIDTH) ================= */
         #marksheet-print-area {
-            display: none;
-            width: 210mm; /* A4 width */
-            height: 297mm; /* A4 height */
-            background-color: white;
-            margin: 0 auto;
-            position: relative;
-            padding: 20px;
-            font-family: 'Times New Roman', Times, serif;
-            color: #3b0764; /* Purple-ish text color to match theme */
-            box-sizing: border-box;
+            display: none; width: 210mm; height: 297mm; background-color: white; margin: 0 auto; position: relative; padding: 20px; font-family: 'Times New Roman', Times, serif; color: #3b0764; box-sizing: border-box;
         }
 
         .cert-border {
-            border: 15px solid #d8b4e2;
-            border-image: repeating-linear-gradient(45deg, #d8b4e2, #d8b4e2 10px, #e8d0ef 10px, #e8d0ef 20px) 15;
-            height: 100%;
-            padding: 20px;
-            position: relative;
-            z-index: 2;
+            border: 15px solid #d8b4e2; border-image: repeating-linear-gradient(45deg, #d8b4e2, #d8b4e2 10px, #e8d0ef 10px, #e8d0ef 20px) 15; height: 100%; padding: 20px; position: relative; z-index: 2;
         }
 
         .cert-watermark {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            opacity: 0.05;
-            font-size: 100px;
-            font-weight: bold;
-            color: #3b0764;
-            z-index: 1;
-            pointer-events: none;
-            user-select: none;
-            white-space: pre;
-            text-align: center;
-            line-height: 1.2;
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.05; font-size: 100px; font-weight: bold; color: #3b0764; z-index: 1; pointer-events: none; user-select: none; white-space: pre; text-align: center; line-height: 1.2;
         }
 
-        .cert-header {
-            text-align: center;
-            margin-bottom: 10px;
-        }
+        .cert-header { text-align: center; margin-bottom: 10px; }
+        .cert-header h1 { font-size: 26px; margin: 0; color: #4c1d95; text-transform: uppercase; }
+        .cert-header h2 { font-size: 16px; margin-top: 10px; color: #3b0764; }
 
-        .cert-header h1 {
-            font-size: 26px;
-            margin: 0;
-            color: #4c1d95;
-            text-transform: uppercase;
-        }
-
-        .cert-header h2 {
-            font-size: 16px;
-            margin-top: 10px;
-            color: #3b0764;
-        }
-
-        .cert-top-info {
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
+        .cert-top-info { display: flex; justify-content: space-between; font-size: 12px; font-weight: bold; margin-bottom: 10px; }
 
         .cert-photo-area {
-            position: absolute;
-            top: 80px;
-            left: 40px;
-            width: 100px;
-            height: 120px;
-            border: 2px solid #4c1d95;
-            background-color: #f1f5f9;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 10px;
-            color: #94a3b8;
+            position: absolute; top: 80px; left: 40px; width: 100px; height: 120px; border: 2px solid #4c1d95; background-color: #f1f5f9; display: flex; justify-content: center; align-items: center; font-size: 10px; color: #94a3b8; overflow: hidden;
         }
 
-        .cert-details {
-            margin-left: 150px; /* Make space for photo */
-            font-size: 14px;
-            line-height: 1.8;
-            margin-bottom: 15px;
-        }
-
+        .cert-details { margin-left: 150px; font-size: 14px; line-height: 1.8; margin-bottom: 15px; }
         .cert-details .row { display: flex; margin-bottom: 5px; }
         .cert-details .label { width: 150px; font-weight: bold; }
-        .cert-details .value { font-weight: bold; text-transform: uppercase; }
+        .cert-details .value { font-weight: bold; text-transform: uppercase; border-bottom: 1px dotted #4c1d95; flex: 1; }
 
         .cert-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 15px;
-            border: 2px solid #4c1d95;
+            width: 100%; border-collapse: collapse; margin-bottom: 15px; border: 2px solid #4c1d95; table-layout: fixed; /* Fixes empty space */
         }
-
-        .cert-table th, .cert-table td {
-            border: 1px solid #4c1d95;
-            padding: 8px;
-            text-align: center;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
+        .cert-table th, .cert-table td { border: 1px solid #4c1d95; padding: 8px; text-align: center; font-size: 13px; font-weight: bold; }
         .cert-table th { background-color: #f3e8ff; color: #4c1d95; }
+        .cert-table th:nth-child(1) { width: 15%; }
+        .cert-table th:nth-child(2) { width: 45%; text-align: left; padding-left: 15px; }
+        .cert-table th:nth-child(3) { width: 20%; }
+        .cert-table th:nth-child(4) { width: 20%; }
+        .cert-table td:nth-child(2) { text-align: left; padding-left: 15px; }
 
-        .cert-footer-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 10px;
-        }
-
-        .cert-grade-box {
-            border: 2px solid #4c1d95;
-            padding: 10px 20px;
-            text-align: center;
-            font-weight: bold;
-            background-color: #f3e8ff;
-        }
-
-        .cert-signatures {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 40px;
-            font-weight: bold;
-            font-size: 12px;
-            text-align: center;
-        }
-
-        .cert-signatures div {
-            border-top: 1px dashed #4c1d95;
-            padding-top: 5px;
-            width: 200px;
-        }
+        .cert-footer-info { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+        .cert-grade-box { border: 2px solid #4c1d95; padding: 10px 20px; text-align: center; font-weight: bold; background-color: #f3e8ff; }
+        .cert-signatures { display: flex; justify-content: space-between; margin-top: 40px; font-weight: bold; font-size: 12px; text-align: center; }
+        .cert-signatures div { border-top: 1px dashed #4c1d95; padding-top: 5px; width: 200px; }
 
         /* Print Specific Styles */
         @media print {
             body * { visibility: hidden; }
             #receipt-section, #receipt-section * { visibility: visible; }
             #marksheet-print-area, #marksheet-print-area * { visibility: visible; }
-            
             #receipt-section { position: absolute; left: 0; top: 0; width: 100%; background: white; border: none; box-shadow: none; padding: 20px; }
-            #marksheet-print-area { 
-                position: absolute; 
-                left: 0; 
-                top: 0; 
-                width: 210mm; 
-                height: 297mm;
-                display: block !important; 
-                margin: 0;
-                padding: 0;
-                box-shadow: none;
-            }
+            #marksheet-print-area { position: absolute; left: 0; top: 0; width: 210mm; height: 297mm; display: block !important; margin: 0; padding: 0; box-shadow: none; border: none; }
             .no-print { display: none !important; }
             .container { display: none; }
         }
@@ -242,7 +136,7 @@
         <div id="home-view">
             <div class="notice-board">
                 <h4>📢 Important Notice Board</h4>
-                <p id="display-notice">• Official Marksheet & Portal System is live.<br>• Certificate Header updated to display Specific School Name!</p>
+                <p id="display-notice">• Official Marksheet & Portal System is live.<br>• NEW: Student Photo Upload, Full Width Certificate Table!</p>
             </div>
 
             <div class="results-btn-card">
@@ -256,7 +150,7 @@
                     <div class="welcome-card">
                         <h3>🌟 Welcome to Digital School Management</h3>
                         <p>Manage your schools, student admissions, and records securely on the cloud platform.</p>
-                        <p><b>✨ Features:</b> Custom School Header on Certificate, 100% DB Safety, OTP Verified.</p>
+                        <p><b>✨ Features:</b> Custom School Header on Certificate, Photo Upload, 100% DB Safety.</p>
                     </div>
 
                     <div class="section-title">📌 Quick Portal Actions</div>
@@ -348,7 +242,7 @@
             <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
             
             <div id="student-form-step">
-                <h3 style="color: #0d3b66; margin-bottom:15px;">🎓 Public Student Application Form (18-Point)</h3>
+                <h3 style="color: #0d3b66; margin-bottom:15px;">🎓 Public Student Application Form</h3>
                 
                 <div class="form-grid">
                     <div><label>1. Student's Name <span class="req">*</span></label><input type="text" id="reg-s-name" class="input-box"></div>
@@ -369,7 +263,14 @@
                     <div><label>16. State <span class="req">*</span></label><select id="reg-s-state" class="input-box"><option value="">Select</option><option value="Odisha">Odisha</option><option value="West Bengal">West Bengal</option><option value="Andhra Pradesh">Andhra Pradesh</option></select></div>
                     <div><label>17. Local Language <span class="req">*</span></label><select id="reg-s-lang" class="input-box"><option value="">Select</option><option value="Odia">Odia</option><option value="Hindi">Hindi</option><option value="English">English</option></select></div>
                     <div><label>18. Mail ID <span class="req">*</span></label><input type="text" id="reg-s-mail" class="input-box"></div>
-                    <div style="grid-column: span 2;">
+                    
+                    <!-- NEW: PHOTO UPLOAD -->
+                    <div style="background:#e0f2fe; padding:10px; border-radius:8px; border:1px solid #bae6fd;">
+                        <label>19. Upload Student Photo <span class="req">*</span></label>
+                        <input type="file" id="reg-s-photo" accept="image/*" class="input-box" onchange="handlePublicPhotoUpload(event)">
+                    </div>
+
+                    <div>
                         <label>Select Target School <span class="req">*</span></label>
                         <select id="reg-s-school" class="input-box">
                             <!-- Dynamic Options loaded here -->
@@ -396,7 +297,7 @@
             </div>
         </div>
 
-        <!-- Receipt Section -->
+        <!-- Receipt / Application Form Document Section -->
         <div id="receipt-section" class="content-section" style="background:white;">
             <div style="border:2px solid #0d3b66; padding:30px; border-radius:12px; position:relative;">
                 <h2 id="receipt-title" style="text-align:center; color:#0d3b66; margin-bottom:10px;">🏫 OFFICIAL RECEIPT</h2>
@@ -430,7 +331,16 @@
                 
                 <select id="school-login-state" class="input-box" style="margin-bottom:15px;">
                     <option value="">-- Select Registered State --</option>
-                    <option value="Odisha">Odisha</option><option value="West Bengal">West Bengal</option><option value="Andhra Pradesh">Andhra Pradesh</option>
+                    <option value="Odisha">Odisha</option>
+                    <option value="West Bengal">West Bengal</option>
+                    <option value="Andhra Pradesh">Andhra Pradesh</option>
+                    <option value="Bihar">Bihar</option>
+                    <option value="Chhattisgarh">Chhattisgarh</option>
+                    <option value="Jharkhand">Jharkhand</option>
+                    <option value="Madhya Pradesh">Madhya Pradesh</option>
+                    <option value="Maharashtra">Maharashtra</option>
+                    <option value="Tamil Nadu">Tamil Nadu</option>
+                    <option value="Delhi">Delhi</option>
                 </select>
                 
                 <input type="text" id="school-login-id" placeholder="Enter School Code (e.g. 155CB)" class="input-box" style="margin-bottom:15px;">
@@ -443,12 +353,10 @@
             <div id="school-forgot-area" style="display:none; background:#f1f5f9; padding:20px; border-radius:12px; border:1px solid #cbd5e1;">
                 <h4 style="color:#0d3b66; margin-bottom:10px;">🔐 Reset School Password</h4>
                 <p style="font-size:14px; color:#64748b; margin-bottom:15px;">Enter your registered School Email to receive an OTP.</p>
-                
                 <div style="display:flex; gap:10px; margin-bottom:10px;">
                     <input type="email" id="school-reset-email" placeholder="Registered School Email" class="input-box" style="flex:1;">
                     <button style="background:#0d3b66; color:white; border:none; padding:10px 15px; border-radius:6px; cursor:pointer;" onclick="sendSchoolLoginOTP()">Send OTP</button>
                 </div>
-                
                 <div id="school-login-otp-div" style="display:none; margin-bottom:10px;">
                     <label style="color:#b45309; font-size:12px; font-weight:bold;">Enter OTP:</label>
                     <div style="display:flex; gap:10px; margin-top:5px;">
@@ -456,7 +364,6 @@
                         <button style="background:#f59e0b; color:white; border:none; padding:10px 15px; border-radius:6px; cursor:pointer; font-weight:bold;" onclick="verifySchoolLoginOTP()">Verify OTP ✅</button>
                     </div>
                 </div>
-
                 <div id="school-newpass-div" style="display:none;">
                     <label style="color:#166534; font-size:12px; font-weight:bold;">Set New Password:</label>
                     <input type="password" id="school-new-pass-input" placeholder="New Password" class="input-box" style="margin-top:5px; margin-bottom:10px; border-color:#16a34a;">
@@ -484,10 +391,10 @@
                 </div>
                 <table>
                     <thead>
-                        <tr><th>Roll No</th><th>Student Name</th><th>Father's Name</th><th>Total Marks</th><th>% & Grade</th><th>Status</th><th>Actions (Edit/Print/Delete)</th></tr>
+                        <tr><th>Photo</th><th>Roll No</th><th>Student Name</th><th>Father's Name</th><th>Total Marks</th><th>% & Grade</th><th>Status</th><th>Actions (Edit/Print/Delete)</th></tr>
                     </thead>
                     <tbody id="school-student-table-body">
-                        <!-- Loaded dynamically from studentDataStore -->
+                        <!-- Loaded dynamically -->
                     </tbody>
                 </table>
             </div>
@@ -496,7 +403,7 @@
                 <h3>🔔 New Admission Applications</h3>
                 <table>
                     <thead>
-                        <tr><th>App ID</th><th>Student Name</th><th>Payment Status</th><th>Action (Assign Roll & Approve)</th></tr>
+                        <tr><th>Photo</th><th>App ID</th><th>Student Name</th><th>Payment Status</th><th>Action (Assign Roll & Approve)</th></tr>
                     </thead>
                     <tbody id="school-pending-table-body">
                         <!-- Loaded dynamically -->
@@ -555,7 +462,6 @@
                 <button class="tab-btn" onclick="switchAdminTab('settings-tab', this)">⚙️ Portal Settings</button>
             </div>
 
-            <!-- Manage Schools & Approvals -->
             <div id="schools-tab" class="admin-tab-content">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                     <h3>School Approvals, Passwords & Payments</h3>
@@ -570,7 +476,6 @@
                 </table>
             </div>
 
-            <!-- Admin Students Master DB -->
             <div id="students-tab-admin" class="admin-tab-content" style="display:none;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                     <h3>🎓 Complete Student Database</h3>
@@ -578,7 +483,7 @@
                 </div>
                 <table>
                     <thead>
-                        <tr><th>Roll No</th><th>Student Name</th><th>Father's Name</th><th>School Name / Info</th><th>Total Marks</th><th>Actions</th></tr>
+                        <tr><th>Photo</th><th>Roll No</th><th>Student Name</th><th>Father's Name</th><th>School Name / Info</th><th>Total Marks</th><th>Actions</th></tr>
                     </thead>
                     <tbody id="student-table-body-admin">
                         <!-- Loaded dynamically -->
@@ -586,7 +491,6 @@
                 </table>
             </div>
 
-            <!-- Global Payment Settings -->
             <div id="payment-settings-tab" class="admin-tab-content" style="display:none;">
                 <h3>💳 Master Admin Payment Settings (For School Registration)</h3>
                 <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1; max-width:600px;">
@@ -600,7 +504,6 @@
                 </div>
             </div>
 
-            <!-- Admin Profile -->
             <div id="admin-profile-tab" class="admin-tab-content" style="display:none;">
                 <h3>👤 Admin Profile & Security</h3>
                 <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1; max-width:600px; margin-bottom:20px;">
@@ -615,7 +518,6 @@
                 </div>
             </div>
 
-            <!-- Portal Settings -->
             <div id="settings-tab" class="admin-tab-content" style="display:none;">
                 <h3>⚙️ Portal Customization Settings</h3>
                 <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1; margin-bottom:20px;">
@@ -626,13 +528,13 @@
                 <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1;">
                     <h4>📢 Edit / Update Notice Board</h4>
                     <textarea id="notice-input" rows="5" class="input-box" style="margin-bottom:10px;">• Official Marksheet & Portal System is live.
-• Fixed: Certificate Header displays Specific School Name. 100% Data Safe.</textarea>
+• 100% Full Width Certificate with Dynamic School Header enabled.</textarea>
                     <button style="background:#16a34a; color:white; border:none; padding:8px 20px; border-radius:6px; cursor:pointer;" onclick="updateNoticeBoard()">Save Notice Board 💾</button>
                 </div>
             </div>
         </div>
 
-        <!-- UNIVERSAL Add/Edit Student Modal (18 Points + Subjects + Auto Calculation) -->
+        <!-- UNIVERSAL Add/Edit Student Modal (18 Points + Subjects + Photo + Auto Calc) -->
         <div id="universalStudentModal" class="modal">
             <div class="modal-content">
                 <h3 id="us-modal-title" style="color:#0d3b66; margin-bottom:15px;">Add/Edit Student & Marksheet (18-Point)</h3>
@@ -657,7 +559,13 @@
                     <div><label style="font-size:12px; font-weight:bold;">15. PIN:</label><input type="text" id="us-pin" class="input-box"></div>
                     <div><label style="font-size:12px; font-weight:bold;">16. State:</label><select id="us-state" class="input-box"><option value="Odisha">Odisha</option></select></div>
                     <div><label style="font-size:12px; font-weight:bold;">17. Language:</label><select id="us-lang" class="input-box"><option value="Odia">Odia</option><option value="Hindi">Hindi</option></select></div>
-                    <div style="grid-column: span 2;"><label style="font-size:12px; font-weight:bold;">18. Mail ID:</label><input type="text" id="us-mail" class="input-box"></div>
+                    <div><label style="font-size:12px; font-weight:bold;">18. Mail ID:</label><input type="text" id="us-mail" class="input-box"></div>
+                    
+                    <div style="background:#e0f2fe; padding:10px; border-radius:8px; border:1px solid #bae6fd;">
+                        <label style="font-size:12px; font-weight:bold;">19. Upload Photo:</label>
+                        <input type="file" id="us-photo-input" accept="image/*" class="input-box" onchange="handleUsPhotoUpload(event)">
+                        <input type="hidden" id="us-photo-data">
+                    </div>
                 </div>
 
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
@@ -701,62 +609,17 @@
                 </div>
             </div>
         </div>
-        
-        <!-- ADMIN: Edit School Modal -->
-        <div id="editSchoolModal" class="modal">
-            <div class="modal-content">
-                <h3 style="color:#0d3b66; margin-bottom:15px;">✏️ Verify & Edit School Application</h3>
-                <input type="hidden" id="edit-sch-old-id">
-                <input type="text" id="edit-sch-name" placeholder="School Name" class="input-box" style="margin-bottom:12px;">
-                <input type="text" id="edit-sch-id" placeholder="School Code" class="input-box" style="margin-bottom:12px;">
-                <input type="text" id="edit-sch-hm" placeholder="Headmaster Name" class="input-box" style="margin-bottom:12px;">
-                <input type="text" id="edit-sch-mobile" placeholder="Mobile No" class="input-box" style="margin-bottom:12px;">
-                <select id="edit-sch-state" class="input-box" style="margin-bottom:12px;"><option value="Odisha">Odisha</option><option value="West Bengal">West Bengal</option><option value="Andhra Pradesh">Andhra Pradesh</option></select>
-                <div style="display:flex; justify-content:flex-end; gap:10px;">
-                    <button style="background:#64748b; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="document.getElementById('editSchoolModal').style.display='none'">Cancel</button>
-                    <button style="background:#2563eb; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="saveEditedSchool()">Save Changes 💾</button>
-                </div>
-            </div>
-        </div>
 
-        <!-- School Payment Setup Modal (Admin side) -->
-        <div id="schoolPaymentModal" class="modal">
-            <div class="modal-content" style="width:500px;">
-                <h3 style="color:#0d3b66; margin-bottom:10px;">💳 Set School Payment Gateway</h3>
-                <p id="sp-school-name" style="color:#1e3a8a; font-weight:bold; margin-bottom:15px;"></p>
-                <input type="hidden" id="sp-school-id">
-                
-                <label style="font-size:12px; font-weight:bold;">School UPI ID:</label>
-                <input type="text" id="sp-upi" placeholder="e.g. school123@upi" class="input-box" style="margin-bottom:12px;">
-                
-                <label style="font-size:12px; font-weight:bold;">Admission Base Fee (₹):</label>
-                <input type="number" id="sp-fee" placeholder="500" class="input-box" style="margin-bottom:12px;">
-                
-                <label style="font-size:12px; font-weight:bold;">GST Option:</label>
-                <select id="sp-gst-opt" class="input-box" style="margin-bottom:12px;" onchange="toggleGstInput()">
-                    <option value="none">No GST</option>
-                    <option value="percent">Apply GST %</option>
-                </select>
-                
-                <div id="sp-gst-div" style="display:none;">
-                    <label style="font-size:12px; font-weight:bold;">GST Percentage (%):</label>
-                    <input type="number" id="sp-gst-pct" placeholder="18" class="input-box" style="margin-bottom:12px;">
-                </div>
-                
-                <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px;">
-                    <button style="background:#64748b; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="document.getElementById('schoolPaymentModal').style.display='none'">Cancel</button>
-                    <button style="background:#22c55e; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="saveSchoolPaymentSetup()">Save Payment Setup 💾</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- PRINTABLE MARKSHEET SECTION (ORIGINAL BOARD DESIGN) -->
+        <!-- PRINTABLE MARKSHEET SECTION (FULL WIDTH ORIGINAL BOARD DESIGN) -->
         <div id="marksheet-print-area">
             <div class="cert-border">
-                <div class="cert-watermark" id="pm-watermark">SCHOOL<br>MARKSHEET</div>
+                <div class="cert-watermark" id="pm-watermark">BOARD OF<br>SECONDARY<br>EDUCATION<br>ODISHA</div>
 
                 <div class="cert-header">
+                    <img src="https://upload.wikimedia.org/wikipedia/en/thumb/f/f2/Board_of_Secondary_Education%2C_Odisha_logo.png/220px-Board_of_Secondary_Education%2C_Odisha_logo.png" alt="Board Logo" style="width: 80px; height: 80px; position:absolute; top:20px; left:50%; transform:translateX(-50%);">
+                    <br><br><br><br>
                     <h1 id="pm-header-school-name" style="font-size: 26px; margin: 0; color: #4c1d95; text-transform: uppercase;">SCHOOL NAME HERE</h1>
+                    <h2 style="font-family: Arial, sans-serif;">ମାଧ୍ୟମିକ ଶିକ୍ଷା ପରିଷଦ, ଓଡ଼ିଶା</h2>
                     <h2 style="font-size: 16px; margin-top:10px; color:#3b0764;">HIGH SCHOOL CERTIFICATE EXAMINATION - 2026</h2>
                     <h2 style="font-family: Arial, sans-serif; font-size:14px; color:#3b0764;">ଉଚ୍ଚ ବିଦ୍ୟାଳୟ ପ୍ରମାଣପତ୍ର ପରୀକ୍ଷା - ୨୦୨୬</h2>
                     <h2 style="font-size: 14px; margin-top:5px; color:#3b0764;">CERTIFICATE-CUM-MARK SHEET</h2>
@@ -774,7 +637,10 @@
                     </div>
                 </div>
 
-                <div class="cert-photo-area">Photo Not Available</div>
+                <div class="cert-photo-area">
+                    <img id="pm-photo" src="" style="width:100%; height:100%; object-fit:cover; display:none;">
+                    <span id="pm-photo-text">Photo</span>
+                </div>
 
                 <div class="cert-details">
                     <div class="row">
@@ -796,6 +662,10 @@
                     <div class="row" style="margin-top:10px;">
                         <div class="value" style="width:100%; border-bottom:1px dashed #4c1d95; padding-bottom:5px;" id="pm-school">SCHOOL NAME</div>
                     </div>
+                    <div class="row" style="margin-top:5px; font-size:12px;">
+                        <div style="width:50%;">ବ୍ଲକ୍/Block: <span class="value">DHAMNAGAR</span></div>
+                        <div style="width:50%; text-align:right;">ଜିଲ୍ଲା/District: <span class="value">BHADRAK</span></div>
+                    </div>
                     <div class="row" style="margin-top:5px; color:#4c1d95; font-size:12px;">
                         ଫେବୃଆରୀ ୨୦୨୬ ରେ ଅନୁଷ୍ଠିତ ମାଧ୍ୟମିକ ଉଚ୍ଚ ବିଦ୍ୟାଳୟ ପ୍ରମାଣପତ୍ର ପରୀକ୍ଷାରେ ଉତ୍ତୀର୍ଣ୍ଣ ହୋଇଛନ୍ତି।<br>
                         Passed the High School Certificate Examination held in the month of February - 2026.
@@ -811,7 +681,7 @@
                         <!-- Filled by JS -->
                     </tbody>
                     <tfoot>
-                        <tr><th colspan="2" style="text-align:right;">ମୋଟ / TOTAL</th><th id="pm-total-max">600</th><th id="pm-total-sec"></th></tr>
+                        <tr><th colspan="2" style="text-align:right; padding-right:15px;">ମୋଟ / TOTAL</th><th id="pm-total-max">600</th><th id="pm-total-sec"></th></tr>
                     </tfoot>
                 </table>
 
@@ -867,9 +737,11 @@
         let schoolPaymentTimerInterval; let paymentTimerInterval; let currentStudentFeeTotal = 0;
         let isSchoolOtpVerified = false; let generatedSchoolOtp = ""; let adminGenOtp = ""; let profGenOtp = ""; let schLoginGenOtp = ""; let resettingSchoolId = "";
 
-        // Advanced Data Structure for Subjects
+        let publicRegPhotoBase64 = ""; // Store uploaded photo globally for reg
+        
+        // Advanced Data Structure for Subjects & Photos
         let studentDataStore = JSON.parse(localStorage.getItem('studentDataStore')) || [
-            { roll: "155CB0197", name: "DIBYANSHI DAS", fname: "ANTARYAMI DAS", mname: "SHASHIKALA DAS", dob: "30/09/2010", mobile: "9876543210", school: "SRI BAIRAGI SARASWATI SISHU VIDYAMANDIR, ASURALI", total: 360, max: 600, grade: "B1", status: "Pass", subjects: [{code:"FLO", name:"FIRST LANGUAGE ODIA", max:100, sec:87}, {code:"SLE", name:"SECOND LANGUAGE ENGLISH", max:100, sec:81}, {code:"TLS", name:"THIRD LANGUAGE SANSKRIT", max:100, sec:92}, {code:"MTH", name:"MATHEMATICS", max:100, sec:69}, {code:"GSC", name:"GENERAL SCIENCE", max:100, sec:73}, {code:"SSC", name:"SOCIAL SCIENCE", max:100, sec:66}] }
+            { roll: "155CB0197", name: "DIBYANSHI DAS", fname: "ANTARYAMI DAS", mname: "SHASHIKALA DAS", dob: "30/09/2010", mobile: "9876543210", school: "SRI BAIRAGI SARASWATI SISHU VIDYAMANDIR", photo: "", total: 360, max: 600, grade: "B1", status: "Pass", subjects: [{code:"FLO", name:"FIRST LANGUAGE ODIA", max:100, sec:87}, {code:"SLE", name:"SECOND LANGUAGE ENGLISH", max:100, sec:81}, {code:"TLS", name:"THIRD LANGUAGE SANSKRIT", max:100, sec:92}, {code:"MTH", name:"MATHEMATICS", max:100, sec:69}, {code:"GSC", name:"GENERAL SCIENCE", max:100, sec:73}, {code:"SSC", name:"SOCIAL SCIENCE", max:100, sec:66}] }
         ];
 
         function saveLocalData() {
@@ -909,9 +781,10 @@
                 let statHtml = s.status === "Pass" ? `<span class="badge-pass">Pass ✅</span>` : `<span class="badge-fail">Fail ❌</span>`;
                 let actSchool = `<button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; margin-right:4px;" onclick="openAddEditStudentModal('${s.roll}')">Edit</button> <button style="background:#1e3a8a; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; margin-right:4px;" onclick="printStudent('${s.roll}')">Print / PDF</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="deleteStudent('${s.roll}')">Delete</button>`;
                 let actAdmin = `<button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; margin-right:4px;" onclick="openAddEditStudentModal('${s.roll}')">Edit</button> <button style="background:#1e3a8a; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; margin-right:4px;" onclick="printStudent('${s.roll}')">Print / PDF</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="deleteStudent('${s.roll}')">Delete</button>`;
+                let photoHtml = s.photo ? `<img src="${s.photo}" width="40" height="40" style="border-radius:4px; object-fit:cover;">` : "N/A";
 
-                schoolTbody.innerHTML += `<tr><td><b>${s.roll}</b></td><td>${s.name}</td><td>${s.fname}</td><td><b style="color:#16a34a;">${s.total} / ${s.max}</b></td><td>${((s.total/s.max)*100).toFixed(2)}% (${s.grade})</td><td>${statHtml}</td><td>${actSchool}</td></tr>`;
-                adminTbody.innerHTML += `<tr><td><b>${s.roll}</b></td><td>${s.name}</td><td>${s.fname}</td><td>${s.school}</td><td><b style="color:#16a34a;">${s.total} / ${s.max}</b></td><td>${actAdmin}</td></tr>`;
+                schoolTbody.innerHTML += `<tr><td>${photoHtml}</td><td><b>${s.roll}</b></td><td>${s.name}</td><td>${s.fname}</td><td><b style="color:#16a34a;">${s.total} / ${s.max}</b></td><td>${((s.total/s.max)*100).toFixed(2)}% (${s.grade})</td><td>${statHtml}</td><td>${actSchool}</td></tr>`;
+                adminTbody.innerHTML += `<tr><td>${photoHtml}</td><td><b>${s.roll}</b></td><td>${s.name}</td><td>${s.fname}</td><td>${s.school}</td><td><b style="color:#16a34a;">${s.total} / ${s.max}</b></td><td>${actAdmin}</td></tr>`;
             });
         }
 
@@ -922,7 +795,27 @@
             }
         }
 
-        // --- NEW: PRINT / PDF FEATURE (ORIGINAL DESIGN) ---
+        // --- PUBLIC REGISTRATION PHOTO UPLOAD ---
+        function handlePublicPhotoUpload(event) {
+            let file = event.target.files[0];
+            if(file) {
+                let reader = new FileReader();
+                reader.onload = function(e) { publicRegPhotoBase64 = e.target.result; };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // --- UNIVERSAL ADD/EDIT PHOTO UPLOAD ---
+        function handleUsPhotoUpload(event) {
+            let file = event.target.files[0];
+            if(file) {
+                let reader = new FileReader();
+                reader.onload = function(e) { document.getElementById('us-photo-data').value = e.target.result; };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // --- NEW: PRINT / PDF FEATURE (ORIGINAL DESIGN FULL WIDTH) ---
         function printStudent(roll) {
             let student = studentDataStore.find(s => s.roll === roll);
             if(!student) { alert("Student data not found for printing!"); return; }
@@ -941,6 +834,15 @@
             document.getElementById('pm-grade').innerText = student.grade;
             document.getElementById('pm-words').innerText = `( ${numberToWords(student.total)} )`;
             
+            if(student.photo) {
+                document.getElementById('pm-photo').src = student.photo;
+                document.getElementById('pm-photo').style.display = 'block';
+                document.getElementById('pm-photo-text').style.display = 'none';
+            } else {
+                document.getElementById('pm-photo').style.display = 'none';
+                document.getElementById('pm-photo-text').style.display = 'block';
+            }
+
             document.getElementById('pm-barcode').src = `https://barcode.tec-it.com/barcode.ashx?data=${student.roll}&code=Code128&translate-esc=on`;
             
             let qrData = `Name: ${student.name}%0ARoll: ${student.roll}%0ATotal: ${student.total}/${student.max}%0AGrade: ${student.grade}`;
@@ -950,7 +852,7 @@
             tbody.innerHTML = "";
             if (student.subjects && student.subjects.length > 0) {
                 student.subjects.forEach(sub => {
-                    tbody.innerHTML += `<tr><td>${sub.code}</td><td style="text-align:left;">${sub.name}</td><td>${sub.max}</td><td>${sub.sec}</td></tr>`;
+                    tbody.innerHTML += `<tr><td>${sub.code}</td><td style="text-align:left; padding-left:15px;">${sub.name}</td><td>${sub.max}</td><td>${sub.sec}</td></tr>`;
                 });
             } else {
                  tbody.innerHTML = `<tr><td colspan="4">Marks detailed breakdown not available.</td></tr>`;
@@ -962,7 +864,10 @@
         }
         
         function closePrintView() {
-            document.getElementById('marksheet-print-area').style.display = 'none'; openPage('school-dashboard');
+            document.getElementById('marksheet-print-area').style.display = 'none'; 
+            // Determine if admin or school was active
+            if(adminProfile.user === document.getElementById('admin-user').value) { openPage('admin-dashboard'); }
+            else { openPage('school-dashboard'); } // Default fallback
         }
 
         function saveAsPDF() {
@@ -991,7 +896,7 @@
             let student = studentDataStore.find(s => s.roll.toLowerCase() === roll.toLowerCase());
             let area = document.getElementById('result-display-area');
             if(student) {
-                area.innerHTML = `<div style="background:#f1f5f9; padding:15px; border-radius:10px; border-left:5px solid #2563eb; font-size:14px;"><h4 style="color:#1e3a8a; margin-bottom:8px;">📄 Result Found: ${student.name}</h4><p><b>Roll No:</b> ${student.roll}</p><p><b>Total:</b> ${student.total}/${student.max} (${student.grade})</p><p><b>Status:</b> ${student.status}</p><button style="background:#1e3a8a; color:white; border:none; padding:8px 15px; border-radius:4px; margin-top:10px; cursor:pointer;" onclick="document.getElementById('resultsModal').style.display='none'; printStudent('${student.roll}')">🖨️ View & Print Original Marksheet</button></div>`;
+                area.innerHTML = `<div style="background:#f1f5f9; padding:15px; border-radius:10px; border-left:5px solid #2563eb; font-size:14px;"><h4 style="color:#1e3a8a; margin-bottom:8px;">📄 Result Found: ${student.name}</h4><p><b>Roll No:</b> ${student.roll}</p><p><b>Total:</b> ${student.total}/${student.max} (${student.grade})</p><p><b>Status:</b> ${student.status}</p><button style="background:#1e3a8a; color:white; border:none; padding:8px 15px; border-radius:4px; margin-top:10px; cursor:pointer;" onclick="document.getElementById('resultsModal').style.display='none'; printStudent('${student.roll}')">🖨️️ View & Print Original Marksheet</button></div>`;
             } else {
                 area.innerHTML = `<p style="color:red; font-weight:bold; text-align:center;">❌ Roll Number not found.</p>`;
             }
@@ -1010,6 +915,8 @@
                 document.getElementById('us-roll').value = student.roll; document.getElementById('us-name').value = student.name; 
                 document.getElementById('us-fname').value = student.fname; document.getElementById('us-mname').value = student.mname || "";
                 document.getElementById('us-dob').value = student.dob || ""; document.getElementById('us-mobile').value = student.mobile || "";
+                document.getElementById('us-photo-data').value = student.photo || "";
+                document.getElementById('us-photo-input').value = ""; // clear file input
                 
                 sBody.innerHTML = "";
                 student.subjects.forEach(sub => {
@@ -1019,6 +926,7 @@
                 currentEditRoll = null; document.getElementById('us-modal-title').innerText = "Add Student & Subjects Manually";
                 document.getElementById('us-roll').value = ""; document.getElementById('us-name').value = ""; document.getElementById('us-fname').value = ""; 
                 document.getElementById('us-mname').value = ""; document.getElementById('us-dob').value = ""; document.getElementById('us-mobile').value = "";
+                document.getElementById('us-photo-data').value = ""; document.getElementById('us-photo-input').value = "";
                 
                 sBody.innerHTML = `<div class="sub-row"><input type="text" value="FLO" class="input-box sub-code" style="padding:6px;"><input type="text" value="FIRST LANGUAGE ODIA" class="input-box sub-name" style="padding:6px;"><input type="number" value="100" class="input-box sub-max" style="padding:6px;" oninput="calculateAutoMarks()"><input type="number" value="" class="input-box sub-sec" style="padding:6px;" oninput="calculateAutoMarks()"><button type="button" style="background:#dc2626; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('.sub-row').remove(); calculateAutoMarks();">Delete</button></div>`;
             }
@@ -1066,10 +974,12 @@
                 activeSchoolName = document.getElementById('school-dash-title').innerText.replace('🏫 ', '');
             }
 
+            let photoData = document.getElementById('us-photo-data').value;
+
             let studentObj = {
                 roll: roll, name: document.getElementById('us-name').value.trim(), fname: document.getElementById('us-fname').value.trim(),
                 mname: document.getElementById('us-mname').value.trim(), dob: document.getElementById('us-dob').value.trim(),
-                mobile: document.getElementById('us-mobile').value.trim(), school: activeSchoolName,
+                mobile: document.getElementById('us-mobile').value.trim(), school: activeSchoolName, photo: photoData,
                 total: parseFloat(document.getElementById('auto-sec').innerText), max: parseFloat(document.getElementById('auto-max').innerText),
                 grade: document.getElementById('us-final-pctgrade').value, status: document.getElementById('us-final-status').value,
                 subjects: subs
@@ -1091,7 +1001,52 @@
         function openPage(pageId) { document.getElementById('home-view').style.display = 'none'; let sections = document.getElementsByClassName('content-section'); for (let sec of sections) { sec.classList.remove('active'); } document.getElementById(pageId).classList.add('active'); }
         function goHome() { let sections = document.getElementsByClassName('content-section'); for (let sec of sections) { sec.classList.remove('active'); } document.getElementById('home-view').style.display = 'block'; clearInterval(paymentTimerInterval); clearInterval(schoolPaymentTimerInterval); }
 
-        // --- ALL ADMIN & SCHOOL LOGIC RETAINED ---
+        // --- PUBLIC NEW STUDENT ADMISSION WITH PHOTO ---
+        function updatePublicSchoolDropdown() {
+            let select = document.getElementById('reg-s-school');
+            if(!select) return; select.innerHTML = '<option value="">-- Choose School --</option>';
+            registeredSchools.forEach(s => { if(s.status === "Approved") { select.innerHTML += `<option value="${s.id}">${s.name} (${s.id})</option>`; } });
+        }
+        function openStudentRegistration() { document.getElementById('student-form-step').style.display = 'block'; document.getElementById('student-payment-step').style.display = 'none'; publicRegPhotoBase64 = ""; document.getElementById('reg-s-photo').value = ""; openPage('student-reg'); }
+        function validateStudentForm() {
+            let reqIds = ['reg-s-name', 'reg-s-gender', 'reg-s-dob', 'reg-s-mname', 'reg-s-fname', 'reg-s-aadhaar', 'reg-s-mobile', 'reg-s-blood', 'reg-s-minority', 'reg-s-category', 'reg-s-address', 'reg-s-pin', 'reg-s-state', 'reg-s-lang', 'reg-s-mail', 'reg-s-school'];
+            for(let id of reqIds) { if(!document.getElementById(id).value.trim()) { alert('Please fill all Mandatory (*) Fields correctly!'); return; } }
+            if(!publicRegPhotoBase64) { alert("Please Upload Student Photo!"); return; }
+
+            let sId = document.getElementById('reg-s-school').value; let school = registeredSchools.find(s => s.id === sId);
+            let upi = school.upi || "default@upi"; let fee = school.baseFee || 500; let gst = school.hasGst ? fee * (school.gstPct / 100) : 0; currentStudentFeeTotal = fee + gst;
+            document.getElementById('spay-school-name').innerText = school.name; document.getElementById('display-stu-fee').innerText = fee; document.getElementById('display-stu-gst').innerText = gst; document.getElementById('display-stu-total').innerText = currentStudentFeeTotal; document.getElementById('display-stu-upi').innerText = upi; document.getElementById('stu-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=${upi}&pn=SchoolAdmission&am=${currentStudentFeeTotal}&cu=INR`; document.getElementById('student-form-step').style.display = 'none'; document.getElementById('student-payment-step').style.display = 'block'; let timeLeft = 30; document.getElementById('payment-timer').innerText = timeLeft; clearInterval(paymentTimerInterval); paymentTimerInterval = setInterval(() => { timeLeft--; document.getElementById('payment-timer').innerText = timeLeft; if(timeLeft <= 0) { clearInterval(paymentTimerInterval); alert("Payment Timeout!"); goHome(); } }, 1000); 
+        }
+        function submitStudentApplication() { 
+            let utr = document.getElementById('student-utr').value.trim(); if(!utr) { alert("Please enter Transaction ID to verify payment!"); return; } clearInterval(paymentTimerInterval); 
+            let newApp = { appId: Math.floor(Math.random() * 90000 + 10000), name: document.getElementById('reg-s-name').value, fname: document.getElementById('reg-s-fname').value, mobile: document.getElementById('reg-s-mobile').value, gender: document.getElementById('reg-s-gender').value, schoolId: document.getElementById('reg-s-school').value, schoolName: document.getElementById('reg-s-school').options[document.getElementById('reg-s-school').selectedIndex].text, utr: utr, amt: currentStudentFeeTotal, photo: publicRegPhotoBase64 }; 
+            pendingApplications.push(newApp); saveLocalData(); document.getElementById('student-reg').classList.remove('active'); document.getElementById('receipt-title').innerText = "🏫 OFFICIAL ADMISSION RECEIPT"; document.getElementById('receipt-sub').innerText = "Submit this Hard Copy to your Respective School"; document.getElementById('rec-school').parentElement.style.display = 'block'; document.getElementById('rec-app-id').innerText = newApp.appId; document.getElementById('rec-date').innerText = new Date().toLocaleDateString(); document.getElementById('rec-name').innerText = newApp.name; document.getElementById('rec-fname').innerText = newApp.fname; document.getElementById('rec-info').innerText = `Mobile: ${newApp.mobile}`; document.getElementById('rec-school').innerText = newApp.schoolName; document.getElementById('rec-utr').innerText = utr; document.getElementById('rec-amt').innerText = newApp.amt; document.getElementById('receipt-section').classList.add('active'); updateNotificationBadge(); 
+        }
+
+        // --- PENDING APP RENDERING WITH PHOTO ---
+        function updateNotificationBadge() { let badge = document.getElementById('notif-badge'); if(!badge) return; if(pendingApplications.length > 0) { badge.innerText = pendingApplications.length; badge.style.display = 'inline-block'; } else { badge.style.display = 'none'; } }
+        function renderPendingApplications(schoolId) { 
+            let tbody = document.getElementById('school-pending-table-body'); tbody.innerHTML = ""; let relevantApps = pendingApplications.filter(app => app.schoolId === schoolId); 
+            for(let i=0; i<relevantApps.length; i++) { 
+                let app = relevantApps[i]; let row = tbody.insertRow(); 
+                let photoHtml = app.photo ? `<img src="${app.photo}" width="40" height="40" style="border-radius:4px; object-fit:cover;">` : "N/A";
+                row.innerHTML = `<td>${photoHtml}</td><td><b>APP-${app.appId}</b></td><td>${app.name}</td><td><span style="color:#16a34a; font-weight:bold;">${app.utr}</span></td><td><button style="background:#16a34a; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="approveApplication(${app.appId})">Assign Roll & Approve ✅</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="rejectApplication(${app.appId})">Reject ❌</button></td>`; 
+            } updateNotificationBadge(); 
+        }
+        function approveApplication(appId) { 
+            let index = pendingApplications.findIndex(a => a.appId === appId); 
+            if(index > -1) { 
+                let app = pendingApplications[index]; let assignedRoll = prompt(`ASSIGN A ROLL NUMBER:`, "e.g. 155CB0198"); 
+                if(assignedRoll && assignedRoll.trim() !== "") { 
+                    let newStudent = { roll: assignedRoll, name: app.name, fname: app.fname, mname: "", dob: "", mobile: app.mobile, school: app.schoolName, photo: app.photo, total: 0, max: 0, grade: "-", status: "Fail", subjects: [] };
+                    studentDataStore.push(newStudent);
+                    pendingApplications.splice(index, 1); saveLocalData(); refreshTablesFromStore(); alert(`Student Approved! Assigned Roll No: ${assignedRoll}`); renderPendingApplications(app.schoolId); 
+                } else { alert("Roll No is required to approve."); } 
+            } 
+        }
+        function rejectApplication(appId) { if(confirm("Are you sure?")) { let index = pendingApplications.findIndex(a => a.appId === appId); if(index > -1) { let sId = pendingApplications[index].schoolId; pendingApplications.splice(index, 1); saveLocalData(); renderPendingApplications(sId); } } }
+
+        // --- ALL ADMIN / SCHOOL REG & LOGIN REST OF CODE ---
         function validateAdmin() { let u = document.getElementById('admin-user').value.trim(); let p = document.getElementById('admin-pass').value.trim(); if (u === adminProfile.user && p === adminProfile.pass) { document.getElementById('admin-user').value = ""; document.getElementById('admin-pass').value = ""; openPage('admin-dashboard'); } else { alert('Invalid Admin Username or Password!'); } }
         function openAdminForgotPassword() { document.getElementById('admin-login-area').style.display = 'none'; document.getElementById('admin-forgot-area').style.display = 'block'; }
         function cancelAdminForgot() { document.getElementById('admin-forgot-area').style.display = 'none'; document.getElementById('admin-login-area').style.display = 'block'; }
@@ -1114,10 +1069,6 @@
         function rejectSchool(id) { if(confirm("Are you sure you want to Reject and Delete this school?")) { registeredSchools = registeredSchools.filter(s => s.id !== id); saveLocalData(); renderAdminSchoolsTable(); updatePublicSchoolDropdown(); } }
         function openVerifyEditSchool(id) { let school = registeredSchools.find(s => s.id === id); if(school) { document.getElementById('edit-sch-old-id').value = school.id; document.getElementById('edit-sch-name').value = school.name; document.getElementById('edit-sch-id').value = school.id; document.getElementById('edit-sch-hm').value = school.hm || ""; document.getElementById('edit-sch-mobile').value = school.mobile || ""; document.getElementById('edit-sch-state').value = school.state || "Odisha"; document.getElementById('editSchoolModal').style.display = 'flex'; } }
         function saveEditedSchool() { let oldId = document.getElementById('edit-sch-old-id').value; let school = registeredSchools.find(s => s.id === oldId); if(school) { school.name = document.getElementById('edit-sch-name').value.trim(); school.id = document.getElementById('edit-sch-id').value.trim(); school.hm = document.getElementById('edit-sch-hm').value.trim(); school.mobile = document.getElementById('edit-sch-mobile').value.trim(); school.state = document.getElementById('edit-sch-state').value; saveLocalData(); renderAdminSchoolsTable(); updatePublicSchoolDropdown(); document.getElementById('editSchoolModal').style.display = 'none'; alert("School details updated!"); } }
-        function updatePublicSchoolDropdown() { let select = document.getElementById('reg-s-school'); if(!select) return; select.innerHTML = '<option value="">-- Choose School --</option>'; registeredSchools.forEach(s => { if(s.status === "Approved") { select.innerHTML += `<option value="${s.id}">${s.name} (${s.id})</option>`; } }); }
-        function openStudentRegistration() { document.getElementById('student-form-step').style.display = 'block'; document.getElementById('student-payment-step').style.display = 'none'; openPage('student-reg'); }
-        function validateStudentForm() { let reqIds = ['reg-s-name', 'reg-s-gender', 'reg-s-dob', 'reg-s-mname', 'reg-s-fname', 'reg-s-aadhaar', 'reg-s-mobile', 'reg-s-blood', 'reg-s-minority', 'reg-s-category', 'reg-s-address', 'reg-s-pin', 'reg-s-state', 'reg-s-lang', 'reg-s-mail', 'reg-s-school']; for(let id of reqIds) { if(!document.getElementById(id).value.trim()) { alert('Please fill all Mandatory (*) Fields correctly!'); return; } } let sId = document.getElementById('reg-s-school').value; let school = registeredSchools.find(s => s.id === sId); let upi = school.upi || "default@upi"; let fee = school.baseFee || 500; let gst = school.hasGst ? fee * (school.gstPct / 100) : 0; currentStudentFeeTotal = fee + gst; document.getElementById('spay-school-name').innerText = school.name; document.getElementById('display-stu-fee').innerText = fee; document.getElementById('display-stu-gst').innerText = gst; document.getElementById('display-stu-total').innerText = currentStudentFeeTotal; document.getElementById('display-stu-upi').innerText = upi; document.getElementById('stu-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=${upi}&pn=SchoolAdmission&am=${currentStudentFeeTotal}&cu=INR`; document.getElementById('student-form-step').style.display = 'none'; document.getElementById('student-payment-step').style.display = 'block'; let timeLeft = 30; document.getElementById('payment-timer').innerText = timeLeft; clearInterval(paymentTimerInterval); paymentTimerInterval = setInterval(() => { timeLeft--; document.getElementById('payment-timer').innerText = timeLeft; if(timeLeft <= 0) { clearInterval(paymentTimerInterval); alert("Payment Timeout!"); goHome(); } }, 1000); }
-        function submitStudentApplication() { let utr = document.getElementById('student-utr').value.trim(); if(!utr) { alert("Please enter Transaction ID to verify payment!"); return; } clearInterval(paymentTimerInterval); let newApp = { appId: Math.floor(Math.random() * 90000 + 10000), name: document.getElementById('reg-s-name').value, fname: document.getElementById('reg-s-fname').value, mobile: document.getElementById('reg-s-mobile').value, gender: document.getElementById('reg-s-gender').value, schoolId: document.getElementById('reg-s-school').value, schoolName: document.getElementById('reg-s-school').options[document.getElementById('reg-s-school').selectedIndex].text, utr: utr, amt: currentStudentFeeTotal }; pendingApplications.push(newApp); saveLocalData(); document.getElementById('student-reg').classList.remove('active'); document.getElementById('receipt-title').innerText = "🏫 OFFICIAL ADMISSION RECEIPT"; document.getElementById('receipt-sub').innerText = "Submit this Hard Copy to your Respective School"; document.getElementById('rec-school').parentElement.style.display = 'block'; document.getElementById('rec-app-id').innerText = newApp.appId; document.getElementById('rec-date').innerText = new Date().toLocaleDateString(); document.getElementById('rec-name').innerText = newApp.name; document.getElementById('rec-fname').innerText = newApp.fname; document.getElementById('rec-info').innerText = `Mobile: ${newApp.mobile}`; document.getElementById('rec-school').innerText = newApp.schoolName; document.getElementById('rec-utr').innerText = utr; document.getElementById('rec-amt').innerText = newApp.amt; document.getElementById('receipt-section').classList.add('active'); updateNotificationBadge(); }
         function validateSchoolLogin() { let state = document.getElementById('school-login-state').value; let sId = document.getElementById('school-login-id').value.trim(); let pass = document.getElementById('school-login-pass').value.trim(); if(!state) { alert("Please select your registered State!"); return; } let match = registeredSchools.find(s => s.id.toLowerCase() === sId.toLowerCase() && s.pass === pass && s.state === state); if(match) { if(match.status !== "Approved") { alert("Your School Registration is still pending Master Admin Approval. You cannot login yet."); return; } document.getElementById('school-dash-title').innerText = `🏫 ${match.name}`; document.getElementById('school-dash-sub').innerText = `ID: ${match.id} | HM: ${match.hm}`; renderPendingApplications(match.id); switchSchoolTab('school-enrolled-tab', document.getElementById('school-dashboard').getElementsByClassName('tab-btn')[0]); openPage('school-dashboard'); } else { alert('Invalid State, School ID, or Password!'); } }
         function openSchoolForgotPassword() { document.getElementById('school-login-area').style.display = 'none'; document.getElementById('school-forgot-area').style.display = 'block'; }
         function cancelSchoolForgot() { document.getElementById('school-forgot-area').style.display = 'none'; document.getElementById('school-login-area').style.display = 'block'; document.getElementById('school-login-otp-div').style.display = 'none'; document.getElementById('school-newpass-div').style.display = 'none'; resettingSchoolId = ""; }
@@ -1125,14 +1076,6 @@
         function verifySchoolLoginOTP() { if(document.getElementById('school-reset-otp').value.trim() === schLoginGenOtp) { alert("OTP Verified!"); document.getElementById('school-login-otp-div').style.display = 'none'; document.getElementById('school-newpass-div').style.display = 'block'; } else { alert("Invalid OTP!"); } }
         function saveNewSchoolPassword() { let newPass = document.getElementById('school-new-pass-input').value.trim(); if(!newPass) { alert("Enter a new password!"); return; } let school = registeredSchools.find(s => s.id === resettingSchoolId); if(school) { school.pass = newPass; saveLocalData(); alert("School Password updated successfully! Please login with new password."); cancelSchoolForgot(); } }
         function switchSchoolTab(tabId, btn) { let contents = document.getElementsByClassName('school-tab-content'); for(let c of contents) { c.style.display = 'none'; } document.getElementById(tabId).style.display = 'block'; let btns = document.getElementById('school-dashboard').getElementsByClassName('tab-btn'); for(let b of btns) { b.classList.remove('active-tab'); } btn.classList.add('active-tab'); }
-        function updateNotificationBadge() { let badge = document.getElementById('notif-badge'); if(!badge) return; if(pendingApplications.length > 0) { badge.innerText = pendingApplications.length; badge.style.display = 'inline-block'; } else { badge.style.display = 'none'; } }
-        function renderPendingApplications(schoolId) { let tbody = document.getElementById('school-pending-table-body'); tbody.innerHTML = ""; let relevantApps = pendingApplications.filter(app => app.schoolId === schoolId); for(let i=0; i<relevantApps.length; i++) { let app = relevantApps[i]; let row = tbody.insertRow(); row.innerHTML = `<td><b>APP-${app.appId}</b></td><td>${app.name}</td><td><span style="color:#16a34a; font-weight:bold;">${app.utr}</span></td><td><button style="background:#16a34a; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="approveApplication(${app.appId})">Assign Roll & Approve ✅</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="rejectApplication(${app.appId})">Reject ❌</button></td>`; } updateNotificationBadge(); }
-        function approveApplication(appId) { let index = pendingApplications.findIndex(a => a.appId === appId); if(index > -1) { let app = pendingApplications[index]; let assignedRoll = prompt(`ASSIGN A ROLL NUMBER:`, "e.g. 155CB0198"); if(assignedRoll && assignedRoll.trim() !== "") { 
-            let newStudent = { roll: assignedRoll, name: app.name, fname: app.fname, mname: "", dob: "", mobile: app.mobile, school: app.schoolName, total: 0, max: 0, grade: "-", status: "Fail", subjects: [] };
-            studentDataStore.push(newStudent);
-            pendingApplications.splice(index, 1); saveLocalData(); refreshTablesFromStore(); alert(`Student Approved! Assigned Roll No: ${assignedRoll}`); renderPendingApplications(app.schoolId); 
-        } else { alert("Roll No is required to approve."); } } }
-        function rejectApplication(appId) { if(confirm("Are you sure?")) { let index = pendingApplications.findIndex(a => a.appId === appId); if(index > -1) { let sId = pendingApplications[index].schoolId; pendingApplications.splice(index, 1); saveLocalData(); renderPendingApplications(sId); } } }
         function updateSchoolPassword(schoolId, newPass) { let school = registeredSchools.find(s => s.id === schoolId); if(school) { school.pass = newPass; saveLocalData(); alert(`Password updated!`); } }
         function openSchoolPaymentSetup(id) { let school = registeredSchools.find(s => s.id === id); if(!school) return; document.getElementById('sp-school-id').value = school.id; document.getElementById('sp-school-name').innerText = school.name + " (" + school.id + ")"; document.getElementById('sp-upi').value = school.upi || ""; document.getElementById('sp-fee').value = school.baseFee || 500; document.getElementById('sp-gst-opt').value = school.hasGst ? "percent" : "none"; document.getElementById('sp-gst-pct').value = school.gstPct || 18; toggleGstInput(); document.getElementById('schoolPaymentModal').style.display = 'flex'; }
         function toggleGstInput() { let opt = document.getElementById('sp-gst-opt').value; document.getElementById('sp-gst-div').style.display = opt === 'percent' ? 'block' : 'none'; }
