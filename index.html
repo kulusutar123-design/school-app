@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>School Home Portal - Ultimate Edition</title>
+    <title>School Home Portal - Ultimate Secure Edition</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background: linear-gradient(rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.7)), url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1920&auto=format&fit=crop') no-repeat center center fixed; background-size: cover; color: #333; padding: 20px; min-height: 100vh; }
@@ -55,7 +55,7 @@
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
         .req { color: red; }
-        .input-box { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; }
+        .input-box { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline: none; }
 
         /* Modal */
         .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(5px); justify-content: center; align-items: center; }
@@ -66,8 +66,8 @@
         /* Print Specific Styles */
         @media print {
             body * { visibility: hidden; }
-            #student-receipt-section, #student-receipt-section * { visibility: visible; }
-            #student-receipt-section { position: absolute; left: 0; top: 0; width: 100%; background: white; border: none; box-shadow: none; padding: 20px; }
+            #receipt-section, #receipt-section * { visibility: visible; }
+            #receipt-section { position: absolute; left: 0; top: 0; width: 100%; background: white; border: none; box-shadow: none; padding: 20px; }
             .no-print { display: none !important; }
         }
     </style>
@@ -85,7 +85,7 @@
         <div id="home-view">
             <div class="notice-board">
                 <h4>📢 Important Notice Board</h4>
-                <p id="display-notice">• Official Marksheet & Portal System is live.<br>• Everything is Auto-Saved. Added School Registration Next & Timer features.</p>
+                <p id="display-notice">• Official Marksheet & Portal System is live.<br>• New Feature: OTP based School Registration & Admin Approval system active.</p>
             </div>
 
             <div class="results-btn-card">
@@ -99,7 +99,7 @@
                     <div class="welcome-card">
                         <h3>🌟 Welcome to Digital School Management</h3>
                         <p>Manage your schools, student admissions, and records securely on the cloud platform.</p>
-                        <p><b>✨ Features:</b> Admin School Payments, Auto-Save Database, Dual QR Payments.</p>
+                        <p><b>✨ Features:</b> OTP Registration, Admin Payment Approvals, Complete Auto-Save DB.</p>
                     </div>
 
                     <div class="section-title">📌 Quick Portal Actions</div>
@@ -126,13 +126,13 @@
             </div>
         </div>
 
-        <!-- 1. PUBLIC NEW SCHOOL REGISTRATION FLOW (WITH PAYMENT TO ADMIN) -->
+        <!-- 1. PUBLIC NEW SCHOOL REGISTRATION FLOW (OTP + PAYMENT TO ADMIN) -->
         <div id="school-reg" class="content-section">
             <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
             
             <div id="school-form-step">
                 <h3 style="color: #0d3b66; margin-bottom:15px;">📝 New School Registration Form</h3>
-                <p style="color: #64748b; margin-bottom: 20px;">Fields marked with <span class="req">*</span> are compulsory.</p>
+                <p style="color: #64748b; margin-bottom: 20px;">Complete the form, verify email via OTP, set password, and proceed to payment.</p>
                 
                 <div class="form-grid">
                     <div><label>1. SCHOOL NAME <span class="req">*</span></label><input type="text" id="reg-school-name" class="input-box"></div>
@@ -142,17 +142,30 @@
                     <div style="grid-column: span 2;"><label>5. STATE <span class="req">*</span></label>
                         <select id="reg-school-state" class="input-box">
                             <option value="">-- Select State --</option>
-                            <option value="Odisha">Odisha</option>
-                            <option value="West Bengal">West Bengal</option>
-                            <option value="Andhra Pradesh">Andhra Pradesh</option>
-                            <option value="Bihar">Bihar</option>
-                            <option value="Chhattisgarh">Chhattisgarh</option>
-                            <option value="Jharkhand">Jharkhand</option>
-                            <option value="Madhya Pradesh">Madhya Pradesh</option>
-                            <option value="Maharashtra">Maharashtra</option>
-                            <option value="Tamil Nadu">Tamil Nadu</option>
-                            <option value="Delhi">Delhi</option>
+                            <option value="Odisha">Odisha</option><option value="West Bengal">West Bengal</option><option value="Andhra Pradesh">Andhra Pradesh</option>
                         </select>
+                    </div>
+                    
+                    <!-- OTP & Password Section -->
+                    <div style="grid-column: span 2; background: #f1f5f9; padding: 15px; border-radius: 8px; border: 1px solid #cbd5e1;">
+                        <label>6. MAIL ID <span class="req">*</span></label>
+                        <div style="display:flex; gap:10px; margin-bottom:10px;">
+                            <input type="email" id="reg-school-email" placeholder="Enter valid email" class="input-box" style="flex:1;">
+                            <button style="background:#0d3b66; color:white; border:none; padding:10px 15px; border-radius:6px; cursor:pointer;" onclick="sendSchoolOTP()">Send OTP</button>
+                        </div>
+                        
+                        <div id="school-otp-div" style="display:none; margin-bottom:10px;">
+                            <label style="color:#b45309;">Enter OTP sent to Mail:</label>
+                            <div style="display:flex; gap:10px; margin-top:5px;">
+                                <input type="text" id="reg-school-otp" placeholder="6-digit OTP" class="input-box" style="flex:1; border-color:#f59e0b;">
+                                <button style="background:#f59e0b; color:white; border:none; padding:10px 15px; border-radius:6px; cursor:pointer; font-weight:bold;" onclick="verifySchoolOTP()">Verify OTP ✅</button>
+                            </div>
+                        </div>
+
+                        <div id="school-pass-div" style="display:none;">
+                            <label style="color:#166534; font-weight:bold;">OTP Verified! Create Your Login Password <span class="req">*</span></label>
+                            <input type="password" id="reg-school-pass" placeholder="Create Strong Password" class="input-box" style="margin-top:5px; border-color:#16a34a;">
+                        </div>
                     </div>
                 </div>
                 
@@ -172,20 +185,19 @@
                     <p style="font-size:14px; color:#64748b; margin-bottom:10px;">Scan QR Code to pay via Admin UPI: <b id="display-upi">kulu123@upi</b></p>
                     <img id="dynamic-qr-img" src="" alt="Admin QR" style="border:4px solid white; box-shadow:0 4px 10px rgba(0,0,0,0.1); border-radius:8px;">
                     
-                    <input type="text" id="reg-school-utr" placeholder="Enter UPI UTR Transaction Reference No" class="input-box" style="margin-top:15px; text-align:center; font-weight:bold;">
+                    <input type="text" id="reg-school-utr" placeholder="Enter UPI UTR Transaction ID" class="input-box" style="margin-top:15px; text-align:center; font-weight:bold;">
                 </div>
                 <br>
-                <button style="background:#16a34a; color:white; padding:12px 30px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="submitSchoolRegistration()">Submit Registration & Notify Admin ✅</button>
+                <button style="background:#16a34a; color:white; padding:12px 30px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="submitSchoolRegistration()">Submit Registration ✅</button>
             </div>
         </div>
 
-        <!-- 2. PUBLIC NEW STUDENT REGISTRATION FLOW (WITH PAYMENT TO SCHOOL) -->
+        <!-- 2. PUBLIC NEW STUDENT REGISTRATION FLOW -->
         <div id="student-reg" class="content-section">
             <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
             
             <div id="student-form-step">
                 <h3 style="color: #0d3b66; margin-bottom:15px;">🎓 Public Student Application Form (18-Point)</h3>
-                <p style="color: #64748b; margin-bottom: 20px;">Fields marked with <span class="req">*</span> are compulsory.</p>
                 
                 <div class="form-grid">
                     <div><label>1. Student's Name <span class="req">*</span></label><input type="text" id="reg-s-name" class="input-box"></div>
@@ -216,7 +228,7 @@
                 <button style="background:#2563eb; color:white; width:100%; padding:15px; border:none; border-radius:8px; font-weight:bold; font-size:16px; margin-top:20px; cursor:pointer;" onclick="validateStudentForm()">Next ➡️ Proceed to Payment</button>
             </div>
 
-            <!-- Student Payment System to Target School -->
+            <!-- Student Payment System -->
             <div id="student-payment-step" style="display:none; text-align:center;">
                 <h3 style="color:#0d3b66; margin-bottom:10px;">💳 School Application Fee Payment</h3>
                 <p style="color:#dc2626; font-weight:bold; font-size:18px; margin-bottom:15px;">⏳ Time Left: <span id="payment-timer">30</span> Seconds</p>
@@ -228,32 +240,31 @@
                     <p style="color:#64748b; margin-bottom:10px;">Scan QR Code to pay to School UPI: <b id="display-stu-upi"></b></p>
                     <img id="stu-qr-img" src="" alt="QR" style="border:4px solid white; box-shadow:0 4px 10px rgba(0,0,0,0.1); border-radius:8px;">
                     
-                    <input type="text" id="student-utr" placeholder="Enter UPI Transaction ID here" style="width:100%; padding:12px; margin-top:15px; border:2px solid #cbd5e1; border-radius:8px; outline:none; text-align:center; font-weight:bold;">
+                    <input type="text" id="student-utr" placeholder="Enter UPI Transaction ID here" class="input-box" style="margin-top:15px; text-align:center; font-weight:bold;">
                 </div>
                 <br>
                 <button style="background:#16a34a; color:white; padding:12px 30px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="submitStudentApplication()">Submit Application ✅</button>
             </div>
         </div>
 
-        <!-- Receipt Section -->
-        <div id="student-receipt-section" class="content-section" style="background:white;">
+        <!-- Receipt / Application Form Document Section -->
+        <div id="receipt-section" class="content-section" style="background:white;">
             <div style="border:2px solid #0d3b66; padding:30px; border-radius:12px; position:relative;">
-                <h2 style="text-align:center; color:#0d3b66; margin-bottom:10px;">🏫 OFFICIAL ADMISSION RECEIPT</h2>
-                <p style="text-align:center; color:#64748b; margin-bottom:20px;">Submit this Hard Copy to your Respective School</p>
+                <h2 id="receipt-title" style="text-align:center; color:#0d3b66; margin-bottom:10px;">🏫 OFFICIAL RECEIPT</h2>
+                <p id="receipt-sub" style="text-align:center; color:#64748b; margin-bottom:20px;">Submit this to complete your process.</p>
                 <hr style="margin-bottom:20px;">
                 <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-size:15px;">
-                    <p><b>Application Ref:</b> APP-<span id="rec-app-id"></span></p>
+                    <p><b>Reference ID:</b> <span id="rec-app-id"></span></p>
                     <p><b>Date:</b> <span id="rec-date"></span></p>
                 </div>
                 <div style="background:#f1f5f9; padding:15px; border-radius:8px; margin-bottom:20px;">
-                    <p><b>Student Name:</b> <span id="rec-name"></span></p>
-                    <p><b>Father's Name:</b> <span id="rec-fname"></span></p>
-                    <p><b>Target School:</b> <span id="rec-school"></span></p>
+                    <p><b>Name:</b> <span id="rec-name"></span></p>
+                    <p><b>Info:</b> <span id="rec-info"></span></p>
                 </div>
                 <div style="border:1px dashed #16a34a; padding:15px; border-radius:8px; text-align:center; background:#dcfce7;">
-                    <h3 style="color:#166534;">✅ Payment Received</h3>
+                    <h3 style="color:#166534;">✅ Payment Verified</h3>
                     <p style="color:#166534;"><b>Transaction ID:</b> <span id="rec-utr"></span> | <b>Amount Paid:</b> ₹<span id="rec-amt"></span></p>
-                    <p style="font-size:12px; margin-top:5px;">Application is Pending School Approval.</p>
+                    <p style="font-size:12px; margin-top:5px; color:#991b1b; font-weight:bold;">Currently Pending Admin/School Approval.</p>
                 </div>
                 <button class="no-print" style="background:#2563eb; color:white; width:100%; padding:15px; border:none; border-radius:8px; font-weight:bold; font-size:16px; margin-top:20px; cursor:pointer;" onclick="window.print()">🖨️ Print Hard Copy</button>
                 <button class="no-print" style="background:#64748b; color:white; width:100%; padding:10px; border:none; border-radius:8px; font-weight:bold; margin-top:10px; cursor:pointer;" onclick="goHome()">⬅️ Return Home</button>
@@ -327,20 +338,20 @@
             <h2 style="color: #0d3b66; margin-bottom: 15px;">👑 Master Admin Dashboard</h2>
             
             <div style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px;">
-                <button class="tab-btn active-tab" onclick="switchAdminTab('schools-tab', this)">🏫 Manage Schools</button>
+                <button class="tab-btn active-tab" onclick="switchAdminTab('schools-tab', this)" style="position:relative;">🏫 School Approvals <span id="admin-notif-badge" style="background:red; color:white; border-radius:50%; padding:2px 6px; font-size:12px; display:none;">1</span></button>
                 <button class="tab-btn" onclick="switchAdminTab('students-tab-admin', this)">🎓 All Students DB</button>
                 <button class="tab-btn" onclick="switchAdminTab('payment-settings-tab', this)">💳 Global Payments</button>
                 <button class="tab-btn" onclick="switchAdminTab('settings-tab', this)">⚙️ Portal Settings</button>
             </div>
 
-            <!-- Manage Schools -->
+            <!-- Manage Schools & Approvals -->
             <div id="schools-tab" class="admin-tab-content">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                     <h3>School Approvals, Passwords & Payments</h3>
                 </div>
                 <table>
                     <thead>
-                        <tr><th>School Name</th><th>School Code</th><th>Login Pass</th><th>Headmaster</th><th>State</th><th>Status</th><th>Actions & Settings</th></tr>
+                        <tr><th>School Name</th><th>School Code</th><th>Login Pass</th><th>Headmaster</th><th>State</th><th>Payment UTR</th><th>Status</th><th>Actions & Settings</th></tr>
                     </thead>
                     <tbody id="school-table-body">
                         <!-- Loaded dynamically -->
@@ -378,7 +389,7 @@
                 </div>
             </div>
 
-            <!-- Portal Settings (RESTORED) -->
+            <!-- Portal Settings -->
             <div id="settings-tab" class="admin-tab-content" style="display:none;">
                 <h3>⚙️ Portal Customization Settings</h3>
                 <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1; margin-bottom:20px;">
@@ -453,6 +464,23 @@
             </div>
         </div>
         
+        <!-- ADMIN: Edit School Modal -->
+        <div id="editSchoolModal" class="modal">
+            <div class="modal-content">
+                <h3 style="color:#0d3b66; margin-bottom:15px;">✏️ Verify & Edit School Application</h3>
+                <input type="hidden" id="edit-sch-old-id">
+                <input type="text" id="edit-sch-name" placeholder="School Name" class="input-box" style="margin-bottom:12px;">
+                <input type="text" id="edit-sch-id" placeholder="School Code" class="input-box" style="margin-bottom:12px;">
+                <input type="text" id="edit-sch-hm" placeholder="Headmaster Name" class="input-box" style="margin-bottom:12px;">
+                <input type="text" id="edit-sch-mobile" placeholder="Mobile No" class="input-box" style="margin-bottom:12px;">
+                <select id="edit-sch-state" class="input-box" style="margin-bottom:12px;"><option value="Odisha">Odisha</option><option value="West Bengal">West Bengal</option><option value="Andhra Pradesh">Andhra Pradesh</option></select>
+                <div style="display:flex; justify-content:flex-end; gap:10px;">
+                    <button style="background:#64748b; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="document.getElementById('editSchoolModal').style.display='none'">Cancel</button>
+                    <button style="background:#2563eb; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="saveEditedSchool()">Save Changes 💾</button>
+                </div>
+            </div>
+        </div>
+
         <!-- School Payment Setup Modal (Admin side) -->
         <div id="schoolPaymentModal" class="modal">
             <div class="modal-content" style="width:500px;">
@@ -500,14 +528,17 @@
     <script>
         // --- LOCAL STORAGE DATA MANAGEMENT ---
         let adminPaymentConfig = JSON.parse(localStorage.getItem('adminPaymentConfig')) || { upiId: "kulu123@upi", baseFee: 1000, gstPct: 18 };
-        let defaultSchool = { id: "155CB", name: "SRI BAIRAGI SARASWATI SISHU VIDYAMANDIR", pass: "school123", hm: "ANTARYAMI DAS", mobile: "9876543210", state: "Odisha", upi: "school155@upi", baseFee: 500, hasGst: true, gstPct: 18 };
+        
+        let defaultSchool = { id: "155CB", name: "SRI BAIRAGI SARASWATI SISHU VIDYAMANDIR", pass: "school123", hm: "ANTARYAMI DAS", mobile: "9876543210", state: "Odisha", email: "school@gmail.com", status: "Approved", utr: "MANUAL", upi: "school155@upi", baseFee: 500, hasGst: true, gstPct: 18 };
         
         let registeredSchools = JSON.parse(localStorage.getItem('registeredSchools')) || [defaultSchool];
         let pendingApplications = JSON.parse(localStorage.getItem('pendingApplications')) || [];
         
-        let paymentTimerInterval;
         let schoolPaymentTimerInterval;
+        let paymentTimerInterval;
         let currentStudentFeeTotal = 0;
+        let isSchoolOtpVerified = false;
+        let generatedSchoolOtp = "";
 
         function saveLocalData() {
             localStorage.setItem('adminPaymentConfig', JSON.stringify(adminPaymentConfig));
@@ -532,7 +563,7 @@
             updatePublicSchoolDropdown();
             renderAdminSchoolsTable();
             updateAdminFeeDisplay();
-        };
+        }
 
         function openPage(pageId) {
             document.getElementById('home-view').style.display = 'none';
@@ -548,7 +579,7 @@
             clearInterval(schoolPaymentTimerInterval);
         }
 
-        // --- PUBLIC NEW SCHOOL REGISTRATION ---
+        // --- 1. NEW SCHOOL REGISTRATION FLOW (OTP + PAYMENT) ---
         function updateAdminFeeDisplay() {
             let gstAmt = (adminPaymentConfig.baseFee * adminPaymentConfig.gstPct) / 100;
             let totalFee = adminPaymentConfig.baseFee + gstAmt;
@@ -561,24 +592,41 @@
                 document.getElementById('dynamic-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=${adminPaymentConfig.upiId}&pn=SchoolPortal&am=${totalFee}&cu=INR`;
             }
         }
-        function saveAdminPaymentSettings() {
-            adminPaymentConfig.upiId = document.getElementById('set-upi').value.trim();
-            adminPaymentConfig.baseFee = parseFloat(document.getElementById('set-base-fee').value);
-            adminPaymentConfig.gstPct = parseFloat(document.getElementById('set-gst').value);
-            saveLocalData(); updateAdminFeeDisplay(); alert('Master Admin Payment Settings Saved!');
-        }
-        
         function openSchoolRegistration() {
             document.getElementById('school-form-step').style.display = 'block';
             document.getElementById('school-payment-step').style.display = 'none';
+            isSchoolOtpVerified = false;
+            document.getElementById('school-otp-div').style.display = 'none';
+            document.getElementById('school-pass-div').style.display = 'none';
             openPage('school-reg');
         }
 
+        function sendSchoolOTP() {
+            let email = document.getElementById('reg-school-email').value.trim();
+            if(!email) { alert("Please enter Mail ID first!"); return; }
+            generatedSchoolOtp = Math.floor(100000 + Math.random() * 900000).toString();
+            alert(`Simulation: An OTP has been sent to ${email}.\n\nYour OTP is: ${generatedSchoolOtp}`);
+            document.getElementById('school-otp-div').style.display = 'block';
+        }
+        function verifySchoolOTP() {
+            let entered = document.getElementById('reg-school-otp').value.trim();
+            if(entered === generatedSchoolOtp) {
+                isSchoolOtpVerified = true;
+                alert("OTP Verified Successfully!");
+                document.getElementById('school-otp-div').style.display = 'none';
+                document.getElementById('school-pass-div').style.display = 'block';
+            } else {
+                alert("Invalid OTP! Try again.");
+            }
+        }
+
         function validateSchoolForm() {
-            let reqIds = ['reg-school-name', 'reg-school-id', 'reg-hm-name', 'reg-hm-mobile', 'reg-school-state'];
+            let reqIds = ['reg-school-name', 'reg-school-id', 'reg-hm-name', 'reg-hm-mobile', 'reg-school-state', 'reg-school-email'];
             for(let id of reqIds) {
                 if(!document.getElementById(id).value.trim()) { alert('Please fill all Mandatory (*) Fields correctly!'); return; }
             }
+            if(!isSchoolOtpVerified) { alert("You must Verify Email OTP to proceed!"); return; }
+            if(!document.getElementById('reg-school-pass').value.trim()) { alert("Please Create a Password!"); return; }
 
             document.getElementById('school-form-step').style.display = 'none';
             document.getElementById('school-payment-step').style.display = 'block';
@@ -593,19 +641,125 @@
         }
 
         function submitSchoolRegistration() {
-            let name = document.getElementById('reg-school-name').value.trim();
-            let id = document.getElementById('reg-school-id').value.trim();
-            let hm = document.getElementById('reg-hm-name').value.trim();
-            let mobile = document.getElementById('reg-hm-mobile').value.trim();
-            let state = document.getElementById('reg-school-state').value;
             let utr = document.getElementById('reg-school-utr').value.trim();
-
-            if(!utr) { alert("Please enter Transaction ID!"); return; }
+            if(!utr) { alert("Please enter Transaction ID to verify payment!"); return; }
             clearInterval(schoolPaymentTimerInterval);
 
-            registeredSchools.push({ id: id, name: name, pass: "12345", hm: hm, mobile: mobile, state: state, upi: "", baseFee: 500, hasGst: false, gstPct: 0 });
+            let newSchool = {
+                id: document.getElementById('reg-school-id').value.trim(),
+                name: document.getElementById('reg-school-name').value.trim(),
+                hm: document.getElementById('reg-hm-name').value.trim(),
+                mobile: document.getElementById('reg-hm-mobile').value.trim(),
+                state: document.getElementById('reg-school-state').value,
+                email: document.getElementById('reg-school-email').value.trim(),
+                pass: document.getElementById('reg-school-pass').value.trim(),
+                utr: utr,
+                status: "Pending", // Requires Admin Approval
+                upi: "", baseFee: 500, hasGst: false, gstPct: 0
+            };
+            
+            registeredSchools.push(newSchool);
             saveLocalData(); renderAdminSchoolsTable(); updatePublicSchoolDropdown();
-            alert('School Registered Successfully with UTR: ' + utr + '! Admin will review.'); goHome();
+
+            // Generate App Receipt
+            document.getElementById('school-reg').classList.remove('active');
+            let d = new Date();
+            document.getElementById('rec-app-id').innerText = "SCH-" + Math.floor(Math.random()*9000+1000);
+            document.getElementById('rec-date').innerText = d.toLocaleDateString();
+            document.getElementById('receipt-title').innerText = "🏫 SCHOOL REGISTRATION RECEIPT";
+            document.getElementById('receipt-sub').innerText = "Awaiting Master Admin Approval.";
+            document.getElementById('rec-name').innerText = newSchool.name + " (" + newSchool.id + ")";
+            document.getElementById('rec-info').innerText = `HM: ${newSchool.hm} | Mobile: ${newSchool.mobile}`;
+            document.getElementById('rec-school').parentElement.style.display = 'none'; // hide target school for this receipt
+            document.getElementById('rec-utr').innerText = utr;
+            document.getElementById('rec-amt').innerText = "1180 (Reg Fee)";
+
+            document.getElementById('receipt-section').classList.add('active');
+            alert('School Registered Successfully! Application sent to Master Admin for approval.');
+        }
+
+
+        // --- ADMIN CONTROLS FOR SCHOOLS ---
+        function renderAdminSchoolsTable() {
+            let tbody = document.getElementById('school-table-body');
+            tbody.innerHTML = "";
+            let pendingCount = 0;
+
+            registeredSchools.forEach(s => {
+                let statusHtml = "";
+                let actionsHtml = "";
+                
+                if(s.status === "Pending") {
+                    pendingCount++;
+                    statusHtml = `<span style="background:#fef08a; color:#854d0e; padding:4px 10px; border-radius:6px; font-weight:bold;">Pending ⏳</span>`;
+                    actionsHtml = `
+                        <button style="background:#f59e0b; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openVerifyEditSchool('${s.id}')">Verify/Edit ✏️</button>
+                        <button style="background:#16a34a; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="approveSchool('${s.id}')">Approve ✅</button>
+                        <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="rejectSchool('${s.id}')">Reject ❌</button>
+                    `;
+                } else {
+                    statusHtml = `<span class="badge-approved">Approved ✅</span>`;
+                    actionsHtml = `<button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openSchoolPaymentSetup('${s.id}')">💳 Set Payment</button> <button style="background:#f59e0b; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openVerifyEditSchool('${s.id}')">Edit ✏️</button>`;
+                }
+
+                tbody.innerHTML += `<tr>
+                    <td>${s.name}</td><td><b>${s.id}</b></td>
+                    <td><input type="text" value="${s.pass}" onchange="updateSchoolPassword('${s.id}', this.value)" style="padding:5px; width:90px;"></td>
+                    <td>${s.hm}</td><td>${s.state || "N/A"}</td>
+                    <td><b style="color:#16a34a;">${s.utr || "N/A"}</b></td>
+                    <td>${statusHtml}</td>
+                    <td>${actionsHtml}</td>
+                </tr>`;
+            });
+
+            // Update Admin Notification Badge
+            let badge = document.getElementById('admin-notif-badge');
+            if(pendingCount > 0) { badge.innerText = pendingCount; badge.style.display = 'inline-block'; } 
+            else { badge.style.display = 'none'; }
+        }
+
+        function approveSchool(id) {
+            let school = registeredSchools.find(s => s.id === id);
+            if(school) {
+                school.status = "Approved";
+                saveLocalData(); renderAdminSchoolsTable(); updatePublicSchoolDropdown();
+                alert(`School "${school.name}" Approved successfully! They can now login.`);
+            }
+        }
+
+        function rejectSchool(id) {
+            if(confirm("Are you sure you want to Reject and Delete this school application?")) {
+                registeredSchools = registeredSchools.filter(s => s.id !== id);
+                saveLocalData(); renderAdminSchoolsTable(); updatePublicSchoolDropdown();
+            }
+        }
+
+        function openVerifyEditSchool(id) {
+            let school = registeredSchools.find(s => s.id === id);
+            if(school) {
+                document.getElementById('edit-sch-old-id').value = school.id;
+                document.getElementById('edit-sch-name').value = school.name;
+                document.getElementById('edit-sch-id').value = school.id;
+                document.getElementById('edit-sch-hm').value = school.hm;
+                document.getElementById('edit-sch-mobile').value = school.mobile;
+                document.getElementById('edit-sch-state').value = school.state || "Odisha";
+                document.getElementById('editSchoolModal').style.display = 'flex';
+            }
+        }
+
+        function saveEditedSchool() {
+            let oldId = document.getElementById('edit-sch-old-id').value;
+            let school = registeredSchools.find(s => s.id === oldId);
+            if(school) {
+                school.name = document.getElementById('edit-sch-name').value.trim();
+                school.id = document.getElementById('edit-sch-id').value.trim();
+                school.hm = document.getElementById('edit-sch-hm').value.trim();
+                school.mobile = document.getElementById('edit-sch-mobile').value.trim();
+                school.state = document.getElementById('edit-sch-state').value;
+                saveLocalData(); renderAdminSchoolsTable(); updatePublicSchoolDropdown();
+                document.getElementById('editSchoolModal').style.display = 'none';
+                alert("School details verified and updated!");
+            }
         }
 
         // --- PUBLIC NEW STUDENT ADMISSION FLOW ---
@@ -613,7 +767,11 @@
             let select = document.getElementById('reg-s-school');
             if(!select) return;
             select.innerHTML = '<option value="">-- Choose School --</option>';
-            registeredSchools.forEach(s => { select.innerHTML += `<option value="${s.id}">${s.name} (${s.id})</option>`; });
+            registeredSchools.forEach(s => { 
+                if(s.status === "Approved") {
+                    select.innerHTML += `<option value="${s.id}">${s.name} (${s.id})</option>`; 
+                }
+            });
         }
         function openStudentRegistration() {
             document.getElementById('student-form-step').style.display = 'block';
@@ -628,7 +786,6 @@
 
             let sId = document.getElementById('reg-s-school').value;
             let school = registeredSchools.find(s => s.id === sId);
-            
             let upi = school.upi || "default@upi"; let fee = school.baseFee || 500;
             let gst = school.hasGst ? fee * (school.gstPct / 100) : 0;
             currentStudentFeeTotal = fee + gst;
@@ -665,14 +822,21 @@
             pendingApplications.push(newApp); saveLocalData();
 
             document.getElementById('student-reg').classList.remove('active');
+            
+            document.getElementById('receipt-title').innerText = "🏫 OFFICIAL ADMISSION RECEIPT";
+            document.getElementById('receipt-sub').innerText = "Submit this Hard Copy to your Respective School";
+            document.getElementById('rec-school').parentElement.style.display = 'block';
+            
             document.getElementById('rec-app-id').innerText = newApp.appId;
             document.getElementById('rec-date').innerText = new Date().toLocaleDateString();
             document.getElementById('rec-name').innerText = newApp.name;
             document.getElementById('rec-fname').innerText = newApp.fname;
+            document.getElementById('rec-info').innerText = `Mobile: ${newApp.mobile}`;
             document.getElementById('rec-school').innerText = newApp.schoolName;
             document.getElementById('rec-utr').innerText = utr;
             document.getElementById('rec-amt').innerText = newApp.amt;
-            document.getElementById('student-receipt-section').classList.add('active');
+            
+            document.getElementById('receipt-section').classList.add('active');
             updateNotificationBadge();
         }
 
@@ -681,7 +845,12 @@
             let sId = document.getElementById('school-login-id').value.trim();
             let pass = document.getElementById('school-login-pass').value.trim();
             let match = registeredSchools.find(s => s.id.toLowerCase() === sId.toLowerCase() && s.pass === pass);
+            
             if(match) {
+                if(match.status !== "Approved") {
+                    alert("Your School Registration is still pending Master Admin Approval. You cannot login yet.");
+                    return;
+                }
                 document.getElementById('school-dash-title').innerText = `🏫 ${match.name}`;
                 document.getElementById('school-dash-sub').innerText = `ID: ${match.id} | HM: ${match.hm}`;
                 renderPendingApplications(match.id);
@@ -809,13 +978,7 @@
             for(let b of btns) { b.classList.remove('active-tab'); }
             btn.classList.add('active-tab');
         }
-        function renderAdminSchoolsTable() {
-            let tbody = document.getElementById('school-table-body');
-            tbody.innerHTML = "";
-            registeredSchools.forEach(s => {
-                tbody.innerHTML += `<tr><td>${s.name}</td><td><b>${s.id}</b></td><td><input type="text" value="${s.pass}" onchange="updateSchoolPassword('${s.id}', this.value)" style="padding:5px; width:100px;"></td><td>${s.hm}</td><td>${s.state || "N/A"}</td><td><span class="badge-approved">Approved ✅</span></td><td><button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openSchoolPaymentSetup('${s.id}')">💳 Set Payment</button></td></tr>`;
-            });
-        }
+
         function updateSchoolPassword(schoolId, newPass) { let school = registeredSchools.find(s => s.id === schoolId); if(school) { school.pass = newPass; saveLocalData(); alert(`Password updated!`); } }
 
         function openSchoolPaymentSetup(id) {
@@ -844,6 +1007,13 @@
                 saveLocalData(); alert("Payment Settings Updated for " + school.name + "!");
                 document.getElementById('schoolPaymentModal').style.display = 'none';
             }
+        }
+
+        function saveAdminPaymentSettings() {
+            adminPaymentConfig.upiId = document.getElementById('set-upi').value.trim();
+            adminPaymentConfig.baseFee = parseFloat(document.getElementById('set-base-fee').value);
+            adminPaymentConfig.gstPct = parseFloat(document.getElementById('set-gst').value);
+            saveLocalData(); updateAdminFeeDisplay(); alert('Master Admin Payment Settings Saved!');
         }
 
         function changeBackgroundImage() { alert('Background Updated Successfully! 🖼️'); }
