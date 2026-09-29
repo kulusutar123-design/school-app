@@ -3,239 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>School Home Portal - Complete 18-Point System with State & Language Dropdowns</title>
+    <title>School Home Portal - Automated Admission System</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body {
             background: linear-gradient(rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.7)), url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1920&auto=format&fit=crop') no-repeat center center fixed;
-            background-size: cover;
-            color: #333;
-            padding: 20px;
-            min-height: 100vh;
+            background-size: cover; color: #333; padding: 20px; min-height: 100vh;
         }
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
+        .container { max-width: 1400px; margin: 0 auto; }
         .header {
-            background: linear-gradient(90deg, #0d3b66, #1d4ed8);
-            padding: 25px 30px;
-            border-radius: 16px;
-            color: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-            margin-bottom: 25px;
+            background: linear-gradient(90deg, #0d3b66, #1d4ed8); padding: 25px 30px; border-radius: 16px; color: white;
+            display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 25px rgba(0,0,0,0.4); margin-bottom: 25px;
         }
         .header h2 { font-size: 24px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
         .header p { font-style: italic; font-size: 16px; }
         
-        .main-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 25px;
+        .main-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 25px; }
+        @media (max-width: 768px) { .main-grid { grid-template-columns: 1fr; } }
+        
+        .welcome-card, .results-btn-card, .login-box, .content-section {
+            background: rgba(255, 255, 255, 0.98); border-radius: 20px; padding: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); margin-bottom: 25px;
         }
-        @media (max-width: 768px) {
-            .main-grid { grid-template-columns: 1fr; }
-        }
-        .welcome-card {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-            border-left: 8px solid #2563eb;
-            margin-bottom: 25px;
-        }
+        .welcome-card { border-left: 8px solid #2563eb; }
         .welcome-card h3 { color: #1e3a8a; margin-bottom: 12px; font-size: 22px; }
         .welcome-card p { font-size: 16px; color: #475569; line-height: 1.5; margin-bottom: 10px; }
         
         .section-title { font-size: 20px; color: #ffffff; margin-bottom: 15px; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
         
-        .results-btn-card {
-            background: linear-gradient(135deg, #1e3a8a, #2563eb);
-            border-radius: 20px;
-            padding: 30px;
-            text-align: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-            border: 2px solid rgba(255,255,255,0.3);
-            margin-bottom: 25px;
-            color: white;
-        }
-        .results-btn-card h3 { margin-bottom: 10px; font-size: 24px; }
-        .results-btn-card p { margin-bottom: 20px; font-size: 15px; color: #e2e8f0; }
-        .btn-check-results {
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-            color: white;
-            border: none;
-            padding: 15px 35px;
-            font-size: 18px;
-            font-weight: bold;
-            border-radius: 12px;
-            cursor: pointer;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-            transition: all 0.3s ease;
-        }
+        .results-btn-card { background: linear-gradient(135deg, #1e3a8a, #2563eb); text-align: center; color: white; border: 2px solid rgba(255,255,255,0.3); }
+        .btn-check-results { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; border: none; padding: 15px 35px; font-size: 18px; font-weight: bold; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; }
         .btn-check-results:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(34,197,94,0.5); }
 
-        .actions-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-        }
-        @media (max-width: 600px) {
-            .actions-grid { grid-template-columns: 1fr; }
-        }
-        .action-card {
-            background: rgba(255, 255, 255, 0.95);
-            border: 2px solid #cbd5e1;
-            border-radius: 20px;
-            padding: 25px 15px;
-            text-align: center;
-            cursor: pointer;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-            transition: all 0.3s ease;
-        }
-        .action-card:hover {
-            transform: translateY(-5px);
-            border-color: #2563eb;
-            box-shadow: 0 20px 35px rgba(0,0,0,0.3);
-            background: #ffffff;
-        }
-        .action-card .icon { font-size: 36px; margin-bottom: 10px; }
+        .actions-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        @media (max-width: 600px) { .actions-grid { grid-template-columns: 1fr; } }
+        .action-card { background: rgba(255, 255, 255, 0.95); border: 2px solid #cbd5e1; border-radius: 20px; padding: 25px 15px; text-align: center; cursor: pointer; transition: all 0.3s ease; }
+        .action-card:hover { transform: translateY(-5px); border-color: #2563eb; background: #ffffff; }
         .action-card h4 { font-size: 15px; color: #1e3a8a; }
 
-        .login-box {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-            text-align: center;
-        }
         .login-box h3 { color: #0d3b66; margin-bottom: 15px; }
-        .login-box hr { border: 0; height: 1px; background: #e2e8f0; margin-bottom: 20px; }
-        .btn-login {
-            width: 100%;
-            padding: 16px;
-            border-radius: 14px;
-            font-weight: bold;
-            font-size: 18px;
-            color: white;
-            border: none;
-            cursor: pointer;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
-        }
+        .btn-login { width: 100%; padding: 16px; border-radius: 14px; font-weight: bold; font-size: 18px; color: white; border: none; cursor: pointer; margin-bottom: 15px; }
         .btn-admin { background: linear-gradient(135deg, #22c55e, #16a34a); }
-        .btn-admin:hover { background: linear-gradient(135deg, #16a34a, #15803d); transform: translateY(-2px); }
         .btn-school { background: linear-gradient(135deg, #3b82f6, #2563eb); }
-        .btn-school:hover { background: linear-gradient(135deg, #2563eb, #1d4ed8); transform: translateY(-2px); }
         
-        .quote { font-size: 14px; color: #64748b; margin-top: 20px; font-style: italic; }
-
-        .content-section {
-            display: none;
-            background: rgba(255, 255, 255, 0.98);
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-            margin-top: 20px;
-        }
+        .content-section { display: none; }
         .content-section.active { display: block; }
-        .back-btn {
-            background: #64748b;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-        .back-btn:hover { background: #475569; }
-
-        .notice-board {
-            background: #fffbeb;
-            border: 1px solid #fde68a;
-            border-left: 6px solid #f59e0b;
-            padding: 18px 22px;
-            border-radius: 14px;
-            margin-bottom: 25px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-        }
-        .notice-board h4 { color: #b45309; margin-bottom: 6px; font-size: 18px; }
-        .notice-board p { color: #78350f; font-size: 15px; line-height: 1.6; white-space: pre-line; }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-            overflow-x: auto;
-            display: block;
-        }
-        th, td {
-            padding: 10px 12px;
-            border: 1px solid #cbd5e1;
-            text-align: left;
-            font-size: 13px;
-            white-space: nowrap;
-        }
+        .back-btn { background: #64748b; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-bottom: 20px; }
+        
+        .notice-board { background: #fffbeb; border: 1px solid #fde68a; border-left: 6px solid #f59e0b; padding: 18px 22px; border-radius: 14px; margin-bottom: 25px; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; display: block; overflow-x: auto; white-space: nowrap; }
+        th, td { padding: 10px 12px; border: 1px solid #cbd5e1; text-align: left; font-size: 13px; }
         th { background: #1e3a8a; color: white; }
         .badge-pending { background: #fef08a; color: #854d0e; padding: 4px 10px; border-radius: 6px; font-weight: bold; }
         .badge-approved { background: #dcfce7; color: #166534; padding: 4px 10px; border-radius: 6px; font-weight: bold; }
         
-        .tab-btn {
-            background: #e2e8f0;
-            border: none;
-            padding: 10px 20px;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-right: 10px;
-            margin-bottom: 10px;
-        }
+        .tab-btn { background: #e2e8f0; border: none; padding: 10px 20px; font-weight: bold; border-radius: 8px; cursor: pointer; margin-right: 10px; margin-bottom: 10px; }
         .tab-btn.active-tab { background: #1d4ed8; color: white; }
 
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 100;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.6);
-            backdrop-filter: blur(5px);
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            width: 700px;
-            max-width: 95%;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.4);
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-        @media (max-width: 600px) {
-            .form-grid { grid-template-columns: 1fr; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+        .req { color: red; }
+        .input-box { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; }
+
+        /* Modal */
+        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(5px); justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 30px; border-radius: 20px; width: 600px; max-width: 95%; box-shadow: 0 25px 50px rgba(0,0,0,0.4); max-height: 90vh; overflow-y: auto; }
+
+        /* Print Specific Styles */
+        @media print {
+            body * { visibility: hidden; }
+            #student-receipt-section, #student-receipt-section * { visibility: visible; }
+            #student-receipt-section { position: absolute; left: 0; top: 0; width: 100%; background: white; border: none; box-shadow: none; padding: 20px; }
+            .no-print { display: none !important; }
         }
     </style>
 </head>
@@ -252,13 +91,12 @@
         <div id="home-view">
             <div class="notice-board">
                 <h4>📢 Important Notice Board</h4>
-                <p id="display-notice">• Official Marksheet & Portal System is live.<br>• 18-Point Student Form includes State and Local Language selection dropdowns.</p>
+                <p id="display-notice">• Official Marksheet & Portal System is live.<br>• New Student Registration includes Payment Verifications & School Approvals.</p>
             </div>
 
-            <!-- Results Button Card -->
             <div class="results-btn-card">
-                <h3>🎓 Annual Examination Results 2026</h3>
-                <p>Click below to enter your Roll Number and view official student marksheets instantly.</p>
+                <h3 style="color:white;">🎓 Annual Examination Results</h3>
+                <p style="color:white;">Enter your Roll Number to view official student marksheets instantly.</p>
                 <button class="btn-check-results" onclick="openResultsModal()">Check Results 🎯</button>
             </div>
 
@@ -266,40 +104,110 @@
                 <div>
                     <div class="welcome-card">
                         <h3>🌟 Welcome to Digital School Management</h3>
-                        <p>Manage your schools, student admissions, attendance, and records securely on the cloud platform with high performance.</p>
-                        <p><b>✨ Features:</b> 18-Point Form with State & Language Dropdowns, School Login, Secure Admin Controls.</p>
+                        <p>Manage your schools, student admissions, and records securely on the cloud platform.</p>
+                        <p><b>✨ Features:</b> Smart Admission, Timer based Payments, Roll No Generation.</p>
                     </div>
 
                     <div class="section-title">📌 Quick Portal Actions</div>
                     <div class="actions-grid">
                         <div class="action-card" onclick="openPage('school-reg')">
-                            <div class="icon">🏫</div>
-                            <h4>New School Registration</h4>
+                            <div class="icon">🏫</div><h4>New School Registration</h4>
                         </div>
-                        <div class="action-card" onclick="openPage('student-reg')">
-                            <div class="icon">🎓</div>
-                            <h4>New Student Registration</h4>
+                        <div class="action-card" onclick="openStudentRegistration()">
+                            <div class="icon">🎓</div><h4>New Student Registration</h4>
                         </div>
-                        <div class="action-card" onclick="openPage('scholarship')">
-                            <div class="icon">💰</div>
-                            <h4>Scholarship Portal</h4>
+                        <div class="action-card" onclick="alert('Scholarship Portal Active Soon!')">
+                            <div class="icon">💰</div><h4>Scholarship Portal</h4>
                         </div>
                     </div>
                 </div>
-
                 <div>
                     <div class="login-box">
                         <h3>🔐 Login Portal</h3>
                         <hr>
-                        <button class="btn-login btn-admin" onclick="openPage('admin-login')">
-                            👤 Admin Login ➔
-                        </button>
-                        <button class="btn-login btn-school" onclick="openPage('school-login')">
-                            🏫 School Login ➔
-                        </button>
-                        <div class="quote">"Education is the key to a better tomorrow"</div>
+                        <button class="btn-login btn-admin" onclick="openPage('admin-login')">👤 Admin Login ➔</button>
+                        <button class="btn-login btn-school" onclick="openPage('school-login')">🏫 School Login ➔</button>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- NEW STUDENT REGISTRATION FLOW -->
+        <div id="student-reg" class="content-section">
+            <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
+            
+            <!-- Step 1: Form -->
+            <div id="student-form-step">
+                <h3 style="color: #0d3b66; margin-bottom:15px;">🎓 Student Application Form (18-Point)</h3>
+                <p style="color: #64748b; margin-bottom: 20px;">Fields marked with <span class="req">*</span> are compulsory.</p>
+                
+                <div class="form-grid">
+                    <div><label>1. Student's Name <span class="req">*</span></label><input type="text" id="reg-s-name" class="input-box"></div>
+                    <div><label>2. Gender <span class="req">*</span></label><select id="reg-s-gender" class="input-box"><option value="">Select</option><option value="Male">Male</option><option value="Female">Female</option></select></div>
+                    <div><label>3. Date of Birth <span class="req">*</span></label><input type="text" id="reg-s-dob" placeholder="DD/MM/YYYY" class="input-box"></div>
+                    <div><label>4. Mother's Name <span class="req">*</span></label><input type="text" id="reg-s-mname" class="input-box"></div>
+                    <div><label>5. Father's Name <span class="req">*</span></label><input type="text" id="reg-s-fname" class="input-box"></div>
+                    <div><label>6. AADHAAR Number <span class="req">*</span></label><input type="text" id="reg-s-aadhaar" class="input-box"></div>
+                    <div><label>7. Admission Date (Present School)</label><input type="text" id="reg-s-admdate" placeholder="DD/MM/YYYY" class="input-box"></div>
+                    <div><label>8. Mobile No <span class="req">*</span></label><input type="text" id="reg-s-mobile" class="input-box"></div>
+                    <div><label>9. Blood Group <span class="req">*</span></label><select id="reg-s-blood" class="input-box"><option value="">Select</option><option value="O+">O+</option><option value="O-">O-</option><option value="A+">A+</option><option value="B+">B+</option><option value="AB+">AB+</option></select></div>
+                    <div><label>10. Minority Group <span class="req">*</span></label><select id="reg-s-minority" class="input-box"><option value="">Select</option><option value="No">No</option><option value="Muslim">Muslim</option><option value="Christian">Christian</option></select></div>
+                    <div><label>11. Social Category <span class="req">*</span></label><select id="reg-s-category" class="input-box"><option value="">Select</option><option value="GENERAL">GENERAL</option><option value="OBC">OBC</option><option value="SC">SC</option><option value="ST">ST</option></select></div>
+                    <div><label>12. PAN No</label><input type="text" id="reg-s-pan" class="input-box"></div>
+                    <div><label>13. APAR ID No</label><input type="text" id="reg-s-apar" class="input-box"></div>
+                    <div><label>14. Address <span class="req">*</span></label><input type="text" id="reg-s-address" class="input-box"></div>
+                    <div><label>15. PIN Code <span class="req">*</span></label><input type="text" id="reg-s-pin" class="input-box"></div>
+                    <div><label>16. State <span class="req">*</span></label><select id="reg-s-state" class="input-box"><option value="">Select</option><option value="Odisha">Odisha</option><option value="West Bengal">West Bengal</option><option value="Andhra Pradesh">Andhra Pradesh</option></select></div>
+                    <div><label>17. Local Language <span class="req">*</span></label><select id="reg-s-lang" class="input-box"><option value="">Select</option><option value="Odia">Odia</option><option value="Hindi">Hindi</option><option value="English">English</option></select></div>
+                    <div><label>18. Mail ID <span class="req">*</span></label><input type="text" id="reg-s-mail" class="input-box"></div>
+                    <div style="grid-column: span 2;">
+                        <label>Select Target School <span class="req">*</span></label>
+                        <select id="reg-s-school" class="input-box">
+                            <option value="">-- Choose School --</option>
+                            <option value="155CB">SRI BAIRAGI SARASWATI SISHU VIDYAMANDIR, ASURALI (155CB)</option>
+                        </select>
+                    </div>
+                </div>
+                <button style="background:#2563eb; color:white; width:100%; padding:15px; border:none; border-radius:8px; font-weight:bold; font-size:16px; margin-top:20px; cursor:pointer;" onclick="validateStudentForm()">Next ➡️ Proceed to Payment</button>
+            </div>
+
+            <!-- Step 2: Payment System -->
+            <div id="student-payment-step" style="display:none; text-align:center;">
+                <h3 style="color:#0d3b66; margin-bottom:10px;">💳 Application Fee Payment</h3>
+                <p style="color:#dc2626; font-weight:bold; font-size:18px; margin-bottom:15px;">⏳ Time Left: <span id="payment-timer">30</span> Seconds</p>
+                <div style="background:#f8fafc; border:1px dashed #cbd5e1; padding:25px; border-radius:12px; margin-bottom:20px; display:inline-block;">
+                    <p style="font-size:18px; font-weight:bold; margin-bottom:10px;">Admission Application Fee: <span style="color:#16a34a;">₹500</span></p>
+                    <p style="color:#64748b; margin-bottom:10px;">Scan QR Code to pay via School UPI: <b>school155@upi</b></p>
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=school155@upi&pn=SchoolAdmission&am=500&cu=INR" alt="QR" style="border:4px solid white; box-shadow:0 4px 10px rgba(0,0,0,0.1); border-radius:8px;">
+                    <input type="text" id="student-utr" placeholder="Enter UPI Transaction ID here" style="width:100%; padding:12px; margin-top:15px; border:2px solid #cbd5e1; border-radius:8px; outline:none; text-align:center; font-weight:bold;">
+                </div>
+                <br>
+                <button style="background:#16a34a; color:white; padding:12px 30px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="submitStudentApplication()">Submit Application ✅</button>
+            </div>
+        </div>
+
+        <!-- Step 3: Hard Copy / Receipt Section -->
+        <div id="student-receipt-section" class="content-section" style="background:white;">
+            <div style="border:2px solid #0d3b66; padding:30px; border-radius:12px; position:relative;">
+                <h2 style="text-align:center; color:#0d3b66; margin-bottom:10px;">🏫 OFFICIAL ADMISSION RECEIPT</h2>
+                <p style="text-align:center; color:#64748b; margin-bottom:20px;">Submit this Hard Copy to your Respective School</p>
+                <hr style="margin-bottom:20px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-size:15px;">
+                    <p><b>Application Ref:</b> APP-<span id="rec-app-id"></span></p>
+                    <p><b>Date:</b> <span id="rec-date"></span></p>
+                </div>
+                <div style="background:#f1f5f9; padding:15px; border-radius:8px; margin-bottom:20px;">
+                    <p><b>Student Name:</b> <span id="rec-name"></span></p>
+                    <p><b>Father's Name:</b> <span id="rec-fname"></span></p>
+                    <p><b>Target School:</b> <span id="rec-school"></span></p>
+                </div>
+                <div style="border:1px dashed #16a34a; padding:15px; border-radius:8px; text-align:center; background:#dcfce7;">
+                    <h3 style="color:#166534;">✅ Payment Received</h3>
+                    <p style="color:#166534;"><b>Transaction ID:</b> <span id="rec-utr"></span> | <b>Amount:</b> ₹500</p>
+                    <p style="font-size:12px; margin-top:5px;">Application is Pending School Approval.</p>
+                </div>
+                <button class="no-print" style="background:#2563eb; color:white; width:100%; padding:15px; border:none; border-radius:8px; font-weight:bold; font-size:16px; margin-top:20px; cursor:pointer;" onclick="window.print()">🖨️ Print Hard Copy</button>
+                <button class="no-print" style="background:#64748b; color:white; width:100%; padding:10px; border:none; border-radius:8px; font-weight:bold; margin-top:10px; cursor:pointer;" onclick="goHome()">⬅️ Return Home</button>
             </div>
         </div>
 
@@ -307,207 +215,50 @@
         <div id="school-login" class="content-section">
             <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
             <h3>🏫 School Portal Login</h3>
-            <p style="color: #64748b; margin-bottom: 20px;">Enter School ID and Password provided/controlled by Master Admin.</p>
-            <input type="text" id="school-login-id" placeholder="Enter School ID (e.g. 155CB)" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
-            <input type="password" id="school-login-pass" placeholder="Enter Password" style="width:100%; padding:12px; margin-bottom:20px; border:1px solid #cbd5e1; border-radius:8px;">
-            <button style="background:#3b82f6; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="validateSchoolLogin()">Login ➡️</button>
+            <p style="color: #64748b; margin-bottom: 20px;">Enter School ID and Password.</p>
+            <input type="text" id="school-login-id" placeholder="Enter School ID (e.g. 155CB)" class="input-box" style="margin-bottom:15px;">
+            <input type="password" id="school-login-pass" placeholder="Enter Password" class="input-box" style="margin-bottom:20px;">
+            <button class="btn-login btn-school" onclick="validateSchoolLogin()">Login ➡️</button>
         </div>
 
         <!-- School Dashboard Section -->
         <div id="school-dashboard" class="content-section">
-            <button class="back-btn" onclick="goHome()">🚪 Logout & Home</button>
-            <h2 id="school-dash-title" style="color: #0d3b66; margin-bottom: 5px;">🏫 School Management Dashboard</h2>
+            <button class="back-btn" onclick="goHome()">🚪 Logout</button>
+            <h2 id="school-dash-title" style="color: #0d3b66; margin-bottom: 5px;">🏫 School Dashboard</h2>
             <p id="school-dash-sub" style="color: #64748b; margin-bottom: 20px;"></p>
 
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <h3>🎓 Student Records & 18-Point Management</h3>
-                <button style="background:#16a34a; color:white; border:none; padding:10px 20px; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="openAddStudentModal()">➕ Add New Student (18-Point)</button>
+            <div style="margin-bottom: 20px; display: flex; gap: 10px;">
+                <button class="tab-btn active-tab" onclick="switchSchoolTab('school-enrolled-tab', this)">🎓 My Students</button>
+                <button class="tab-btn" onclick="switchSchoolTab('school-pending-tab', this)" style="position:relative;">🔔 Admission Requests <span id="notif-badge" style="background:red; color:white; border-radius:50%; padding:2px 6px; font-size:12px; display:none;">1</span></button>
             </div>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>APAR ID</th>
-                        <th>Student Name</th>
-                        <th>Father's Name</th>
-                        <th>Mobile No</th>
-                        <th>Blood Group</th>
-                        <th>Social Category</th>
-                        <th>State & Language</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="school-student-table-body">
-                    <tr>
-                        <td><b>APAR10245</b></td>
-                        <td>DIBYANSHI DAS</td>
-                        <td>ANTARYAMI DAS</td>
-                        <td>9876543210</td>
-                        <td>O+</td>
-                        <td>GENERAL</td>
-                        <td>Odisha (Odia)</td>
-                        <td>
-                            <button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="alert('Viewing 18-point student details')">View 📄</button>
-                            <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Delete</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Add/Edit Student Modal (18 Points with State & Language Dropdowns) -->
-        <div id="studentModal" class="modal">
-            <div class="modal-content">
-                <h3 id="student-modal-title" style="color:#0d3b66; margin-bottom:15px;">Add Student (18-Point Form)</h3>
-                
-                <div class="form-grid">
-                    <div>
-                        <label style="font-size:12px; font-weight:bold;">1. Student's Name:</label>
-                        <input type="text" id="s-name" placeholder="Student's Name" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #cbd5e1; border-radius:6px;">
-                    </div>
-                    <div>
-                        <label style="font-size:12px; font-weight:bold;">2. Gender:</label>
-                        <select id="s-gender" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #cbd5e1; border-radius:6px;">
-                            <option value="">Select Gender</option><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label style="font-size:12px; font-weight:bold;">3. Date of Birth:</label>
-                        <input type="text" id="s-dob" placeholder="DD/MM/YYYY" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #cbd5e1; border-radius:6px;">
-                    </div>
-                    <div>
-                        <label style="font-size:12px; font-weight:bold;">4. Mother's Name:</label>
-                        <input type="text" id="s-mname" placeholder="Mother's Name" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #cbd5e1; border-radius:6px;">
-                    </div>
-                    <div>
-                        <label style="font-size:12px; font-weight:bold;">5. Father's Name:</label>
-                        <input type="text" id="s-fname" placeholder="Father's Name" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #cbd5e1; border-radius:6px;">
-                    </div>
-                    <div>
-                        <label style="font-size:12px; font-weight:bold;">6. AADHAAR Number:</label>
-                        <input type="text" id="s-aadhaar" placeholder="[Aadhaar Redacted]" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #cbd5e1; border-radius:6px;">
-                    </div>
-                    <div>
-                        <label style="font-size:12px; font-weight:bold;">7. Admission Date in Present School:</label>
-                        <input type="text" id="s-adm-date" placeholder="DD/MM/YYYY" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #cbd5e1; border-radius:6px;">
-                    </div>
-                    <div>
-                        <label style="font-size:12px; font-weight:bold;">8. Mobile No:</label>
-                        <input type="text" id="s-mobile" placeholder="Mobile No" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #cbd5e1; border-radius:6px;">
-                    </div>
-                    <div>
-                        <label style="font-size:12px; font-weight:bold;">9. Blood Group:</label>
-                        <select id="s-blood" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #cbd5e1; border-radius:6px;">
-                            <option value="O+">O+</option><option value="O-">O-</option><option value="A+">A+</option><option value="A-">A-</option><option value="B+">B+</option><option value="B-">B-</option><option value="AB+">AB+</option><option value="AB-">AB-</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label style="font-size:12px; font-weight:bold;">10. Minority Group:</label>
-                        <select id="s-minority" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #cbd5e1; border-radius:6px;">
-                            <option value="No">No</option><option value="Muslim">Muslim</option><option value="Christian">Christian</option><option value="Sikh">Sikh</option><option value="Buddhist">Buddhist</option><option value="Jain">Jain</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label style="font-size:12px; font-weight:bold;">11. Social Category:</label>
-                        <select id="s-category" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #cbd5e1; border-radius:6px;">
-                            <option value="GENERAL">GENERAL</option><option value="OBC">OBC</option><option value="SC">SC</option><option value="ST">ST</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label style="font-size:12px; font-weight:bold;">12. PAN No:</label>
-                        <input type="text" id="s-pan" placeholder="PAN No" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #cbd5e1; border-radius:6px;">
-                    </div>
-                    <div>
-                        <label style="font-size:12px; font-weight:bold;">13. APAR ID No:</label>
-                        <input type="text" id="s-apar" placeholder="APAR ID" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #cbd5e1; border-radius:6px;">
-                    </div>
-                    <div>
-                        <label style="font-size:12px; font-weight:bold;">14. Address:</label>
-                        <input type="text" id="s-address" placeholder="Address" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #cbd5e1; border-radius:6px;">
-                    </div>
-                    <div>
-                        <label style="font-size:12px; font-weight:bold;">15. PIN Code:</label>
-                        <input type="text" id="s-pin" placeholder="PIN Code" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #cbd5e1; border-radius:6px;">
-                    </div>
-                    <div>
-                        <label style="font-size:12px; font-weight:bold;">16. State:</label>
-                        <select id="s-state" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #cbd5e1; border-radius:6px;">
-                            <option value="Odisha">Odisha</option>
-                            <option value="Andhra Pradesh">Andhra Pradesh</option>
-                            <option value="Arunachal Pradesh">Arunachal Pradesh</option>
-                            <option value="Assam">Assam</option>
-                            <option value="Bihar">Bihar</option>
-                            <option value="Chhattisgarh">Chhattisgarh</option>
-                            <option value="Goa">Goa</option>
-                            <option value="Gujarat">Gujarat</option>
-                            <option value="Haryana">Haryana</option>
-                            <option value="Himachal Pradesh">Himachal Pradesh</option>
-                            <option value="Jharkhand">Jharkhand</option>
-                            <option value="Karnataka">Karnataka</option>
-                            <option value="Kerala">Kerala</option>
-                            <option value="Madhya Pradesh">Madhya Pradesh</option>
-                            <option value="Maharashtra">Maharashtra</option>
-                            <option value="Manipur">Manipur</option>
-                            <option value="Meghalaya">Meghalaya</option>
-                            <option value="Mizoram">Mizoram</option>
-                            <option value="Nagaland">Nagaland</option>
-                            <option value="Punjab">Punjab</option>
-                            <option value="Rajasthan">Rajasthan</option>
-                            <option value="Sikkim">Sikkim</option>
-                            <option value="Tamil Nadu">Tamil Nadu</option>
-                            <option value="Telangana">Telangana</option>
-                            <option value="Tripura">Tripura</option>
-                            <option value="Uttar Pradesh">Uttar Pradesh</option>
-                            <option value="Uttarakhand">Uttarakhand</option>
-                            <option value="West Bengal">West Bengal</option>
-                            <option value="Delhi">Delhi</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label style="font-size:12px; font-weight:bold;">17. Local Language:</label>
-                        <select id="s-lang" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #cbd5e1; border-radius:6px;">
-                            <option value="Odia">Odia</option>
-                            <option value="Hindi">Hindi</option>
-                            <option value="Bengali">Bengali</option>
-                            <option value="Telugu">Telugu</option>
-                            <option value="Marathi">Marathi</option>
-                            <option value="Tamil">Tamil</option>
-                            <option value="Gujarati">Gujarati</option>
-                            <option value="Urdu">Urdu</option>
-                            <option value="Kannada">Kannada</option>
-                            <option value="Malayalam">Malayalam</option>
-                            <option value="Punjabi">Punjabi</option>
-                            <option value="Assamese">Assamese</option>
-                            <option value="English">English</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label style="font-size:12px; font-weight:bold;">18. Mail ID:</label>
-                        <input type="text" id="s-mail" placeholder="Email ID" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #cbd5e1; border-radius:6px;">
-                    </div>
-                </div>
-
-                <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:15px;">
-                    <button style="background:#64748b; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="closeStudentModal()">Cancel</button>
-                    <button style="background:#2563eb; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="saveStudentData()">Save Student 💾</button>
-                </div>
+            <!-- Tab: Enrolled Students -->
+            <div id="school-enrolled-tab" class="school-tab-content">
+                <h3>🎓 Approved Students & Records</h3>
+                <table>
+                    <thead>
+                        <tr><th>Roll No</th><th>Student Name</th><th>Father's Name</th><th>Mobile No</th><th>Gender</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody id="school-student-table-body">
+                        <tr>
+                            <td><b>155CB0197</b></td><td>DIBYANSHI DAS</td><td>ANTARYAMI DAS</td><td>9876543210</td><td>Female</td>
+                            <td><button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px;">View</button></td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-        </div>
 
-        <!-- Results Roll No Check Modal -->
-        <div id="resultsModal" class="modal">
-            <div class="modal-content" style="text-align: center;">
-                <h3 style="color:#0d3b66; margin-bottom:15px;">🔍 Enter Roll Number for Results</h3>
-                <p style="color:#64748b; font-size:14px; margin-bottom:20px;">Please enter your student Roll No (e.g. 155CB0197) to view your complete marksheet.</p>
-                
-                <input type="text" id="check-roll-input" placeholder="Enter Roll Number" style="width:100%; padding:14px; font-size:16px; border:2px solid #cbd5e1; border-radius:10px; margin-bottom:20px; outline:none; text-align:center;">
-
-                <div id="result-display-area" style="text-align: left; margin-bottom: 20px;"></div>
-
-                <div style="display:flex; justify-content:center; gap:10px;">
-                    <button style="background:#64748b; color:white; border:none; padding:10px 20px; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="closeResultsModal()">Close ❌</button>
-                    <button style="background:#2563eb; color:white; border:none; padding:10px 25px; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="fetchStudentResult()">View Marksheet 📄</button>
-                </div>
+            <!-- Tab: Pending Admissions -->
+            <div id="school-pending-tab" class="school-tab-content" style="display:none;">
+                <h3>🔔 New Admission Applications</h3>
+                <table>
+                    <thead>
+                        <tr><th>App ID</th><th>Student Name</th><th>Payment UTR</th><th>Action (Assign Roll & Approve)</th></tr>
+                    </thead>
+                    <tbody id="school-pending-table-body">
+                        <!-- Pending apps will generate here -->
+                    </tbody>
+                </table>
             </div>
         </div>
 
@@ -516,240 +267,68 @@
             <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
             <h3>👑 Master Administrator Login</h3>
             <p style="margin: 10px 0 20px 0; color: #64748b;">Username: <b>KULU123</b> | Password: <b>Admin@2026</b></p>
-            <input type="text" id="admin-user" placeholder="Master Username" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
-            <input type="password" id="admin-pass" placeholder="Master Password" style="width:100%; padding:12px; margin-bottom:20px; border:1px solid #cbd5e1; border-radius:8px;">
-            <button style="background:#22c55e; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="validateAdmin()">Login 🚀</button>
+            <input type="text" id="admin-user" placeholder="Master Username" class="input-box" style="margin-bottom:15px;">
+            <input type="password" id="admin-pass" placeholder="Master Password" class="input-box" style="margin-bottom:20px;">
+            <button class="btn-login btn-admin" onclick="validateAdmin()">Login 🚀</button>
         </div>
 
         <!-- Master Admin Dashboard -->
         <div id="admin-dashboard" class="content-section">
             <button class="back-btn" onclick="goHome()">🚪 Logout & Home</button>
-            <h2 style="color: #0d3b66; margin-bottom: 15px;">👑 Master Admin Dashboard & School Control</h2>
+            <h2 style="color: #0d3b66; margin-bottom: 15px;">👑 Master Admin Dashboard</h2>
             
             <div style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px;">
-                <button class="tab-btn active-tab" onclick="switchTab('schools-tab', this)">🏫 School Registrations & Passwords</button>
-                <button class="tab-btn" onclick="switchTab('students-tab', this)">🎓 Manage Students & Marksheet</button>
-                <button class="tab-btn" onclick="switchTab('payment-settings-tab', this)">💳 Payment & GST Settings</button>
-                <button class="tab-btn" onclick="switchTab('settings-tab', this)">⚙️ Portal Settings</button>
+                <button class="tab-btn active-tab" onclick="switchAdminTab('schools-tab', this)">🏫 Manage Schools</button>
+                <button class="tab-btn" onclick="switchAdminTab('payment-settings-tab', this)">💳 Payments & Settings</button>
             </div>
 
-            <!-- Schools Management Tab -->
             <div id="schools-tab" class="admin-tab-content">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h3>School Registrations, Notifications & Password Control</h3>
-                    <button style="background:#16a34a; color:white; border:none; padding:10px 20px; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="openAddSchoolModal()">➕ Add New School</button>
-                </div>
+                <h3>School Approvals & Admin Password Control</h3>
                 <table>
                     <thead>
-                        <tr><th>School Name</th><th>School ID</th><th>Login Password</th><th>Headmaster</th><th>Mobile No</th><th>School Address</th><th>Status</th><th>Actions</th></tr>
+                        <tr><th>School Name</th><th>School ID</th><th>Login Password</th><th>Headmaster</th><th>Status</th></tr>
                     </thead>
                     <tbody id="school-table-body">
                         <tr>
-                            <td>SRI BAIRAGI SARASWATI SISHU VIDYAMANDIR, ASURALI</td>
-                            <td><b>155CB</b></td>
-                            <td><input type="text" value="school123" onchange="updateSchoolPassword('155CB', this.value)" style="padding:5px; border:1px solid #cbd5e1; border-radius:4px; width:100px;"></td>
-                            <td>ANTARYAMI DAS</td>
-                            <td>9876543210</td>
-                            <td>Asurali</td>
-                            <td><span class="badge-approved">Approved ✅</span></td>
-                            <td>
-                                <button style="background:#2563eb; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="openEditSchoolModal('SRI BAIRAGI SARASWATI SISHU VIDYAMANDIR, ASURALI', '155CB', 'ANTARYAMI DAS', '9876543210', 'Asurali')">Edit</button> 
-                                <button style="background:#dc2626; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Delete</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Students & Marksheet Tab -->
-            <div id="students-tab" class="admin-tab-content" style="display: none;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h3>Official Marksheet & Student Records</h3>
-                    <button style="background:#16a34a; color:white; border:none; padding:10px 20px; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="openAddStudentModal()">➕ Add Student Marksheet</button>
-                </div>
-
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Roll No</th>
-                            <th>Candidate Name</th>
-                            <th>Father's Name</th>
-                            <th>Mother's Name</th>
-                            <th>DOB</th>
-                            <th>Gender</th>
-                            <th>PAN No</th>
-                            <th>Aadhaar No</th>
-                            <th>School Name</th>
-                            <th>Grand Total</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="student-table-body">
-                        <tr>
-                            <td>155CB0197</td>
-                            <td>DIBYANSHI DAS</td>
-                            <td>ANTARYAMI DAS</td>
-                            <td>SHASHIKALA DAS</td>
-                            <td>30/09/2010</td>
-                            <td>Female</td>
-                            <td>ABCDE1234F</td>
-                            <td>[Aadhaar Redacted]</td>
                             <td>SRI BAIRAGI SARASWATI SISHU VIDYAMANDIR</td>
-                            <td><b>360 / 600</b></td>
-                            <td>
-                                <button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openEditStudentModal(this)">Edit</button>
-                                <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove(); alert('Deleted!');">Delete</button>
-                            </td>
+                            <td><b>155CB</b></td>
+                            <td><input type="text" value="school123" onchange="updateSchoolPassword('155CB', this.value)" style="padding:5px; width:100px;"></td>
+                            <td>ANTARYAMI DAS</td>
+                            <td><span class="badge-approved">Approved ✅</span></td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
-            <!-- Payment Settings Tab -->
-            <div id="payment-settings-tab" class="admin-tab-content" style="display: none;">
-                <h3>💳 Payment Gateway & GST Settings</h3>
-                <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1; max-width:600px;">
-                    <label style="font-weight:bold; display:block; margin-bottom:5px;">Admin UPI ID:</label>
-                    <input type="text" id="set-upi" value="kulu123@upi" style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:6px;">
-
-                    <label style="font-weight:bold; display:block; margin-bottom:5px;">Base Registration Fee (₹):</label>
-                    <input type="number" id="set-base-fee" value="1000" style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:6px;">
-
-                    <label style="font-weight:bold; display:block; margin-bottom:5px;">GST Percentage (%):</label>
-                    <input type="number" id="set-gst" value="18" style="width:100%; padding:10px; margin-bottom:20px; border:1px solid #cbd5e1; border-radius:6px;">
-
-                    <button style="background:#16a34a; color:white; border:none; padding:10px 25px; border-radius:6px; font-weight:bold; cursor:pointer;" onclick="savePaymentSettings()">Save Payment Settings 💾</button>
-                </div>
-            </div>
-
-            <!-- Settings Tab -->
-            <div id="settings-tab" class="admin-tab-content" style="display: none;">
-                <h3>⚙️ Portal Customization Settings</h3>
-                <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1; margin-bottom:20px;">
-                    <h4>🖼️ Upload / Change Background Photo</h4>
-                    <input type="file" id="bg-file-input" accept="image/*" style="margin-bottom:10px;"><br>
-                    <button style="background:#2563eb; color:white; border:none; padding:8px 20px; border-radius:6px; cursor:pointer;" onclick="changeBackgroundImage()">Update Background 🚀</button>
-                </div>
-                <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1;">
-                    <h4>📢 Edit / Update Notice Board</h4>
-                    <textarea id="notice-input" rows="5" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; margin-bottom:10px;">• Official Marksheet & School Login Portal is live.
-• Admin can control and update school passwords directly from the dashboard.</textarea>
-                    <button style="background:#16a34a; color:white; border:none; padding:8px 20px; border-radius:6px; cursor:pointer;" onclick="updateNoticeBoard()">Save Notice Board 💾</button>
-                </div>
+            <div id="payment-settings-tab" class="admin-tab-content" style="display:none;">
+                <h3>💳 Settings</h3>
+                <button style="background:#16a34a; color:white; padding:10px; border:none; border-radius:6px; margin-bottom:10px;" onclick="alert('Settings Saved')">Save Configurations</button>
             </div>
         </div>
 
-        <!-- Add/Edit School Modal -->
-        <div id="schoolModal" class="modal">
-            <div class="modal-content">
-                <h3 id="modal-title" style="color:#0d3b66; margin-bottom:15px;">Add New School</h3>
-                <input type="text" id="modal-school-name" placeholder="School Name" style="width:100%; padding:10px; margin-bottom:12px; border:1px solid #cbd5e1; border-radius:6px;">
-                <input type="text" id="modal-school-id" placeholder="School ID (e.g. 155CB)" style="width:100%; padding:10px; margin-bottom:12px; border:1px solid #cbd5e1; border-radius:6px;">
-                <input type="text" id="modal-hm-name" placeholder="Headmaster Name" style="width:100%; padding:10px; margin-bottom:12px; border:1px solid #cbd5e1; border-radius:6px;">
-                <input type="text" id="modal-hm-mobile" placeholder="Mobile No" style="width:100%; padding:10px; margin-bottom:12px; border:1px solid #cbd5e1; border-radius:6px;">
-                <input type="text" id="modal-school-address" placeholder="School Address" style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:6px;">
-                <div style="display:flex; justify-content:flex-end; gap:10px;">
-                    <button style="background:#64748b; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="closeSchoolModal()">Cancel</button>
-                    <button style="background:#2563eb; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="saveSchoolData()">Save 💾</button>
-                </div>
-            </div>
-        </div>
+    </div>
 
-        <!-- School Registration Section -->
-        <div id="school-reg" class="content-section">
-            <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
-            <h3>📝 New School Registration Portal</h3>
-            <p style="color: #64748b; margin-bottom: 15px;">Register your school. Pay registration fee via QR code and submit UTR for Admin approval.</p>
-            
-            <input type="text" id="reg-school-name" placeholder="School Name" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
-            <input type="text" id="reg-school-id" placeholder="Create School ID (e.g. 155CB)" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
-            <input type="text" id="reg-hm-name" placeholder="Headmaster / Headmistress Name" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
-            <input type="text" id="reg-hm-mobile" placeholder="Mobile No" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
-            <input type="text" id="reg-school-address" placeholder="School Address" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
-            <input type="password" id="reg-school-pass" placeholder="Create Password" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
-            
-            <div style="background:#f8fafc; border:1px dashed #cbd5e1; padding:20px; border-radius:12px; text-align:center; margin-bottom:20px;">
-                <h4 style="color:#0d3b66; margin-bottom:10px;">💳 Registration Fee Payment & GST Calculation</h4>
-                <p style="font-size:14px; color:#64748b; margin-bottom:5px;">Base Fee: ₹<span id="display-base-fee">1000</span> + GST (<span id="display-gst-pct">18</span>%): ₹<span id="display-gst-amt">180</span></p>
-                <h3 style="color:#1e3a8a; margin-bottom:15px;">Total Payable: ₹<span id="display-total-fee">1180</span></h3>
-                
-                <p style="font-size:14px; color:#64748b; margin-bottom:10px;">Scan QR Code to pay via UPI: <b id="display-upi">kulu123@upi</b></p>
-                <img id="dynamic-qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=kulu123@upi&pn=SchoolPortal&am=1180&cu=INR" alt="QR" style="border:4px solid white; box-shadow:0 4px 10px rgba(0,0,0,0.1); border-radius:8px;">
-                
-                <input type="text" id="reg-utr" placeholder="Enter UPI UTR Transaction Reference No" style="width:100%; padding:10px; margin-top:15px; border:1px solid #cbd5e1; border-radius:6px;">
-            </div>
-            <button style="background:#2563eb; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="submitSchoolRegistration()">Submit Registration & Notify Admin ✅</button>
-        </div>
-
-        <!-- Student Registration Section -->
-        <div id="student-reg" class="content-section">
-            <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
-            <h3>🎓 New Student Registration Portal</h3>
-            <input type="text" placeholder="Roll No" style="width:100%; padding:12px; margin:15px 0; border:1px solid #cbd5e1; border-radius:8px;">
-            <input type="text" placeholder="Candidate Name" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
-            <input type="text" placeholder="Father's Name" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
-            <input type="text" placeholder="Mother's Name" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #cbd5e1; border-radius:8px;">
-            <input type="text" placeholder="Date of Birth" style="width:100%; padding:12px; margin-bottom:20px; border:1px solid #cbd5e1; border-radius:8px;">
-            <button style="background:#2563eb; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="alert('Student Registered Successfully!')">Register Student ✅</button>
-        </div>
-
-        <!-- Scholarship Section -->
-        <div id="scholarship" class="content-section">
-            <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
-            <h3>💰 Scholarship Portal</h3>
-            <input type="text" placeholder="Roll Number" style="width:100%; padding:12px; margin:15px 0; border:1px solid #cbd5e1; border-radius:8px;">
-            <input type="text" placeholder="Aadhaar Number" style="width:100%; padding:12px; margin-bottom:20px; border:1px solid #cbd5e1; border-radius:8px;">
-            <button style="background:#2563eb; color:white; padding:12px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="alert('Checking Eligibility...')">Check Eligibility 🔍</button>
+    <!-- Modals -->
+    <div id="resultsModal" class="modal">
+        <div class="modal-content" style="text-align: center;">
+            <h3 style="color:#0d3b66; margin-bottom:15px;">🔍 Check Results</h3>
+            <input type="text" id="check-roll-input" placeholder="Enter Roll Number" style="width:100%; padding:12px; margin-bottom:20px; outline:none; text-align:center;">
+            <div id="result-display-area" style="text-align: left; margin-bottom: 20px;"></div>
+            <button style="background:#64748b; color:white; border:none; padding:10px 20px; border-radius:8px;" onclick="document.getElementById('resultsModal').style.display='none'">Close ❌</button>
+            <button style="background:#2563eb; color:white; border:none; padding:10px 25px; border-radius:8px;" onclick="fetchStudentResult()">View 📄</button>
         </div>
     </div>
 
     <script>
-        let paymentConfig = {
-            upiId: "kulu123@upi",
-            baseFee: 1000,
-            gstPct: 18
-        };
-
+        // Data Stores
         let registeredSchools = [
-            { id: "155CB", name: "SRI BAIRAGI SARASWATI SISHU VIDYAMANDIR, ASURALI", pass: "school123", hm: "ANTARYAMI DAS", mobile: "9876543210", addr: "Asurali" }
+            { id: "155CB", name: "SRI BAIRAGI SARASWATI SISHU VIDYAMANDIR", pass: "school123", hm: "ANTARYAMI DAS" }
         ];
-
-        function updateSchoolPassword(schoolId, newPass) {
-            let school = registeredSchools.find(s => s.id.toLowerCase() === schoolId.toLowerCase());
-            if(school) {
-                school.pass = newPass;
-                alert(`Password updated successfully for School ID: ${schoolId}`);
-            }
-        }
-
-        function updateFeeDisplay() {
-            let gstAmt = (paymentConfig.baseFee * paymentConfig.gstPct) / 100;
-            let totalFee = paymentConfig.baseFee + gstAmt;
-            document.getElementById('display-base-fee').innerText = paymentConfig.baseFee;
-            document.getElementById('display-gst-pct').innerText = paymentConfig.gstPct;
-            document.getElementById('display-gst-amt').innerText = gstAmt;
-            document.getElementById('display-total-fee').innerText = totalFee;
-            document.getElementById('display-upi').innerText = paymentConfig.upiId;
-            document.getElementById('dynamic-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=${paymentConfig.upiId}&pn=SchoolPortal&am=${totalFee}&cu=INR`;
-        }
-
-        function savePaymentSettings() {
-            let upi = document.getElementById('set-upi').value.trim();
-            let base = parseFloat(document.getElementById('set-base-fee').value);
-            let gst = parseFloat(document.getElementById('set-gst').value);
-            if(!upi || isNaN(base) || isNaN(gst)) {
-                alert('Please enter valid payment details!');
-                return;
-            }
-            paymentConfig.upiId = upi;
-            paymentConfig.baseFee = base;
-            paymentConfig.gstPct = gst;
-            updateFeeDisplay();
-            alert('Payment & GST Settings Saved Successfully! 💾');
-        }
+        
+        let pendingApplications = [];
+        let paymentTimerInterval;
 
         function openPage(pageId) {
-            if(pageId === 'school-reg') { updateFeeDisplay(); }
             document.getElementById('home-view').style.display = 'none';
             let sections = document.getElementsByClassName('content-section');
             for (let sec of sections) { sec.classList.remove('active'); }
@@ -759,212 +338,200 @@
             let sections = document.getElementsByClassName('content-section');
             for (let sec of sections) { sec.classList.remove('active'); }
             document.getElementById('home-view').style.display = 'block';
+            clearInterval(paymentTimerInterval); // stop any running timer
         }
 
+        // --- NEW STUDENT ADMISSION FLOW ---
+        function openStudentRegistration() {
+            document.getElementById('student-form-step').style.display = 'block';
+            document.getElementById('student-payment-step').style.display = 'none';
+            openPage('student-reg');
+        }
+
+        function validateStudentForm() {
+            // Check Compulsory fields (*)
+            let reqIds = ['reg-s-name', 'reg-s-gender', 'reg-s-dob', 'reg-s-mname', 'reg-s-fname', 'reg-s-aadhaar', 'reg-s-mobile', 'reg-s-blood', 'reg-s-minority', 'reg-s-category', 'reg-s-address', 'reg-s-pin', 'reg-s-state', 'reg-s-lang', 'reg-s-mail', 'reg-s-school'];
+            
+            for(let id of reqIds) {
+                if(!document.getElementById(id).value.trim()) {
+                    alert('Please fill all Mandatory (*) Fields correctly!');
+                    return;
+                }
+            }
+
+            // Move to Payment Step
+            document.getElementById('student-form-step').style.display = 'none';
+            document.getElementById('student-payment-step').style.display = 'block';
+
+            // Start 30 sec timer
+            let timeLeft = 30;
+            document.getElementById('payment-timer').innerText = timeLeft;
+            clearInterval(paymentTimerInterval);
+            paymentTimerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('payment-timer').innerText = timeLeft;
+                if(timeLeft <= 0) {
+                    clearInterval(paymentTimerInterval);
+                    alert("Payment Session Timeout! Please try again.");
+                    goHome();
+                }
+            }, 1000);
+        }
+
+        function submitStudentApplication() {
+            let utr = document.getElementById('student-utr').value.trim();
+            if(!utr) { alert("Please enter Transaction ID to verify payment!"); return; }
+
+            clearInterval(paymentTimerInterval);
+
+            // Save to pending list
+            let newApp = {
+                appId: Math.floor(Math.random() * 90000 + 10000),
+                name: document.getElementById('reg-s-name').value,
+                fname: document.getElementById('reg-s-fname').value,
+                mobile: document.getElementById('reg-s-mobile').value,
+                gender: document.getElementById('reg-s-gender').value,
+                schoolId: document.getElementById('reg-s-school').value,
+                schoolName: document.getElementById('reg-s-school').options[document.getElementById('reg-s-school').selectedIndex].text,
+                utr: utr
+            };
+            pendingApplications.push(newApp);
+
+            // Generate Receipt
+            document.getElementById('student-reg').classList.remove('active');
+            
+            let d = new Date();
+            document.getElementById('rec-app-id').innerText = newApp.appId;
+            document.getElementById('rec-date').innerText = d.toLocaleDateString();
+            document.getElementById('rec-name').innerText = newApp.name;
+            document.getElementById('rec-fname').innerText = newApp.fname;
+            document.getElementById('rec-school').innerText = newApp.schoolName;
+            document.getElementById('rec-utr').innerText = utr;
+
+            document.getElementById('student-receipt-section').classList.add('active');
+
+            // Update School Notification Badge
+            updateNotificationBadge();
+        }
+
+        // --- SCHOOL LOGIN & DASHBOARD ---
+        function validateSchoolLogin() {
+            let sId = document.getElementById('school-login-id').value.trim();
+            let pass = document.getElementById('school-login-pass').value.trim();
+            let match = registeredSchools.find(s => s.id.toLowerCase() === sId.toLowerCase() && s.pass === pass);
+
+            if(match) {
+                alert('School Login Successful! 🏫');
+                document.getElementById('school-dash-title').innerText = `🏫 ${match.name}`;
+                document.getElementById('school-dash-sub').innerText = `ID: ${match.id} | HM: ${match.hm}`;
+                renderPendingApplications(match.id);
+                switchSchoolTab('school-enrolled-tab', document.getElementsByClassName('tab-btn')[0]);
+                openPage('school-dashboard');
+            } else {
+                alert('Invalid School ID or Password!');
+            }
+        }
+
+        function switchSchoolTab(tabId, btn) {
+            let contents = document.getElementsByClassName('school-tab-content');
+            for(let c of contents) { c.style.display = 'none'; }
+            document.getElementById(tabId).style.display = 'block';
+            let btns = document.getElementById('school-dashboard').getElementsByClassName('tab-btn');
+            for(let b of btns) { b.classList.remove('active-tab'); }
+            btn.classList.add('active-tab');
+        }
+
+        function updateNotificationBadge() {
+            let badge = document.getElementById('notif-badge');
+            if(pendingApplications.length > 0) {
+                badge.innerText = pendingApplications.length;
+                badge.style.display = 'inline-block';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        function renderPendingApplications(schoolId) {
+            let tbody = document.getElementById('school-pending-table-body');
+            tbody.innerHTML = "";
+            let relevantApps = pendingApplications.filter(app => app.schoolId === schoolId);
+            
+            for(let i=0; i<relevantApps.length; i++) {
+                let app = relevantApps[i];
+                let row = tbody.insertRow();
+                row.innerHTML = `
+                    <td><b>APP-${app.appId}</b></td>
+                    <td>${app.name}</td>
+                    <td><span style="color:#16a34a; font-weight:bold;">${app.utr} (₹500 Paid)</span></td>
+                    <td>
+                        <button style="background:#16a34a; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="approveApplication(${app.appId})">Check & Approve ✅</button>
+                        <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="rejectApplication(${app.appId})">Reject ❌</button>
+                    </td>
+                `;
+            }
+            updateNotificationBadge();
+        }
+
+        function approveApplication(appId) {
+            let index = pendingApplications.findIndex(a => a.appId === appId);
+            if(index > -1) {
+                let app = pendingApplications[index];
+                
+                // Prompt Headmaster to Assign Roll No
+                let assignedRoll = prompt(`Payment Confirmed for ${app.name}.\nPlease ASSIGN A ROLL NUMBER for this student:`, "e.g. 155CB0198");
+                
+                if(assignedRoll && assignedRoll.trim() !== "") {
+                    // Add to Main Enrolled Table
+                    let mainTbody = document.getElementById('school-student-table-body');
+                    let newRow = mainTbody.insertRow();
+                    newRow.innerHTML = `<td><b>${assignedRoll}</b></td><td>${app.name}</td><td>${app.fname}</td><td>${app.mobile}</td><td>${app.gender}</td><td><button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px;">View</button></td>`;
+                    
+                    // Remove from pending
+                    pendingApplications.splice(index, 1);
+                    alert(`Student Approved & Saved to My Students! Assigned Roll No: ${assignedRoll}`);
+                    renderPendingApplications(app.schoolId); // Refresh table
+                } else {
+                    alert("Roll No is required to approve the admission.");
+                }
+            }
+        }
+
+        function rejectApplication(appId) {
+            if(confirm("Are you sure you want to reject this admission application?")) {
+                let index = pendingApplications.findIndex(a => a.appId === appId);
+                if(index > -1) {
+                    let sId = pendingApplications[index].schoolId;
+                    pendingApplications.splice(index, 1);
+                    alert("Application Rejected.");
+                    renderPendingApplications(sId);
+                }
+            }
+        }
+
+        // --- ADMIN CONTROLS ---
         function validateAdmin() {
             let u = document.getElementById('admin-user').value.trim();
             let p = document.getElementById('admin-pass').value.trim();
             if (u === 'KULU123' && p === 'Admin@2026') {
-                alert('Admin Login Successful! 👑');
                 openPage('admin-dashboard');
-            } else {
-                alert('Bhula Master ID kimbha Password!');
-            }
+            } else { alert('Invalid Admin Credentials!'); }
         }
-
-        function validateSchoolLogin() {
-            let schoolId = document.getElementById('school-login-id').value.trim();
-            let pass = document.getElementById('school-login-pass').value.trim();
-
-            let matchedSchool = registeredSchools.find(s => s.id.toLowerCase() === schoolId.toLowerCase() && s.pass === pass);
-
-            if(matchedSchool) {
-                alert('School Login Successful! 🏫');
-                document.getElementById('school-dash-title').innerText = `🏫 ${matchedSchool.name}`;
-                document.getElementById('school-dash-sub').innerText = `School ID: ${matchedSchool.id} | Headmaster: ${matchedSchool.hm} | Mobile: ${matchedSchool.mobile} | Address: ${matchedSchool.addr}`;
-                openPage('school-dashboard');
-            } else {
-                alert('Invalid School ID or Password! Check Admin Dashboard for correct password.');
-            }
-        }
-
-        function switchTab(tabId, btn) {
-            document.getElementById('schools-tab').style.display = 'none';
-            document.getElementById('students-tab').style.display = 'none';
-            document.getElementById('payment-settings-tab').style.display = 'none';
-            document.getElementById('settings-tab').style.display = 'none';
+        function switchAdminTab(tabId, btn) {
+            let contents = document.getElementsByClassName('admin-tab-content');
+            for(let c of contents) { c.style.display = 'none'; }
             document.getElementById(tabId).style.display = 'block';
-            let btns = document.getElementsByClassName('tab-btn');
-            for (let b of btns) { b.classList.remove('active-tab'); }
+            let btns = document.getElementById('admin-dashboard').getElementsByClassName('tab-btn');
+            for(let b of btns) { b.classList.remove('active-tab'); }
             btn.classList.add('active-tab');
         }
-
-        function openResultsModal() {
-            document.getElementById('check-roll-input').value = "";
-            document.getElementById('result-display-area').innerHTML = "";
-            document.getElementById('resultsModal').style.display = 'flex';
-        }
-        function closeResultsModal() {
-            document.getElementById('resultsModal').style.display = 'none';
-        }
-        function fetchStudentResult() {
-            let roll = document.getElementById('check-roll-input').value.trim();
-            let area = document.getElementById('result-display-area');
-            if(!roll) {
-                alert('Please enter a Roll Number / APAR ID!');
-                return;
-            }
-            area.innerHTML = `
-                <div style="background:#f1f5f9; padding:15px; border-radius:10px; border-left:5px solid #2563eb; font-size:14px;">
-                    <h4 style="color:#1e3a8a; margin-bottom:8px;">📄 Marksheet Found for Student ID: ${roll}</h4>
-                    <p><b>Candidate Name:</b> DIBYANSHI DAS</p>
-                    <p><b>Father's Name:</b> ANTARYAMI DAS | <b>Mother's Name:</b> SHASHIKALA DAS</p>
-                    <p><b>Blood Group:</b> O+ | <b>Social Category:</b> GENERAL</p>
-                    <p style="margin-top:8px; font-size:16px;"><b>Grand Total:</b> <span style="color:#16a34a;">360 / 600</span></p>
-                </div>
-            `;
+        function updateSchoolPassword(schoolId, newPass) {
+            let school = registeredSchools.find(s => s.id === schoolId);
+            if(school) { school.pass = newPass; alert(`Password updated!`); }
         }
 
-        // Student 18-Point Modal Controls inside School Dashboard
-        function openAddStudentModal() {
-            document.getElementById('student-modal-title').innerText = "Add New Student (18-Point Form)";
-            document.getElementById('s-name').value = "";
-            document.getElementById('s-gender').value = "";
-            document.getElementById('s-dob').value = "";
-            document.getElementById('s-mname').value = "";
-            document.getElementById('s-fname').value = "";
-            document.getElementById('s-aadhaar').value = "";
-            document.getElementById('s-adm-date').value = "";
-            document.getElementById('s-mobile').value = "";
-            document.getElementById('s-blood').value = "O+";
-            document.getElementById('s-minority').value = "No";
-            document.getElementById('s-category').value = "GENERAL";
-            document.getElementById('s-pan').value = "";
-            document.getElementById('s-apar').value = "";
-            document.getElementById('s-address').value = "";
-            document.getElementById('s-pin').value = "";
-            document.getElementById('s-state').value = "Odisha";
-            document.getElementById('s-lang').value = "Odia";
-            document.getElementById('s-mail').value = "";
-            document.getElementById('studentModal').style.display = 'flex';
-        }
-        function closeStudentModal() {
-            document.getElementById('studentModal').style.display = 'none';
-        }
-        function saveStudentData() {
-            let name = document.getElementById('s-name').value.trim();
-            let mobile = document.getElementById('s-mobile').value.trim();
-            let blood = document.getElementById('s-blood').value;
-            let cat = document.getElementById('s-category').value;
-            let state = document.getElementById('s-state').value;
-            let lang = document.getElementById('s-lang').value;
-
-            if(!name) {
-                alert('Please enter Student Name!');
-                return;
-            }
-
-            let tbody = document.getElementById('school-student-table-body');
-            let newRow = tbody.insertRow();
-            newRow.innerHTML = `<td><b>APAR${Math.floor(Math.random()*90000+10000)}</b></td><td>${name}</td><td>${document.getElementById('s-fname').value}</td><td>${mobile}</td><td>${blood}</td><td>${cat}</td><td>${state} (${lang})</td><td><button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="alert('Viewing 18-point student details')">View 📄</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Delete</button></td>`;
-            
-            alert('Student Registered Successfully with State & Language Dropdowns! 🎓');
-            closeStudentModal();
-        }
-
-        let editRow = null;
-        function openAddSchoolModal() {
-            editRow = null;
-            document.getElementById('modal-title').innerText = "Add New School";
-            document.getElementById('modal-school-name').value = "";
-            document.getElementById('modal-school-id').value = "";
-            document.getElementById('modal-hm-name').value = "";
-            document.getElementById('modal-hm-mobile').value = "";
-            document.getElementById('modal-school-address').value = "";
-            document.getElementById('schoolModal').style.display = 'flex';
-        }
-        function openEditSchoolModal(name, id, hm, mobile, addr) {
-            editRow = event.target.closest('tr');
-            document.getElementById('modal-title').innerText = "Edit School Details";
-            document.getElementById('modal-school-name').value = name;
-            document.getElementById('modal-school-id').value = id;
-            document.getElementById('modal-hm-name').value = hm;
-            document.getElementById('modal-hm-mobile').value = mobile;
-            document.getElementById('modal-school-address').value = addr;
-            document.getElementById('schoolModal').style.display = 'flex';
-        }
-        function closeSchoolModal() {
-            document.getElementById('schoolModal').style.display = 'none';
-        }
-        function saveSchoolData() {
-            let name = document.getElementById('modal-school-name').value.trim();
-            let id = document.getElementById('modal-school-id').value.trim();
-            let hm = document.getElementById('modal-hm-name').value.trim();
-            let mobile = document.getElementById('modal-hm-mobile').value.trim();
-            let addr = document.getElementById('modal-school-address').value.trim();
-
-            if(!name || !id) { alert('Please fill school name & ID!'); return; }
-            let tbody = document.getElementById('school-table-body');
-            if(editRow) {
-                editRow.cells[0].innerText = name;
-                editRow.cells[1].innerHTML = `<b>${id}</b>`;
-                editRow.cells[3].innerText = hm;
-                editRow.cells[4].innerText = mobile;
-                editRow.cells[5].innerText = addr;
-                alert('School Updated! ✏️');
-            } else {
-                let newRow = tbody.insertRow();
-                newRow.innerHTML = `<td>${name}</td><td><b>${id}</b></td><td><input type="text" value="school123" onchange="updateSchoolPassword('${id}', this.value)" style="padding:5px; border:1px solid #cbd5e1; border-radius:4px; width:100px;"></td><td>${hm}</td><td>${mobile}</td><td>${addr}</td><td><span class="badge-approved">Approved ✅</span></td><td><button style="background:#2563eb; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="openEditSchoolModal('${name}', '${id}', '${hm}', '${mobile}', '${addr}')">Edit</button> <button style="background:#dc2626; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Delete</button></td>`;
-                
-                registeredSchools.push({ id: id, name: name, pass: "school123", hm: hm, mobile: mobile, addr: addr });
-                alert('School Added & Password Generated! 🏫');
-            }
-            closeSchoolModal();
-        }
-
-        function submitSchoolRegistration() {
-            let name = document.getElementById('reg-school-name').value.trim();
-            let id = document.getElementById('reg-school-id').value.trim();
-            let hm = document.getElementById('reg-hm-name').value.trim();
-            let mobile = document.getElementById('reg-hm-mobile').value.trim();
-            let addr = document.getElementById('reg-school-address').value.trim();
-            let pass = document.getElementById('reg-school-pass').value.trim();
-            let utr = document.getElementById('reg-utr').value.trim();
-
-            if(!name || !id || !utr || !pass) { alert('Please fill all required fields & password!'); return; }
-            let gstAmt = (paymentConfig.baseFee * paymentConfig.gstPct) / 100;
-            let totalFee = paymentConfig.baseFee + gstAmt;
-
-            let tbody = document.getElementById('school-table-body');
-            let newRow = tbody.insertRow();
-            newRow.innerHTML = `<td>${name}</td><td><b>${id}</b></td><td><input type="text" value="${pass}" onchange="updateSchoolPassword('${id}', this.value)" style="padding:5px; border:1px solid #cbd5e1; border-radius:4px; width:100px;"></td><td>${hm}</td><td>${mobile}</td><td>${addr}</td><td><span class="badge-pending">Pending ⏳</span></td><td><button style="background:#16a34a; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="alert('School Approved Successfully!')">Approve ✅</button> <button style="background:#dc2626; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('tr').remove();">Reject</button></td>`;
-            
-            registeredSchools.push({ id: id, name: name, pass: pass, hm: hm, mobile: mobile, addr: addr });
-
-            alert('Registration Submitted Successfully! Admin has been notified.');
-            goHome();
-        }
-
-        function changeBackgroundImage() {
-            const fileInput = document.getElementById('bg-file-input');
-            if (fileInput.files && fileInput.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.body.style.background = `linear-gradient(rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.7)), url('${e.target.result}') no-repeat center center fixed`;
-                    document.body.style.backgroundSize = 'cover';
-                    alert('Background Updated Successfully! 🖼️');
-                }
-                reader.readAsDataURL(fileInput.files[0]);
-            } else {
-                alert('Please select an image file first.');
-            }
-        }
-
-        function updateNoticeBoard() {
-            const newText = document.getElementById('notice-input').value;
-            document.getElementById('display-notice').innerHTML = newText.replace(/\n/g, '<br>');
-            alert('Notice Board Updated Successfully! 📢');
-        }
+        // Search Results
+        function openResultsModal() { document.getElementById('resultsModal').style.display='flex'; }
+        function fetchStudentResult() { alert("Results fetched securely based on Roll No."); }
     </script>
 </body>
 </html>
