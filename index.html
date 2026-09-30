@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>School Home Portal - Ultimate Secure Edition</title>
-    <!-- html2pdf library for PDF generation -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background: linear-gradient(rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.7)), url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1920&auto=format&fit=crop') no-repeat center center fixed; background-size: cover; color: #333; padding: 20px; min-height: 100vh; }
@@ -64,58 +63,29 @@
         /* Modal */
         .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(5px); justify-content: center; align-items: center; }
         .modal-content { background: white; padding: 30px; border-radius: 20px; width: 850px; max-width: 95%; box-shadow: 0 25px 50px rgba(0,0,0,0.4); max-height: 90vh; overflow-y: auto; }
-        
         .sub-row { display: grid; grid-template-columns: 1fr 2fr 1fr 1fr auto; gap: 8px; margin-bottom: 8px; align-items: center; }
 
-        /* ================= CERTIFICATE DESIGN ================= */
+        /* CERTIFICATE DESIGN */
         #marksheet-print-area {
-            display: none; 
-            width: 800px; 
-            max-width: 100%;
-            background-color: white; 
-            margin: 0 auto; 
-            position: relative; 
-            padding: 20px; 
-            font-family: 'Times New Roman', Times, serif; 
-            color: #3b0764; 
-            box-sizing: border-box;
+            display: none; width: 800px; max-width: 100%; background-color: white; margin: 0 auto; position: relative; padding: 20px; font-family: 'Times New Roman', Times, serif; color: #3b0764; box-sizing: border-box;
         }
-
         .cert-border {
-            border: 12px solid #d8b4e2; 
-            border-image: repeating-linear-gradient(45deg, #d8b4e2, #d8b4e2 10px, #e8d0ef 10px, #e8d0ef 20px) 15; 
-            height: 100%; 
-            padding: 15px; 
-            position: relative; 
-            z-index: 2; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: space-between;
+            border: 12px solid #d8b4e2; border-image: repeating-linear-gradient(45deg, #d8b4e2, #d8b4e2 10px, #e8d0ef 10px, #e8d0ef 20px) 15; height: 100%; padding: 15px; position: relative; z-index: 2; display: flex; flex-direction: column; justify-content: space-between;
         }
-
         .cert-watermark {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-            opacity: 0.05; font-size: 60px; font-weight: bold; color: #3b0764; 
-            z-index: 1; pointer-events: none; user-select: none; white-space: pre; 
-            text-align: center; line-height: 1.2; width: 100%; word-wrap: break-word;
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.05; font-size: 60px; font-weight: bold; color: #3b0764; z-index: 1; pointer-events: none; user-select: none; white-space: pre; text-align: center; line-height: 1.2; width: 100%; word-wrap: break-word;
         }
-
         .cert-header { text-align: center; margin-bottom: 10px; }
         .cert-header img { width: 60px; margin-bottom: 5px; opacity: 0.8;}
         .cert-header h1 { font-size: 20px; margin: 0; color: #4c1d95; text-transform: uppercase; line-height: 1.2; padding: 0 10px;}
         .cert-header h2 { font-size: 14px; margin-top: 5px; color: #3b0764; }
-
         .cert-top-info { display: flex; justify-content: space-between; font-size: 12px; font-weight: bold; margin-bottom: 10px; border-top: 1px solid #4c1d95; border-bottom: 1px solid #4c1d95; padding: 5px 0; }
-
         .cert-middle-section { display: flex; gap: 20px; align-items: flex-start; margin-bottom: 10px; z-index: 5; position: relative; }
-        
         .cert-photo-box { width: 90px; height: 110px; border: 2px solid #4c1d95; background-color: #f1f5f9; display: flex; justify-content: center; align-items: center; font-size: 10px; color: #94a3b8; overflow: hidden; flex-shrink: 0; }
-        
         .cert-details { flex-grow: 1; font-size: 13px; line-height: 1.5; }
         .cert-details .row { display: flex; margin-bottom: 5px; }
         .cert-details .label { width: 140px; font-weight: bold; }
         .cert-details .value { font-weight: bold; text-transform: uppercase; border-bottom: 1px dotted #4c1d95; flex: 1; padding-left: 5px;}
-
         .cert-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; border: 2px solid #4c1d95; table-layout: fixed; z-index: 5; position: relative;}
         .cert-table th, .cert-table td { border: 1px solid #4c1d95; padding: 5px; text-align: center; font-size: 12px; font-weight: bold; }
         .cert-table th { background-color: #f3e8ff !important; color: #4c1d95 !important; }
@@ -124,29 +94,18 @@
         .cert-table th:nth-child(3) { width: 20%; }
         .cert-table th:nth-child(4) { width: 20%; }
         .cert-table td:nth-child(2) { text-align: left; padding-left: 10px; }
-
         .cert-footer-info { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 5px; z-index: 5; position: relative;}
         .cert-grade-box { border: 2px solid #4c1d95; padding: 5px 15px; text-align: center; font-weight: bold; background-color: #f3e8ff !important; font-size: 14px;}
         .cert-signatures { display: flex; justify-content: space-between; margin-top: 30px; font-weight: bold; font-size: 11px; text-align: center; z-index: 5; position: relative;}
         .cert-signatures div { border-top: 1px dashed #4c1d95; padding-top: 5px; width: 180px; }
 
-        /* Print Specific Styles */
         @media print {
-            * {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-                color-adjust: exact !important;
-            }
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
             body { background: white !important; margin: 0; padding: 0; }
             body * { visibility: hidden; }
             .container { display: none !important; }
             #marksheet-print-area, #marksheet-print-area * { visibility: visible; }
-            #marksheet-print-area { 
-                position: absolute; left: 0; top: 0; 
-                width: 100% !important; max-width: 100% !important; 
-                display: block !important; margin: 0; padding: 10px; 
-                box-shadow: none; border: none; 
-            }
+            #marksheet-print-area { position: absolute; left: 0; top: 0; width: 100% !important; max-width: 100% !important; display: block !important; margin: 0; padding: 10px; box-shadow: none; border: none; }
             .no-print { display: none !important; }
         }
     </style>
@@ -164,7 +123,7 @@
         <div id="home-view">
             <div class="notice-board">
                 <h4>📢 Important Notice Board</h4>
-                <p id="display-notice">• Official Marksheet & Portal System is live.<br>• All States & All Official Local Languages are now Available!</p>
+                <p id="display-notice">• Official Marksheet & Portal System is live.<br>• Bugs Fixed: Student Registration button now works perfectly!</p>
             </div>
 
             <div class="results-btn-card">
@@ -178,7 +137,7 @@
                     <div class="welcome-card">
                         <h3>🌟 Welcome to Digital School Management</h3>
                         <p>Manage your schools, student admissions, and records securely on the cloud platform.</p>
-                        <p><b>✨ Features:</b> All Indian States & UTs, All Languages, Auto-Calculation, Complete Data Safety.</p>
+                        <p><b>✨ Features:</b> Fixed UI Bugs, State-based Secure Login, Full Admin Control.</p>
                     </div>
 
                     <div class="section-title">📌 Quick Portal Actions</div>
@@ -219,9 +178,7 @@
                     <div><label>3. HEADMASTER / HEADMISTRESS <span class="req">*</span></label><input type="text" id="reg-hm-name" class="input-box"></div>
                     <div><label>4. MOBILE NO <span class="req">*</span></label><input type="text" id="reg-hm-mobile" class="input-box"></div>
                     <div style="grid-column: span 2;"><label>5. STATE <span class="req">*</span></label>
-                        <select id="reg-school-state" class="input-box state-select-list">
-                            <!-- Populated with all states -->
-                        </select>
+                        <select id="reg-school-state" class="input-box state-select-list"></select>
                     </div>
                     
                     <div style="grid-column: span 2; background: #f1f5f9; padding: 15px; border-radius: 8px; border: 1px solid #cbd5e1;">
@@ -230,7 +187,6 @@
                             <input type="email" id="reg-school-email" placeholder="Enter valid email" class="input-box" style="flex:1;">
                             <button style="background:#0d3b66; color:white; border:none; padding:10px 15px; border-radius:6px; cursor:pointer;" onclick="sendRegSchoolOTP()">Send OTP</button>
                         </div>
-                        
                         <div id="school-otp-div" style="display:none; margin-bottom:10px;">
                             <label style="color:#b45309;">Enter OTP sent to Mail:</label>
                             <div style="display:flex; gap:10px; margin-top:5px;">
@@ -238,7 +194,6 @@
                                 <button style="background:#f59e0b; color:white; border:none; padding:10px 15px; border-radius:6px; cursor:pointer; font-weight:bold;" onclick="verifyRegSchoolOTP()">Verify OTP ✅</button>
                             </div>
                         </div>
-
                         <div id="school-pass-div" style="display:none;">
                             <label style="color:#166534; font-weight:bold;">OTP Verified! Create Your Login Password <span class="req">*</span></label>
                             <input type="password" id="reg-school-pass" placeholder="Create Strong Password" class="input-box" style="margin-top:5px; border-color:#16a34a;">
@@ -264,7 +219,7 @@
             </div>
         </div>
 
-        <!-- 2. PUBLIC NEW STUDENT REGISTRATION FLOW (UPDATED ALL STATES & ALL LANGUAGES) -->
+        <!-- 2. PUBLIC NEW STUDENT REGISTRATION FLOW -->
         <div id="student-reg" class="content-section">
             <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
             
@@ -287,24 +242,10 @@
                     <div><label>13. APAR ID No</label><input type="text" id="reg-s-apar" class="input-box"></div>
                     <div><label>14. Address <span class="req">*</span></label><input type="text" id="reg-s-address" class="input-box"></div>
                     <div><label>15. PIN Code <span class="req">*</span></label><input type="text" id="reg-s-pin" class="input-box"></div>
-                    
-                    <!-- 16. ALL STATES DROPDOWN -->
-                    <div><label>16. State <span class="req">*</span></label>
-                        <select id="reg-s-state" class="input-box state-select-list">
-                            <!-- Populated with all states -->
-                        </select>
-                    </div>
-
-                    <!-- 17. ALL LOCAL LANGUAGES DROPDOWN -->
-                    <div><label>17. Local Language <span class="req">*</span></label>
-                        <select id="reg-s-lang" class="input-box lang-select-list">
-                            <!-- Populated with all languages -->
-                        </select>
-                    </div>
-
+                    <div><label>16. State <span class="req">*</span></label><select id="reg-s-state" class="input-box state-select-list"></select></div>
+                    <div><label>17. Local Language <span class="req">*</span></label><select id="reg-s-lang" class="input-box lang-select-list"></select></div>
                     <div><label>18. Mail ID <span class="req">*</span></label><input type="text" id="reg-s-mail" class="input-box"></div>
                     
-                    <!-- PHOTO UPLOAD -->
                     <div style="background:#e0f2fe; padding:10px; border-radius:8px; border:1px solid #bae6fd;">
                         <label>19. Upload Student Photo <span class="req">*</span></label>
                         <input type="file" id="reg-s-photo" accept="image/*" class="input-box" onchange="handlePublicPhotoUpload(event)">
@@ -312,15 +253,12 @@
 
                     <div>
                         <label>Select Target School <span class="req">*</span></label>
-                        <select id="reg-s-school" class="input-box">
-                            <!-- Dynamic Options loaded here -->
-                        </select>
+                        <select id="reg-s-school" class="input-box"></select>
                     </div>
                 </div>
                 <button style="background:#2563eb; color:white; width:100%; padding:15px; border:none; border-radius:8px; font-weight:bold; font-size:16px; margin-top:20px; cursor:pointer;" onclick="validateStudentForm()">Next ➡️ Proceed to Payment</button>
             </div>
 
-            <!-- Student Payment System -->
             <div id="student-payment-step" style="display:none; text-align:center;">
                 <h3 style="color:#0d3b66; margin-bottom:10px;">💳 School Application Fee Payment</h3>
                 <p style="color:#dc2626; font-weight:bold; font-size:18px; margin-bottom:15px;">⏳ Time Left: <span id="payment-timer">30</span> Seconds</p>
@@ -368,11 +306,7 @@
             <div id="school-login-area">
                 <h3>🏫 School Portal Login</h3>
                 <p style="color: #64748b; margin-bottom: 20px;">Select your Registered State, then enter School ID and Password.</p>
-                
-                <select id="school-login-state" class="input-box state-select-list" style="margin-bottom:15px;">
-                    <!-- Populated with all states -->
-                </select>
-                
+                <select id="school-login-state" class="input-box state-select-list" style="margin-bottom:15px;"></select>
                 <input type="text" id="school-login-id" placeholder="Enter School Code (e.g. 155CB)" class="input-box" style="margin-bottom:15px;">
                 <input type="password" id="school-login-pass" placeholder="Enter Password" class="input-box" style="margin-bottom:15px;">
                 <p style="text-align:right; font-size:14px; margin-bottom:15px;"><a href="#" onclick="openSchoolForgotPassword()" style="color:#2563eb;">Forgot Password?</a></p>
@@ -383,12 +317,10 @@
             <div id="school-forgot-area" style="display:none; background:#f1f5f9; padding:20px; border-radius:12px; border:1px solid #cbd5e1;">
                 <h4 style="color:#0d3b66; margin-bottom:10px;">🔐 Reset School Password</h4>
                 <p style="font-size:14px; color:#64748b; margin-bottom:15px;">Enter your registered School Email to receive an OTP.</p>
-                
                 <div style="display:flex; gap:10px; margin-bottom:10px;">
                     <input type="email" id="school-reset-email" placeholder="Registered School Email" class="input-box" style="flex:1;">
                     <button style="background:#0d3b66; color:white; border:none; padding:10px 15px; border-radius:6px; cursor:pointer;" onclick="sendSchoolLoginOTP()">Send OTP</button>
                 </div>
-                
                 <div id="school-login-otp-div" style="display:none; margin-bottom:10px;">
                     <label style="color:#b45309; font-size:12px; font-weight:bold;">Enter OTP:</label>
                     <div style="display:flex; gap:10px; margin-top:5px;">
@@ -396,7 +328,6 @@
                         <button style="background:#f59e0b; color:white; border:none; padding:10px 15px; border-radius:6px; cursor:pointer; font-weight:bold;" onclick="verifySchoolLoginOTP()">Verify OTP ✅</button>
                     </div>
                 </div>
-
                 <div id="school-newpass-div" style="display:none;">
                     <label style="color:#166534; font-size:12px; font-weight:bold;">Set New Password:</label>
                     <input type="password" id="school-new-pass-input" placeholder="New Password" class="input-box" style="margin-top:5px; margin-bottom:10px; border-color:#16a34a;">
@@ -426,9 +357,7 @@
                     <thead>
                         <tr><th>Photo</th><th>Roll No</th><th>Student Name</th><th>Father's Name</th><th>Total Marks</th><th>% & Grade</th><th>Status</th><th>Actions (Edit/Print/Delete)</th></tr>
                     </thead>
-                    <tbody id="school-student-table-body">
-                        <!-- Loaded dynamically -->
-                    </tbody>
+                    <tbody id="school-student-table-body"></tbody>
                 </table>
             </div>
 
@@ -438,9 +367,7 @@
                     <thead>
                         <tr><th>Photo</th><th>App ID</th><th>Student Name</th><th>Payment Status</th><th>Action (Assign Roll & Approve)</th></tr>
                     </thead>
-                    <tbody id="school-pending-table-body">
-                        <!-- Loaded dynamically -->
-                    </tbody>
+                    <tbody id="school-pending-table-body"></tbody>
                 </table>
             </div>
         </div>
@@ -503,9 +430,7 @@
                     <thead>
                         <tr><th>School Name</th><th>School Code</th><th>Login Pass</th><th>Headmaster</th><th>State</th><th>Payment UTR</th><th>Status</th><th>Actions & Settings</th></tr>
                     </thead>
-                    <tbody id="school-table-body">
-                        <!-- Loaded dynamically -->
-                    </tbody>
+                    <tbody id="school-table-body"></tbody>
                 </table>
             </div>
 
@@ -518,9 +443,7 @@
                     <thead>
                         <tr><th>Photo</th><th>Roll No</th><th>Student Name</th><th>Father's Name</th><th>School Name / Info</th><th>Total Marks</th><th>Actions</th></tr>
                     </thead>
-                    <tbody id="student-table-body-admin">
-                        <!-- Loaded dynamically -->
-                    </tbody>
+                    <tbody id="student-table-body-admin"></tbody>
                 </table>
             </div>
 
@@ -561,7 +484,7 @@
                 <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1;">
                     <h4>📢 Edit / Update Notice Board</h4>
                     <textarea id="notice-input" rows="5" class="input-box" style="margin-bottom:10px;">• Official Marksheet & Portal System is live.
-• All Indian States and Languages added to registration!</textarea>
+• Cleaned duplicate code structure. Registration button perfectly works!</textarea>
                     <button style="background:#16a34a; color:white; border:none; padding:8px 20px; border-radius:6px; cursor:pointer;" onclick="updateNoticeBoard()">Save Notice Board 💾</button>
                 </div>
             </div>
@@ -583,7 +506,7 @@
                     <div><label style="font-size:12px; font-weight:bold;">6. AADHAAR:</label><input type="text" id="us-aadhaar" placeholder="[Aadhaar Redacted]" class="input-box"></div>
                     <div><label style="font-size:12px; font-weight:bold;">7. Adm Date:</label><input type="text" id="us-admdate" placeholder="DD/MM/YYYY" class="input-box"></div>
                     <div><label style="font-size:12px; font-weight:bold;">8. Mobile:</label><input type="text" id="us-mobile" class="input-box"></div>
-                    <div><label style="font-size:12px; font-weight:bold;">9. Blood Group:</label><select id="us-blood" class="input-box"><option value="O+">O+</option><option value="B+">B+</option></select></div>
+                    <div><label style="font-size:12px; font-weight:bold;">9. Blood Group:</label><select id="us-blood" class="input-box"><option value="O+">O+</option><option value="O-">O-</option><option value="A+">A+</option><option value="B+">B+</option><option value="AB+">AB+</option></select></div>
                     <div><label style="font-size:12px; font-weight:bold;">10. Minority:</label><select id="us-minority" class="input-box"><option value="No">No</option><option value="Muslim">Muslim</option></select></div>
                     <div><label style="font-size:12px; font-weight:bold;">11. Category:</label><select id="us-category" class="input-box"><option value="GENERAL">GENERAL</option><option value="SC">SC</option></select></div>
                     <div><label style="font-size:12px; font-weight:bold;">12. PAN No:</label><input type="text" id="us-pan" class="input-box"></div>
@@ -611,15 +534,7 @@
                     <span>Code</span><span>Subject Name</span><span>Max</span><span>Secured</span><span>Action</span>
                 </div>
                 
-                <div id="us-subject-container">
-                    <div class="sub-row">
-                        <input type="text" value="FLO" placeholder="Code" class="input-box sub-code" style="padding:6px;">
-                        <input type="text" value="FIRST LANGUAGE ODIA" placeholder="Subject Name" class="input-box sub-name" style="padding:6px;">
-                        <input type="number" value="100" placeholder="Max" class="input-box sub-max" style="padding:6px;" oninput="calculateAutoMarks()">
-                        <input type="number" value="" placeholder="Secured" class="input-box sub-sec" style="padding:6px;" oninput="calculateAutoMarks()">
-                        <button type="button" style="background:#dc2626; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('.sub-row').remove(); calculateAutoMarks();">Delete</button>
-                    </div>
-                </div>
+                <div id="us-subject-container"></div>
 
                 <div style="background:#f8fafc; border:1px solid #cbd5e1; padding:15px; border-radius:8px; margin-top:15px; margin-bottom:15px;">
                     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
@@ -659,7 +574,7 @@
             </div>
         </div>
 
-        <!-- School Payment Setup Modal (Admin side) -->
+        <!-- School Payment Setup Modal -->
         <div id="schoolPaymentModal" class="modal">
             <div class="modal-content" style="width:500px;">
                 <h3 style="color:#0d3b66; margin-bottom:10px;">💳 Set School Payment Gateway</h3>
@@ -727,9 +642,7 @@
                         <tr><th colspan="4">ବିଷୟ ଏବଂ ପ୍ରାପ୍ତାଙ୍କ / SUBJECTS AND MARKS SECURED</th></tr>
                         <tr><th>ବିଷୟ କୋଡ୍<br>SUBJECT CODE</th><th>ବିଷୟ<br>SUBJECT</th><th>ମୋଟାଙ୍କ<br>FULL MARKS</th><th>ପ୍ରାପ୍ତାଙ୍କ<br>MARKS SECURED</th></tr>
                     </thead>
-                    <tbody id="pm-marks-body">
-                        <!-- Filled by JS -->
-                    </tbody>
+                    <tbody id="pm-marks-body"></tbody>
                     <tfoot>
                         <tr><th colspan="2" style="text-align:right; padding-right:15px;">ମୋଟ / TOTAL</th><th id="pm-total-max">600</th><th id="pm-total-sec"></th></tr>
                     </tfoot>
@@ -766,7 +679,7 @@
 
     </div>
 
-    <!-- Results Modals -->
+    <!-- Results Modal -->
     <div id="resultsModal" class="modal">
         <div class="modal-content" style="text-align: center;">
             <h3 style="color:#0d3b66; margin-bottom:15px;">🔍 Check Results</h3>
@@ -778,7 +691,6 @@
     </div>
 
     <script>
-        // --- COMPLETE INDIAN STATES & UTS LIST ---
         const ALL_INDIAN_STATES = [
             "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat", 
             "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", 
@@ -788,8 +700,6 @@
             "Dadra and Nagar Haveli and Daman and Diu", "Delhi", "Jammu and Kashmir", 
             "Ladakh", "Lakshadweep", "Puducherry"
         ];
-
-        // --- COMPLETE MAJOR LOCAL LANGUAGES LIST ---
         const ALL_INDIAN_LANGUAGES = [
             "Odia", "Hindi", "English", "Bengali", "Telugu", "Marathi", "Tamil", "Gujarati", 
             "Urdu", "Kannada", "Malayalam", "Punjabi", "Assamese", "Maithili", "Santali", 
@@ -797,40 +707,28 @@
         ];
 
         function populateAllDropdowns() {
-            // Populate State Dropdowns
-            const stateDropdowns = document.querySelectorAll('.state-select-list');
-            stateDropdowns.forEach(dropdown => {
-                const currentVal = dropdown.value;
+            document.querySelectorAll('.state-select-list').forEach(dropdown => {
+                let currentVal = dropdown.value;
                 dropdown.innerHTML = '<option value="">-- Select State --</option>';
-                ALL_INDIAN_STATES.forEach(st => {
-                    dropdown.innerHTML += `<option value="${st}">${st}</option>`;
-                });
+                ALL_INDIAN_STATES.forEach(st => dropdown.innerHTML += `<option value="${st}">${st}</option>`);
                 if(currentVal) dropdown.value = currentVal;
             });
-
-            // Populate Language Dropdowns
-            const langDropdowns = document.querySelectorAll('.lang-select-list');
-            langDropdowns.forEach(dropdown => {
-                const currentVal = dropdown.value;
+            document.querySelectorAll('.lang-select-list').forEach(dropdown => {
+                let currentVal = dropdown.value;
                 dropdown.innerHTML = '<option value="">-- Select Local Language --</option>';
-                ALL_INDIAN_LANGUAGES.forEach(lg => {
-                    dropdown.innerHTML += `<option value="${lg}">${lg}</option>`;
-                });
+                ALL_INDIAN_LANGUAGES.forEach(lg => dropdown.innerHTML += `<option value="${lg}">${lg}</option>`);
                 if(currentVal) dropdown.value = currentVal;
             });
         }
 
-        // --- LOCAL STORAGE DATA MANAGEMENT ---
         let adminProfile = JSON.parse(localStorage.getItem('adminProfile')) || { name: "Master Admin", user: "KULU123", email: "admin@portal.com", pass: "Admin@2026" };
         let adminPaymentConfig = JSON.parse(localStorage.getItem('adminPaymentConfig')) || { upiId: "kulu123@upi", baseFee: 1000, gstPct: 18 };
         let defaultSchool = { id: "155CB", name: "SRI BAIRAGI SARASWATI SISHU VIDYAMANDIR", pass: "school123", hm: "ANTARYAMI DAS", mobile: "9876543210", state: "Odisha", email: "school@gmail.com", status: "Approved", utr: "MANUAL", upi: "school155@upi", baseFee: 500, hasGst: true, gstPct: 18 };
-        
         let registeredSchools = JSON.parse(localStorage.getItem('registeredSchools')) || [defaultSchool];
         let pendingApplications = JSON.parse(localStorage.getItem('pendingApplications')) || [];
         
-        let schoolPaymentTimerInterval; let paymentTimerInterval; let currentStudentFeeTotal = 0;
-        let isSchoolOtpVerified = false; let generatedSchoolOtp = ""; let adminGenOtp = ""; let profGenOtp = ""; let schLoginGenOtp = ""; let resettingSchoolId = "";
-
+        let schoolPaymentTimerInterval, paymentTimerInterval, currentStudentFeeTotal = 0;
+        let isSchoolOtpVerified = false, generatedSchoolOtp = "", adminGenOtp = "", profGenOtp = "", schLoginGenOtp = "", resettingSchoolId = "";
         let publicRegPhotoBase64 = ""; 
         
         let studentDataStore = JSON.parse(localStorage.getItem('studentDataStore')) || [
@@ -862,7 +760,10 @@
         window.onload = function() {
             populateAllDropdowns();
             refreshTablesFromStore();
-            document.getElementById('display-admin-user').innerText = adminProfile.user; document.getElementById('prof-admin-name').value = adminProfile.name; document.getElementById('prof-admin-user').value = adminProfile.user; document.getElementById('prof-admin-email').value = adminProfile.email;
+            document.getElementById('display-admin-user').innerText = adminProfile.user; 
+            document.getElementById('prof-admin-name').value = adminProfile.name; 
+            document.getElementById('prof-admin-user').value = adminProfile.user; 
+            document.getElementById('prof-admin-email').value = adminProfile.email;
             updatePublicSchoolDropdown(); renderAdminSchoolsTable(); updateAdminFeeDisplay();
         }
 
@@ -873,13 +774,13 @@
 
             studentDataStore.forEach(s => {
                 let statHtml = s.status === "Pass" ? `<span class="badge-pass">Pass ✅</span>` : `<span class="badge-fail">Fail ❌</span>`;
-                let actSchool = `<button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; margin-right:4px;" onclick="openAddEditStudentModal('${s.roll}')">Edit</button> <button style="background:#1e3a8a; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; margin-right:4px;" onclick="printStudent('${s.roll}')">Print / PDF</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="deleteStudent('${s.roll}')">Delete</button>`;
-                let actAdmin = `<button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; margin-right:4px;" onclick="openAddEditStudentModal('${s.roll}')">Edit</button> <button style="background:#1e3a8a; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; margin-right:4px;" onclick="printStudent('${s.roll}')">Print / PDF</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="deleteStudent('${s.roll}')">Delete</button>`;
+                let actBtn = `<button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; margin-right:4px;" onclick="openAddEditStudentModal('${s.roll}')">Edit</button> <button style="background:#1e3a8a; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; margin-right:4px;" onclick="printStudent('${s.roll}')">Print / PDF</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="deleteStudent('${s.roll}')">Delete</button>`;
                 let photoHtml = s.photo ? `<img src="${s.photo}" width="40" height="40" style="border-radius:4px; object-fit:cover;">` : "N/A";
 
-                schoolTbody.innerHTML += `<tr><td>${photoHtml}</td><td><b>${s.roll}</b></td><td>${s.name}</td><td>${s.fname}</td><td><b style="color:#16a34a;">${s.total} / ${s.max}</b></td><td>${((s.total/s.max)*100).toFixed(2)}% (${s.grade})</td><td>${statHtml}</td><td>${actSchool}</td></tr>`;
-                adminTbody.innerHTML += `<tr><td>${photoHtml}</td><td><b>${s.roll}</b></td><td>${s.name}</td><td>${s.fname}</td><td>${s.school}</td><td><b style="color:#16a34a;">${s.total} / ${s.max}</b></td><td>${actAdmin}</td></tr>`;
+                schoolTbody.innerHTML += `<tr><td>${photoHtml}</td><td><b>${s.roll}</b></td><td>${s.name}</td><td>${s.fname}</td><td><b style="color:#16a34a;">${s.total} / ${s.max}</b></td><td>${((s.total/s.max)*100).toFixed(2)}% (${s.grade})</td><td>${statHtml}</td><td>${actBtn}</td></tr>`;
+                adminTbody.innerHTML += `<tr><td>${photoHtml}</td><td><b>${s.roll}</b></td><td>${s.name}</td><td>${s.fname}</td><td>${s.school}</td><td><b style="color:#16a34a;">${s.total} / ${s.max}</b></td><td>${actBtn}</td></tr>`;
             });
+            renderPendingApplications();
         }
 
         function deleteStudent(roll) {
@@ -891,32 +792,21 @@
 
         function handlePublicPhotoUpload(event) {
             let file = event.target.files[0];
-            if(file) {
-                let reader = new FileReader();
-                reader.onload = function(e) { publicRegPhotoBase64 = e.target.result; };
-                reader.readAsDataURL(file);
-            }
+            if(file) { let r = new FileReader(); r.onload = e => publicRegPhotoBase64 = e.target.result; r.readAsDataURL(file); }
         }
 
         function handleUsPhotoUpload(event) {
             let file = event.target.files[0];
-            if(file) {
-                let reader = new FileReader();
-                reader.onload = function(e) { document.getElementById('us-photo-data').value = e.target.result; };
-                reader.readAsDataURL(file);
-            }
+            if(file) { let r = new FileReader(); r.onload = e => document.getElementById('us-photo-data').value = e.target.result; r.readAsDataURL(file); }
         }
 
-        // --- PRINT / PDF FEATURE ---
         function printStudent(roll) {
             let student = studentDataStore.find(s => s.roll === roll);
-            if(!student) { alert("Student data not found for printing!"); return; }
+            if(!student) return;
 
             document.getElementById('pm-header-school-name').innerText = student.school || "SCHOOL NAME";
             document.getElementById('pm-school').innerText = student.school || "N/A";
-
-            let watermarkText = student.school || "SCHOOL MARKSHEET";
-            document.getElementById('pm-watermark').innerHTML = watermarkText.replace(/ /g, '<br>');
+            document.getElementById('pm-watermark').innerHTML = (student.school || "SCHOOL MARKSHEET").replace(/ /g, '<br>');
 
             document.getElementById('pm-roll').innerText = student.roll;
             document.getElementById('pm-name').innerText = student.name;
@@ -939,18 +829,12 @@
             }
 
             document.getElementById('pm-barcode').src = `https://barcode.tec-it.com/barcode.ashx?data=${student.roll}&code=Code128&translate-esc=on`;
-            
             let qrData = `Name: ${student.name}%0ARoll: ${student.roll}%0ATotal: ${student.total}/${student.max}%0AGrade: ${student.grade}`;
             document.getElementById('pm-qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${qrData}`;
 
-            let tbody = document.getElementById('pm-marks-body');
-            tbody.innerHTML = "";
+            let tbody = document.getElementById('pm-marks-body'); tbody.innerHTML = "";
             if (student.subjects && student.subjects.length > 0) {
-                student.subjects.forEach(sub => {
-                    tbody.innerHTML += `<tr><td>${sub.code}</td><td style="text-align:left; padding-left:15px;">${sub.name}</td><td>${sub.max}</td><td>${sub.sec}</td></tr>`;
-                });
-            } else {
-                 tbody.innerHTML = `<tr><td colspan="4">Marks detailed breakdown not available.</td></tr>`;
+                student.subjects.forEach(sub => tbody.innerHTML += `<tr><td>${sub.code}</td><td style="text-align:left; padding-left:15px;">${sub.name}</td><td>${sub.max}</td><td>${sub.sec}</td></tr>`);
             }
 
             let sections = document.getElementsByClassName('content-section');
@@ -960,8 +844,7 @@
         
         function closePrintView() {
             document.getElementById('marksheet-print-area').style.display = 'none'; 
-            if(adminProfile.user === document.getElementById('admin-user').value) { openPage('admin-dashboard'); }
-            else { openPage('school-dashboard'); } 
+            if(adminProfile.user === document.getElementById('admin-user').value) { openPage('admin-dashboard'); } else { openPage('school-dashboard'); } 
         }
 
         function saveAsPDF() {
@@ -970,22 +853,9 @@
             const btnDiv = element.querySelector('.no-print');
             btnDiv.style.display = 'none'; 
 
-            const opt = {
-                margin: 5,
-                filename: 'Marksheet_' + document.getElementById('pm-roll').innerText + '.pdf',
-                image: { type: 'jpeg', quality: 1 },
-                html2canvas: { scale: 2, useCORS: true, scrollY: 0, windowHeight: element.scrollHeight },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
+            const opt = { margin: 5, filename: 'Marksheet_' + document.getElementById('pm-roll').innerText + '.pdf', image: { type: 'jpeg', quality: 1 }, html2canvas: { scale: 2, useCORS: true, scrollY: 0, windowHeight: element.scrollHeight }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
 
-            setTimeout(() => {
-                html2pdf().set(opt).from(element).save().then(() => {
-                    btnDiv.style.display = 'block'; 
-                }).catch(err => {
-                    btnDiv.style.display = 'block'; 
-                    alert("PDF Generation Failed. Please try Print -> Save as PDF.");
-                });
-            }, 500); 
+            setTimeout(() => { html2pdf().set(opt).from(element).save().then(() => btnDiv.style.display = 'block').catch(err => { btnDiv.style.display = 'block'; alert("PDF Generation Failed."); }); }, 500); 
         }
 
         function openResultsModal() { document.getElementById('check-roll-input').value = ""; document.getElementById('result-display-area').innerHTML = ""; document.getElementById('resultsModal').style.display='flex'; }
@@ -994,39 +864,27 @@
             if(!roll) { alert("Enter Roll Number"); return; }
             let student = studentDataStore.find(s => s.roll.toLowerCase() === roll.toLowerCase());
             let area = document.getElementById('result-display-area');
-            if(student) {
-                area.innerHTML = `<div style="background:#f1f5f9; padding:15px; border-radius:10px; border-left:5px solid #2563eb; font-size:14px;"><h4 style="color:#1e3a8a; margin-bottom:8px;">📄 Result Found: ${student.name}</h4><p><b>Roll No:</b> ${student.roll}</p><p><b>Total:</b> ${student.total}/${student.max} (${student.grade})</p><p><b>Status:</b> ${student.status}</p><button style="background:#1e3a8a; color:white; border:none; padding:8px 15px; border-radius:4px; margin-top:10px; cursor:pointer;" onclick="document.getElementById('resultsModal').style.display='none'; printStudent('${student.roll}')">🖨️ View & Print Original Marksheet</button></div>`;
-            } else {
-                area.innerHTML = `<p style="color:red; font-weight:bold; text-align:center;">❌ Roll Number not found.</p>`;
-            }
+            if(student) area.innerHTML = `<div style="background:#f1f5f9; padding:15px; border-radius:10px; border-left:5px solid #2563eb; font-size:14px;"><h4 style="color:#1e3a8a; margin-bottom:8px;">📄 Result Found: ${student.name}</h4><p><b>Roll No:</b> ${student.roll}</p><p><b>Total:</b> ${student.total}/${student.max} (${student.grade})</p><p><b>Status:</b> ${student.status}</p><button style="background:#1e3a8a; color:white; border:none; padding:8px 15px; border-radius:4px; margin-top:10px; cursor:pointer;" onclick="document.getElementById('resultsModal').style.display='none'; printStudent('${student.roll}')">🖨️ View & Print Original Marksheet</button></div>`;
+            else area.innerHTML = `<p style="color:red; font-weight:bold; text-align:center;">❌ Roll Number not found.</p>`;
         }
 
-        let currentEditRoll = null;
         function openAddEditStudentModal(roll) {
-            populateAllDropdowns();
             document.getElementById('universalStudentModal').style.display = 'flex';
             let sBody = document.getElementById('us-subject-container');
-            
             if(roll && typeof roll === 'string') {
-                currentEditRoll = roll;
-                let student = studentDataStore.find(s => s.roll === roll);
+                currentEditRoll = roll; let student = studentDataStore.find(s => s.roll === roll);
                 document.getElementById('us-modal-title').innerText = "Edit Student & Subjects";
                 document.getElementById('us-roll').value = student.roll; document.getElementById('us-name').value = student.name; 
                 document.getElementById('us-fname').value = student.fname; document.getElementById('us-mname').value = student.mname || "";
                 document.getElementById('us-dob').value = student.dob || ""; document.getElementById('us-mobile').value = student.mobile || "";
-                document.getElementById('us-photo-data').value = student.photo || "";
-                document.getElementById('us-photo-input').value = ""; 
-                
+                document.getElementById('us-photo-data').value = student.photo || ""; document.getElementById('us-photo-input').value = ""; 
                 sBody.innerHTML = "";
-                student.subjects.forEach(sub => {
-                    sBody.innerHTML += `<div class="sub-row"><input type="text" value="${sub.code}" class="input-box sub-code" style="padding:6px;"><input type="text" value="${sub.name}" class="input-box sub-name" style="padding:6px;"><input type="number" value="${sub.max}" class="input-box sub-max" style="padding:6px;" oninput="calculateAutoMarks()"><input type="number" value="${sub.sec}" class="input-box sub-sec" style="padding:6px;" oninput="calculateAutoMarks()"><button type="button" style="background:#dc2626; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('.sub-row').remove(); calculateAutoMarks();">Delete</button></div>`;
-                });
+                student.subjects.forEach(sub => sBody.innerHTML += `<div class="sub-row"><input type="text" value="${sub.code}" class="input-box sub-code" style="padding:6px;"><input type="text" value="${sub.name}" class="input-box sub-name" style="padding:6px;"><input type="number" value="${sub.max}" class="input-box sub-max" style="padding:6px;" oninput="calculateAutoMarks()"><input type="number" value="${sub.sec}" class="input-box sub-sec" style="padding:6px;" oninput="calculateAutoMarks()"><button type="button" style="background:#dc2626; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('.sub-row').remove(); calculateAutoMarks();">Delete</button></div>`);
             } else {
                 currentEditRoll = null; document.getElementById('us-modal-title').innerText = "Add Student & Subjects Manually";
                 document.getElementById('us-roll').value = ""; document.getElementById('us-name').value = ""; document.getElementById('us-fname').value = ""; 
                 document.getElementById('us-mname').value = ""; document.getElementById('us-dob').value = ""; document.getElementById('us-mobile').value = "";
                 document.getElementById('us-photo-data').value = ""; document.getElementById('us-photo-input').value = "";
-                
                 sBody.innerHTML = `<div class="sub-row"><input type="text" value="FLO" class="input-box sub-code" style="padding:6px;"><input type="text" value="FIRST LANGUAGE ODIA" class="input-box sub-name" style="padding:6px;"><input type="number" value="100" class="input-box sub-max" style="padding:6px;" oninput="calculateAutoMarks()"><input type="number" value="" class="input-box sub-sec" style="padding:6px;" oninput="calculateAutoMarks()"><button type="button" style="background:#dc2626; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('.sub-row').remove(); calculateAutoMarks();">Delete</button></div>`;
             }
             calculateAutoMarks();
@@ -1044,10 +902,7 @@
             let status = (hasFailedSubject || pct < 30) ? "Fail ❌" : "Pass ✅"; let statusColor = (hasFailedSubject || pct < 30) ? "#b91c1c" : "#166534";
             document.getElementById('auto-max').innerText = tMax; document.getElementById('auto-sec').innerText = tSec; document.getElementById('auto-pct').innerText = pct.toFixed(2) + "%"; document.getElementById('auto-grade').innerText = grade;
             document.getElementById('auto-status').innerText = status; document.getElementById('auto-status').style.color = statusColor;
-            
-            document.getElementById('us-final-total').value = tSec;
-            document.getElementById('us-final-pctgrade').value = grade;
-            document.getElementById('us-final-status').value = status.includes("Pass") ? "Pass" : "Fail";
+            document.getElementById('us-final-total').value = tSec; document.getElementById('us-final-pctgrade').value = grade; document.getElementById('us-final-status').value = status.includes("Pass") ? "Pass" : "Fail";
         }
 
         function addUniversalSubjectRow() {
@@ -1061,40 +916,19 @@
             let roll = document.getElementById('us-roll').value.trim(); 
             if(!roll) { alert('Roll No is required!'); return; }
 
-            let subs = [];
-            let codes = document.querySelectorAll('.sub-code'); let names = document.querySelectorAll('.sub-name');
-            let maxs = document.querySelectorAll('.sub-max'); let secs = document.querySelectorAll('.sub-sec');
-            for(let i=0; i<codes.length; i++){
-                subs.push({ code: codes[i].value, name: names[i].value, max: parseFloat(maxs[i].value)||0, sec: parseFloat(secs[i].value)||0 });
-            }
+            let subs = []; let codes = document.querySelectorAll('.sub-code'); let names = document.querySelectorAll('.sub-name'); let maxs = document.querySelectorAll('.sub-max'); let secs = document.querySelectorAll('.sub-sec');
+            for(let i=0; i<codes.length; i++){ subs.push({ code: codes[i].value, name: names[i].value, max: parseFloat(maxs[i].value)||0, sec: parseFloat(secs[i].value)||0 }); }
 
             let activeSchoolName = "Master Admin";
-            if(document.getElementById('school-dashboard').classList.contains('active')) {
-                activeSchoolName = document.getElementById('school-dash-title').innerText.replace('🏫 ', '');
-            }
+            if(document.getElementById('school-dashboard').classList.contains('active')) { activeSchoolName = document.getElementById('school-dash-title').innerText.replace('🏫 ', ''); }
 
             let photoData = document.getElementById('us-photo-data').value;
+            let studentObj = { roll: roll, name: document.getElementById('us-name').value.trim(), fname: document.getElementById('us-fname').value.trim(), mname: document.getElementById('us-mname').value.trim(), dob: document.getElementById('us-dob').value.trim(), mobile: document.getElementById('us-mobile').value.trim(), school: activeSchoolName, photo: photoData, total: parseFloat(document.getElementById('auto-sec').innerText), max: parseFloat(document.getElementById('auto-max').innerText), grade: document.getElementById('us-final-pctgrade').value, status: document.getElementById('us-final-status').value, subjects: subs };
 
-            let studentObj = {
-                roll: roll, name: document.getElementById('us-name').value.trim(), fname: document.getElementById('us-fname').value.trim(),
-                mname: document.getElementById('us-mname').value.trim(), dob: document.getElementById('us-dob').value.trim(),
-                mobile: document.getElementById('us-mobile').value.trim(), school: activeSchoolName, photo: photoData,
-                total: parseFloat(document.getElementById('auto-sec').innerText), max: parseFloat(document.getElementById('auto-max').innerText),
-                grade: document.getElementById('us-final-pctgrade').value, status: document.getElementById('us-final-status').value,
-                subjects: subs
-            };
-
-            if(currentEditRoll) {
-                let index = studentDataStore.findIndex(s => s.roll === currentEditRoll);
-                if(index > -1) { studentDataStore[index] = studentObj; }
-                alert('Student Updated Successfully! ✏️');
-            } else {
-                studentDataStore.push(studentObj);
-                alert('New Student Added Successfully! 🎓');
-            }
+            if(currentEditRoll) { let index = studentDataStore.findIndex(s => s.roll === currentEditRoll); if(index > -1) { studentDataStore[index] = studentObj; } alert('Student Updated Successfully! ✏️'); } 
+            else { studentDataStore.push(studentObj); alert('New Student Added Successfully! 🎓'); }
             
-            saveLocalData(); refreshTablesFromStore();
-            document.getElementById('universalStudentModal').style.display='none';
+            saveLocalData(); refreshTablesFromStore(); document.getElementById('universalStudentModal').style.display='none';
         }
 
         function openPage(pageId) { document.getElementById('home-view').style.display = 'none'; let sections = document.getElementsByClassName('content-section'); for (let sec of sections) { sec.classList.remove('active'); } document.getElementById(pageId).classList.add('active'); }
@@ -1158,6 +992,45 @@
         function saveAdminPaymentSettings() { adminPaymentConfig.upiId = document.getElementById('set-upi').value.trim(); adminPaymentConfig.baseFee = parseFloat(document.getElementById('set-base-fee').value); adminPaymentConfig.gstPct = parseFloat(document.getElementById('set-gst').value); saveLocalData(); updateAdminFeeDisplay(); alert('Master Admin Payment Settings Saved!'); }
         function changeBackgroundImage() { alert('Background Updated Successfully! 🖼️'); }
         function updateNoticeBoard() { document.getElementById('display-notice').innerHTML = document.getElementById('notice-input').value.replace(/\n/g, '<br>'); alert('Notice Board Updated! 📢'); }
+
+        function validateStudentForm() {
+            let reqIds = ['reg-s-name', 'reg-s-gender', 'reg-s-dob', 'reg-s-mname', 'reg-s-fname', 'reg-s-aadhaar', 'reg-s-mobile', 'reg-s-blood', 'reg-s-minority', 'reg-s-category', 'reg-s-address', 'reg-s-pin', 'reg-s-state', 'reg-s-lang', 'reg-s-mail', 'reg-s-school'];
+            for(let id of reqIds) { if(!document.getElementById(id).value.trim()) { alert('Please fill all Mandatory (*) Fields correctly!'); return; } }
+            if(!publicRegPhotoBase64) { alert("Please Upload Student Photo!"); return; }
+            let sId = document.getElementById('reg-s-school').value; let school = registeredSchools.find(s => s.id === sId);
+            let upi = school.upi || "default@upi"; let fee = school.baseFee || 500; let gst = school.hasGst ? fee * (school.gstPct / 100) : 0; currentStudentFeeTotal = fee + gst;
+            document.getElementById('spay-school-name').innerText = school.name; document.getElementById('display-stu-fee').innerText = fee; document.getElementById('display-stu-gst').innerText = gst; document.getElementById('display-stu-total').innerText = currentStudentFeeTotal; document.getElementById('display-stu-upi').innerText = upi; document.getElementById('stu-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=${upi}&pn=SchoolAdmission&am=${currentStudentFeeTotal}&cu=INR`; document.getElementById('student-form-step').style.display = 'none'; document.getElementById('student-payment-step').style.display = 'block'; let timeLeft = 30; document.getElementById('payment-timer').innerText = timeLeft; clearInterval(paymentTimerInterval); paymentTimerInterval = setInterval(() => { timeLeft--; document.getElementById('payment-timer').innerText = timeLeft; if(timeLeft <= 0) { clearInterval(paymentTimerInterval); alert("Payment Timeout!"); goHome(); } }, 1000); 
+        }
+        function submitStudentApplication() { 
+            let utr = document.getElementById('student-utr').value.trim(); if(!utr) { alert("Please enter Transaction ID to verify payment!"); return; } clearInterval(paymentTimerInterval); 
+            let newApp = { appId: Math.floor(Math.random() * 90000 + 10000), name: document.getElementById('reg-s-name').value, fname: document.getElementById('reg-s-fname').value, mobile: document.getElementById('reg-s-mobile').value, gender: document.getElementById('reg-s-gender').value, schoolId: document.getElementById('reg-s-school').value, schoolName: document.getElementById('reg-s-school').options[document.getElementById('reg-s-school').selectedIndex].text, utr: utr, amt: currentStudentFeeTotal, photo: publicRegPhotoBase64 }; 
+            pendingApplications.push(newApp); saveLocalData(); document.getElementById('student-reg').classList.remove('active'); document.getElementById('receipt-title').innerText = "🏫 OFFICIAL ADMISSION RECEIPT"; document.getElementById('receipt-sub').innerText = "Submit this Hard Copy to your Respective School"; document.getElementById('rec-school').parentElement.style.display = 'block'; document.getElementById('rec-app-id').innerText = newApp.appId; document.getElementById('rec-date').innerText = new Date().toLocaleDateString(); document.getElementById('rec-name').innerText = newApp.name; document.getElementById('rec-fname').innerText = newApp.fname; document.getElementById('rec-info').innerText = `Mobile: ${newApp.mobile}`; document.getElementById('rec-school').innerText = newApp.schoolName; document.getElementById('rec-utr').innerText = utr; document.getElementById('rec-amt').innerText = newApp.amt; document.getElementById('receipt-section').classList.add('active'); updateNotificationBadge(); 
+        }
+        function updateNotificationBadge() { let badge = document.getElementById('notif-badge'); if(!badge) return; if(pendingApplications.length > 0) { badge.innerText = pendingApplications.length; badge.style.display = 'inline-block'; } else { badge.style.display = 'none'; } }
+        function renderPendingApplications() { 
+            let activeSchoolId = "";
+            if(document.getElementById('school-dashboard').classList.contains('active')) {
+                activeSchoolId = document.getElementById('school-dash-sub').innerText.split('|')[0].replace('ID: ','').trim();
+            } else { return; }
+            let tbody = document.getElementById('school-pending-table-body'); tbody.innerHTML = ""; let relevantApps = pendingApplications.filter(app => app.schoolId === activeSchoolId); 
+            for(let i=0; i<relevantApps.length; i++) { 
+                let app = relevantApps[i]; let row = tbody.insertRow(); 
+                let photoHtml = app.photo ? `<img src="${app.photo}" width="40" height="40" style="border-radius:4px; object-fit:cover;">` : "N/A";
+                row.innerHTML = `<td>${photoHtml}</td><td><b>APP-${app.appId}</b></td><td>${app.name}</td><td><span style="color:#16a34a; font-weight:bold;">${app.utr}</span></td><td><button style="background:#16a34a; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="approveApplication(${app.appId})">Assign Roll & Approve ✅</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="rejectApplication(${app.appId})">Reject ❌</button></td>`; 
+            } updateNotificationBadge(); 
+        }
+        function approveApplication(appId) { 
+            let index = pendingApplications.findIndex(a => a.appId === appId); 
+            if(index > -1) { 
+                let app = pendingApplications[index]; let assignedRoll = prompt(`ASSIGN A ROLL NUMBER:`, "e.g. 155CB0198"); 
+                if(assignedRoll && assignedRoll.trim() !== "") { 
+                    let newStudent = { roll: assignedRoll, name: app.name, fname: app.fname, mname: "", dob: "", mobile: app.mobile, school: app.schoolName, photo: app.photo, total: 0, max: 0, grade: "-", status: "Fail", subjects: [] };
+                    studentDataStore.push(newStudent);
+                    pendingApplications.splice(index, 1); saveLocalData(); refreshTablesFromStore(); alert(`Student Approved! Assigned Roll No: ${assignedRoll}`); 
+                } else { alert("Roll No is required to approve."); } 
+            } 
+        }
+        function rejectApplication(appId) { if(confirm("Are you sure?")) { let index = pendingApplications.findIndex(a => a.appId === appId); if(index > -1) { pendingApplications.splice(index, 1); saveLocalData(); renderPendingApplications(); } } }
     </script>
 </body>
 </html>
