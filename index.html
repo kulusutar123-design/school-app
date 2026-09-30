@@ -67,10 +67,10 @@
         
         .sub-row { display: grid; grid-template-columns: 1fr 2fr 1fr 1fr auto; gap: 8px; margin-bottom: 8px; align-items: center; }
 
-        /* ================= CERTIFICATE DESIGN (FIXED RENDERING & COLORS) ================= */
+        /* ================= CERTIFICATE DESIGN ================= */
         #marksheet-print-area {
             display: none; 
-            width: 800px; /* Fixed width for perfect HTML2PDF rendering without cutting */
+            width: 800px; 
             max-width: 100%;
             background-color: white; 
             margin: 0 auto; 
@@ -95,13 +95,13 @@
 
         .cert-watermark {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-            opacity: 0.05; font-size: 90px; font-weight: bold; color: #3b0764; 
+            opacity: 0.05; font-size: 60px; font-weight: bold; color: #3b0764; 
             z-index: 1; pointer-events: none; user-select: none; white-space: pre; 
-            text-align: center; line-height: 1.2;
+            text-align: center; line-height: 1.2; width: 100%; word-wrap: break-word;
         }
 
         .cert-header { text-align: center; margin-bottom: 10px; }
-        .cert-header img { width: 60px; margin-bottom: 5px; }
+        .cert-header img { width: 60px; margin-bottom: 5px; opacity: 0.8;}
         .cert-header h1 { font-size: 20px; margin: 0; color: #4c1d95; text-transform: uppercase; line-height: 1.2; padding: 0 10px;}
         .cert-header h2 { font-size: 14px; margin-top: 5px; color: #3b0764; }
 
@@ -125,15 +125,14 @@
         .cert-table th:nth-child(4) { width: 20%; }
         .cert-table td:nth-child(2) { text-align: left; padding-left: 10px; }
 
-        .cert-footer-info { display: flex; justify-content: space-between; align-items: center; margin-top: 5px; z-index: 5; position: relative;}
+        .cert-footer-info { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 5px; z-index: 5; position: relative;}
         .cert-grade-box { border: 2px solid #4c1d95; padding: 5px 15px; text-align: center; font-weight: bold; background-color: #f3e8ff !important; font-size: 14px;}
-        .cert-signatures { display: flex; justify-content: space-between; margin-top: 20px; font-weight: bold; font-size: 11px; text-align: center; z-index: 5; position: relative;}
+        .cert-signatures { display: flex; justify-content: space-between; margin-top: 30px; font-weight: bold; font-size: 11px; text-align: center; z-index: 5; position: relative;}
         .cert-signatures div { border-top: 1px dashed #4c1d95; padding-top: 5px; width: 180px; }
 
         /* Print Specific Styles */
         @media print {
             * {
-                /* FORCE PRINT COLORS AND BACKGROUNDS */
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
                 color-adjust: exact !important;
@@ -165,7 +164,7 @@
         <div id="home-view">
             <div class="notice-board">
                 <h4>📢 Important Notice Board</h4>
-                <p id="display-notice">• Official Marksheet & Portal System is live.<br>• PDF & Print Issues Completely Fixed. Background Colors enabled.</p>
+                <p id="display-notice">• Official Marksheet & Portal System is live.<br>• Fixed: Custom School Watermark, Logo, and Barcode Placement.</p>
             </div>
 
             <div class="results-btn-card">
@@ -179,7 +178,7 @@
                     <div class="welcome-card">
                         <h3>🌟 Welcome to Digital School Management</h3>
                         <p>Manage your schools, student admissions, and records securely on the cloud platform.</p>
-                        <p><b>✨ Features:</b> Fixed PDF Generation, Auto Grade Calculation, 100% Data Safety.</p>
+                        <p><b>✨ Features:</b> Fixed Certificate Layout, Dynamic School Watermark, 100% Data Safety.</p>
                     </div>
 
                     <div class="section-title">📌 Quick Portal Actions</div>
@@ -308,7 +307,6 @@
                 <button style="background:#2563eb; color:white; width:100%; padding:15px; border:none; border-radius:8px; font-weight:bold; font-size:16px; margin-top:20px; cursor:pointer;" onclick="validateStudentForm()">Next ➡️ Proceed to Payment</button>
             </div>
 
-            <!-- Student Payment System -->
             <div id="student-payment-step" style="display:none; text-align:center;">
                 <h3 style="color:#0d3b66; margin-bottom:10px;">💳 School Application Fee Payment</h3>
                 <p style="color:#dc2626; font-weight:bold; font-size:18px; margin-bottom:15px;">⏳ Time Left: <span id="payment-timer">30</span> Seconds</p>
@@ -368,7 +366,6 @@
                 <button class="btn-login btn-school" onclick="validateSchoolLogin()">Login ➡️</button>
             </div>
 
-            <!-- School Forgot Password Flow -->
             <div id="school-forgot-area" style="display:none; background:#f1f5f9; padding:20px; border-radius:12px; border:1px solid #cbd5e1;">
                 <h4 style="color:#0d3b66; margin-bottom:10px;">🔐 Reset School Password</h4>
                 <p style="font-size:14px; color:#64748b; margin-bottom:15px;">Enter your registered School Email to receive an OTP.</p>
@@ -447,7 +444,6 @@
                 <button class="btn-login btn-admin" onclick="validateAdmin()">Login 🚀</button>
             </div>
 
-            <!-- Admin Forgot Password -->
             <div id="admin-forgot-area" style="display:none; background:#f1f5f9; padding:20px; border-radius:12px; border:1px solid #cbd5e1;">
                 <h4 style="color:#0d3b66; margin-bottom:10px;">🔐 Reset Admin Credentials</h4>
                 <p style="font-size:14px; color:#64748b; margin-bottom:15px;">Enter your registered Admin Email to receive an OTP.</p>
@@ -543,20 +539,20 @@
             <div id="settings-tab" class="admin-tab-content" style="display:none;">
                 <h3>⚙️ Portal Customization Settings</h3>
                 <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1; margin-bottom:20px;">
-                    <h4>🖼️️ Upload / Change Background Photo</h4>
+                    <h4>🖼️ Upload / Change Background Photo</h4>
                     <input type="file" id="bg-file-input" accept="image/*" style="margin-bottom:10px;"><br>
                     <button style="background:#2563eb; color:white; border:none; padding:8px 20px; border-radius:6px; cursor:pointer;" onclick="changeBackgroundImage()">Update Background 🚀</button>
                 </div>
                 <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1;">
                     <h4>📢 Edit / Update Notice Board</h4>
                     <textarea id="notice-input" rows="5" class="input-box" style="margin-bottom:10px;">• Official Marksheet & Portal System is live.
-• PDF & Print Background Issue has been resolved.</textarea>
+• Fixed: Certificate Layout & Print/PDF Download functionality working 100%.</textarea>
                     <button style="background:#16a34a; color:white; border:none; padding:8px 20px; border-radius:6px; cursor:pointer;" onclick="updateNoticeBoard()">Save Notice Board 💾</button>
                 </div>
             </div>
         </div>
 
-        <!-- UNIVERSAL Add/Edit Student Modal (18 Points + Subjects + Photo + Auto Calculation) -->
+        <!-- UNIVERSAL Add/Edit Student Modal -->
         <div id="universalStudentModal" class="modal">
             <div class="modal-content">
                 <h3 id="us-modal-title" style="color:#0d3b66; margin-bottom:15px;">Add/Edit Student & Marksheet (18-Point)</h3>
@@ -630,18 +626,55 @@
                 </div>
             </div>
         </div>
+        
+        <!-- ADMIN: Edit School Modal -->
+        <div id="editSchoolModal" class="modal">
+            <div class="modal-content">
+                <h3 style="color:#0d3b66; margin-bottom:15px;">✏️ Verify & Edit School Application</h3>
+                <input type="hidden" id="edit-sch-old-id">
+                <input type="text" id="edit-sch-name" placeholder="School Name" class="input-box" style="margin-bottom:12px;">
+                <input type="text" id="edit-sch-id" placeholder="School Code" class="input-box" style="margin-bottom:12px;">
+                <input type="text" id="edit-sch-hm" placeholder="Headmaster Name" class="input-box" style="margin-bottom:12px;">
+                <input type="text" id="edit-sch-mobile" placeholder="Mobile No" class="input-box" style="margin-bottom:12px;">
+                <select id="edit-sch-state" class="input-box" style="margin-bottom:12px;"><option value="Odisha">Odisha</option><option value="West Bengal">West Bengal</option><option value="Andhra Pradesh">Andhra Pradesh</option></select>
+                <div style="display:flex; justify-content:flex-end; gap:10px;">
+                    <button style="background:#64748b; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="document.getElementById('editSchoolModal').style.display='none'">Cancel</button>
+                    <button style="background:#2563eb; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="saveEditedSchool()">Save Changes 💾</button>
+                </div>
+            </div>
+        </div>
 
-        <!-- PRINTABLE MARKSHEET SECTION (FIXED PDF WIDTH & PRINT COLORS) -->
+        <!-- School Payment Setup Modal (Admin side) -->
+        <div id="schoolPaymentModal" class="modal">
+            <div class="modal-content" style="width:500px;">
+                <h3 style="color:#0d3b66; margin-bottom:10px;">💳 Set School Payment Gateway</h3>
+                <p id="sp-school-name" style="color:#1e3a8a; font-weight:bold; margin-bottom:15px;"></p>
+                <input type="hidden" id="sp-school-id">
+                <label style="font-size:12px; font-weight:bold;">School UPI ID:</label>
+                <input type="text" id="sp-upi" class="input-box" style="margin-bottom:12px;">
+                <label style="font-size:12px; font-weight:bold;">Admission Base Fee (₹):</label>
+                <input type="number" id="sp-fee" class="input-box" style="margin-bottom:12px;">
+                <label style="font-size:12px; font-weight:bold;">GST Option:</label>
+                <select id="sp-gst-opt" class="input-box" style="margin-bottom:12px;" onchange="toggleGstInput()"><option value="none">No GST</option><option value="percent">Apply GST %</option></select>
+                <div id="sp-gst-div" style="display:none;"><label style="font-size:12px; font-weight:bold;">GST Percentage (%):</label><input type="number" id="sp-gst-pct" class="input-box" style="margin-bottom:12px;"></div>
+                <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px;">
+                    <button style="background:#64748b; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="document.getElementById('schoolPaymentModal').style.display='none'">Cancel</button>
+                    <button style="background:#22c55e; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="saveSchoolPaymentSetup()">Save Payment Setup 💾</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PRINTABLE MARKSHEET SECTION -->
         <div id="marksheet-print-area">
             <div class="cert-border">
-                <div class="cert-watermark" id="pm-watermark">BOARD OF<br>SECONDARY<br>EDUCATION<br>ODISHA</div>
+                <div class="cert-watermark" id="pm-watermark">SCHOOL<br>MARKSHEET</div>
 
                 <div class="cert-header">
-                    <img src="https://upload.wikimedia.org/wikipedia/en/thumb/f/f2/Board_of_Secondary_Education%2C_Odisha_logo.png/220px-Board_of_Secondary_Education%2C_Odisha_logo.png" crossorigin="anonymous" alt="Board Logo">
+                    <!-- Changed to a generic icon to prevent loading issues -->
+                    <img src="https://cdn-icons-png.flaticon.com/512/167/167707.png" crossorigin="anonymous" alt="School Logo">
                     <h1 id="pm-header-school-name">SCHOOL NAME HERE</h1>
-                    <h2>ମାଧ୍ୟମିକ ଶିକ୍ଷା ପରିଷଦ, ଓଡ଼ିଶା</h2>
-                    <h2 style="font-size: 14px; margin-top:5px; color:#3b0764;">HIGH SCHOOL CERTIFICATE EXAMINATION - 2026</h2>
-                    <h2 style="font-size: 12px; color:#3b0764;">CERTIFICATE-CUM-MARK SHEET</h2>
+                    <h2 style="font-family: Arial, sans-serif;">HIGH SCHOOL CERTIFICATE EXAMINATION - 2026</h2>
+                    <h2 style="font-size: 14px; margin-top:5px; color:#3b0764;">CERTIFICATE-CUM-MARK SHEET</h2>
                 </div>
 
                 <div class="cert-top-info">
@@ -690,16 +723,18 @@
 
                 <div style="text-align:center; font-weight:bold; font-size:12px; text-transform:uppercase;" id="pm-words"></div>
 
-                <div class="cert-footer-info">
-                    <div>
-                        <img id="pm-barcode" src="" crossorigin="anonymous" alt="Barcode" style="height:35px; margin-bottom:5px;">
+                <div class="cert-footer-info" style="align-items: flex-end;">
+                    <div style="flex:1;">
+                        <img id="pm-barcode" src="" crossorigin="anonymous" alt="Barcode" style="height:35px; margin-bottom:5px; display:block;">
                         <p style="font-size:10px; color:#4c1d95;">ଫଳାଫଳ ପ୍ରକାଶନ ତାରିଖ<br>DATE OF PUBLICATION OF RESULTS<br><b style="font-size:12px;">02/05/2026</b></p>
                     </div>
-                    <div>
-                        <p style="color:#4c1d95; font-size:12px; text-align:center; margin-bottom:5px;">ଗ୍ରେଡ୍<br>GRADE</p>
-                        <div class="cert-grade-box" id="pm-grade"></div>
+                    <div style="flex:1; text-align:center;">
+                        <p style="color:#4c1d95; font-size:12px; margin-bottom:5px;">ଗ୍ରେଡ୍<br>GRADE</p>
+                        <div class="cert-grade-box" id="pm-grade" style="display:inline-block;"></div>
                     </div>
-                    <div><img id="pm-qr" src="" crossorigin="anonymous" alt="QR Code" style="height:70px; width:70px; border:1px solid #4c1d95;"></div>
+                    <div style="flex:1; text-align:right;">
+                        <img id="pm-qr" src="" crossorigin="anonymous" alt="QR Code" style="height:70px; width:70px; border:1px solid #4c1d95;">
+                    </div>
                 </div>
 
                 <div class="cert-signatures">
@@ -815,13 +850,17 @@
             }
         }
 
-        // --- FIXED: PRINT / PDF FEATURE ---
+        // --- PRINT / PDF FEATURE (WITH DYNAMIC WATERMARK) ---
         function printStudent(roll) {
             let student = studentDataStore.find(s => s.roll === roll);
             if(!student) { alert("Student data not found for printing!"); return; }
 
             document.getElementById('pm-header-school-name').innerText = student.school || "SCHOOL NAME";
             document.getElementById('pm-school').innerText = student.school || "N/A";
+
+            // Update Dynamic Watermark with School Name
+            let watermarkText = student.school || "SCHOOL MARKSHEET";
+            document.getElementById('pm-watermark').innerHTML = watermarkText.replace(/ /g, '<br>');
 
             document.getElementById('pm-roll').innerText = student.roll;
             document.getElementById('pm-name').innerText = student.name;
@@ -869,7 +908,6 @@
             else { openPage('school-dashboard'); } 
         }
 
-        // CRITICAL FIX: Add delay and scroll reset for correct PDF generation
         function saveAsPDF() {
             window.scrollTo(0, 0); 
             const element = document.getElementById('marksheet-print-area');
@@ -877,11 +915,11 @@
             btnDiv.style.display = 'none'; 
 
             const opt = {
-                margin: 0,
+                margin: 5,
                 filename: 'Marksheet_' + document.getElementById('pm-roll').innerText + '.pdf',
                 image: { type: 'jpeg', quality: 1 },
                 html2canvas: { scale: 2, useCORS: true, scrollY: 0, windowHeight: element.scrollHeight },
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
             setTimeout(() => {
