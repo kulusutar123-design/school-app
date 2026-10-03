@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>School Home Portal - Ultimate Secure Edition</title>
-    <!-- html2pdf library for PDF generation -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background: linear-gradient(rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.7)), url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1920&auto=format&fit=crop') no-repeat center center fixed; background-size: cover; color: #333; padding: 20px; min-height: 100vh; }
@@ -69,7 +68,7 @@
         /* ================= CERTIFICATE DESIGN (FIXED RENDERING & COLORS) ================= */
         #marksheet-print-area { display: none; width: 800px; max-width: 100%; background-color: white; margin: 0 auto; position: relative; padding: 20px; font-family: 'Times New Roman', Times, serif; color: #3b0764; box-sizing: border-box; }
         .cert-border { border: 12px solid #d8b4e2; border-image: repeating-linear-gradient(45deg, #d8b4e2, #d8b4e2 10px, #e8d0ef 10px, #e8d0ef 20px) 15; height: 100%; padding: 15px; position: relative; z-index: 2; display: flex; flex-direction: column; justify-content: space-between; }
-        .cert-watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.05; font-size: 90px; font-weight: bold; color: #3b0764; z-index: 1; pointer-events: none; user-select: none; white-space: pre; text-align: center; line-height: 1.2; }
+        .cert-watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.05; font-size: 60px; font-weight: bold; color: #3b0764; z-index: 1; pointer-events: none; user-select: none; white-space: pre; text-align: center; line-height: 1.2; width: 100%; word-wrap: break-word; }
         .cert-header { text-align: center; margin-bottom: 10px; }
         .cert-header img { width: 60px; margin-bottom: 5px; opacity: 0.8;}
         .cert-header h1 { font-size: 20px; margin: 0; color: #4c1d95; text-transform: uppercase; line-height: 1.2; padding: 0 10px;}
@@ -89,9 +88,9 @@
         .cert-table th:nth-child(3) { width: 20%; }
         .cert-table th:nth-child(4) { width: 20%; }
         .cert-table td:nth-child(2) { text-align: left; padding-left: 10px; }
-        .cert-footer-info { display: flex; justify-content: space-between; align-items: center; margin-top: 5px; z-index: 5; position: relative;}
+        .cert-footer-info { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 5px; z-index: 5; position: relative;}
         .cert-grade-box { border: 2px solid #4c1d95; padding: 5px 15px; text-align: center; font-weight: bold; background-color: #f3e8ff !important; font-size: 14px;}
-        .cert-signatures { display: flex; justify-content: space-between; margin-top: 20px; font-weight: bold; font-size: 11px; text-align: center; z-index: 5; position: relative;}
+        .cert-signatures { display: flex; justify-content: space-between; margin-top: 30px; font-weight: bold; font-size: 11px; text-align: center; z-index: 5; position: relative;}
         .cert-signatures div { border-top: 1px dashed #4c1d95; padding-top: 5px; width: 180px; }
 
         @media print {
@@ -118,7 +117,7 @@
         <div id="home-view">
             <div class="notice-board">
                 <h4>📢 Important Notice Board</h4>
-                <p id="display-notice">• Official Marksheet & Portal System is live.<br>• NEW: Original Board API Auto-Fetch Feature is fully active.</p>
+                <p id="display-notice">• Official Marksheet & Portal System is live.<br>• NEW: PAN No, APAR ID, and accurate School Code added to Certificate!</p>
             </div>
 
             <div class="results-btn-card">
@@ -132,7 +131,7 @@
                     <div class="welcome-card">
                         <h3>🌟 Welcome to Digital School Management</h3>
                         <p>Manage your schools, student admissions, and records securely on the cloud platform.</p>
-                        <p><b>✨ Features:</b> Auto Fetch Original Board Results, Fixed PDF Generation, 100% Data Safety.</p>
+                        <p><b>✨ Features:</b> Full Certificate Details (PAN & APAR), 100% DB Safety.</p>
                     </div>
 
                     <div class="section-title">📌 Quick Portal Actions</div>
@@ -232,8 +231,8 @@
                     <div><label>9. Blood Group <span class="req">*</span></label><select id="reg-s-blood" class="input-box"><option value="">Select</option><option value="O+">O+</option><option value="O-">O-</option><option value="A+">A+</option><option value="B+">B+</option><option value="AB+">AB+</option></select></div>
                     <div><label>10. Minority Group <span class="req">*</span></label><select id="reg-s-minority" class="input-box"><option value="">Select</option><option value="No">No</option><option value="Muslim">Muslim</option><option value="Christian">Christian</option></select></div>
                     <div><label>11. Social Category <span class="req">*</span></label><select id="reg-s-category" class="input-box"><option value="">Select</option><option value="GENERAL">GENERAL</option><option value="OBC">OBC</option><option value="SC">SC</option><option value="ST">ST</option></select></div>
-                    <div><label>12. PAN No</label><input type="text" id="reg-s-pan" class="input-box"></div>
-                    <div><label>13. APAR ID No</label><input type="text" id="reg-s-apar" class="input-box"></div>
+                    <div><label>12. PAN No <span class="req">*</span></label><input type="text" id="reg-s-pan" class="input-box" placeholder="e.g. ABCDE1234F"></div>
+                    <div><label>13. APAR ID No <span class="req">*</span></label><input type="text" id="reg-s-apar" class="input-box"></div>
                     <div><label>14. Address <span class="req">*</span></label><input type="text" id="reg-s-address" class="input-box"></div>
                     <div><label>15. PIN Code <span class="req">*</span></label><input type="text" id="reg-s-pin" class="input-box"></div>
                     <div><label>16. State <span class="req">*</span></label><select id="reg-s-state" class="input-box state-select-list"></select></div>
@@ -253,7 +252,6 @@
                 <button style="background:#2563eb; color:white; width:100%; padding:15px; border:none; border-radius:8px; font-weight:bold; font-size:16px; margin-top:20px; cursor:pointer;" onclick="validateStudentForm()">Next ➡️ Proceed to Payment</button>
             </div>
 
-            <!-- Student Payment System -->
             <div id="student-payment-step" style="display:none; text-align:center;">
                 <h3 style="color:#0d3b66; margin-bottom:10px;">💳 School Application Fee Payment</h3>
                 <p style="color:#dc2626; font-weight:bold; font-size:18px; margin-bottom:15px;">⏳ Time Left: <span id="payment-timer">30</span> Seconds</p>
@@ -270,7 +268,7 @@
             </div>
         </div>
 
-        <!-- Receipt Section -->
+        <!-- Receipt / Application Form Document Section -->
         <div id="receipt-section" class="content-section" style="background:white;">
             <div style="border:2px solid #0d3b66; padding:30px; border-radius:12px; position:relative;">
                 <h2 id="receipt-title" style="text-align:center; color:#0d3b66; margin-bottom:10px;">🏫 OFFICIAL RECEIPT</h2>
@@ -296,12 +294,11 @@
 
         <!-- 3. SCHOOL LOGIN SECTION -->
         <div id="school-login" class="content-section">
-            <button class="back-btn" onclick="goHome()">⬅ Back to Home</button>
+            <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
             
             <div id="school-login-area">
                 <h3>🏫 School Portal Login</h3>
                 <p style="color: #64748b; margin-bottom: 20px;">Select your Registered State, then enter School ID and Password.</p>
-                
                 <select id="school-login-state" class="input-box state-select-list" style="margin-bottom:15px;"></select>
                 <input type="text" id="school-login-id" placeholder="Enter School Code (e.g. 155CB)" class="input-box" style="margin-bottom:15px;">
                 <input type="password" id="school-login-pass" placeholder="Enter Password" class="input-box" style="margin-bottom:15px;">
@@ -309,16 +306,13 @@
                 <button class="btn-login btn-school" onclick="validateSchoolLogin()">Login ➡️</button>
             </div>
 
-            <!-- School Forgot Password Flow -->
             <div id="school-forgot-area" style="display:none; background:#f1f5f9; padding:20px; border-radius:12px; border:1px solid #cbd5e1;">
                 <h4 style="color:#0d3b66; margin-bottom:10px;">🔐 Reset School Password</h4>
                 <p style="font-size:14px; color:#64748b; margin-bottom:15px;">Enter your registered School Email to receive an OTP.</p>
-                
                 <div style="display:flex; gap:10px; margin-bottom:10px;">
                     <input type="email" id="school-reset-email" placeholder="Registered School Email" class="input-box" style="flex:1;">
                     <button style="background:#0d3b66; color:white; border:none; padding:10px 15px; border-radius:6px; cursor:pointer;" onclick="sendSchoolLoginOTP()">Send OTP</button>
                 </div>
-                
                 <div id="school-login-otp-div" style="display:none; margin-bottom:10px;">
                     <label style="color:#b45309; font-size:12px; font-weight:bold;">Enter OTP:</label>
                     <div style="display:flex; gap:10px; margin-top:5px;">
@@ -326,7 +320,6 @@
                         <button style="background:#f59e0b; color:white; border:none; padding:10px 15px; border-radius:6px; cursor:pointer; font-weight:bold;" onclick="verifySchoolLoginOTP()">Verify OTP ✅</button>
                     </div>
                 </div>
-
                 <div id="school-newpass-div" style="display:none;">
                     <label style="color:#166534; font-size:12px; font-weight:bold;">Set New Password:</label>
                     <input type="password" id="school-new-pass-input" placeholder="New Password" class="input-box" style="margin-top:5px; margin-bottom:10px; border-color:#16a34a;">
@@ -356,9 +349,7 @@
                     <thead>
                         <tr><th>Photo</th><th>Roll No</th><th>Student Name</th><th>Father's Name</th><th>Total Marks</th><th>% & Grade</th><th>Status</th><th>Actions (Edit/Print/Delete)</th></tr>
                     </thead>
-                    <tbody id="school-student-table-body">
-                        <!-- Loaded dynamically -->
-                    </tbody>
+                    <tbody id="school-student-table-body"></tbody>
                 </table>
             </div>
 
@@ -368,9 +359,7 @@
                     <thead>
                         <tr><th>Photo</th><th>App ID</th><th>Student Name</th><th>Payment Status</th><th>Action (Assign Roll & Approve)</th></tr>
                     </thead>
-                    <tbody id="school-pending-table-body">
-                        <!-- Loaded dynamically -->
-                    </tbody>
+                    <tbody id="school-pending-table-body"></tbody>
                 </table>
             </div>
         </div>
@@ -388,7 +377,6 @@
                 <button class="btn-login btn-admin" onclick="validateAdmin()">Login 🚀</button>
             </div>
 
-            <!-- Admin Forgot Password -->
             <div id="admin-forgot-area" style="display:none; background:#f1f5f9; padding:20px; border-radius:12px; border:1px solid #cbd5e1;">
                 <h4 style="color:#0d3b66; margin-bottom:10px;">🔐 Reset Admin Credentials</h4>
                 <p style="font-size:14px; color:#64748b; margin-bottom:15px;">Enter your registered Admin Email to receive an OTP.</p>
@@ -433,9 +421,7 @@
                     <thead>
                         <tr><th>School Name</th><th>School Code</th><th>Login Pass</th><th>Headmaster</th><th>State</th><th>Payment UTR</th><th>Status</th><th>Actions & Settings</th></tr>
                     </thead>
-                    <tbody id="school-table-body">
-                        <!-- Loaded dynamically -->
-                    </tbody>
+                    <tbody id="school-table-body"></tbody>
                 </table>
             </div>
 
@@ -448,9 +434,7 @@
                     <thead>
                         <tr><th>Photo</th><th>Roll No</th><th>Student Name</th><th>Father's Name</th><th>School Name / Info</th><th>Total Marks</th><th>Actions</th></tr>
                     </thead>
-                    <tbody id="student-table-body-admin">
-                        <!-- Loaded dynamically -->
-                    </tbody>
+                    <tbody id="student-table-body-admin"></tbody>
                 </table>
             </div>
 
@@ -491,18 +475,17 @@
                 <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1;">
                     <h4>📢 Edit / Update Notice Board</h4>
                     <textarea id="notice-input" rows="5" class="input-box" style="margin-bottom:10px;">• Official Marksheet & Portal System is live.
-• Original Board Auto-Fetch feature is now completely functional.</textarea>
+• Added PAN and APAR fields in Certificate.</textarea>
                     <button style="background:#16a34a; color:white; border:none; padding:8px 20px; border-radius:6px; cursor:pointer;" onclick="updateNoticeBoard()">Save Notice Board 💾</button>
                 </div>
             </div>
         </div>
 
-        <!-- UNIVERSAL Add/Edit Student Modal (18 Points + Subjects + Photo + Auto Calculation) -->
+        <!-- UNIVERSAL Add/Edit Student Modal -->
         <div id="universalStudentModal" class="modal">
             <div class="modal-content">
                 <h3 id="us-modal-title" style="color:#0d3b66; margin-bottom:15px;">Add/Edit Student & Marksheet (18-Point)</h3>
                 
-                <!-- AUTO FETCH BOARD DATA SECTION -->
                 <div style="background:#fef08a; padding:12px; border-radius:8px; border:1px solid #ca8a04; display:flex; gap:10px; align-items:center; margin-bottom:15px;">
                     <label style="font-size:13px; font-weight:bold; color:#854d0e; white-space:nowrap;">📡 Auto-Fetch Board Data:</label>
                     <input type="text" id="auto-fetch-roll" placeholder="Enter Board Roll No (e.g. 175CB0077)" class="input-box" style="flex:1; padding:8px; border:1px solid #ca8a04;">
@@ -523,8 +506,8 @@
                     <div><label style="font-size:12px; font-weight:bold;">9. Blood Group:</label><select id="us-blood" class="input-box"><option value="O+">O+</option><option value="O-">O-</option><option value="A+">A+</option><option value="B+">B+</option></select></div>
                     <div><label style="font-size:12px; font-weight:bold;">10. Minority:</label><select id="us-minority" class="input-box"><option value="No">No</option><option value="Muslim">Muslim</option></select></div>
                     <div><label style="font-size:12px; font-weight:bold;">11. Category:</label><select id="us-category" class="input-box"><option value="GENERAL">GENERAL</option><option value="SC">SC</option></select></div>
-                    <div><label style="font-size:12px; font-weight:bold;">12. PAN No:</label><input type="text" id="us-pan" class="input-box"></div>
-                    <div><label style="font-size:12px; font-weight:bold;">13. APAR ID:</label><input type="text" id="us-apar" class="input-box"></div>
+                    <div><label style="font-size:12px; font-weight:bold;">12. PAN No <span class="req">*</span>:</label><input type="text" id="us-pan" class="input-box" placeholder="e.g. ABCDE1234F"></div>
+                    <div><label style="font-size:12px; font-weight:bold;">13. APAR ID <span class="req">*</span>:</label><input type="text" id="us-apar" class="input-box"></div>
                     <div><label style="font-size:12px; font-weight:bold;">14. Address:</label><input type="text" id="us-address" class="input-box"></div>
                     <div><label style="font-size:12px; font-weight:bold;">15. PIN:</label><input type="text" id="us-pin" class="input-box"></div>
                     <div><label style="font-size:12px; font-weight:bold;">16. State:</label><select id="us-state" class="input-box state-select-list"></select></div>
@@ -571,7 +554,6 @@
             </div>
         </div>
         
-        <!-- ADMIN: Edit School Modal -->
         <div id="editSchoolModal" class="modal">
             <div class="modal-content">
                 <h3 style="color:#0d3b66; margin-bottom:15px;">✏️ Verify & Edit School Application</h3>
@@ -588,7 +570,6 @@
             </div>
         </div>
 
-        <!-- School Payment Setup Modal -->
         <div id="schoolPaymentModal" class="modal">
             <div class="modal-content" style="width:500px;">
                 <h3 style="color:#0d3b66; margin-bottom:10px;">💳 Set School Payment Gateway</h3>
@@ -627,7 +608,7 @@
                     </div>
                     <div style="text-align:right;">
                         <p>କ୍ରମିକ ନଂ / SL NO : <span style="color:black;">261122001</span></p>
-                        <p>ବିଦ୍ୟାଳୟ କୋଡ୍ / SCHOOL CODE : <span style="color:black;">CODE</span></p>
+                        <p>ବିଦ୍ୟାଳୟ କୋଡ୍ / SCHOOL CODE : <span id="pm-school-code" style="color:black;">CODE</span></p>
                     </div>
                 </div>
 
@@ -641,6 +622,8 @@
                         <div class="row"><div class="label">ମାତାଙ୍କ ନାମ<br>Mother's Name</div><div class="value" id="pm-mname"></div></div>
                         <div class="row"><div class="label">ପିତାଙ୍କ ନାମ<br>Father's Name</div><div class="value" id="pm-fname"></div></div>
                         <div class="row"><div class="label">ଜନ୍ମ ତାରିଖ<br>Date of Birth</div><div class="value" id="pm-dob"></div></div>
+                        <div class="row"><div class="label">ପ୍ୟାନ୍ ନମ୍ବର<br>PAN No</div><div class="value" id="pm-pan"></div></div>
+                        <div class="row"><div class="label">ଆପାର୍ ଆଇଡି<br>APAR ID</div><div class="value" id="pm-apar"></div></div>
                         <div class="row" style="margin-top:5px;">
                             <div class="value" style="width:100%; border-bottom:1px dashed #4c1d95; padding-bottom:5px;" id="pm-school">SCHOOL NAME</div>
                         </div>
@@ -687,13 +670,12 @@
             <div class="no-print" style="text-align:center; margin-top:20px;">
                 <button style="background:#2563eb; color:white; padding:10px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="window.print()">🖨️ Print Marksheet</button>
                 <button style="background:#16a34a; color:white; padding:10px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer; margin-left:10px;" onclick="saveAsPDF()">💾 Save as PDF</button>
-                <button style="background:#64748b; color:white; padding:10px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer; margin-left:10px;" onclick="closePrintView()">⬅️️ Back to Dashboard</button>
+                <button style="background:#64748b; color:white; padding:10px 25px; border:none; border-radius:8px; font-weight:bold; cursor:pointer; margin-left:10px;" onclick="closePrintView()">⬅️ Back to Dashboard</button>
             </div>
         </div>
 
     </div>
 
-    <!-- Results Modal -->
     <div id="resultsModal" class="modal">
         <div class="modal-content" style="text-align: center;">
             <h3 style="color:#0d3b66; margin-bottom:15px;">🔍 Check Results</h3>
@@ -734,7 +716,7 @@
         let publicRegPhotoBase64 = ""; 
         
         let studentDataStore = JSON.parse(localStorage.getItem('studentDataStore')) || [
-            { roll: "155CB0197", name: "DIBYANSHI DAS", fname: "ANTARYAMI DAS", mname: "SHASHIKALA DAS", dob: "30/09/2010", mobile: "9876543210", school: "SRI BAIRAGI SARASWATI SISHU VIDYAMANDIR", photo: "", total: 360, max: 600, grade: "B1", status: "Pass", subjects: [{code:"FLO", name:"FIRST LANGUAGE ODIA", max:100, sec:87}, {code:"SLE", name:"SECOND LANGUAGE ENGLISH", max:100, sec:81}, {code:"TLS", name:"THIRD LANGUAGE SANSKRIT", max:100, sec:92}, {code:"MTH", name:"MATHEMATICS", max:100, sec:69}, {code:"GSC", name:"GENERAL SCIENCE", max:100, sec:73}, {code:"SSC", name:"SOCIAL SCIENCE", max:100, sec:66}] }
+            { roll: "155CB0197", name: "DIBYANSHI DAS", fname: "ANTARYAMI DAS", mname: "SHASHIKALA DAS", dob: "30/09/2010", mobile: "9876543210", pan: "ABCDE1234F", apar: "123456789012", school: "SRI BAIRAGI SARASWATI SISHU VIDYAMANDIR", photo: "", total: 360, max: 600, grade: "B1", status: "Pass", subjects: [{code:"FLO", name:"FIRST LANGUAGE ODIA", max:100, sec:87}, {code:"SLE", name:"SECOND LANGUAGE ENGLISH", max:100, sec:81}, {code:"TLS", name:"THIRD LANGUAGE SANSKRIT", max:100, sec:92}, {code:"MTH", name:"MATHEMATICS", max:100, sec:69}, {code:"GSC", name:"GENERAL SCIENCE", max:100, sec:73}, {code:"SSC", name:"SOCIAL SCIENCE", max:100, sec:66}] }
         ];
 
         function saveLocalData() {
@@ -815,7 +797,12 @@
             document.getElementById('pm-fname').innerText = student.fname;
             document.getElementById('pm-mname').innerText = student.mname || "N/A";
             document.getElementById('pm-dob').innerText = student.dob || "N/A";
+            document.getElementById('pm-pan').innerText = student.pan || "N/A";
+            document.getElementById('pm-apar').innerText = student.apar || "N/A";
             
+            let schoolObj = registeredSchools.find(s => s.name === student.school);
+            document.getElementById('pm-school-code').innerText = schoolObj ? schoolObj.id : (student.roll.substring(0, 5) || "N/A");
+
             document.getElementById('pm-total-max').innerText = student.max;
             document.getElementById('pm-total-sec').innerText = student.total;
             document.getElementById('pm-grade').innerText = student.grade;
@@ -872,7 +859,6 @@
             else area.innerHTML = `<p style="color:red; font-weight:bold; text-align:center;">❌ Roll Number not found.</p>`;
         }
 
-        // --- NEW: FETCH SPECIFIC BOARD DATA LOGIC ---
         function fetchBoardData(btn) {
             let fetchRoll = document.getElementById('auto-fetch-roll').value.trim();
             if(!fetchRoll) { alert("Please enter a Roll Number to fetch!"); return; }
@@ -881,13 +867,14 @@
             
             setTimeout(() => {
                 if (fetchRoll.toUpperCase() === "175CB0077") {
-                    // Populate Specific Data from provided image
                     document.getElementById('us-roll').value = "175CB0077";
                     document.getElementById('us-name').value = "ADYASHA SAHOO"; 
                     document.getElementById('us-fname').value = "UTTAM KUMAR SAHOO";
                     document.getElementById('us-mname').value = "MAMATARANI SAHU";
                     document.getElementById('us-dob').value = "20/03/2011";
-                    document.getElementById('us-mobile').value = ""; // Board doesn't provide this
+                    document.getElementById('us-mobile').value = ""; 
+                    document.getElementById('us-pan').value = "ABCDE1234F";
+                    document.getElementById('us-apar').value = "123456789012";
 
                     let sBody = document.getElementById('us-subject-container');
                     sBody.innerHTML = "";
@@ -904,13 +891,14 @@
                         sBody.innerHTML += `<div class="sub-row"><input type="text" value="${sub.c}" class="input-box sub-code" style="padding:6px;"><input type="text" value="${sub.n}" class="input-box sub-name" style="padding:6px;"><input type="number" value="${sub.m}" class="input-box sub-max" style="padding:6px;" oninput="calculateAutoMarks()"><input type="number" value="${sub.s}" class="input-box sub-sec" style="padding:6px;" oninput="calculateAutoMarks()"><button type="button" style="background:#dc2626; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('.sub-row').remove(); calculateAutoMarks();">Delete</button></div>`;
                     });
                 } else {
-                    // Dummy generic data for any other roll number
                     document.getElementById('us-roll').value = fetchRoll;
                     document.getElementById('us-name').value = "PRAKASH NAYAK"; 
                     document.getElementById('us-fname').value = "RAMESH NAYAK";
                     document.getElementById('us-mname').value = "SITA NAYAK";
                     document.getElementById('us-dob').value = "15/08/2010";
                     document.getElementById('us-mobile').value = "9876543210";
+                    document.getElementById('us-pan').value = "ABCXYZ123M";
+                    document.getElementById('us-apar').value = "987654321098";
                     
                     let sBody = document.getElementById('us-subject-container');
                     sBody.innerHTML = "";
@@ -944,6 +932,7 @@
                 document.getElementById('us-roll').value = student.roll; document.getElementById('us-name').value = student.name; 
                 document.getElementById('us-fname').value = student.fname; document.getElementById('us-mname').value = student.mname || "";
                 document.getElementById('us-dob').value = student.dob || ""; document.getElementById('us-mobile').value = student.mobile || "";
+                document.getElementById('us-pan').value = student.pan || ""; document.getElementById('us-apar').value = student.apar || "";
                 document.getElementById('us-photo-data').value = student.photo || ""; document.getElementById('us-photo-input').value = ""; 
                 sBody.innerHTML = "";
                 student.subjects.forEach(sub => sBody.innerHTML += `<div class="sub-row"><input type="text" value="${sub.code}" class="input-box sub-code" style="padding:6px;"><input type="text" value="${sub.name}" class="input-box sub-name" style="padding:6px;"><input type="number" value="${sub.max}" class="input-box sub-max" style="padding:6px;" oninput="calculateAutoMarks()"><input type="number" value="${sub.sec}" class="input-box sub-sec" style="padding:6px;" oninput="calculateAutoMarks()"><button type="button" style="background:#dc2626; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('.sub-row').remove(); calculateAutoMarks();">Delete</button></div>`);
@@ -951,6 +940,7 @@
                 currentEditRoll = null; document.getElementById('us-modal-title').innerText = "Add Student & Subjects Manually";
                 document.getElementById('us-roll').value = ""; document.getElementById('us-name').value = ""; document.getElementById('us-fname').value = ""; 
                 document.getElementById('us-mname').value = ""; document.getElementById('us-dob').value = ""; document.getElementById('us-mobile').value = "";
+                document.getElementById('us-pan').value = ""; document.getElementById('us-apar').value = "";
                 document.getElementById('us-photo-data').value = ""; document.getElementById('us-photo-input').value = "";
                 sBody.innerHTML = `<div class="sub-row"><input type="text" value="FLO" class="input-box sub-code" style="padding:6px;"><input type="text" value="FIRST LANGUAGE ODIA" class="input-box sub-name" style="padding:6px;"><input type="number" value="100" class="input-box sub-max" style="padding:6px;" oninput="calculateAutoMarks()"><input type="number" value="" class="input-box sub-sec" style="padding:6px;" oninput="calculateAutoMarks()"><button type="button" style="background:#dc2626; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('.sub-row').remove(); calculateAutoMarks();">Delete</button></div>`;
             }
@@ -969,10 +959,7 @@
             let status = (hasFailedSubject || pct < 30) ? "Fail ❌" : "Pass ✅"; let statusColor = (hasFailedSubject || pct < 30) ? "#b91c1c" : "#166534";
             document.getElementById('auto-max').innerText = tMax; document.getElementById('auto-sec').innerText = tSec; document.getElementById('auto-pct').innerText = pct.toFixed(2) + "%"; document.getElementById('auto-grade').innerText = grade;
             document.getElementById('auto-status').innerText = status; document.getElementById('auto-status').style.color = statusColor;
-            
-            document.getElementById('us-final-total').value = tSec;
-            document.getElementById('us-final-pctgrade').value = grade;
-            document.getElementById('us-final-status').value = status.includes("Pass") ? "Pass" : "Fail";
+            document.getElementById('us-final-total').value = tSec; document.getElementById('us-final-pctgrade').value = grade; document.getElementById('us-final-status').value = status.includes("Pass") ? "Pass" : "Fail";
         }
 
         function addUniversalSubjectRow() {
@@ -993,7 +980,16 @@
             if(document.getElementById('school-dashboard').classList.contains('active')) { activeSchoolName = document.getElementById('school-dash-title').innerText.replace('🏫 ', ''); }
 
             let photoData = document.getElementById('us-photo-data').value;
-            let studentObj = { roll: roll, name: document.getElementById('us-name').value.trim(), fname: document.getElementById('us-fname').value.trim(), mname: document.getElementById('us-mname').value.trim(), dob: document.getElementById('us-dob').value.trim(), mobile: document.getElementById('us-mobile').value.trim(), school: activeSchoolName, photo: photoData, total: parseFloat(document.getElementById('auto-sec').innerText), max: parseFloat(document.getElementById('auto-max').innerText), grade: document.getElementById('us-final-pctgrade').value, status: document.getElementById('us-final-status').value, subjects: subs };
+            let studentObj = { 
+                roll: roll, name: document.getElementById('us-name').value.trim(), fname: document.getElementById('us-fname').value.trim(), 
+                mname: document.getElementById('us-mname').value.trim(), dob: document.getElementById('us-dob').value.trim(), 
+                mobile: document.getElementById('us-mobile').value.trim(), 
+                pan: document.getElementById('us-pan').value.trim(), 
+                apar: document.getElementById('us-apar').value.trim(), 
+                school: activeSchoolName, photo: photoData, 
+                total: parseFloat(document.getElementById('auto-sec').innerText), max: parseFloat(document.getElementById('auto-max').innerText), 
+                grade: document.getElementById('us-final-pctgrade').value, status: document.getElementById('us-final-status').value, subjects: subs 
+            };
 
             if(currentEditRoll) { let index = studentDataStore.findIndex(s => s.roll === currentEditRoll); if(index > -1) { studentDataStore[index] = studentObj; } alert('Student Updated Successfully! ✏️'); } 
             else { studentDataStore.push(studentObj); alert('New Student Added Successfully! 🎓'); }
@@ -1011,8 +1007,8 @@
         }
         function openStudentRegistration() { document.getElementById('student-form-step').style.display = 'block'; document.getElementById('student-payment-step').style.display = 'none'; publicRegPhotoBase64 = ""; document.getElementById('reg-s-photo').value = ""; openPage('student-reg'); }
         function validateStudentForm() {
-            let reqIds = ['reg-s-name', 'reg-s-gender', 'reg-s-dob', 'reg-s-mname', 'reg-s-fname', 'reg-s-aadhaar', 'reg-s-mobile', 'reg-s-blood', 'reg-s-minority', 'reg-s-category', 'reg-s-address', 'reg-s-pin', 'reg-s-state', 'reg-s-lang', 'reg-s-mail', 'reg-s-school'];
-            for(let id of reqIds) { if(!document.getElementById(id).value.trim()) { alert('Please fill all Mandatory (*) Fields correctly!'); return; } }
+            let reqIds = ['reg-s-name', 'reg-s-gender', 'reg-s-dob', 'reg-s-mname', 'reg-s-fname', 'reg-s-aadhaar', 'reg-s-mobile', 'reg-s-blood', 'reg-s-minority', 'reg-s-category', 'reg-s-address', 'reg-s-pin', 'reg-s-state', 'reg-s-lang', 'reg-s-mail', 'reg-s-school', 'reg-s-pan', 'reg-s-apar'];
+            for(let id of reqIds) { if(!document.getElementById(id) || !document.getElementById(id).value.trim()) { alert('Please fill all Mandatory (*) Fields correctly!'); return; } }
             if(!publicRegPhotoBase64) { alert("Please Upload Student Photo!"); return; }
 
             let sId = document.getElementById('reg-s-school').value; let school = registeredSchools.find(s => s.id === sId);
