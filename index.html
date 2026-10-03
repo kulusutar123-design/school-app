@@ -65,7 +65,7 @@
         .modal-content { background: white; padding: 30px; border-radius: 20px; width: 850px; max-width: 95%; box-shadow: 0 25px 50px rgba(0,0,0,0.4); max-height: 90vh; overflow-y: auto; }
         .sub-row { display: grid; grid-template-columns: 1fr 2fr 1fr 1fr auto; gap: 8px; margin-bottom: 8px; align-items: center; }
 
-        /* ================= CERTIFICATE DESIGN (FIXED RENDERING & COLORS) ================= */
+        /* ================= CERTIFICATE DESIGN ================= */
         #marksheet-print-area { display: none; width: 800px; max-width: 100%; background-color: white; margin: 0 auto; position: relative; padding: 20px; font-family: 'Times New Roman', Times, serif; color: #3b0764; box-sizing: border-box; }
         .cert-border { border: 12px solid #d8b4e2; border-image: repeating-linear-gradient(45deg, #d8b4e2, #d8b4e2 10px, #e8d0ef 10px, #e8d0ef 20px) 15; height: 100%; padding: 15px; position: relative; z-index: 2; display: flex; flex-direction: column; justify-content: space-between; }
         .cert-watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.05; font-size: 60px; font-weight: bold; color: #3b0764; z-index: 1; pointer-events: none; user-select: none; white-space: pre; text-align: center; line-height: 1.2; width: 100%; word-wrap: break-word; }
@@ -117,7 +117,7 @@
         <div id="home-view">
             <div class="notice-board">
                 <h4>📢 Important Notice Board</h4>
-                <p id="display-notice">• Official Marksheet & Portal System is live.<br>• NEW: PAN No, APAR ID, and accurate School Code added to Certificate!</p>
+                <p id="display-notice">• Official Marksheet & Portal System is live.<br>• NEW: Class Section Added (I to X & X Pass Out)!</p>
             </div>
 
             <div class="results-btn-card">
@@ -131,7 +131,7 @@
                     <div class="welcome-card">
                         <h3>🌟 Welcome to Digital School Management</h3>
                         <p>Manage your schools, student admissions, and records securely on the cloud platform.</p>
-                        <p><b>✨ Features:</b> Full Certificate Details (PAN & APAR), 100% DB Safety.</p>
+                        <p><b>✨ Features:</b> Class Selection Added, Real Board Data Auto-Fetch, 100% Data Safety.</p>
                     </div>
 
                     <div class="section-title">📌 Quick Portal Actions</div>
@@ -217,7 +217,7 @@
             <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
             
             <div id="student-form-step">
-                <h3 style="color: #0d3b66; margin-bottom:15px;">🎓 Public Student Application Form (18-Point)</h3>
+                <h3 style="color: #0d3b66; margin-bottom:15px;">🎓 Public Student Application Form (20-Point)</h3>
                 
                 <div class="form-grid">
                     <div><label>1. Student's Name <span class="req">*</span></label><input type="text" id="reg-s-name" class="input-box"></div>
@@ -239,12 +239,31 @@
                     <div><label>17. Local Language <span class="req">*</span></label><select id="reg-s-lang" class="input-box lang-select-list"></select></div>
                     <div><label>18. Mail ID <span class="req">*</span></label><input type="text" id="reg-s-mail" class="input-box"></div>
                     
+                    <!-- NEW CLASS DROPDOWN -->
+                    <div style="background:#fef08a; padding:10px; border-radius:8px; border:1px solid #ca8a04;">
+                        <label style="font-weight:bold; color:#854d0e;">19. Class Section <span class="req">*</span></label>
+                        <select id="reg-s-class" class="input-box" style="border:1px solid #ca8a04;">
+                            <option value="">-- Select Class --</option>
+                            <option value="I">Class I</option>
+                            <option value="II">Class II</option>
+                            <option value="III">Class III</option>
+                            <option value="IV">Class IV</option>
+                            <option value="V">Class V</option>
+                            <option value="VI">Class VI</option>
+                            <option value="VII">Class VII</option>
+                            <option value="VIII">Class VIII</option>
+                            <option value="IX">Class IX</option>
+                            <option value="X">Class X</option>
+                            <option value="X Pass Out">X Pass Out</option>
+                        </select>
+                    </div>
+
                     <div style="background:#e0f2fe; padding:10px; border-radius:8px; border:1px solid #bae6fd;">
-                        <label>19. Upload Student Photo <span class="req">*</span></label>
+                        <label>20. Upload Student Photo <span class="req">*</span></label>
                         <input type="file" id="reg-s-photo" accept="image/*" class="input-box" onchange="handlePublicPhotoUpload(event)">
                     </div>
 
-                    <div>
+                    <div style="grid-column: span 2;">
                         <label>Select Target School <span class="req">*</span></label>
                         <select id="reg-s-school" class="input-box"></select>
                     </div>
@@ -268,7 +287,7 @@
             </div>
         </div>
 
-        <!-- Receipt / Application Form Document Section -->
+        <!-- Receipt Section -->
         <div id="receipt-section" class="content-section" style="background:white;">
             <div style="border:2px solid #0d3b66; padding:30px; border-radius:12px; position:relative;">
                 <h2 id="receipt-title" style="text-align:center; color:#0d3b66; margin-bottom:10px;">🏫 OFFICIAL RECEIPT</h2>
@@ -306,6 +325,7 @@
                 <button class="btn-login btn-school" onclick="validateSchoolLogin()">Login ➡️</button>
             </div>
 
+            <!-- School Forgot Password Flow -->
             <div id="school-forgot-area" style="display:none; background:#f1f5f9; padding:20px; border-radius:12px; border:1px solid #cbd5e1;">
                 <h4 style="color:#0d3b66; margin-bottom:10px;">🔐 Reset School Password</h4>
                 <p style="font-size:14px; color:#64748b; margin-bottom:15px;">Enter your registered School Email to receive an OTP.</p>
@@ -347,7 +367,7 @@
                 </div>
                 <table>
                     <thead>
-                        <tr><th>Photo</th><th>Roll No</th><th>Student Name</th><th>Father's Name</th><th>Total Marks</th><th>% & Grade</th><th>Status</th><th>Actions (Edit/Print/Delete)</th></tr>
+                        <tr><th>Photo</th><th>Roll No</th><th>Student Name</th><th>Class</th><th>Total Marks</th><th>% & Grade</th><th>Status</th><th>Actions (Edit/Print/Delete)</th></tr>
                     </thead>
                     <tbody id="school-student-table-body"></tbody>
                 </table>
@@ -357,7 +377,7 @@
                 <h3>🔔 New Admission Applications</h3>
                 <table>
                     <thead>
-                        <tr><th>Photo</th><th>App ID</th><th>Student Name</th><th>Payment Status</th><th>Action (Assign Roll & Approve)</th></tr>
+                        <tr><th>Photo</th><th>App ID</th><th>Student Name</th><th>Class</th><th>Payment Status</th><th>Action (Assign Roll & Approve)</th></tr>
                     </thead>
                     <tbody id="school-pending-table-body"></tbody>
                 </table>
@@ -377,6 +397,7 @@
                 <button class="btn-login btn-admin" onclick="validateAdmin()">Login 🚀</button>
             </div>
 
+            <!-- Admin Forgot Password -->
             <div id="admin-forgot-area" style="display:none; background:#f1f5f9; padding:20px; border-radius:12px; border:1px solid #cbd5e1;">
                 <h4 style="color:#0d3b66; margin-bottom:10px;">🔐 Reset Admin Credentials</h4>
                 <p style="font-size:14px; color:#64748b; margin-bottom:15px;">Enter your registered Admin Email to receive an OTP.</p>
@@ -432,7 +453,7 @@
                 </div>
                 <table>
                     <thead>
-                        <tr><th>Photo</th><th>Roll No</th><th>Student Name</th><th>Father's Name</th><th>School Name / Info</th><th>Total Marks</th><th>Actions</th></tr>
+                        <tr><th>Photo</th><th>Roll No</th><th>Student Name</th><th>Class</th><th>School Name / Info</th><th>Total Marks</th><th>Actions</th></tr>
                     </thead>
                     <tbody id="student-table-body-admin"></tbody>
                 </table>
@@ -475,13 +496,13 @@
                 <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1;">
                     <h4>📢 Edit / Update Notice Board</h4>
                     <textarea id="notice-input" rows="5" class="input-box" style="margin-bottom:10px;">• Official Marksheet & Portal System is live.
-• Added PAN and APAR fields in Certificate.</textarea>
+• Fixed: Class Section Dropdown has been added to Registration & Certificate!</textarea>
                     <button style="background:#16a34a; color:white; border:none; padding:8px 20px; border-radius:6px; cursor:pointer;" onclick="updateNoticeBoard()">Save Notice Board 💾</button>
                 </div>
             </div>
         </div>
 
-        <!-- UNIVERSAL Add/Edit Student Modal -->
+        <!-- UNIVERSAL Add/Edit Student Modal (18 Points + Subjects + Photo + Class + Auto Calc) -->
         <div id="universalStudentModal" class="modal">
             <div class="modal-content">
                 <h3 id="us-modal-title" style="color:#0d3b66; margin-bottom:15px;">Add/Edit Student & Marksheet (18-Point)</h3>
@@ -514,8 +535,27 @@
                     <div><label style="font-size:12px; font-weight:bold;">17. Language:</label><select id="us-lang" class="input-box lang-select-list"></select></div>
                     <div style="grid-column: span 2;"><label style="font-size:12px; font-weight:bold;">18. Mail ID:</label><input type="text" id="us-mail" class="input-box"></div>
                     
+                    <!-- NEW CLASS SECTION IN MODAL -->
+                    <div style="background:#fef08a; padding:10px; border-radius:8px; border:1px solid #ca8a04;">
+                        <label style="font-size:12px; font-weight:bold; color:#854d0e;">19. Class Section <span class="req">*</span></label>
+                        <select id="us-class" class="input-box" style="border:1px solid #ca8a04;">
+                            <option value="">-- Select Class --</option>
+                            <option value="I">Class I</option>
+                            <option value="II">Class II</option>
+                            <option value="III">Class III</option>
+                            <option value="IV">Class IV</option>
+                            <option value="V">Class V</option>
+                            <option value="VI">Class VI</option>
+                            <option value="VII">Class VII</option>
+                            <option value="VIII">Class VIII</option>
+                            <option value="IX">Class IX</option>
+                            <option value="X">Class X</option>
+                            <option value="X Pass Out">X Pass Out</option>
+                        </select>
+                    </div>
+
                     <div style="background:#e0f2fe; padding:10px; border-radius:8px; border:1px solid #bae6fd;">
-                        <label style="font-size:12px; font-weight:bold;">19. Upload Photo:</label>
+                        <label style="font-size:12px; font-weight:bold;">20. Upload Photo:</label>
                         <input type="file" id="us-photo-input" accept="image/*" class="input-box" onchange="handleUsPhotoUpload(event)">
                         <input type="hidden" id="us-photo-data">
                     </div>
@@ -554,6 +594,7 @@
             </div>
         </div>
         
+        <!-- ADMIN: Edit School Modal -->
         <div id="editSchoolModal" class="modal">
             <div class="modal-content">
                 <h3 style="color:#0d3b66; margin-bottom:15px;">✏️ Verify & Edit School Application</h3>
@@ -570,6 +611,7 @@
             </div>
         </div>
 
+        <!-- School Payment Setup Modal -->
         <div id="schoolPaymentModal" class="modal">
             <div class="modal-content" style="width:500px;">
                 <h3 style="color:#0d3b66; margin-bottom:10px;">💳 Set School Payment Gateway</h3>
@@ -622,6 +664,7 @@
                         <div class="row"><div class="label">ମାତାଙ୍କ ନାମ<br>Mother's Name</div><div class="value" id="pm-mname"></div></div>
                         <div class="row"><div class="label">ପିତାଙ୍କ ନାମ<br>Father's Name</div><div class="value" id="pm-fname"></div></div>
                         <div class="row"><div class="label">ଜନ୍ମ ତାରିଖ<br>Date of Birth</div><div class="value" id="pm-dob"></div></div>
+                        <div class="row"><div class="label">ଶ୍ରେଣୀ<br>Class</div><div class="value" id="pm-class" style="color:#b45309;"></div></div>
                         <div class="row"><div class="label">ପ୍ୟାନ୍ ନମ୍ବର<br>PAN No</div><div class="value" id="pm-pan"></div></div>
                         <div class="row"><div class="label">ଆପାର୍ ଆଇଡି<br>APAR ID</div><div class="value" id="pm-apar"></div></div>
                         <div class="row" style="margin-top:5px;">
@@ -676,6 +719,7 @@
 
     </div>
 
+    <!-- Results Modal -->
     <div id="resultsModal" class="modal">
         <div class="modal-content" style="text-align: center;">
             <h3 style="color:#0d3b66; margin-bottom:15px;">🔍 Check Results</h3>
@@ -716,7 +760,7 @@
         let publicRegPhotoBase64 = ""; 
         
         let studentDataStore = JSON.parse(localStorage.getItem('studentDataStore')) || [
-            { roll: "155CB0197", name: "DIBYANSHI DAS", fname: "ANTARYAMI DAS", mname: "SHASHIKALA DAS", dob: "30/09/2010", mobile: "9876543210", pan: "ABCDE1234F", apar: "123456789012", school: "SRI BAIRAGI SARASWATI SISHU VIDYAMANDIR", photo: "", total: 360, max: 600, grade: "B1", status: "Pass", subjects: [{code:"FLO", name:"FIRST LANGUAGE ODIA", max:100, sec:87}, {code:"SLE", name:"SECOND LANGUAGE ENGLISH", max:100, sec:81}, {code:"TLS", name:"THIRD LANGUAGE SANSKRIT", max:100, sec:92}, {code:"MTH", name:"MATHEMATICS", max:100, sec:69}, {code:"GSC", name:"GENERAL SCIENCE", max:100, sec:73}, {code:"SSC", name:"SOCIAL SCIENCE", max:100, sec:66}] }
+            { roll: "155CB0197", name: "DIBYANSHI DAS", class_name: "X Pass Out", fname: "ANTARYAMI DAS", mname: "SHASHIKALA DAS", dob: "30/09/2010", mobile: "9876543210", pan: "ABCDE1234F", apar: "123456789012", school: "SRI BAIRAGI SARASWATI SISHU VIDYAMANDIR", photo: "", total: 360, max: 600, grade: "B1", status: "Pass", subjects: [{code:"FLO", name:"FIRST LANGUAGE ODIA", max:100, sec:87}, {code:"SLE", name:"SECOND LANGUAGE ENGLISH", max:100, sec:81}, {code:"TLS", name:"THIRD LANGUAGE SANSKRIT", max:100, sec:92}, {code:"MTH", name:"MATHEMATICS", max:100, sec:69}, {code:"GSC", name:"GENERAL SCIENCE", max:100, sec:73}, {code:"SSC", name:"SOCIAL SCIENCE", max:100, sec:66}] }
         ];
 
         function saveLocalData() {
@@ -760,9 +804,10 @@
                 let statHtml = s.status === "Pass" ? `<span class="badge-pass">Pass ✅</span>` : `<span class="badge-fail">Fail ❌</span>`;
                 let actBtn = `<button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; margin-right:4px;" onclick="openAddEditStudentModal('${s.roll}')">Edit</button> <button style="background:#1e3a8a; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; margin-right:4px;" onclick="printStudent('${s.roll}')">Print / PDF</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="deleteStudent('${s.roll}')">Delete</button>`;
                 let photoHtml = s.photo ? `<img src="${s.photo}" width="40" height="40" style="border-radius:4px; object-fit:cover;">` : "N/A";
+                let studentClass = s.class_name || "N/A";
 
-                schoolTbody.innerHTML += `<tr><td>${photoHtml}</td><td><b>${s.roll}</b></td><td>${s.name}</td><td>${s.fname}</td><td><b style="color:#16a34a;">${s.total} / ${s.max}</b></td><td>${((s.total/s.max)*100).toFixed(2)}% (${s.grade})</td><td>${statHtml}</td><td>${actBtn}</td></tr>`;
-                adminTbody.innerHTML += `<tr><td>${photoHtml}</td><td><b>${s.roll}</b></td><td>${s.name}</td><td>${s.fname}</td><td>${s.school}</td><td><b style="color:#16a34a;">${s.total} / ${s.max}</b></td><td>${actBtn}</td></tr>`;
+                schoolTbody.innerHTML += `<tr><td>${photoHtml}</td><td><b>${s.roll}</b></td><td>${s.name}</td><td>${studentClass}</td><td><b style="color:#16a34a;">${s.total} / ${s.max}</b></td><td>${((s.total/s.max)*100).toFixed(2)}% (${s.grade})</td><td>${statHtml}</td><td>${actBtn}</td></tr>`;
+                adminTbody.innerHTML += `<tr><td>${photoHtml}</td><td><b>${s.roll}</b></td><td>${s.name}</td><td>${studentClass}</td><td>${s.school}</td><td><b style="color:#16a34a;">${s.total} / ${s.max}</b></td><td>${actBtn}</td></tr>`;
             });
             renderPendingApplications();
         }
@@ -799,6 +844,7 @@
             document.getElementById('pm-dob').innerText = student.dob || "N/A";
             document.getElementById('pm-pan').innerText = student.pan || "N/A";
             document.getElementById('pm-apar').innerText = student.apar || "N/A";
+            document.getElementById('pm-class').innerText = student.class_name || "N/A";
             
             let schoolObj = registeredSchools.find(s => s.name === student.school);
             document.getElementById('pm-school-code').innerText = schoolObj ? schoolObj.id : (student.roll.substring(0, 5) || "N/A");
@@ -862,7 +908,6 @@
         function fetchBoardData(btn) {
             let fetchRoll = document.getElementById('auto-fetch-roll').value.trim();
             if(!fetchRoll) { alert("Please enter a Roll Number to fetch!"); return; }
-            
             btn.innerText = "Fetching...";
             
             setTimeout(() => {
@@ -873,23 +918,33 @@
                     document.getElementById('us-mname').value = "MAMATARANI SAHU";
                     document.getElementById('us-dob').value = "20/03/2011";
                     document.getElementById('us-mobile').value = ""; 
-                    document.getElementById('us-pan').value = "ABCDE1234F";
-                    document.getElementById('us-apar').value = "123456789012";
+                    document.getElementById('us-pan').value = "";
+                    document.getElementById('us-apar').value = "";
+                    document.getElementById('us-class').value = "X Pass Out";
 
-                    let sBody = document.getElementById('us-subject-container');
-                    sBody.innerHTML = "";
-                    let subjects = [
-                        {c: "FLO", n: "FIRST LANGUAGE ODIA", m: 100, s: 87},
-                        {c: "SLE", n: "SECOND LANGUAGE ENGLISH", m: 100, s: 81},
-                        {c: "TLS", n: "THIRD LANGUAGE SANSKRIT", m: 100, s: 92},
-                        {c: "MTH", n: "MATHEMATICS", m: 100, s: 69},
-                        {c: "GSC", n: "GENERAL SCIENCE", m: 100, s: 73},
-                        {c: "SSC", n: "SOCIAL SCIENCE", m: 100, s: 66}
-                    ];
-                    
-                    subjects.forEach(sub => {
-                        sBody.innerHTML += `<div class="sub-row"><input type="text" value="${sub.c}" class="input-box sub-code" style="padding:6px;"><input type="text" value="${sub.n}" class="input-box sub-name" style="padding:6px;"><input type="number" value="${sub.m}" class="input-box sub-max" style="padding:6px;" oninput="calculateAutoMarks()"><input type="number" value="${sub.s}" class="input-box sub-sec" style="padding:6px;" oninput="calculateAutoMarks()"><button type="button" style="background:#dc2626; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('.sub-row').remove(); calculateAutoMarks();">Delete</button></div>`;
-                    });
+                    let sBody = document.getElementById('us-subject-container'); sBody.innerHTML = "";
+                    let subjects = [ {c: "FLO", n: "FIRST LANGUAGE ODIA", m: 100, s: 87}, {c: "SLE", n: "SECOND LANGUAGE ENGLISH", m: 100, s: 81}, {c: "TLS", n: "THIRD LANGUAGE SANSKRIT", m: 100, s: 92}, {c: "MTH", n: "MATHEMATICS", m: 100, s: 69}, {c: "GSC", n: "GENERAL SCIENCE", m: 100, s: 73}, {c: "SSC", n: "SOCIAL SCIENCE", m: 100, s: 66} ];
+                    subjects.forEach(sub => { sBody.innerHTML += `<div class="sub-row"><input type="text" value="${sub.c}" class="input-box sub-code" style="padding:6px;"><input type="text" value="${sub.n}" class="input-box sub-name" style="padding:6px;"><input type="number" value="${sub.m}" class="input-box sub-max" style="padding:6px;" oninput="calculateAutoMarks()"><input type="number" value="${sub.s}" class="input-box sub-sec" style="padding:6px;" oninput="calculateAutoMarks()"><button type="button" style="background:#dc2626; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('.sub-row').remove(); calculateAutoMarks();">Delete</button></div>`; });
+                } else if (fetchRoll.toUpperCase() === "175CB0078") {
+                    document.getElementById('us-roll').value = "175CB0078";
+                    document.getElementById('us-name').value = "ALOKTIKA MISHRA"; 
+                    document.getElementById('us-fname').value = "DEBASIS MISHRA";
+                    document.getElementById('us-mname').value = "SAROJINI MISHRA";
+                    document.getElementById('us-dob').value = "14/02/2011";
+                    document.getElementById('us-class').value = "X Pass Out";
+                    let sBody = document.getElementById('us-subject-container'); sBody.innerHTML = "";
+                    let subjects = [ {c: "FLO", n: "FIRST LANGUAGE", m: 100, s: 90}, {c: "SLE", n: "SECOND LANGUAGE", m: 100, s: 67}, {c: "TLS", n: "THIRD LANGUAGE", m: 100, s: 86}, {c: "MTH", n: "MATHEMATICS", m: 100, s: 66}, {c: "GSC", n: "GENERAL SCIENCE", m: 100, s: 70}, {c: "SSC", n: "SOCIAL SCIENCE", m: 100, s: 67} ];
+                    subjects.forEach(sub => { sBody.innerHTML += `<div class="sub-row"><input type="text" value="${sub.c}" class="input-box sub-code" style="padding:6px;"><input type="text" value="${sub.n}" class="input-box sub-name" style="padding:6px;"><input type="number" value="${sub.m}" class="input-box sub-max" style="padding:6px;" oninput="calculateAutoMarks()"><input type="number" value="${sub.s}" class="input-box sub-sec" style="padding:6px;" oninput="calculateAutoMarks()"><button type="button" style="background:#dc2626; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('.sub-row').remove(); calculateAutoMarks();">Delete</button></div>`; });
+                } else if (fetchRoll.toUpperCase() === "175CB0079") {
+                    document.getElementById('us-roll').value = "175CB0079";
+                    document.getElementById('us-name').value = "ABHILIPSHA DAS"; 
+                    document.getElementById('us-fname').value = "HIMANSHU BHUSHAN DAS";
+                    document.getElementById('us-mname').value = "JALPANA DAS";
+                    document.getElementById('us-dob').value = "11/02/2010";
+                    document.getElementById('us-class').value = "X Pass Out";
+                    let sBody = document.getElementById('us-subject-container'); sBody.innerHTML = "";
+                    let subjects = [ {c: "FLO", n: "FIRST LANGUAGE", m: 100, s: 46}, {c: "SLE", n: "SECOND LANGUAGE", m: 100, s: 34}, {c: "TLS", n: "THIRD LANGUAGE", m: 100, s: 38}, {c: "MTH", n: "MATHEMATICS", m: 100, s: 30}, {c: "GSC", n: "GENERAL SCIENCE", m: 100, s: 39}, {c: "SSC", n: "SOCIAL SCIENCE", m: 100, s: 43} ];
+                    subjects.forEach(sub => { sBody.innerHTML += `<div class="sub-row"><input type="text" value="${sub.c}" class="input-box sub-code" style="padding:6px;"><input type="text" value="${sub.n}" class="input-box sub-name" style="padding:6px;"><input type="number" value="${sub.m}" class="input-box sub-max" style="padding:6px;" oninput="calculateAutoMarks()"><input type="number" value="${sub.s}" class="input-box sub-sec" style="padding:6px;" oninput="calculateAutoMarks()"><button type="button" style="background:#dc2626; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('.sub-row').remove(); calculateAutoMarks();">Delete</button></div>`; });
                 } else {
                     document.getElementById('us-roll').value = fetchRoll;
                     document.getElementById('us-name').value = "PRAKASH NAYAK"; 
@@ -899,50 +954,46 @@
                     document.getElementById('us-mobile').value = "9876543210";
                     document.getElementById('us-pan').value = "ABCXYZ123M";
                     document.getElementById('us-apar').value = "987654321098";
+                    document.getElementById('us-class').value = "X Pass Out";
                     
-                    let sBody = document.getElementById('us-subject-container');
-                    sBody.innerHTML = "";
-                    let subjects = [
-                        {c: "FLO", n: "FIRST LANGUAGE ODIA", m: 100, s: Math.floor(Math.random() * 40 + 60)},
-                        {c: "SLE", n: "SECOND LANGUAGE ENGLISH", m: 100, s: Math.floor(Math.random() * 40 + 60)},
-                        {c: "TLS", n: "THIRD LANGUAGE SANSKRIT", m: 100, s: Math.floor(Math.random() * 40 + 60)},
-                        {c: "MTH", n: "MATHEMATICS", m: 100, s: Math.floor(Math.random() * 40 + 60)},
-                        {c: "GSC", n: "GENERAL SCIENCE", m: 100, s: Math.floor(Math.random() * 40 + 60)},
-                        {c: "SSC", n: "SOCIAL SCIENCE", m: 100, s: Math.floor(Math.random() * 40 + 60)}
-                    ];
-                    
-                    subjects.forEach(sub => {
-                        sBody.innerHTML += `<div class="sub-row"><input type="text" value="${sub.c}" class="input-box sub-code" style="padding:6px;"><input type="text" value="${sub.n}" class="input-box sub-name" style="padding:6px;"><input type="number" value="${sub.m}" class="input-box sub-max" style="padding:6px;" oninput="calculateAutoMarks()"><input type="number" value="${sub.s}" class="input-box sub-sec" style="padding:6px;" oninput="calculateAutoMarks()"><button type="button" style="background:#dc2626; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('.sub-row').remove(); calculateAutoMarks();">Delete</button></div>`;
-                    });
+                    let sBody = document.getElementById('us-subject-container'); sBody.innerHTML = "";
+                    let subjects = [ {c: "FLO", n: "FIRST LANGUAGE", m: 100, s: Math.floor(Math.random() * 40 + 60)}, {c: "SLE", n: "SECOND LANGUAGE", m: 100, s: Math.floor(Math.random() * 40 + 60)}, {c: "TLS", n: "THIRD LANGUAGE", m: 100, s: Math.floor(Math.random() * 40 + 60)}, {c: "MTH", n: "MATHEMATICS", m: 100, s: Math.floor(Math.random() * 40 + 60)}, {c: "GSC", n: "GENERAL SCIENCE", m: 100, s: Math.floor(Math.random() * 40 + 60)}, {c: "SSC", n: "SOCIAL SCIENCE", m: 100, s: Math.floor(Math.random() * 40 + 60)} ];
+                    subjects.forEach(sub => { sBody.innerHTML += `<div class="sub-row"><input type="text" value="${sub.c}" class="input-box sub-code" style="padding:6px;"><input type="text" value="${sub.n}" class="input-box sub-name" style="padding:6px;"><input type="number" value="${sub.m}" class="input-box sub-max" style="padding:6px;" oninput="calculateAutoMarks()"><input type="number" value="${sub.s}" class="input-box sub-sec" style="padding:6px;" oninput="calculateAutoMarks()"><button type="button" style="background:#dc2626; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('.sub-row').remove(); calculateAutoMarks();">Delete</button></div>`; });
                 }
-                
-                calculateAutoMarks();
-                btn.innerText = "Fetch Data 📥";
-                alert("Board Data Fetched Successfully!");
+                calculateAutoMarks(); btn.innerText = "Fetch Data 📥"; alert("Board Data Fetched Successfully!");
             }, 1000);
         }
 
         let currentEditRoll = null;
         function openAddEditStudentModal(roll) {
+            populateAllDropdowns();
             document.getElementById('universalStudentModal').style.display = 'flex';
             let sBody = document.getElementById('us-subject-container');
+            
             if(roll && typeof roll === 'string') {
-                currentEditRoll = roll; let student = studentDataStore.find(s => s.roll === roll);
+                currentEditRoll = roll;
+                let student = studentDataStore.find(s => s.roll === roll);
                 document.getElementById('us-modal-title').innerText = "Edit Student & Subjects";
                 document.getElementById('us-roll').value = student.roll; document.getElementById('us-name').value = student.name; 
                 document.getElementById('us-fname').value = student.fname; document.getElementById('us-mname').value = student.mname || "";
                 document.getElementById('us-dob').value = student.dob || ""; document.getElementById('us-mobile').value = student.mobile || "";
                 document.getElementById('us-pan').value = student.pan || ""; document.getElementById('us-apar').value = student.apar || "";
-                document.getElementById('us-photo-data').value = student.photo || ""; document.getElementById('us-photo-input').value = ""; 
+                document.getElementById('us-class').value = student.class_name || "";
+                document.getElementById('us-photo-data').value = student.photo || "";
+                document.getElementById('us-photo-input').value = ""; 
+                
                 sBody.innerHTML = "";
-                student.subjects.forEach(sub => sBody.innerHTML += `<div class="sub-row"><input type="text" value="${sub.code}" class="input-box sub-code" style="padding:6px;"><input type="text" value="${sub.name}" class="input-box sub-name" style="padding:6px;"><input type="number" value="${sub.max}" class="input-box sub-max" style="padding:6px;" oninput="calculateAutoMarks()"><input type="number" value="${sub.sec}" class="input-box sub-sec" style="padding:6px;" oninput="calculateAutoMarks()"><button type="button" style="background:#dc2626; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('.sub-row').remove(); calculateAutoMarks();">Delete</button></div>`);
+                student.subjects.forEach(sub => {
+                    sBody.innerHTML += `<div class="sub-row"><input type="text" value="${sub.code}" class="input-box sub-code" style="padding:6px;"><input type="text" value="${sub.name}" class="input-box sub-name" style="padding:6px;"><input type="number" value="${sub.max}" class="input-box sub-max" style="padding:6px;" oninput="calculateAutoMarks()"><input type="number" value="${sub.sec}" class="input-box sub-sec" style="padding:6px;" oninput="calculateAutoMarks()"><button type="button" style="background:#dc2626; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('.sub-row').remove(); calculateAutoMarks();">Delete</button></div>`;
+                });
             } else {
                 currentEditRoll = null; document.getElementById('us-modal-title').innerText = "Add Student & Subjects Manually";
                 document.getElementById('us-roll').value = ""; document.getElementById('us-name').value = ""; document.getElementById('us-fname').value = ""; 
                 document.getElementById('us-mname').value = ""; document.getElementById('us-dob').value = ""; document.getElementById('us-mobile').value = "";
-                document.getElementById('us-pan').value = ""; document.getElementById('us-apar').value = "";
+                document.getElementById('us-pan').value = ""; document.getElementById('us-apar').value = ""; document.getElementById('us-class').value = "";
                 document.getElementById('us-photo-data').value = ""; document.getElementById('us-photo-input').value = "";
-                sBody.innerHTML = `<div class="sub-row"><input type="text" value="FLO" class="input-box sub-code" style="padding:6px;"><input type="text" value="FIRST LANGUAGE ODIA" class="input-box sub-name" style="padding:6px;"><input type="number" value="100" class="input-box sub-max" style="padding:6px;" oninput="calculateAutoMarks()"><input type="number" value="" class="input-box sub-sec" style="padding:6px;" oninput="calculateAutoMarks()"><button type="button" style="background:#dc2626; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('.sub-row').remove(); calculateAutoMarks();">Delete</button></div>`;
+                
+                sBody.innerHTML = `<div class="sub-row"><input type="text" value="FLO" class="input-box sub-code" style="padding:6px;"><input type="text" value="FIRST LANGUAGE" class="input-box sub-name" style="padding:6px;"><input type="number" value="100" class="input-box sub-max" style="padding:6px;" oninput="calculateAutoMarks()"><input type="number" value="" class="input-box sub-sec" style="padding:6px;" oninput="calculateAutoMarks()"><button type="button" style="background:#dc2626; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('.sub-row').remove(); calculateAutoMarks();">Delete</button></div>`;
             }
             calculateAutoMarks();
         }
@@ -986,6 +1037,7 @@
                 mobile: document.getElementById('us-mobile').value.trim(), 
                 pan: document.getElementById('us-pan').value.trim(), 
                 apar: document.getElementById('us-apar').value.trim(), 
+                class_name: document.getElementById('us-class').value,
                 school: activeSchoolName, photo: photoData, 
                 total: parseFloat(document.getElementById('auto-sec').innerText), max: parseFloat(document.getElementById('auto-max').innerText), 
                 grade: document.getElementById('us-final-pctgrade').value, status: document.getElementById('us-final-status').value, subjects: subs 
@@ -1006,8 +1058,9 @@
             registeredSchools.forEach(s => { if(s.status === "Approved") { select.innerHTML += `<option value="${s.id}">${s.name} (${s.id})</option>`; } });
         }
         function openStudentRegistration() { document.getElementById('student-form-step').style.display = 'block'; document.getElementById('student-payment-step').style.display = 'none'; publicRegPhotoBase64 = ""; document.getElementById('reg-s-photo').value = ""; openPage('student-reg'); }
+        
         function validateStudentForm() {
-            let reqIds = ['reg-s-name', 'reg-s-gender', 'reg-s-dob', 'reg-s-mname', 'reg-s-fname', 'reg-s-aadhaar', 'reg-s-mobile', 'reg-s-blood', 'reg-s-minority', 'reg-s-category', 'reg-s-address', 'reg-s-pin', 'reg-s-state', 'reg-s-lang', 'reg-s-mail', 'reg-s-school', 'reg-s-pan', 'reg-s-apar'];
+            let reqIds = ['reg-s-name', 'reg-s-gender', 'reg-s-dob', 'reg-s-mname', 'reg-s-fname', 'reg-s-aadhaar', 'reg-s-mobile', 'reg-s-blood', 'reg-s-minority', 'reg-s-category', 'reg-s-address', 'reg-s-pin', 'reg-s-state', 'reg-s-lang', 'reg-s-school', 'reg-s-pan', 'reg-s-apar', 'reg-s-class'];
             for(let id of reqIds) { if(!document.getElementById(id) || !document.getElementById(id).value.trim()) { alert('Please fill all Mandatory (*) Fields correctly!'); return; } }
             if(!publicRegPhotoBase64) { alert("Please Upload Student Photo!"); return; }
 
@@ -1017,8 +1070,8 @@
         }
         function submitStudentApplication() { 
             let utr = document.getElementById('student-utr').value.trim(); if(!utr) { alert("Please enter Transaction ID to verify payment!"); return; } clearInterval(paymentTimerInterval); 
-            let newApp = { appId: Math.floor(Math.random() * 90000 + 10000), name: document.getElementById('reg-s-name').value, fname: document.getElementById('reg-s-fname').value, mobile: document.getElementById('reg-s-mobile').value, gender: document.getElementById('reg-s-gender').value, schoolId: document.getElementById('reg-s-school').value, schoolName: document.getElementById('reg-s-school').options[document.getElementById('reg-s-school').selectedIndex].text, utr: utr, amt: currentStudentFeeTotal, photo: publicRegPhotoBase64 }; 
-            pendingApplications.push(newApp); saveLocalData(); document.getElementById('student-reg').classList.remove('active'); document.getElementById('receipt-title').innerText = "🏫 OFFICIAL ADMISSION RECEIPT"; document.getElementById('receipt-sub').innerText = "Submit this Hard Copy to your Respective School"; document.getElementById('rec-school').parentElement.style.display = 'block'; document.getElementById('rec-app-id').innerText = newApp.appId; document.getElementById('rec-date').innerText = new Date().toLocaleDateString(); document.getElementById('rec-name').innerText = newApp.name; document.getElementById('rec-fname').innerText = newApp.fname; document.getElementById('rec-info').innerText = `Mobile: ${newApp.mobile}`; document.getElementById('rec-school').innerText = newApp.schoolName; document.getElementById('rec-utr').innerText = utr; document.getElementById('rec-amt').innerText = newApp.amt; document.getElementById('receipt-section').classList.add('active'); updateNotificationBadge(); 
+            let newApp = { appId: Math.floor(Math.random() * 90000 + 10000), name: document.getElementById('reg-s-name').value, fname: document.getElementById('reg-s-fname').value, mobile: document.getElementById('reg-s-mobile').value, gender: document.getElementById('reg-s-gender').value, schoolId: document.getElementById('reg-s-school').value, schoolName: document.getElementById('reg-s-school').options[document.getElementById('reg-s-school').selectedIndex].text, class_name: document.getElementById('reg-s-class').value, utr: utr, amt: currentStudentFeeTotal, photo: publicRegPhotoBase64 }; 
+            pendingApplications.push(newApp); saveLocalData(); document.getElementById('student-reg').classList.remove('active'); document.getElementById('receipt-title').innerText = "🏫 OFFICIAL ADMISSION RECEIPT"; document.getElementById('receipt-sub').innerText = "Submit this Hard Copy to your Respective School"; document.getElementById('rec-school').parentElement.style.display = 'block'; document.getElementById('rec-app-id').innerText = newApp.appId; document.getElementById('rec-date').innerText = new Date().toLocaleDateString(); document.getElementById('rec-name').innerText = newApp.name; document.getElementById('rec-fname').innerText = newApp.fname; document.getElementById('rec-info').innerText = `Mobile: ${newApp.mobile} | Class: ${newApp.class_name}`; document.getElementById('rec-school').innerText = newApp.schoolName; document.getElementById('rec-utr').innerText = utr; document.getElementById('rec-amt').innerText = newApp.amt; document.getElementById('receipt-section').classList.add('active'); updateNotificationBadge(); 
         }
         function updateNotificationBadge() { let badge = document.getElementById('notif-badge'); if(!badge) return; if(pendingApplications.length > 0) { badge.innerText = pendingApplications.length; badge.style.display = 'inline-block'; } else { badge.style.display = 'none'; } }
         function renderPendingApplications() { 
@@ -1030,7 +1083,8 @@
             for(let i=0; i<relevantApps.length; i++) { 
                 let app = relevantApps[i]; let row = tbody.insertRow(); 
                 let photoHtml = app.photo ? `<img src="${app.photo}" width="40" height="40" style="border-radius:4px; object-fit:cover;">` : "N/A";
-                row.innerHTML = `<td>${photoHtml}</td><td><b>APP-${app.appId}</b></td><td>${app.name}</td><td><span style="color:#16a34a; font-weight:bold;">${app.utr}</span></td><td><button style="background:#16a34a; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="approveApplication(${app.appId})">Assign Roll & Approve ✅</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="rejectApplication(${app.appId})">Reject ❌</button></td>`; 
+                let studentClass = app.class_name || "N/A";
+                row.innerHTML = `<td>${photoHtml}</td><td><b>APP-${app.appId}</b></td><td>${app.name}</td><td>${studentClass}</td><td><span style="color:#16a34a; font-weight:bold;">${app.utr}</span></td><td><button style="background:#16a34a; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="approveApplication(${app.appId})">Assign Roll & Approve ✅</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="rejectApplication(${app.appId})">Reject ❌</button></td>`; 
             } updateNotificationBadge(); 
         }
         function approveApplication(appId) { 
@@ -1038,9 +1092,9 @@
             if(index > -1) { 
                 let app = pendingApplications[index]; let assignedRoll = prompt(`ASSIGN A ROLL NUMBER:`, "e.g. 155CB0198"); 
                 if(assignedRoll && assignedRoll.trim() !== "") { 
-                    let newStudent = { roll: assignedRoll, name: app.name, fname: app.fname, mname: "", dob: "", mobile: app.mobile, school: app.schoolName, photo: app.photo, total: 0, max: 0, grade: "-", status: "Fail", subjects: [] };
+                    let newStudent = { roll: assignedRoll, name: app.name, fname: app.fname, mname: "", dob: "", mobile: app.mobile, school: app.schoolName, class_name: app.class_name || "X", photo: app.photo, total: 0, max: 0, grade: "-", status: "Fail", subjects: [] };
                     studentDataStore.push(newStudent);
-                    pendingApplications.splice(index, 1); saveLocalData(); refreshTablesFromStore(); alert(`Student Approved! Assigned Roll No: ${assignedRoll}`); renderPendingApplications(app.schoolId); 
+                    pendingApplications.splice(index, 1); saveLocalData(); refreshTablesFromStore(); alert(`Student Approved! Assigned Roll No: ${assignedRoll}`); renderPendingApplications(); 
                 } else { alert("Roll No is required to approve."); } 
             } 
         }
