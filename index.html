@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>School Home Portal - Ultimate Secure Edition</title>
+    <!-- html2pdf library for PDF generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -117,7 +118,7 @@
         <div id="home-view">
             <div class="notice-board">
                 <h4>📢 Important Notice Board</h4>
-                <p id="display-notice">• Official Marksheet & Portal System is live.<br>• NEW: All Minority and Caste Categories added completely.</p>
+                <p id="display-notice">• Official Marksheet & Portal System is live.<br>• Fixed: School Isolation feature added. Schools now only see their own students.</p>
             </div>
 
             <div class="results-btn-card">
@@ -131,7 +132,7 @@
                     <div class="welcome-card">
                         <h3>🌟 Welcome to Digital School Management</h3>
                         <p>Manage your schools, student admissions, and records securely on the cloud platform.</p>
-                        <p><b>✨ Features:</b> All Categories/Minorities, Board Data Auto-Fetch, 100% Data Safety.</p>
+                        <p><b>✨ Features:</b> Multi-School Isolation, Advanced Filtering, 100% Data Safety.</p>
                     </div>
 
                     <div class="section-title">📌 Quick Portal Actions</div>
@@ -214,7 +215,7 @@
 
         <!-- 2. PUBLIC NEW STUDENT REGISTRATION FLOW -->
         <div id="student-reg" class="content-section">
-            <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
+            <button class="back-btn" onclick="goHome()">⬅️️ Back to Home</button>
             
             <div id="student-form-step">
                 <h3 style="color: #0d3b66; margin-bottom:15px;">🎓 Public Student Application Form (20-Point)</h3>
@@ -230,7 +231,6 @@
                     <div><label>8. Mobile No <span class="req">*</span></label><input type="text" id="reg-s-mobile" class="input-box"></div>
                     <div><label>9. Blood Group <span class="req">*</span></label><select id="reg-s-blood" class="input-box"><option value="">Select</option><option value="O+">O+</option><option value="O-">O-</option><option value="A+">A+</option><option value="B+">B+</option><option value="AB+">AB+</option></select></div>
                     
-                    <!-- UPDATED MINORITY AND CATEGORY -->
                     <div><label>10. Minority Group <span class="req">*</span></label>
                         <select id="reg-s-minority" class="input-box">
                             <option value="">Select</option><option value="No">No</option>
@@ -279,7 +279,6 @@
                 <button style="background:#2563eb; color:white; width:100%; padding:15px; border:none; border-radius:8px; font-weight:bold; font-size:16px; margin-top:20px; cursor:pointer;" onclick="validateStudentForm()">Next ➡️ Proceed to Payment</button>
             </div>
 
-            <!-- Student Payment System -->
             <div id="student-payment-step" style="display:none; text-align:center;">
                 <h3 style="color:#0d3b66; margin-bottom:10px;">💳 School Application Fee Payment</h3>
                 <p style="color:#dc2626; font-weight:bold; font-size:18px; margin-bottom:15px;">⏳ Time Left: <span id="payment-timer">30</span> Seconds</p>
@@ -296,7 +295,7 @@
             </div>
         </div>
 
-        <!-- Receipt Section -->
+        <!-- Receipt / Application Form Document Section -->
         <div id="receipt-section" class="content-section" style="background:white;">
             <div style="border:2px solid #0d3b66; padding:30px; border-radius:12px; position:relative;">
                 <h2 id="receipt-title" style="text-align:center; color:#0d3b66; margin-bottom:10px;">🏫 OFFICIAL RECEIPT</h2>
@@ -327,7 +326,6 @@
             <div id="school-login-area">
                 <h3>🏫 School Portal Login</h3>
                 <p style="color: #64748b; margin-bottom: 20px;">Select your Registered State, then enter School ID and Password.</p>
-                
                 <select id="school-login-state" class="input-box state-select-list" style="margin-bottom:15px;"></select>
                 <input type="text" id="school-login-id" placeholder="Enter School Code (e.g. 155CB)" class="input-box" style="margin-bottom:15px;">
                 <input type="password" id="school-login-pass" placeholder="Enter Password" class="input-box" style="margin-bottom:15px;">
@@ -379,9 +377,7 @@
                     <thead>
                         <tr><th>Photo</th><th>Roll No</th><th>Student Name</th><th>Class</th><th>Total Marks</th><th>% & Grade</th><th>Status</th><th>Actions (Edit/Print/Delete)</th></tr>
                     </thead>
-                    <tbody id="school-student-table-body">
-                        <!-- Loaded dynamically -->
-                    </tbody>
+                    <tbody id="school-student-table-body"></tbody>
                 </table>
             </div>
 
@@ -391,9 +387,7 @@
                     <thead>
                         <tr><th>Photo</th><th>App ID</th><th>Student Name</th><th>Class</th><th>Payment Status</th><th>Action (Assign Roll & Approve)</th></tr>
                     </thead>
-                    <tbody id="school-pending-table-body">
-                        <!-- Loaded dynamically -->
-                    </tbody>
+                    <tbody id="school-pending-table-body"></tbody>
                 </table>
             </div>
         </div>
@@ -445,7 +439,7 @@
                 <button class="tab-btn" onclick="switchAdminTab('students-tab-admin', this)">🎓 All Students DB</button>
                 <button class="tab-btn" onclick="switchAdminTab('payment-settings-tab', this)">💳 Global Payments</button>
                 <button class="tab-btn" onclick="switchAdminTab('admin-profile-tab', this)">👤 Admin Profile</button>
-                <button class="tab-btn" onclick="switchAdminTab('settings-tab', this)">⚙️ Portal Settings</button>
+                <button class="tab-btn" onclick="switchAdminTab('settings-tab', this)">⚙️️ Portal Settings</button>
             </div>
 
             <div id="schools-tab" class="admin-tab-content">
@@ -456,9 +450,7 @@
                     <thead>
                         <tr><th>School Name</th><th>School Code</th><th>Login Pass</th><th>Headmaster</th><th>State</th><th>Payment UTR</th><th>Status</th><th>Actions & Settings</th></tr>
                     </thead>
-                    <tbody id="school-table-body">
-                        <!-- Loaded dynamically -->
-                    </tbody>
+                    <tbody id="school-table-body"></tbody>
                 </table>
             </div>
 
@@ -471,9 +463,7 @@
                     <thead>
                         <tr><th>Photo</th><th>Roll No</th><th>Student Name</th><th>Class</th><th>School Name / Info</th><th>Total Marks</th><th>Actions</th></tr>
                     </thead>
-                    <tbody id="student-table-body-admin">
-                        <!-- Loaded dynamically -->
-                    </tbody>
+                    <tbody id="student-table-body-admin"></tbody>
                 </table>
             </div>
 
@@ -507,14 +497,14 @@
             <div id="settings-tab" class="admin-tab-content" style="display:none;">
                 <h3>⚙️ Portal Customization Settings</h3>
                 <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1; margin-bottom:20px;">
-                    <h4>🖼️ Upload / Change Background Photo</h4>
+                    <h4>🖼️️ Upload / Change Background Photo</h4>
                     <input type="file" id="bg-file-input" accept="image/*" style="margin-bottom:10px;"><br>
                     <button style="background:#2563eb; color:white; border:none; padding:8px 20px; border-radius:6px; cursor:pointer;" onclick="changeBackgroundImage()">Update Background 🚀</button>
                 </div>
                 <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1;">
                     <h4>📢 Edit / Update Notice Board</h4>
                     <textarea id="notice-input" rows="5" class="input-box" style="margin-bottom:10px;">• Official Marksheet & Portal System is live.
-• Fixed: All Categories & Minorities added to the forms.</textarea>
+• Fixed: School Isolation feature is properly applied.</textarea>
                     <button style="background:#16a34a; color:white; border:none; padding:8px 20px; border-radius:6px; cursor:pointer;" onclick="updateNoticeBoard()">Save Notice Board 💾</button>
                 </div>
             </div>
@@ -544,7 +534,6 @@
                     <div><label style="font-size:12px; font-weight:bold;">8. Mobile:</label><input type="text" id="us-mobile" class="input-box"></div>
                     <div><label style="font-size:12px; font-weight:bold;">9. Blood Group:</label><select id="us-blood" class="input-box"><option value="O+">O+</option><option value="O-">O-</option><option value="A+">A+</option><option value="B+">B+</option></select></div>
                     
-                    <!-- UPDATED MINORITY AND CATEGORY -->
                     <div><label style="font-size:12px; font-weight:bold;">10. Minority:</label>
                         <select id="us-minority" class="input-box">
                             <option value="">Select</option><option value="No">No</option>
@@ -616,43 +605,6 @@
                 <div style="display:flex; justify-content:flex-end; gap:10px;">
                     <button style="background:#64748b; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="document.getElementById('universalStudentModal').style.display='none'">Cancel</button>
                     <button style="background:#2563eb; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="saveUniversalStudentData()">Save Student & Subjects 💾</button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- ADMIN: Edit School Modal -->
-        <div id="editSchoolModal" class="modal">
-            <div class="modal-content">
-                <h3 style="color:#0d3b66; margin-bottom:15px;">✏️ Verify & Edit School Application</h3>
-                <input type="hidden" id="edit-sch-old-id">
-                <input type="text" id="edit-sch-name" placeholder="School Name" class="input-box" style="margin-bottom:12px;">
-                <input type="text" id="edit-sch-id" placeholder="School Code" class="input-box" style="margin-bottom:12px;">
-                <input type="text" id="edit-sch-hm" placeholder="Headmaster Name" class="input-box" style="margin-bottom:12px;">
-                <input type="text" id="edit-sch-mobile" placeholder="Mobile No" class="input-box" style="margin-bottom:12px;">
-                <select id="edit-sch-state" class="input-box state-select-list" style="margin-bottom:12px;"></select>
-                <div style="display:flex; justify-content:flex-end; gap:10px;">
-                    <button style="background:#64748b; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="document.getElementById('editSchoolModal').style.display='none'">Cancel</button>
-                    <button style="background:#2563eb; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="saveEditedSchool()">Save Changes 💾</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- School Payment Setup Modal -->
-        <div id="schoolPaymentModal" class="modal">
-            <div class="modal-content" style="width:500px;">
-                <h3 style="color:#0d3b66; margin-bottom:10px;">💳 Set School Payment Gateway</h3>
-                <p id="sp-school-name" style="color:#1e3a8a; font-weight:bold; margin-bottom:15px;"></p>
-                <input type="hidden" id="sp-school-id">
-                <label style="font-size:12px; font-weight:bold;">School UPI ID:</label>
-                <input type="text" id="sp-upi" class="input-box" style="margin-bottom:12px;">
-                <label style="font-size:12px; font-weight:bold;">Admission Base Fee (₹):</label>
-                <input type="number" id="sp-fee" class="input-box" style="margin-bottom:12px;">
-                <label style="font-size:12px; font-weight:bold;">GST Option:</label>
-                <select id="sp-gst-opt" class="input-box" style="margin-bottom:12px;" onchange="toggleGstInput()"><option value="none">No GST</option><option value="percent">Apply GST %</option></select>
-                <div id="sp-gst-div" style="display:none;"><label style="font-size:12px; font-weight:bold;">GST Percentage (%):</label><input type="number" id="sp-gst-pct" class="input-box" style="margin-bottom:12px;"></div>
-                <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px;">
-                    <button style="background:#64748b; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="document.getElementById('schoolPaymentModal').style.display='none'">Cancel</button>
-                    <button style="background:#22c55e; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="saveSchoolPaymentSetup()">Save Payment Setup 💾</button>
                 </div>
             </div>
         </div>
@@ -826,14 +778,23 @@
             let adminTbody = document.getElementById('student-table-body-admin');
             schoolTbody.innerHTML = ""; adminTbody.innerHTML = "";
 
+            let isSchoolActive = document.getElementById('school-dashboard').classList.contains('active');
+            let activeSchoolName = "";
+            if (isSchoolActive) {
+                activeSchoolName = document.getElementById('school-dash-title').innerText.replace('🏫 ', '').trim();
+            }
+
             studentDataStore.forEach(s => {
                 let statHtml = s.status === "Pass" ? `<span class="badge-pass">Pass ✅</span>` : `<span class="badge-fail">Fail ❌</span>`;
                 let actBtn = `<button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; margin-right:4px;" onclick="openAddEditStudentModal('${s.roll}')">Edit</button> <button style="background:#1e3a8a; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; margin-right:4px;" onclick="printStudent('${s.roll}')">Print / PDF</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="deleteStudent('${s.roll}')">Delete</button>`;
                 let photoHtml = s.photo ? `<img src="${s.photo}" width="40" height="40" style="border-radius:4px; object-fit:cover;">` : "N/A";
                 let studentClass = s.class_name || "N/A";
 
-                schoolTbody.innerHTML += `<tr><td>${photoHtml}</td><td><b>${s.roll}</b></td><td>${s.name}</td><td>${studentClass}</td><td><b style="color:#16a34a;">${s.total} / ${s.max}</b></td><td>${((s.total/s.max)*100).toFixed(2)}% (${s.grade})</td><td>${statHtml}</td><td>${actBtn}</td></tr>`;
                 adminTbody.innerHTML += `<tr><td>${photoHtml}</td><td><b>${s.roll}</b></td><td>${s.name}</td><td>${studentClass}</td><td>${s.school}</td><td><b style="color:#16a34a;">${s.total} / ${s.max}</b></td><td>${actBtn}</td></tr>`;
+
+                if (s.school === activeSchoolName && activeSchoolName !== "School Dashboard") {
+                    schoolTbody.innerHTML += `<tr><td>${photoHtml}</td><td><b>${s.roll}</b></td><td>${s.name}</td><td>${studentClass}</td><td><b style="color:#16a34a;">${s.total} / ${s.max}</b></td><td>${((s.total/s.max)*100).toFixed(2)}% (${s.grade})</td><td>${statHtml}</td><td>${actBtn}</td></tr>`;
+                }
             });
             renderPendingApplications();
         }
@@ -1054,7 +1015,7 @@
             for(let i=0; i<codes.length; i++){ subs.push({ code: codes[i].value, name: names[i].value, max: parseFloat(maxs[i].value)||0, sec: parseFloat(secs[i].value)||0 }); }
 
             let activeSchoolName = "Master Admin";
-            if(document.getElementById('school-dashboard').classList.contains('active')) { activeSchoolName = document.getElementById('school-dash-title').innerText.replace('🏫 ', ''); }
+            if(document.getElementById('school-dashboard').classList.contains('active')) { activeSchoolName = document.getElementById('school-dash-title').innerText.replace('🏫 ', '').trim(); }
 
             let photoData = document.getElementById('us-photo-data').value;
             let studentObj = { 
@@ -1126,7 +1087,22 @@
         }
         function rejectApplication(appId) { if(confirm("Are you sure?")) { let index = pendingApplications.findIndex(a => a.appId === appId); if(index > -1) { pendingApplications.splice(index, 1); saveLocalData(); renderPendingApplications(); } } }
 
-        function validateSchoolLogin() { let state = document.getElementById('school-login-state').value; let sId = document.getElementById('school-login-id').value.trim(); let pass = document.getElementById('school-login-pass').value.trim(); if(!state) { alert("Please select your registered State!"); return; } let match = registeredSchools.find(s => s.id.toLowerCase() === sId.toLowerCase() && s.pass === pass && s.state === state); if(match) { if(match.status !== "Approved") { alert("Your School Registration is still pending Master Admin Approval. You cannot login yet."); return; } document.getElementById('school-dash-title').innerText = `🏫 ${match.name}`; document.getElementById('school-dash-sub').innerText = `ID: ${match.id} | HM: ${match.hm}`; renderPendingApplications(match.id); switchSchoolTab('school-enrolled-tab', document.getElementById('school-dashboard').getElementsByClassName('tab-btn')[0]); openPage('school-dashboard'); } else { alert('Invalid State, School ID, or Password!'); } }
+        function validateSchoolLogin() { 
+            let state = document.getElementById('school-login-state').value; 
+            let sId = document.getElementById('school-login-id').value.trim(); 
+            let pass = document.getElementById('school-login-pass').value.trim(); 
+            if(!state) { alert("Please select your registered State!"); return; } 
+            let match = registeredSchools.find(s => s.id.toLowerCase() === sId.toLowerCase() && s.pass === pass && s.state === state); 
+            if(match) { 
+                if(match.status !== "Approved") { alert("Your School Registration is still pending Master Admin Approval. You cannot login yet."); return; } 
+                openPage('school-dashboard');
+                document.getElementById('school-dash-title').innerText = `🏫 ${match.name}`; 
+                document.getElementById('school-dash-sub').innerText = `ID: ${match.id} | HM: ${match.hm}`; 
+                refreshTablesFromStore(); 
+                switchSchoolTab('school-enrolled-tab', document.getElementById('school-dashboard').getElementsByClassName('tab-btn')[0]); 
+            } else { alert('Invalid State, School ID, or Password!'); } 
+        }
+
         function openSchoolForgotPassword() { document.getElementById('school-login-area').style.display = 'none'; document.getElementById('school-forgot-area').style.display = 'block'; }
         function cancelSchoolForgot() { document.getElementById('school-forgot-area').style.display = 'none'; document.getElementById('school-login-area').style.display = 'block'; document.getElementById('school-login-otp-div').style.display = 'none'; document.getElementById('school-newpass-div').style.display = 'none'; resettingSchoolId = ""; }
         function sendSchoolLoginOTP() { let email = document.getElementById('school-reset-email').value.trim(); if(!email) { alert("Please enter your registered School Email!"); return; } let school = registeredSchools.find(s => s.email && s.email.toLowerCase() === email.toLowerCase()); if(!school) { alert("This email is not registered or approved!"); return; } resettingSchoolId = school.id; schLoginGenOtp = Math.floor(100000 + Math.random() * 900000).toString(); alert(`Simulation: OTP sent to ${email}.\nOTP is: ${schLoginGenOtp}`); document.getElementById('school-login-otp-div').style.display = 'block'; }
