@@ -65,7 +65,7 @@
         .modal-content { background: white; padding: 30px; border-radius: 20px; width: 850px; max-width: 95%; box-shadow: 0 25px 50px rgba(0,0,0,0.4); max-height: 90vh; overflow-y: auto; }
         .sub-row { display: grid; grid-template-columns: 1fr 2fr 1fr 1fr auto; gap: 8px; margin-bottom: 8px; align-items: center; }
 
-        /* ================= CERTIFICATE DESIGN ================= */
+        /* ================= CERTIFICATE DESIGN (FIXED RENDERING & COLORS) ================= */
         #marksheet-print-area { display: none; width: 800px; max-width: 100%; background-color: white; margin: 0 auto; position: relative; padding: 20px; font-family: 'Times New Roman', Times, serif; color: #3b0764; box-sizing: border-box; }
         .cert-border { border: 12px solid #d8b4e2; border-image: repeating-linear-gradient(45deg, #d8b4e2, #d8b4e2 10px, #e8d0ef 10px, #e8d0ef 20px) 15; height: 100%; padding: 15px; position: relative; z-index: 2; display: flex; flex-direction: column; justify-content: space-between; }
         .cert-watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.05; font-size: 60px; font-weight: bold; color: #3b0764; z-index: 1; pointer-events: none; user-select: none; white-space: pre; text-align: center; line-height: 1.2; width: 100%; word-wrap: break-word; }
@@ -117,7 +117,7 @@
         <div id="home-view">
             <div class="notice-board">
                 <h4>📢 Important Notice Board</h4>
-                <p id="display-notice">• Official Marksheet & Portal System is live.<br>• NEW: Class Section Added (I to X & X Pass Out)!</p>
+                <p id="display-notice">• Official Marksheet & Portal System is live.<br>• NEW: All Minority and Caste Categories added completely.</p>
             </div>
 
             <div class="results-btn-card">
@@ -131,7 +131,7 @@
                     <div class="welcome-card">
                         <h3>🌟 Welcome to Digital School Management</h3>
                         <p>Manage your schools, student admissions, and records securely on the cloud platform.</p>
-                        <p><b>✨ Features:</b> Class Selection Added, Real Board Data Auto-Fetch, 100% Data Safety.</p>
+                        <p><b>✨ Features:</b> All Categories/Minorities, Board Data Auto-Fetch, 100% Data Safety.</p>
                     </div>
 
                     <div class="section-title">📌 Quick Portal Actions</div>
@@ -229,8 +229,24 @@
                     <div><label>7. Admission Date</label><input type="text" id="reg-s-admdate" placeholder="DD/MM/YYYY" class="input-box"></div>
                     <div><label>8. Mobile No <span class="req">*</span></label><input type="text" id="reg-s-mobile" class="input-box"></div>
                     <div><label>9. Blood Group <span class="req">*</span></label><select id="reg-s-blood" class="input-box"><option value="">Select</option><option value="O+">O+</option><option value="O-">O-</option><option value="A+">A+</option><option value="B+">B+</option><option value="AB+">AB+</option></select></div>
-                    <div><label>10. Minority Group <span class="req">*</span></label><select id="reg-s-minority" class="input-box"><option value="">Select</option><option value="No">No</option><option value="Muslim">Muslim</option><option value="Christian">Christian</option></select></div>
-                    <div><label>11. Social Category <span class="req">*</span></label><select id="reg-s-category" class="input-box"><option value="">Select</option><option value="GENERAL">GENERAL</option><option value="OBC">OBC</option><option value="SC">SC</option><option value="ST">ST</option></select></div>
+                    
+                    <!-- UPDATED MINORITY AND CATEGORY -->
+                    <div><label>10. Minority Group <span class="req">*</span></label>
+                        <select id="reg-s-minority" class="input-box">
+                            <option value="">Select</option><option value="No">No</option>
+                            <option value="Muslim">Muslim</option><option value="Christian">Christian</option>
+                            <option value="Sikh">Sikh</option><option value="Buddhist">Buddhist</option>
+                            <option value="Parsi">Parsi</option><option value="Jain">Jain</option><option value="Others">Others</option>
+                        </select>
+                    </div>
+                    <div><label>11. Social Category <span class="req">*</span></label>
+                        <select id="reg-s-category" class="input-box">
+                            <option value="">Select</option><option value="GENERAL">GENERAL</option>
+                            <option value="OBC">OBC</option><option value="SEBC">SEBC</option>
+                            <option value="SC">SC</option><option value="ST">ST</option>
+                        </select>
+                    </div>
+                    
                     <div><label>12. PAN No <span class="req">*</span></label><input type="text" id="reg-s-pan" class="input-box" placeholder="e.g. ABCDE1234F"></div>
                     <div><label>13. APAR ID No <span class="req">*</span></label><input type="text" id="reg-s-apar" class="input-box"></div>
                     <div><label>14. Address <span class="req">*</span></label><input type="text" id="reg-s-address" class="input-box"></div>
@@ -239,22 +255,14 @@
                     <div><label>17. Local Language <span class="req">*</span></label><select id="reg-s-lang" class="input-box lang-select-list"></select></div>
                     <div><label>18. Mail ID <span class="req">*</span></label><input type="text" id="reg-s-mail" class="input-box"></div>
                     
-                    <!-- NEW CLASS DROPDOWN -->
                     <div style="background:#fef08a; padding:10px; border-radius:8px; border:1px solid #ca8a04;">
                         <label style="font-weight:bold; color:#854d0e;">19. Class Section <span class="req">*</span></label>
                         <select id="reg-s-class" class="input-box" style="border:1px solid #ca8a04;">
                             <option value="">-- Select Class --</option>
-                            <option value="I">Class I</option>
-                            <option value="II">Class II</option>
-                            <option value="III">Class III</option>
-                            <option value="IV">Class IV</option>
-                            <option value="V">Class V</option>
-                            <option value="VI">Class VI</option>
-                            <option value="VII">Class VII</option>
-                            <option value="VIII">Class VIII</option>
-                            <option value="IX">Class IX</option>
-                            <option value="X">Class X</option>
-                            <option value="X Pass Out">X Pass Out</option>
+                            <option value="I">Class I</option><option value="II">Class II</option><option value="III">Class III</option>
+                            <option value="IV">Class IV</option><option value="V">Class V</option><option value="VI">Class VI</option>
+                            <option value="VII">Class VII</option><option value="VIII">Class VIII</option><option value="IX">Class IX</option>
+                            <option value="X">Class X</option><option value="X Pass Out">X Pass Out</option>
                         </select>
                     </div>
 
@@ -271,6 +279,7 @@
                 <button style="background:#2563eb; color:white; width:100%; padding:15px; border:none; border-radius:8px; font-weight:bold; font-size:16px; margin-top:20px; cursor:pointer;" onclick="validateStudentForm()">Next ➡️ Proceed to Payment</button>
             </div>
 
+            <!-- Student Payment System -->
             <div id="student-payment-step" style="display:none; text-align:center;">
                 <h3 style="color:#0d3b66; margin-bottom:10px;">💳 School Application Fee Payment</h3>
                 <p style="color:#dc2626; font-weight:bold; font-size:18px; margin-bottom:15px;">⏳ Time Left: <span id="payment-timer">30</span> Seconds</p>
@@ -318,6 +327,7 @@
             <div id="school-login-area">
                 <h3>🏫 School Portal Login</h3>
                 <p style="color: #64748b; margin-bottom: 20px;">Select your Registered State, then enter School ID and Password.</p>
+                
                 <select id="school-login-state" class="input-box state-select-list" style="margin-bottom:15px;"></select>
                 <input type="text" id="school-login-id" placeholder="Enter School Code (e.g. 155CB)" class="input-box" style="margin-bottom:15px;">
                 <input type="password" id="school-login-pass" placeholder="Enter Password" class="input-box" style="margin-bottom:15px;">
@@ -369,7 +379,9 @@
                     <thead>
                         <tr><th>Photo</th><th>Roll No</th><th>Student Name</th><th>Class</th><th>Total Marks</th><th>% & Grade</th><th>Status</th><th>Actions (Edit/Print/Delete)</th></tr>
                     </thead>
-                    <tbody id="school-student-table-body"></tbody>
+                    <tbody id="school-student-table-body">
+                        <!-- Loaded dynamically -->
+                    </tbody>
                 </table>
             </div>
 
@@ -379,7 +391,9 @@
                     <thead>
                         <tr><th>Photo</th><th>App ID</th><th>Student Name</th><th>Class</th><th>Payment Status</th><th>Action (Assign Roll & Approve)</th></tr>
                     </thead>
-                    <tbody id="school-pending-table-body"></tbody>
+                    <tbody id="school-pending-table-body">
+                        <!-- Loaded dynamically -->
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -442,7 +456,9 @@
                     <thead>
                         <tr><th>School Name</th><th>School Code</th><th>Login Pass</th><th>Headmaster</th><th>State</th><th>Payment UTR</th><th>Status</th><th>Actions & Settings</th></tr>
                     </thead>
-                    <tbody id="school-table-body"></tbody>
+                    <tbody id="school-table-body">
+                        <!-- Loaded dynamically -->
+                    </tbody>
                 </table>
             </div>
 
@@ -455,7 +471,9 @@
                     <thead>
                         <tr><th>Photo</th><th>Roll No</th><th>Student Name</th><th>Class</th><th>School Name / Info</th><th>Total Marks</th><th>Actions</th></tr>
                     </thead>
-                    <tbody id="student-table-body-admin"></tbody>
+                    <tbody id="student-table-body-admin">
+                        <!-- Loaded dynamically -->
+                    </tbody>
                 </table>
             </div>
 
@@ -496,13 +514,13 @@
                 <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1;">
                     <h4>📢 Edit / Update Notice Board</h4>
                     <textarea id="notice-input" rows="5" class="input-box" style="margin-bottom:10px;">• Official Marksheet & Portal System is live.
-• Fixed: Class Section Dropdown has been added to Registration & Certificate!</textarea>
+• Fixed: All Categories & Minorities added to the forms.</textarea>
                     <button style="background:#16a34a; color:white; border:none; padding:8px 20px; border-radius:6px; cursor:pointer;" onclick="updateNoticeBoard()">Save Notice Board 💾</button>
                 </div>
             </div>
         </div>
 
-        <!-- UNIVERSAL Add/Edit Student Modal (18 Points + Subjects + Photo + Class + Auto Calc) -->
+        <!-- UNIVERSAL Add/Edit Student Modal -->
         <div id="universalStudentModal" class="modal">
             <div class="modal-content">
                 <h3 id="us-modal-title" style="color:#0d3b66; margin-bottom:15px;">Add/Edit Student & Marksheet (18-Point)</h3>
@@ -525,8 +543,24 @@
                     <div><label style="font-size:12px; font-weight:bold;">7. Adm Date:</label><input type="text" id="us-admdate" placeholder="DD/MM/YYYY" class="input-box"></div>
                     <div><label style="font-size:12px; font-weight:bold;">8. Mobile:</label><input type="text" id="us-mobile" class="input-box"></div>
                     <div><label style="font-size:12px; font-weight:bold;">9. Blood Group:</label><select id="us-blood" class="input-box"><option value="O+">O+</option><option value="O-">O-</option><option value="A+">A+</option><option value="B+">B+</option></select></div>
-                    <div><label style="font-size:12px; font-weight:bold;">10. Minority:</label><select id="us-minority" class="input-box"><option value="No">No</option><option value="Muslim">Muslim</option></select></div>
-                    <div><label style="font-size:12px; font-weight:bold;">11. Category:</label><select id="us-category" class="input-box"><option value="GENERAL">GENERAL</option><option value="SC">SC</option></select></div>
+                    
+                    <!-- UPDATED MINORITY AND CATEGORY -->
+                    <div><label style="font-size:12px; font-weight:bold;">10. Minority:</label>
+                        <select id="us-minority" class="input-box">
+                            <option value="">Select</option><option value="No">No</option>
+                            <option value="Muslim">Muslim</option><option value="Christian">Christian</option>
+                            <option value="Sikh">Sikh</option><option value="Buddhist">Buddhist</option>
+                            <option value="Parsi">Parsi</option><option value="Jain">Jain</option><option value="Others">Others</option>
+                        </select>
+                    </div>
+                    <div><label style="font-size:12px; font-weight:bold;">11. Category:</label>
+                        <select id="us-category" class="input-box">
+                            <option value="">Select</option><option value="GENERAL">GENERAL</option>
+                            <option value="OBC">OBC</option><option value="SEBC">SEBC</option>
+                            <option value="SC">SC</option><option value="ST">ST</option>
+                        </select>
+                    </div>
+
                     <div><label style="font-size:12px; font-weight:bold;">12. PAN No <span class="req">*</span>:</label><input type="text" id="us-pan" class="input-box" placeholder="e.g. ABCDE1234F"></div>
                     <div><label style="font-size:12px; font-weight:bold;">13. APAR ID <span class="req">*</span>:</label><input type="text" id="us-apar" class="input-box"></div>
                     <div><label style="font-size:12px; font-weight:bold;">14. Address:</label><input type="text" id="us-address" class="input-box"></div>
@@ -535,22 +569,14 @@
                     <div><label style="font-size:12px; font-weight:bold;">17. Language:</label><select id="us-lang" class="input-box lang-select-list"></select></div>
                     <div style="grid-column: span 2;"><label style="font-size:12px; font-weight:bold;">18. Mail ID:</label><input type="text" id="us-mail" class="input-box"></div>
                     
-                    <!-- NEW CLASS SECTION IN MODAL -->
                     <div style="background:#fef08a; padding:10px; border-radius:8px; border:1px solid #ca8a04;">
                         <label style="font-size:12px; font-weight:bold; color:#854d0e;">19. Class Section <span class="req">*</span></label>
                         <select id="us-class" class="input-box" style="border:1px solid #ca8a04;">
                             <option value="">-- Select Class --</option>
-                            <option value="I">Class I</option>
-                            <option value="II">Class II</option>
-                            <option value="III">Class III</option>
-                            <option value="IV">Class IV</option>
-                            <option value="V">Class V</option>
-                            <option value="VI">Class VI</option>
-                            <option value="VII">Class VII</option>
-                            <option value="VIII">Class VIII</option>
-                            <option value="IX">Class IX</option>
-                            <option value="X">Class X</option>
-                            <option value="X Pass Out">X Pass Out</option>
+                            <option value="I">Class I</option><option value="II">Class II</option><option value="III">Class III</option>
+                            <option value="IV">Class IV</option><option value="V">Class V</option><option value="VI">Class VI</option>
+                            <option value="VII">Class VII</option><option value="VIII">Class VIII</option><option value="IX">Class IX</option>
+                            <option value="X">Class X</option><option value="X Pass Out">X Pass Out</option>
                         </select>
                     </div>
 
@@ -760,7 +786,7 @@
         let publicRegPhotoBase64 = ""; 
         
         let studentDataStore = JSON.parse(localStorage.getItem('studentDataStore')) || [
-            { roll: "155CB0197", name: "DIBYANSHI DAS", class_name: "X Pass Out", fname: "ANTARYAMI DAS", mname: "SHASHIKALA DAS", dob: "30/09/2010", mobile: "9876543210", pan: "ABCDE1234F", apar: "123456789012", school: "SRI BAIRAGI SARASWATI SISHU VIDYAMANDIR", photo: "", total: 360, max: 600, grade: "B1", status: "Pass", subjects: [{code:"FLO", name:"FIRST LANGUAGE ODIA", max:100, sec:87}, {code:"SLE", name:"SECOND LANGUAGE ENGLISH", max:100, sec:81}, {code:"TLS", name:"THIRD LANGUAGE SANSKRIT", max:100, sec:92}, {code:"MTH", name:"MATHEMATICS", max:100, sec:69}, {code:"GSC", name:"GENERAL SCIENCE", max:100, sec:73}, {code:"SSC", name:"SOCIAL SCIENCE", max:100, sec:66}] }
+            { roll: "155CB0077", name: "ADYASHA SAHOO", class_name: "X Pass Out", fname: "UTTAM KUMAR SAHOO", mname: "MAMATARANI SAHU", dob: "20/03/2011", mobile: "9876543210", pan: "ABCDE1234F", apar: "123456789012", school: "SRI BAIRAGI SARASWATI SISHU VIDYAMANDIR", photo: "", total: 468, max: 600, grade: "B1", status: "Pass", subjects: [{code:"FLO", name:"FIRST LANGUAGE ODIA", max:100, sec:87}, {code:"SLE", name:"SECOND LANGUAGE ENGLISH", max:100, sec:81}, {code:"TLS", name:"THIRD LANGUAGE SANSKRIT", max:100, sec:92}, {code:"MTH", name:"MATHEMATICS", max:100, sec:69}, {code:"GSC", name:"GENERAL SCIENCE", max:100, sec:73}, {code:"SSC", name:"SOCIAL SCIENCE", max:100, sec:66}] }
         ];
 
         function saveLocalData() {
