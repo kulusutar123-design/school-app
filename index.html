@@ -118,7 +118,7 @@
         <div id="home-view">
             <div class="notice-board">
                 <h4>📢 Important Notice Board</h4>
-                <p id="display-notice">• Official Marksheet & Portal System is live.<br>• <b>NEW: Dedicated Class Filter added inside School Dashboard!</b></p>
+                <p id="display-notice">• Official Marksheet & Portal System is live.<br>• <b>NEW: Half-Yearly Exam mode & Student Promotion features added!</b></p>
             </div>
 
             <div class="results-btn-card">
@@ -132,7 +132,7 @@
                     <div class="welcome-card">
                         <h3>🌟 Welcome to Digital School Management</h3>
                         <p>Manage your schools, student admissions, and records securely on the cloud platform.</p>
-                        <p><b>✨ Features:</b> Accurate Auto-Fetch, Advanced Class Filter, 100% Data Safety.</p>
+                        <p><b>✨ Features:</b> Accurate Auto-Fetch (Marks + PEN/APAR), Half-Yearly/Annual mode, Student Promotion Tool.</p>
                     </div>
 
                     <div class="section-title">📌 Quick Portal Actions</div>
@@ -161,7 +161,7 @@
 
         <!-- 1. PUBLIC NEW SCHOOL REGISTRATION FLOW -->
         <div id="school-reg" class="content-section">
-            <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
+            <button class="back-btn" onclick="goHome()">⬅️️ Back to Home</button>
             
             <div id="school-form-step">
                 <h3 style="color: #0d3b66; margin-bottom:15px;">📝 New School Registration Form</h3>
@@ -218,7 +218,7 @@
             <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
             
             <div id="student-form-step">
-                <h3 style="color: #0d3b66; margin-bottom:15px;">🎓 Public Student Application Form (20-Point)</h3>
+                <h3 style="color: #0d3b66; margin-bottom:15px;">🎓 Public Student Application Form</h3>
                 
                 <div class="form-grid">
                     <div><label>1. Student's Name <span class="req">*</span></label><input type="text" id="reg-s-name" class="input-box"></div>
@@ -296,7 +296,7 @@
             </div>
         </div>
 
-        <!-- Receipt / Application Form Document Section -->
+        <!-- Receipt -->
         <div id="receipt-section" class="content-section" style="background:white;">
             <div style="border:2px solid #0d3b66; padding:30px; border-radius:12px; position:relative;">
                 <h2 id="receipt-title" style="text-align:center; color:#0d3b66; margin-bottom:10px;">🏫 OFFICIAL RECEIPT</h2>
@@ -315,7 +315,7 @@
                     <p style="color:#166534;"><b>Transaction ID:</b> <span id="rec-utr"></span> | <b>Amount Paid:</b> ₹<span id="rec-amt"></span></p>
                     <p style="font-size:12px; margin-top:5px; color:#991b1b; font-weight:bold;">Currently Pending Admin/School Approval.</p>
                 </div>
-                <button class="no-print" style="background:#2563eb; color:white; width:100%; padding:15px; border:none; border-radius:8px; font-weight:bold; font-size:16px; margin-top:20px; cursor:pointer;" onclick="window.print()">🖨️ Print Hard Copy</button>
+                <button class="no-print" style="background:#2563eb; color:white; width:100%; padding:15px; border:none; border-radius:8px; font-weight:bold; font-size:16px; margin-top:20px; cursor:pointer;" onclick="window.print()">🖨️️ Print Hard Copy</button>
                 <button class="no-print" style="background:#64748b; color:white; width:100%; padding:10px; border:none; border-radius:8px; font-weight:bold; margin-top:10px; cursor:pointer;" onclick="goHome()">⬅️ Return Home</button>
             </div>
         </div>
@@ -366,6 +366,7 @@
 
             <div style="margin-bottom: 20px; display: flex; gap: 10px;">
                 <button class="tab-btn active-tab" onclick="switchSchoolTab('school-enrolled-tab', this)">🎓 My Students & Marks</button>
+                <button class="tab-btn" onclick="switchSchoolTab('school-promote-tab', this)">🎓 Promote Students</button>
                 <button class="tab-btn" onclick="switchSchoolTab('school-pending-tab', this)" style="position:relative;">🔔 Admission Requests <span id="notif-badge" style="background:red; color:white; border-radius:50%; padding:2px 6px; font-size:12px; display:none;">1</span></button>
             </div>
 
@@ -377,27 +378,59 @@
                         <label style="font-weight: bold; color: #0d3b66;">Filter by Class:</label>
                         <select id="school-class-filter" class="input-box" style="padding: 8px; width: auto; border:1px solid #0d3b66;" onchange="refreshTablesFromStore()">
                             <option value="ALL">-- All Classes --</option>
-                            <option value="I">Class I</option>
-                            <option value="II">Class II</option>
-                            <option value="III">Class III</option>
-                            <option value="IV">Class IV</option>
-                            <option value="V">Class V</option>
-                            <option value="VI">Class VI</option>
-                            <option value="VII">Class VII</option>
-                            <option value="VIII">Class VIII</option>
-                            <option value="IX">Class IX</option>
-                            <option value="X">Class X</option>
-                            <option value="X Pass Out">X Pass Out</option>
+                            <option value="I">Class I</option><option value="II">Class II</option><option value="III">Class III</option>
+                            <option value="IV">Class IV</option><option value="V">Class V</option><option value="VI">Class VI</option>
+                            <option value="VII">Class VII</option><option value="VIII">Class VIII</option><option value="IX">Class IX</option>
+                            <option value="X">Class X</option><option value="X Pass Out">X Pass Out</option>
                         </select>
                         <button style="background:#16a34a; color:white; border:none; padding:10px 20px; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="openAddEditStudentModal(null)">➕ Add Student & Marks manually</button>
                     </div>
                 </div>
                 <table>
                     <thead>
-                        <tr><th>Photo</th><th>Roll No</th><th>Student Name</th><th>Class</th><th>Total Marks</th><th>% & Grade</th><th>Status</th><th>Actions (Edit/Print/Delete)</th></tr>
+                        <tr><th>Photo</th><th>Roll No</th><th>Student Name</th><th>Class</th><th>Exam Type</th><th>Total Marks</th><th>% & Grade</th><th>Status</th><th>Actions (Edit/Print/Delete)</th></tr>
                     </thead>
                     <tbody id="school-student-table-body"></tbody>
                 </table>
+            </div>
+
+            <!-- PROMOTE STUDENTS TAB -->
+            <div id="school-promote-tab" class="school-tab-content" style="display:none;">
+                <div style="background:#e0f2fe; padding:20px; border-radius:12px; border:1px solid #bae6fd;">
+                    <h3 style="color:#0369a1; margin-bottom:10px;">🎓 Promote Passed Students to Next Class</h3>
+                    <p style="font-size:14px; color:#0c4a6e; margin-bottom:15px;">Select current class to view students who have passed their exams. You can then promote them in bulk.</p>
+                    
+                    <div style="display:flex; gap:15px; align-items:center; margin-bottom:20px;">
+                        <select id="promote-class-select" class="input-box" style="width:200px;" onchange="loadStudentsForPromotion()">
+                            <option value="">Select Current Class</option>
+                            <option value="I">Class I</option><option value="II">Class II</option><option value="III">Class III</option>
+                            <option value="IV">Class IV</option><option value="V">Class V</option><option value="VI">Class VI</option>
+                            <option value="VII">Class VII</option><option value="VIII">Class VIII</option><option value="IX">Class IX</option>
+                            <option value="X">Class X</option>
+                        </select>
+                        <span style="font-weight:bold;">➡️ Promote To ➡️</span>
+                        <select id="promote-target-class" class="input-box" style="width:200px; border-color:#16a34a;">
+                            <option value="">Select Next Class</option>
+                            <option value="II">Class II</option><option value="III">Class III</option><option value="IV">Class IV</option>
+                            <option value="V">Class V</option><option value="VI">Class VI</option><option value="VII">Class VII</option>
+                            <option value="VIII">Class VIII</option><option value="IX">Class IX</option><option value="X">Class X</option>
+                            <option value="X Pass Out">X Pass Out</option>
+                        </select>
+                        <button style="background:#2563eb; color:white; border:none; padding:10px 20px; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="executePromotion()">Execute Promotion 🚀</button>
+                    </div>
+
+                    <table style="background:white;">
+                        <thead>
+                            <tr>
+                                <th style="width:50px;"><input type="checkbox" id="promo-select-all" onchange="togglePromoCheckboxes(this)"></th>
+                                <th>Roll No</th><th>Student Name</th><th>Current Class</th><th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="promo-table-body">
+                            <tr><td colspan="5" style="text-align:center; padding:20px; color:#64748b;">Select a class above to load students.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <div id="school-pending-tab" class="school-tab-content" style="display:none;">
@@ -478,7 +511,7 @@
                     <h3>🎓 Complete Student Database</h3>
                     <div style="display: flex; gap: 10px; align-items: center;">
                         <label style="font-weight: bold; color: #0d3b66;">Filter School:</label>
-                        <select id="admin-school-filter" class="input-box" style="padding: 8px; width: auto;" onchange="refreshTablesFromStore()">
+                        <select id="admin-school-filter" class="input-box" style="padding: 8px; width: auto;" onchange="filterAdminStudents()">
                             <option value="ALL">-- All Schools --</option>
                         </select>
                         <button style="background:#16a34a; color:white; border:none; padding:10px 20px; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="openAddEditStudentModal(null)">➕ Add Student</button>
@@ -522,14 +555,14 @@
             <div id="settings-tab" class="admin-tab-content" style="display:none;">
                 <h3>⚙️ Portal Customization Settings</h3>
                 <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1; margin-bottom:20px;">
-                    <h4>🖼️ Upload / Change Background Photo</h4>
+                    <h4>🖼 Upload / Change Background Photo</h4>
                     <input type="file" id="bg-file-input" accept="image/*" style="margin-bottom:10px;"><br>
                     <button style="background:#2563eb; color:white; border:none; padding:8px 20px; border-radius:6px; cursor:pointer;" onclick="changeBackgroundImage()">Update Background 🚀</button>
                 </div>
                 <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1;">
                     <h4>📢 Edit / Update Notice Board</h4>
                     <textarea id="notice-input" rows="5" class="input-box" style="margin-bottom:10px;">• Official Marksheet & Portal System is live.
-• Fixed: School Dashboard now has an exclusive Class Filter!</textarea>
+• Fixed: Class Filter and Half-Yearly Exam Mode Added!</textarea>
                     <button style="background:#16a34a; color:white; border:none; padding:8px 20px; border-radius:6px; cursor:pointer;" onclick="updateNoticeBoard()">Save Notice Board 💾</button>
                 </div>
             </div>
@@ -597,8 +630,17 @@
                         </select>
                     </div>
 
+                    <!-- NEW: EXAM TYPE FOR HALFYEARLY/ANNUAL -->
+                    <div style="background:#fdf4ff; padding:10px; border-radius:8px; border:1px solid #d946ef;">
+                        <label style="font-size:12px; font-weight:bold; color:#a21caf;">20. Exam Type <span class="req">*</span></label>
+                        <select id="us-exam-type" class="input-box" style="border:1px solid #d946ef;">
+                            <option value="ANNUAL">Annual HSC Examination</option>
+                            <option value="HALF-YEARLY">Half-Yearly Examination</option>
+                        </select>
+                    </div>
+
                     <div style="background:#e0f2fe; padding:10px; border-radius:8px; border:1px solid #bae6fd;">
-                        <label style="font-size:12px; font-weight:bold;">20. Upload Photo:</label>
+                        <label style="font-size:12px; font-weight:bold;">21. Upload Photo:</label>
                         <input type="file" id="us-photo-input" accept="image/*" class="input-box" onchange="handleUsPhotoUpload(event)">
                         <input type="hidden" id="us-photo-data">
                     </div>
@@ -682,7 +724,8 @@
                 <div class="cert-header">
                     <img src="https://cdn-icons-png.flaticon.com/512/167/167707.png" crossorigin="anonymous" alt="School Logo">
                     <h1 id="pm-header-school-name">SCHOOL NAME HERE</h1>
-                    <h2 style="font-family: Arial, sans-serif;">HIGH SCHOOL CERTIFICATE EXAMINATION - 2026</h2>
+                    <!-- DYNAMIC CERTIFICATE TITLE -->
+                    <h2 id="pm-exam-title" style="font-family: Arial, sans-serif;">HIGH SCHOOL CERTIFICATE EXAMINATION - 2026</h2>
                     <h2 style="font-size: 14px; margin-top:5px; color:#3b0764;">CERTIFICATE-CUM-MARK SHEET</h2>
                 </div>
 
@@ -713,7 +756,7 @@
                         <div class="row" style="margin-top:5px;">
                             <div class="value" style="width:100%; border-bottom:1px dashed #4c1d95; padding-bottom:5px;" id="pm-school">SCHOOL NAME</div>
                         </div>
-                        <div class="row" style="margin-top:5px; color:#4c1d95; font-size:12px;">
+                        <div class="row" style="margin-top:5px; color:#4c1d95; font-size:12px;" id="pm-pass-text">
                             ଫେବୃଆରୀ ୨୦୨୬ ରେ ଅନୁଷ୍ଠିତ ମାଧ୍ୟମିକ ଉଚ୍ଚ ବିଦ୍ୟାଳୟ ପ୍ରମାଣପତ୍ର ପରୀକ୍ଷାରେ ଉତ୍ତୀର୍ଣ୍ଣ ହୋଇଛନ୍ତି।<br>
                             Passed the High School Certificate Examination held in the month of February - 2026.
                         </div>
@@ -855,7 +898,7 @@
             if(currentVal) filterDropdown.value = currentVal;
         }
 
-        // --- NEW: SCHOOL DASHBOARD CLASS FILTER ---
+        // --- FILTER ---
         function filterAdminStudents() { refreshTablesFromStore(); }
 
         function refreshTablesFromStore() {
@@ -879,19 +922,99 @@
                 let actBtn = `<button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; margin-right:4px;" onclick="openAddEditStudentModal('${s.roll}')">Edit</button> <button style="background:#1e3a8a; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; margin-right:4px;" onclick="printStudent('${s.roll}')">Print / PDF</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="deleteStudent('${s.roll}')">Delete</button>`;
                 let photoHtml = s.photo ? `<img src="${s.photo}" width="40" height="40" style="border-radius:4px; object-fit:cover;">` : "N/A";
                 let studentClass = s.class_name || "N/A";
+                let examType = s.exam_type || "ANNUAL";
 
                 if (adminTbody && (selectedFilter === "ALL" || s.school === selectedFilter)) {
                     adminTbody.innerHTML += `<tr><td>${photoHtml}</td><td><b>${s.roll}</b></td><td>${s.name}</td><td>${studentClass}</td><td>${s.school}</td><td><b style="color:#16a34a;">${s.total} / ${s.max}</b></td><td>${actBtn}</td></tr>`;
                 }
                 
-                // School Table With Class Filter
                 if (schoolTbody && s.school === activeSchoolName && activeSchoolName !== "School Dashboard") {
                     if (selectedClassFilter === "ALL" || studentClass === selectedClassFilter) {
-                        schoolTbody.innerHTML += `<tr><td>${photoHtml}</td><td><b>${s.roll}</b></td><td>${s.name}</td><td>${studentClass}</td><td><b style="color:#16a34a;">${s.total} / ${s.max}</b></td><td>${((s.total/s.max)*100).toFixed(2)}% (${s.grade})</td><td>${statHtml}</td><td>${actBtn}</td></tr>`;
+                        schoolTbody.innerHTML += `<tr><td>${photoHtml}</td><td><b>${s.roll}</b></td><td>${s.name}</td><td>${studentClass}</td><td>${examType}</td><td><b style="color:#16a34a;">${s.total} / ${s.max}</b></td><td>${((s.total/s.max)*100).toFixed(2)}% (${s.grade})</td><td>${statHtml}</td><td>${actBtn}</td></tr>`;
                     }
                 }
             });
             renderPendingApplications();
+        }
+
+        // --- NEW: STUDENT PROMOTION LOGIC ---
+        function loadStudentsForPromotion() {
+            let selectedClass = document.getElementById('promote-class-select').value;
+            let promoTbody = document.getElementById('promo-table-body');
+            promoTbody.innerHTML = "";
+            document.getElementById('promo-select-all').checked = false;
+
+            if(!selectedClass) {
+                promoTbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px; color:#64748b;">Select a class above to load students.</td></tr>`;
+                return;
+            }
+
+            let isSchoolActive = document.getElementById('school-dashboard') && document.getElementById('school-dashboard').classList.contains('active');
+            let activeSchoolName = "";
+            if (isSchoolActive) { activeSchoolName = document.getElementById('school-dash-title').innerText.replace('🏫 ', '').trim(); }
+
+            let studentsFound = false;
+
+            studentDataStore.forEach(s => {
+                if(s.school === activeSchoolName && s.class_name === selectedClass) {
+                    studentsFound = true;
+                    let statColor = s.status === "Pass" ? "#16a34a" : "#dc2626";
+                    let isChecked = s.status === "Pass" ? "checked" : "disabled"; 
+                    let statusLabel = s.status === "Pass" ? "Eligible (Pass)" : "Not Eligible (Fail)";
+
+                    promoTbody.innerHTML += `<tr>
+                        <td><input type="checkbox" class="promo-checkbox" value="${s.roll}" ${isChecked}></td>
+                        <td><b>${s.roll}</b></td>
+                        <td>${s.name}</td>
+                        <td>${s.class_name}</td>
+                        <td style="color:${statColor}; font-weight:bold;">${statusLabel}</td>
+                    </tr>`;
+                }
+            });
+
+            if(!studentsFound) {
+                promoTbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px; color:#dc2626;">No students found in ${selectedClass}.</td></tr>`;
+            }
+        }
+
+        function togglePromoCheckboxes(masterCheckbox) {
+            let checkboxes = document.querySelectorAll('.promo-checkbox');
+            checkboxes.forEach(cb => {
+                if(!cb.disabled) {
+                    cb.checked = masterCheckbox.checked;
+                }
+            });
+        }
+
+        function executePromotion() {
+            let targetClass = document.getElementById('promote-target-class').value;
+            if(!targetClass) { alert("Please select the Target Class for promotion!"); return; }
+
+            let selectedRolls = [];
+            let checkboxes = document.querySelectorAll('.promo-checkbox');
+            checkboxes.forEach(cb => {
+                if(cb.checked && !cb.disabled) {
+                    selectedRolls.push(cb.value);
+                }
+            });
+
+            if(selectedRolls.length === 0) {
+                alert("No passed students selected for promotion!"); return;
+            }
+
+            if(confirm(`Are you sure you want to promote ${selectedRolls.length} students to ${targetClass}?`)) {
+                studentDataStore.forEach(s => {
+                    if(selectedRolls.includes(s.roll)) {
+                        s.class_name = targetClass;
+                    }
+                });
+                saveLocalData();
+                alert(`Successfully promoted ${selectedRolls.length} students to ${targetClass}!`);
+                document.getElementById('promote-class-select').value = "";
+                document.getElementById('promote-target-class').value = "";
+                loadStudentsForPromotion();
+                refreshTablesFromStore();
+            }
         }
 
         function deleteStudent(roll) {
@@ -907,6 +1030,15 @@
         function printStudent(roll) {
             let student = studentDataStore.find(s => s.roll === roll);
             if(!student) return;
+
+            let examType = student.exam_type || "ANNUAL";
+            if(examType === "HALF-YEARLY") {
+                document.getElementById('pm-exam-title').innerText = "HALF-YEARLY EXAMINATION - 2026";
+                document.getElementById('pm-pass-text').innerHTML = "ଅନୁଷ୍ଠିତ ଅର୍ଦ୍ଧବାର୍ଷିକ ପରୀକ୍ଷାରେ ଉତ୍ତୀର୍ଣ୍ଣ ହୋଇଛନ୍ତି।<br>Passed the Half-Yearly Examination held in the month of September - 2026.";
+            } else {
+                document.getElementById('pm-exam-title').innerText = "HIGH SCHOOL CERTIFICATE EXAMINATION - 2026";
+                document.getElementById('pm-pass-text').innerHTML = "ଫେବୃଆରୀ ୨୦୨୬ ରେ ଅନୁଷ୍ଠିତ ମାଧ୍ୟମିକ ଉଚ୍ଚ ବିଦ୍ୟାଳୟ ପ୍ରମାଣପତ୍ର ପରୀକ୍ଷାରେ ଉତ୍ତୀର୍ଣ୍ଣ ହୋଇଛନ୍ତି।<br>Passed the High School Certificate Examination held in the month of February - 2026.";
+            }
 
             document.getElementById('pm-header-school-name').innerText = student.school || "SCHOOL NAME";
             document.getElementById('pm-school').innerText = student.school || "N/A";
@@ -1078,7 +1210,7 @@
                 
                 calculateAutoMarks();
                 btn.innerText = "Fetch Data 📥";
-                alert("Board Data Fetched Successfully! (Exact PEN & APAR Updated)");
+                alert("Board Data Fetched Successfully!");
             }, 1000);
         }
 
@@ -1097,6 +1229,7 @@
                 document.getElementById('us-dob').value = student.dob || ""; document.getElementById('us-mobile').value = student.mobile || "";
                 document.getElementById('us-pan').value = student.pan || ""; document.getElementById('us-apar').value = student.apar || "";
                 document.getElementById('us-class').value = student.class_name || "";
+                document.getElementById('us-exam-type').value = student.exam_type || "ANNUAL";
                 document.getElementById('us-slno').value = student.slno || "";
                 document.getElementById('us-photo-data').value = student.photo || "";
                 document.getElementById('us-photo-input').value = ""; 
@@ -1110,7 +1243,7 @@
                 document.getElementById('us-roll').value = ""; document.getElementById('us-name').value = ""; document.getElementById('us-fname').value = ""; 
                 document.getElementById('us-mname').value = ""; document.getElementById('us-dob').value = ""; document.getElementById('us-mobile').value = "";
                 document.getElementById('us-pan').value = ""; document.getElementById('us-apar').value = ""; document.getElementById('us-class').value = "";
-                document.getElementById('us-slno').value = "";
+                document.getElementById('us-exam-type').value = "ANNUAL"; document.getElementById('us-slno').value = "";
                 document.getElementById('us-photo-data').value = ""; document.getElementById('us-photo-input').value = "";
                 
                 sBody.innerHTML = `<div class="sub-row"><input type="text" value="FLO" class="input-box sub-code" style="padding:6px;"><input type="text" value="FIRST LANGUAGE" class="input-box sub-name" style="padding:6px;"><input type="number" value="100" class="input-box sub-max" style="padding:6px;" oninput="calculateAutoMarks()"><input type="number" value="" class="input-box sub-sec" style="padding:6px;" oninput="calculateAutoMarks()"><button type="button" style="background:#dc2626; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;" onclick="this.closest('.sub-row').remove(); calculateAutoMarks();">Delete</button></div>`;
@@ -1158,6 +1291,7 @@
                 pan: document.getElementById('us-pan').value.trim(), 
                 apar: document.getElementById('us-apar').value.trim(), 
                 class_name: document.getElementById('us-class').value,
+                exam_type: document.getElementById('us-exam-type').value,
                 slno: document.getElementById('us-slno').value.trim(),
                 school: activeSchoolName, photo: photoData, 
                 total: parseFloat(document.getElementById('auto-sec').innerText), max: parseFloat(document.getElementById('auto-max').innerText), 
