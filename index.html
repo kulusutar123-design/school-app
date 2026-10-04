@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>School Home Portal - Ultimate Secure Edition</title>
-    <!-- html2pdf library for PDF generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -118,7 +117,7 @@
         <div id="home-view">
             <div class="notice-board">
                 <h4>📢 Important Notice Board</h4>
-                <p id="display-notice">• Official Marksheet & Portal System is live.<br>• <b>NEW: EXACT 44 Students PEN & APAR perfectly linked with Roll No!</b></p>
+                <p id="display-notice">• Official Marksheet & Portal System is live.<br>• <b>NEW: EXACT mapping for 42 Students with Roll No, PEN & APAR ID is now active!</b></p>
             </div>
 
             <div class="results-btn-card">
@@ -132,7 +131,7 @@
                     <div class="welcome-card">
                         <h3>🌟 Welcome to Digital School Management</h3>
                         <p>Manage your schools, student admissions, and records securely on the cloud platform.</p>
-                        <p><b>✨ Features:</b> 100% Accurate Auto-Fetch (Marks + PEN/APAR), 100% Data Safety.</p>
+                        <p><b>✨ Features:</b> Accurate Auto-Fetch (Marks + PEN/APAR), Dynamic Serial No, 100% Data Safety.</p>
                     </div>
 
                     <div class="section-title">📌 Quick Portal Actions</div>
@@ -279,6 +278,7 @@
                 <button style="background:#2563eb; color:white; width:100%; padding:15px; border:none; border-radius:8px; font-weight:bold; font-size:16px; margin-top:20px; cursor:pointer;" onclick="validateStudentForm()">Next ➡️ Proceed to Payment</button>
             </div>
 
+            <!-- Student Payment System -->
             <div id="student-payment-step" style="display:none; text-align:center;">
                 <h3 style="color:#0d3b66; margin-bottom:10px;">💳 School Application Fee Payment</h3>
                 <p style="color:#dc2626; font-weight:bold; font-size:18px; margin-bottom:15px;">⏳ Time Left: <span id="payment-timer">30</span> Seconds</p>
@@ -453,6 +453,7 @@
                 </table>
             </div>
 
+            <!-- ALL STUDENTS DB WITH SCHOOL FILTER -->
             <div id="students-tab-admin" class="admin-tab-content" style="display:none;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                     <h3>🎓 Complete Student Database</h3>
@@ -502,14 +503,14 @@
             <div id="settings-tab" class="admin-tab-content" style="display:none;">
                 <h3>⚙️ Portal Customization Settings</h3>
                 <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1; margin-bottom:20px;">
-                    <h4>🖼 Upload / Change Background Photo</h4>
+                    <h4>🖼️ Upload / Change Background Photo</h4>
                     <input type="file" id="bg-file-input" accept="image/*" style="margin-bottom:10px;"><br>
                     <button style="background:#2563eb; color:white; border:none; padding:8px 20px; border-radius:6px; cursor:pointer;" onclick="changeBackgroundImage()">Update Background 🚀</button>
                 </div>
                 <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1;">
                     <h4>📢 Edit / Update Notice Board</h4>
                     <textarea id="notice-input" rows="5" class="input-box" style="margin-bottom:10px;">• Official Marksheet & Portal System is live.
-• <b>Fixed: 100% Accurate Auto-Fetch Data for all 44 Students Active!</b></textarea>
+• Fixed: Roll No 175CB0077 to 118 EXACT PEN/APAR mapping successful.</textarea>
                     <button style="background:#16a34a; color:white; border:none; padding:8px 20px; border-radius:6px; cursor:pointer;" onclick="updateNoticeBoard()">Save Notice Board 💾</button>
                 </div>
             </div>
@@ -558,6 +559,7 @@
                     <div><label style="font-size:12px; font-weight:bold;">12. PEN No <span class="req">*</span>:</label><input type="text" id="us-pan" class="input-box" placeholder="e.g. 21349438955"></div>
                     <div><label style="font-size:12px; font-weight:bold;">13. APAR ID <span class="req">*</span>:</label><input type="text" id="us-apar" class="input-box"></div>
                     
+                    <!-- NEW SERIAL NUMBER FIELD -->
                     <div style="grid-column: span 2;"><label style="font-size:12px; font-weight:bold; color:#1e3a8a;">📝 Serial No (SL NO):</label><input type="text" id="us-slno" class="input-box" placeholder="Auto-generated or enter manually"></div>
 
                     <div><label style="font-size:12px; font-weight:bold;">14. Address:</label><input type="text" id="us-address" class="input-box"></div>
@@ -613,41 +615,6 @@
                 <div style="display:flex; justify-content:flex-end; gap:10px;">
                     <button style="background:#64748b; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="document.getElementById('universalStudentModal').style.display='none'">Cancel</button>
                     <button style="background:#2563eb; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="saveUniversalStudentData()">Save Student & Subjects 💾</button>
-                </div>
-            </div>
-        </div>
-        
-        <div id="editSchoolModal" class="modal">
-            <div class="modal-content">
-                <h3 style="color:#0d3b66; margin-bottom:15px;">✏️ Verify & Edit School Application</h3>
-                <input type="hidden" id="edit-sch-old-id">
-                <input type="text" id="edit-sch-name" placeholder="School Name" class="input-box" style="margin-bottom:12px;">
-                <input type="text" id="edit-sch-id" placeholder="School Code" class="input-box" style="margin-bottom:12px;">
-                <input type="text" id="edit-sch-hm" placeholder="Headmaster Name" class="input-box" style="margin-bottom:12px;">
-                <input type="text" id="edit-sch-mobile" placeholder="Mobile No" class="input-box" style="margin-bottom:12px;">
-                <select id="edit-sch-state" class="input-box state-select-list" style="margin-bottom:12px;"></select>
-                <div style="display:flex; justify-content:flex-end; gap:10px;">
-                    <button style="background:#64748b; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="document.getElementById('editSchoolModal').style.display='none'">Cancel</button>
-                    <button style="background:#2563eb; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="saveEditedSchool()">Save Changes 💾</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="schoolPaymentModal" class="modal">
-            <div class="modal-content" style="width:500px;">
-                <h3 style="color:#0d3b66; margin-bottom:10px;">💳 Set School Payment Gateway</h3>
-                <p id="sp-school-name" style="color:#1e3a8a; font-weight:bold; margin-bottom:15px;"></p>
-                <input type="hidden" id="sp-school-id">
-                <label style="font-size:12px; font-weight:bold;">School UPI ID:</label>
-                <input type="text" id="sp-upi" class="input-box" style="margin-bottom:12px;">
-                <label style="font-size:12px; font-weight:bold;">Admission Base Fee (₹):</label>
-                <input type="number" id="sp-fee" class="input-box" style="margin-bottom:12px;">
-                <label style="font-size:12px; font-weight:bold;">GST Option:</label>
-                <select id="sp-gst-opt" class="input-box" style="margin-bottom:12px;" onchange="toggleGstInput()"><option value="none">No GST</option><option value="percent">Apply GST %</option></select>
-                <div id="sp-gst-div" style="display:none;"><label style="font-size:12px; font-weight:bold;">GST Percentage (%):</label><input type="number" id="sp-gst-pct" class="input-box" style="margin-bottom:12px;"></div>
-                <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px;">
-                    <button style="background:#64748b; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="document.getElementById('schoolPaymentModal').style.display='none'">Cancel</button>
-                    <button style="background:#22c55e; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;" onclick="saveSchoolPaymentSetup()">Save Payment Setup 💾</button>
                 </div>
             </div>
         </div>
@@ -787,7 +754,9 @@
         let isSchoolOtpVerified = false, generatedSchoolOtp = "", adminGenOtp = "", profGenOtp = "", schLoginGenOtp = "", resettingSchoolId = "";
         let publicRegPhotoBase64 = ""; 
         
-        let studentDataStore = loadData('studentDataStore', []);
+        let studentDataStore = loadData('studentDataStore', [
+            { roll: "155CB0077", name: "ADYASHA SAHOO", class_name: "X Pass Out", fname: "UTTAM KUMAR SAHOO", mname: "MAMATARANI SAHU", dob: "20/03/2011", mobile: "9876543210", pan: "21333578409", apar: "340630618949", slno: "2611220809", school: "SRI BAIRAGI SARASWATI SISHU VIDYAMANDIR", photo: "", total: 468, max: 600, grade: "B1", status: "Pass", subjects: [{code:"FLO", name:"FIRST LANGUAGE ODIA", max:100, sec:87}, {code:"SLE", name:"SECOND LANGUAGE ENGLISH", max:100, sec:81}, {code:"TLS", name:"THIRD LANGUAGE SANSKRIT", max:100, sec:92}, {code:"MTH", name:"MATHEMATICS", max:100, sec:69}, {code:"GSC", name:"GENERAL SCIENCE", max:100, sec:73}, {code:"SSC", name:"SOCIAL SCIENCE", max:100, sec:66}] }
+        ]);
 
         function saveLocalData() {
             localStorage.setItem('adminProfile', JSON.stringify(adminProfile));
@@ -948,57 +917,54 @@
             
             setTimeout(() => {
                 let parsedData = {
-                    "175CB0077": {"pen": "21349438955", "apar": "", "name": "ADYASHA SAHOO", "mname": "MAMATARANI SAHU", "fname": "UTTAM KUMAR SAHOO", "dob": "20/03/2011", "flo":87, "sle":81, "tls":92, "mth":69, "gsc":73, "ssc":66},
-                    "175CB0078": {"pen": "21333578409", "apar": "340630618949", "name": "ALOKTIKA MISHRA", "mname": "SAROJINI MISHRA", "fname": "DEBASIS MISHRA", "dob": "14/02/2011", "flo":90, "sle":67, "tls":86, "mth":66, "gsc":70, "ssc":67},
-                    "175CB0079": {"pen": "21182142821", "apar": "704082184322", "name": "ABHILIPSHA DAS", "mname": "JALPANA DAS", "fname": "HIMANSHU BHUSHAN DAS", "dob": "11/02/2010", "flo":46, "sle":34, "tls":38, "mth":30, "gsc":39, "ssc":43},
-                    "175CB0080": {"pen": "21126528739", "apar": "256200295845", "name": "BAISAKHI SAMAL", "mname": "CHANCHALA SAMAL", "fname": "SUDHAKAR SAMAL", "dob": "26/12/2010", "flo":87, "sle":72, "tls":81, "mth":57, "gsc":61, "ssc":62},
-                    "175CB0081": {"pen": "21041084790", "apar": "789783065343", "name": "BARSHA PRIYADARSHANI MOHANTY", "mname": "SUBHADRA MOHANTY", "fname": "PURNA CHANDRA MOHANTY", "dob": "01/10/2010", "flo":60, "sle":45, "tls":58, "mth":30, "gsc":34, "ssc":41},
-                    "175CB0082": {"pen": "21498662821", "apar": "913475687849", "name": "BARSHARANI KHILAR", "mname": "SANDHYARANI KHILAR", "fname": "SANTOSH KHILAR", "dob": "12/03/2011", "flo":30, "sle":33, "tls":39, "mth":38, "gsc":30, "ssc":34},
-                    "175CB0083": {"pen": "21050451252", "apar": "252741731402", "name": "BHAGYASHREE MOHANTY", "mname": "RASHMITA MOHANTY", "fname": "ARUN KUMAR MOHANTY", "dob": "11/10/2009", "flo":41, "sle":38, "tls":32, "mth":38, "gsc":36, "ssc":37},
-                    "175CB0084": {"pen": "21082361081", "apar": "642970156338", "name": "DIPTI MAYEE SETHY", "mname": "BUNI SETHY", "fname": "SANJAY SETHY", "dob": "11/01/2011", "flo":45, "sle":32, "tls":38, "mth":30, "gsc":30, "ssc":38},
-                    "175CB0085": {"pen": "21025149546", "apar": "503511373905", "name": "HARAPRIYA LENKA", "mname": "SARASWATI LENKA", "fname": "NILAMANI LENKA", "dob": "27/11/2010", "flo":64, "sle":51, "tls":76, "mth":34, "gsc":50, "ssc":53},
-                    "175CB0086": {"pen": "21264457196", "apar": "922843423885", "name": "JOSODA PARIDA", "mname": "GAURIBALA PARIDA", "fname": "SURENDRA PARIDA", "dob": "01/04/2011", "flo":73, "sle":40, "tls":60, "mth":31, "gsc":39, "ssc":57},
-                    "175CB0087": {"pen": "21697711277", "apar": "618622215960", "name": "JYOTI SWORUPA PADHI", "mname": "PURNIMA PADHI", "fname": "SUDHANSHU SEKHAR PADHI", "dob": "19/09/2010", "flo":62, "sle":43, "tls":59, "mth":39, "gsc":39, "ssc":46},
-                    "175CB0088": {"pen": "21067317375", "apar": "135620099184", "name": "JYOTSHNA RANI BISWAL", "mname": "PRATIMA BISWAL", "fname": "SRABAN KUMAR BISWAL", "dob": "13/10/2010", "flo":74, "sle":62, "tls":77, "mth":41, "gsc":48, "ssc":64},
-                    "175CB0089": {"pen": "23364745896", "apar": "904172854667", "name": "LIPA JENA", "mname": "MAMATA JEΝΑ", "fname": "MANMATH JENA", "dob": "14/05/2010", "flo":86, "sle":72, "tls":82, "mth":58, "gsc":64, "ssc":67},
+                    "175CB0077": {"pen": "21333578409", "apar": "340630618949", "name": "ADYASHA SAHOO", "mname": "MAMATARANI SAHU", "fname": "UTTAM KUMAR SAHOO", "dob": "20/03/2011", "flo":87, "sle":81, "tls":92, "mth":69, "gsc":73, "ssc":66},
+                    "175CB0078": {"pen": "21182142821", "apar": "704082184322", "name": "ALOKTIKA MISHRA", "mname": "SAROJINI MISHRA", "fname": "DEBASIS MISHRA", "dob": "14/02/2011", "flo":90, "sle":67, "tls":86, "mth":66, "gsc":70, "ssc":67},
+                    "175CB0079": {"pen": "21349438955", "apar": "", "name": "ABHILIPSHA DAS", "mname": "JALPANA DAS", "fname": "HIMANSHU BHUSHAN DAS", "dob": "11/02/2010", "flo":46, "sle":34, "tls":38, "mth":30, "gsc":39, "ssc":43},
+                    "175CB0080": {"pen": "21041084790", "apar": "789783065343", "name": "BAISAKHI SAMAL", "mname": "CHANCHALA SAMAL", "fname": "SUDHAKAR SAMAL", "dob": "26/12/2010", "flo":87, "sle":72, "tls":81, "mth":57, "gsc":61, "ssc":62},
+                    "175CB0081": {"pen": "21498662821", "apar": "913475687849", "name": "BARSHA PRIYADARSHANI MOHANTY", "mname": "SUBHADRA MOHANTY", "fname": "PURNA CHANDRA MOHANTY", "dob": "01/10/2010", "flo":60, "sle":45, "tls":58, "mth":30, "gsc":34, "ssc":41},
+                    "175CB0082": {"pen": "21050451252", "apar": "252741731402", "name": "BARSHARANI KHILAR", "mname": "SANDHYARANI KHILAR", "fname": "SANTOSH KHILAR", "dob": "12/03/2011", "flo":30, "sle":33, "tls":39, "mth":38, "gsc":30, "ssc":34},
+                    "175CB0083": {"pen": "21082361081", "apar": "642970156338", "name": "BHAGYASHREE MOHANTY", "mname": "RASHMITA MOHANTY", "fname": "ARUN KUMAR MOHANTY", "dob": "11/10/2009", "flo":41, "sle":38, "tls":32, "mth":38, "gsc":36, "ssc":37},
+                    "175CB0084": {"pen": "21025149546", "apar": "503511373905", "name": "DIPTI MAYEE SETHY", "mname": "BUNI SETHY", "fname": "SANJAY SETHY", "dob": "11/01/2011", "flo":45, "sle":32, "tls":38, "mth":30, "gsc":30, "ssc":38},
+                    "175CB0085": {"pen": "21264457196", "apar": "922843423885", "name": "HARAPRIYA LENKA", "mname": "SARASWATI LENKA", "fname": "NILAMANI LENKA", "dob": "27/11/2010", "flo":64, "sle":51, "tls":76, "mth":34, "gsc":50, "ssc":53},
+                    "175CB0086": {"pen": "21697711277", "apar": "618622215960", "name": "JOSODA PARIDA", "mname": "GAURIBALA PARIDA", "fname": "SURENDRA PARIDA", "dob": "01/04/2011", "flo":73, "sle":40, "tls":60, "mth":31, "gsc":39, "ssc":57},
+                    "175CB0087": {"pen": "21067317375", "apar": "135620099184", "name": "JYOTI SWORUPA PADHI", "mname": "PURNIMA PADHI", "fname": "SUDHANSHU SEKHAR PADHI", "dob": "19/09/2010", "flo":62, "sle":43, "tls":59, "mth":39, "gsc":39, "ssc":46},
+                    "175CB0088": {"pen": "23364745896", "apar": "904172854667", "name": "JYOTSHNA RANI BISWAL", "mname": "PRATIMA BISWAL", "fname": "SRABAN KUMAR BISWAL", "dob": "13/10/2010", "flo":74, "sle":62, "tls":77, "mth":41, "gsc":48, "ssc":64},
+                    "175CB0089": {"pen": "21109012923", "apar": "593617329877", "name": "LIPA JENA", "mname": "MAMATA JEΝΑ", "fname": "MANMATH JENA", "dob": "14/05/2010", "flo":86, "sle":72, "tls":82, "mth":58, "gsc":64, "ssc":67},
                     "175CB0090": {"pen": "21463462296", "apar": "184265815264", "name": "LIJA JENA", "mname": "MILI JENA", "fname": "BASANTA JENA", "dob": "29/09/2011", "flo":28, "sle":29, "tls":31, "mth":31, "gsc":29, "ssc":38},
-                    "175CB0091": {"pen": "21109012923", "apar": "593617329877", "name": "LIZA PADHI", "mname": "RANJITA PADHI", "fname": "RATNAKAR PADHI", "dob": "18/09/2010", "flo":70, "sle":53, "tls":62, "mth":42, "gsc":52, "ssc":52},
-                    "175CB0092": {"pen": "21064948534", "apar": "777043813613", "name": "LOVELY PALAI", "mname": "JHUNARANI PALAI", "fname": "PRATAP PALAI", "dob": "25/05/2010", "flo":48, "sle":38, "tls":50, "mth":32, "gsc":32, "ssc":42},
-                    "175CB0093": {"pen": "21311696258", "apar": "671413877266", "name": "MANISHA SETHY", "mname": "PURNIMA SETHY", "fname": "SUSANTA SETHY", "dob": "12/09/2010", "flo":37, "sle":32, "tls":38, "mth":34, "gsc":30, "ssc":38},
+                    "175CB0091": {"pen": "21064948534", "apar": "777043813613", "name": "LIZA PADHI", "mname": "RANJITA PADHI", "fname": "RATNAKAR PADHI", "dob": "18/09/2010", "flo":70, "sle":53, "tls":62, "mth":42, "gsc":52, "ssc":52},
+                    "175CB0092": {"pen": "21311696258", "apar": "671413877266", "name": "LOVELY PALAI", "mname": "JHUNARANI PALAI", "fname": "PRATAP PALAI", "dob": "25/05/2010", "flo":48, "sle":38, "tls":50, "mth":32, "gsc":32, "ssc":42},
+                    "175CB0093": {"pen": "21106762170", "apar": "611657596631", "name": "MANISHA SETHY", "mname": "PURNIMA SETHY", "fname": "SUSANTA SETHY", "dob": "12/09/2010", "flo":37, "sle":32, "tls":38, "mth":34, "gsc":30, "ssc":38},
                     "175CB0094": {"pen": "21025888551", "apar": "270710056668", "name": "MANISHA JENA", "mname": "SUBHASMITA JENA", "fname": "DILLIP JENA", "dob": "01/05/2010", "flo":74, "sle":55, "tls":65, "mth":43, "gsc":51, "ssc":54},
-                    "175CB0095": {"pen": "21106762170", "apar": "611657596631", "name": "MITASHREE JENA", "mname": "ANAPURNΝΑ JENA", "fname": "KHAGESWAR JENA", "dob": "06/04/2011", "flo":52, "sle":40, "tls":58, "mth":33, "gsc":40, "ssc":43},
-                    "175CB0096": {"pen": "21050476279", "apar": "790335617395", "name": "PRIYANKA PRIYADARSHINI SAMAL", "mname": "SNEHANJALI SAMAL", "fname": "MANGARAJ SAMAL", "dob": "25/04/2010", "flo":48, "sle":40, "tls":44, "mth":32, "gsc":41, "ssc":35},
-                    "175CB0097": {"pen": "21347860819", "apar": "284100557411", "name": "PUJARANI MOHANTY", "mname": "DEBIKAMOHANTY", "fname": "AMARENDRA MOHANTY", "dob": "08/06/2011", "flo":66, "sle":56, "tls":86, "mth":30, "gsc":42, "ssc":49},
-                    "175CB0098": {"pen": "21086864465", "apar": "408019175598", "name": "PUJARANI PRUSTY", "mname": "SASMITA PRUSTY", "fname": "RABINDRA KU PURSTY", "dob": "22/03/2011", "flo":67, "sle":58, "tls":72, "mth":35, "gsc":43, "ssc":56},
-                    "175CB0099": {"pen": "21264956198", "apar": "360893477685", "name": "PURBASHA PARIDA", "mname": "JHARANA PARIDA", "fname": "HARINARAYANA PARIDA", "dob": "11/02/2010", "flo":70, "sle":41, "tls":59, "mth":38, "gsc":38, "ssc":54},
-                    "175CB0100": {"pen": "21229203899", "apar": "734196300420", "name": "RANI JENA", "mname": "KUMUDINI JENA", "fname": "RABINDRA JENA", "dob": "18/11/2010", "flo":48, "sle":46, "tls":48, "mth":33, "gsc":33, "ssc":37},
+                    "175CB0095": {"pen": "21050476279", "apar": "790335617395", "name": "MITASHREE JENA", "mname": "ANAPURNΝΑ JENA", "fname": "KHAGESWAR JENA", "dob": "06/04/2011", "flo":52, "sle":40, "tls":58, "mth":33, "gsc":40, "ssc":43},
+                    "175CB0096": {"pen": "21347860819", "apar": "284100557411", "name": "PRIYANKA PRIYADARSHINI SAMAL", "mname": "SNEHANJALI SAMAL", "fname": "MANGARAJ SAMAL", "dob": "25/04/2010", "flo":48, "sle":40, "tls":44, "mth":32, "gsc":41, "ssc":35},
+                    "175CB0097": {"pen": "21086864465", "apar": "408019175598", "name": "PUJARANI MOHANTY", "mname": "DEBIKAMOHANTY", "fname": "AMARENDRA MOHANTY", "dob": "08/06/2011", "flo":66, "sle":56, "tls":86, "mth":30, "gsc":42, "ssc":49},
+                    "175CB0098": {"pen": "21264956198", "apar": "360893477685", "name": "PUJARANI PRUSTY", "mname": "SASMITA PRUSTY", "fname": "RABINDRA KU PURSTY", "dob": "22/03/2011", "flo":67, "sle":58, "tls":72, "mth":35, "gsc":43, "ssc":56},
+                    "175CB0099": {"pen": "21229203899", "apar": "734196300420", "name": "PURBASHA PARIDA", "mname": "JHARANA PARIDA", "fname": "HARINARAYANA PARIDA", "dob": "11/02/2010", "flo":70, "sle":41, "tls":59, "mth":38, "gsc":38, "ssc":54},
+                    "175CB0100": {"pen": "21421573731", "apar": "701239984481", "name": "RANI JENA", "mname": "KUMUDINI JENA", "fname": "RABINDRA JENA", "dob": "18/11/2010", "flo":48, "sle":46, "tls":48, "mth":33, "gsc":33, "ssc":37},
                     "175CB0101": {"pen": "21402389757", "apar": "724381829344", "name": "RADHA RANI BEHERA", "mname": "TAPASWINI BEHERA", "fname": "DEBENDRA NATH BEHERA", "dob": "08/03/2011", "flo":75, "sle":68, "tls":77, "mth":40, "gsc":43, "ssc":57},
-                    "175CB0102": {"pen": "21421573731", "apar": "701239984481", "name": "RASHMIREKНА DAS", "mname": "SASMITA DAS", "fname": "NRUSINGHA DAS", "dob": "05/12/2010", "flo":76, "sle":62, "tls":80, "mth":37, "gsc":50, "ssc":62},
-                    "175CB0103": {"pen": "21050388749", "apar": "919157141678", "name": "RINU MOHANTY", "mname": "MANORAMA MOHANTY", "fname": "SIBA MOHANTY", "dob": "15/08/2010", "flo":70, "sle":55, "tls":74, "mth":38, "gsc":43, "ssc":53},
-                    "175CB0104": {"pen": "21752940465", "apar": "585710037248", "name": "ROJALIN PANDA", "mname": "RANJITA PANDA", "fname": "PRATAP KUMAR PANDA", "dob": "17/07/2010", "flo":84, "sle":69, "tls":82, "mth":48, "gsc":63, "ssc":57},
-                    "175CB0105": {"pen": "21558866778", "apar": "161232284559", "name": "SAROJINI BEHERA", "mname": "MEERARANI BEHERA", "fname": "MADAN BEHERA", "dob": "25/12/2010", "flo":51, "sle":35, "tls":48, "mth":38, "gsc":34, "ssc":34},
-                    "175CB0106": {"pen": "21197126707", "apar": "486947073442", "name": "SHRABANI SAHOO", "mname": "DIPALI SAHOO", "fname": "BIDYADHAR SAHOO", "dob": "29/07/2010", "flo":81, "sle":73, "tls":84, "mth":77, "gsc":54, "ssc":58},
-                    "175CB0107": {"pen": "21024509156", "apar": "377751563500", "name": "SHRIYA PARIDA", "mname": "JYOTSNARANI PARIDA", "fname": "ASHOK KUMAR PARIDA", "dob": "04/06/2010", "flo":64, "sle":38, "tls":62, "mth":31, "gsc":31, "ssc":46},
-                    "175CB0108": {"pen": "21031034330", "apar": "536352323335", "name": "SMRUTIREKHA KHILLAR", "mname": "SABITA KHILLAR", "fname": "CHHABINDRA KHILLAR", "dob": "08/03/2011", "flo":42, "sle":44, "tls":40, "mth":38, "gsc":37, "ssc":39},
-                    "175CB0109": {"pen": "21704868439", "apar": "833200620741", "name": "SMRUTIREKHA SAHOO", "mname": "PRAMILA SAHOO", "fname": "BIJAY KUMAR SAHOO", "dob": "09/11/2009", "flo":82, "sle":69, "tls":75, "mth":54, "gsc":56, "ssc":62},
-                    "175CB0110": {"pen": "21077897450", "apar": "939307473716", "name": "SRUTINGYA KHILAR", "mname": "SABITRI KHILAR", "fname": "BISWANATH KHILAR", "dob": "09/12/2010", "flo":82, "sle":71, "tls":94, "mth":66, "gsc":65, "ssc":80},
-                    "175CB0111": {"pen": "21515201906", "apar": "856403020289", "name": "SUBHADRA BEHERA", "mname": "REENARANI BEHERA", "fname": "AJAYA BEHERA", "dob": "13/03/2011", "flo":67, "sle":66, "tls":74, "mth":44, "gsc":52, "ssc":65},
-                    "175CB0112": {"pen": "21158801854", "apar": "845483054020", "name": "SUBHASMIΤΑ PANDA", "mname": "HEMALATA PANDA", "fname": "NARAYAN PANDA", "dob": "07/09/2010", "flo":66, "sle":52, "tls":56, "mth":31, "gsc":44, "ssc":51},
-                    "175CB0113": {"pen": "21013751501", "apar": "240564234821", "name": "SHUBHASMITA SAMANTA", "mname": "SASMITA SAMANTA", "fname": "BHASKAR CHANDRA SAMANTA", "dob": "26/02/2010", "flo":57, "sle":42, "tls":56, "mth":31, "gsc":38, "ssc":50},
-                    "175CB0114": {"pen": "21697498328", "apar": "346161684808", "name": "SWAPNARANI PARIDA", "mname": "RADHARANI PARIDA", "fname": "HAREKRUSHNA PARIDA", "dob": "21/12/2010", "flo":61, "sle":50, "tls":69, "mth":34, "gsc":46, "ssc":62},
-                    "175CB0115": {"pen": "21013361804", "apar": "549518813294", "name": "SWOPNA JENA", "mname": "BASANTI JENA", "fname": "MUKTIKANTA JENA", "dob": "09/08/2010", "flo":35, "sle":32, "tls":31, "mth":32, "gsc":34, "ssc":34},
-                    "175CB0116": {"pen": "21060625257", "apar": "807530411559", "name": "TRUPTI REKHA BARIK", "mname": "RANJULATA BARIK", "fname": "RABINDRA BARIK", "dob": "01/02/2010", "flo":62, "sle":45, "tls":57, "mth":38, "gsc":40, "ssc":42},
-                    "175CB0117": {"pen": "21073087895", "apar": "795235253070", "name": "UME SALMA", "mname": "FAIJUN NESHA", "fname": "SHAH MD QUAMRUDDIN", "dob": "19/04/2010", "flo":60, "sle":55, "tls":48, "mth":33, "gsc":42, "ssc":48},
-                    "175CB0118": {"pen": "21358384708", "apar": "393771061550", "name": "YANJYASENI DAS", "mname": "KABITA BEHURIA", "fname": "SUSANTA DAS", "dob": "01/11/2010", "flo":38, "sle":30, "tls":38, "mth":32, "gsc":35, "ssc":34},
-                    "175CB0119": {"pen": "21354154825", "apar": "156117659572", "name": "UME SALMA", "mname": "FAIZUN NISHA", "fname": "SHAH MD QUAMRUDDIN", "dob": "19/04/2010", "flo":60, "sle":55, "tls":48, "mth":33, "gsc":42, "ssc":48},
-                    "175CB0120": {"pen": "21072379693", "apar": "147250355555", "name": "YAGNYASENI DAS", "mname": "KABITA BEHURIA", "fname": "SUSHANT KUMAR DAS", "dob": "01/01/2010", "flo":38, "sle":30, "tls":38, "mth":32, "gsc":35, "ssc":34}
+                    "175CB0102": {"pen": "21050388749", "apar": "919157141678", "name": "RASHMIREKНА DAS", "mname": "SASMITA DAS", "fname": "NRUSINGHA DAS", "dob": "05/12/2010", "flo":76, "sle":62, "tls":80, "mth":37, "gsc":50, "ssc":62},
+                    "175CB0103": {"pen": "21558866778", "apar": "161232284559", "name": "RINU MOHANTY", "mname": "MANORAMA MOHANTY", "fname": "SIBA MOHANTY", "dob": "15/08/2010", "flo":70, "sle":55, "tls":74, "mth":38, "gsc":43, "ssc":53},
+                    "175CB0104": {"pen": "21197126707", "apar": "486947073442", "name": "ROJALIN PANDA", "mname": "RANJITA PANDA", "fname": "PRATAP KU PANDA", "dob": "17/07/2010", "flo":84, "sle":69, "tls":82, "mth":48, "gsc":63, "ssc":57},
+                    "175CB0105": {"pen": "21024509156", "apar": "377751563500", "name": "SAROJINI BEHERA", "mname": "MEERARANI BEHERA", "fname": "MADAN BEHERA", "dob": "25/12/2010", "flo":51, "sle":35, "tls":48, "mth":38, "gsc":34, "ssc":34},
+                    "175CB0106": {"pen": "21031034330", "apar": "536352323335", "name": "SHRABANI SAHOO", "mname": "DIPALI SAHOO", "fname": "BIDYADHAR SAHOO", "dob": "29/07/2010", "flo":81, "sle":73, "tls":84, "mth":77, "gsc":54, "ssc":58},
+                    "175CB0107": {"pen": "21704868439", "apar": "833200620741", "name": "SHRIYA PARIDA", "mname": "JYOTSNARANI PARIDA", "fname": "ASHOK PARIDA", "dob": "04/06/2010", "flo":64, "sle":38, "tls":62, "mth":31, "gsc":31, "ssc":46},
+                    "175CB0108": {"pen": "21515201906", "apar": "856403020289", "name": "SMRUTIREKHA KHILLAR", "mname": "SABITA KHILLAR", "fname": "CHHABINDRA KHILLAR", "dob": "08/03/2011", "flo":42, "sle":44, "tls":40, "mth":38, "gsc":37, "ssc":39},
+                    "175CB0109": {"pen": "21158801854", "apar": "845483054020", "name": "SMRUTIREKHA SAHOO", "mname": "PRAMILA SAHOO", "fname": "BIJAYA KUMAR SAHOO", "dob": "09/11/2009", "flo":82, "sle":69, "tls":75, "mth":54, "gsc":56, "ssc":62},
+                    "175CB0110": {"pen": "21013751501", "apar": "240564234821", "name": "SRUTINGYA KHILAR", "mname": "SABITRI KHILAR", "fname": "BISWANATH KHILAR", "dob": "09/12/2010", "flo":82, "sle":71, "tls":94, "mth":66, "gsc":65, "ssc":80},
+                    "175CB0111": {"pen": "21697498328", "apar": "346161684808", "name": "SUBHADRA BEHERA", "mname": "RENARANI BEHERA", "fname": "AJAYA BEHERA", "dob": "13/03/2011", "flo":67, "sle":66, "tls":74, "mth":44, "gsc":52, "ssc":65},
+                    "175CB0112": {"pen": "21013361804", "apar": "549518813294", "name": "SUBHASMITA PANDA", "mname": "HEMALATA PANDA", "fname": "NARAYAN PANDA", "dob": "07/09/2010", "flo":66, "sle":52, "tls":56, "mth":31, "gsc":44, "ssc":51},
+                    "175CB0113": {"pen": "21077897450", "apar": "939307473716", "name": "SHUBHASMITA SAMANTA", "mname": "SASMITA SAMANTA", "fname": "BHASKAR CH SAMANTA", "dob": "26/02/2010", "flo":57, "sle":42, "tls":56, "mth":31, "gsc":38, "ssc":50},
+                    "175CB0114": {"pen": "21060625257", "apar": "807530411559", "name": "SWAPNARANI PARIDA", "mname": "RADHARANI PARIDA", "fname": "HAREKRUSHNA PARIDA", "dob": "21/12/2010", "flo":61, "sle":50, "tls":69, "mth":34, "gsc":46, "ssc":62},
+                    "175CB0115": {"pen": "21073087895", "apar": "795235253070", "name": "SWOPNA JENA", "mname": "BASANTI JENA", "fname": "MUKTIKANTA JENA", "dob": "09/08/2010", "flo":35, "sle":32, "tls":31, "mth":32, "gsc":34, "ssc":34},
+                    "175CB0116": {"pen": "21358384708", "apar": "393771061550", "name": "TRUPTI REKHA BARIK", "mname": "RANJULATA BARIK", "fname": "RABINDRA BARIK", "dob": "01/02/2010", "flo":62, "sle":45, "tls":57, "mth":38, "gsc":40, "ssc":42},
+                    "175CB0117": {"pen": "21354154825", "apar": "156117659572", "name": "UME SALMA", "mname": "FAIJUN NESHA", "fname": "SHAH MD QUAMRUDDIN", "dob": "19/04/2010", "flo":60, "sle":55, "tls":48, "mth":33, "gsc":42, "ssc":48},
+                    "175CB0118": {"pen": "21072379693", "apar": "147250355555", "name": "YANJYASENI DAS", "mname": "KABITA BEHURIA", "fname": "SUSANTA DAS", "dob": "01/11/2010", "flo":38, "sle":30, "tls":38, "mth":32, "gsc":35, "ssc":34}
                 };
 
                 let pData = parsedData[fetchRoll];
                 
-                // AUTOMATIC SERIAL NO LOGIC: Base is 2611220809 for 77
                 let rollSuffix = parseInt(fetchRoll.replace(/[^0-9]/g, '').slice(-3));
-                let autoSlno = "261122" + Math.floor(Math.random() * 9000 + 1000); // generic random
+                let autoSlno = "261122" + Math.floor(Math.random() * 9000 + 1000); 
                 if (!isNaN(rollSuffix) && rollSuffix >= 77) {
                     autoSlno = "261122" + String(809 + (rollSuffix - 77)).padStart(4, '0');
                 }
@@ -1018,9 +984,9 @@
                     let sBody = document.getElementById('us-subject-container');
                     sBody.innerHTML = "";
                     let subjects = [
-                        {c: "FLO", n: "FIRST LANGUAGE ODIA", m: 100, s: pData.flo},
-                        {c: "SLE", n: "SECOND LANGUAGE ENGLISH", m: 100, s: pData.sle},
-                        {c: "TLS", n: "THIRD LANGUAGE SANSKRIT", m: 100, s: pData.tls},
+                        {c: "FLO", n: "FIRST LANGUAGE", m: 100, s: pData.flo},
+                        {c: "SLE", n: "SECOND LANGUAGE", m: 100, s: pData.sle},
+                        {c: "TLS", n: "THIRD LANGUAGE", m: 100, s: pData.tls},
                         {c: "MTH", n: "MATHEMATICS", m: 100, s: pData.mth},
                         {c: "GSC", n: "GENERAL SCIENCE", m: 100, s: pData.gsc},
                         {c: "SSC", n: "SOCIAL SCIENCE", m: 100, s: pData.ssc}
@@ -1059,7 +1025,7 @@
                 
                 calculateAutoMarks();
                 btn.innerText = "Fetch Data 📥";
-                alert("Board Data Fetched Successfully! (Serial Number, PEN & APAR Updated)");
+                alert("Board Data Fetched Successfully! (Exact PEN & APAR Updated)");
             }, 1000);
         }
 
@@ -1162,7 +1128,7 @@
         function openStudentRegistration() { document.getElementById('student-form-step').style.display = 'block'; document.getElementById('student-payment-step').style.display = 'none'; publicRegPhotoBase64 = ""; document.getElementById('reg-s-photo').value = ""; openPage('student-reg'); }
         
         function validateStudentForm() {
-            let reqIds = ['reg-s-name', 'reg-s-gender', 'reg-s-dob', 'reg-s-mname', 'reg-s-fname', 'reg-s-aadhaar', 'reg-s-mobile', 'reg-s-blood', 'reg-s-minority', 'reg-s-category', 'reg-s-address', 'reg-s-pin', 'reg-s-state', 'reg-s-lang', 'reg-s-school', 'reg-s-pan', 'reg-s-apar', 'reg-s-class'];
+            let reqIds = ['reg-s-name', 'reg-s-gender', 'reg-s-dob', 'reg-s-mname', 'reg-s-fname', 'reg-s-aadhaar', 'reg-s-mobile', 'reg-s-blood', 'reg-s-minority', 'reg-s-category', 'reg-s-address', 'reg-s-pin', 'reg-s-state', 'reg-s-lang', 'reg-s-school', 'reg-s-pan', 'reg-s-class'];
             for(let id of reqIds) { if(!document.getElementById(id) || !document.getElementById(id).value.trim()) { alert('Please fill all Mandatory (*) Fields correctly!'); return; } }
             if(!publicRegPhotoBase64) { alert("Please Upload Student Photo!"); return; }
 
