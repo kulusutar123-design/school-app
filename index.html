@@ -118,7 +118,7 @@
         <div id="home-view">
             <div class="notice-board">
                 <h4>📢 Important Notice Board</h4>
-                <p id="display-notice">• Official Marksheet & Portal System is live.<br>• <b>NEW: EXACT 34 Students (257CB0001 to 257CB0034) PEN & APAR perfectly linked with Roll No!</b></p>
+                <p id="display-notice">• Official Marksheet & Portal System is live.<br>• <b>NEW: Dedicated Class Filter added inside School Dashboard!</b></p>
             </div>
 
             <div class="results-btn-card">
@@ -132,7 +132,7 @@
                     <div class="welcome-card">
                         <h3>🌟 Welcome to Digital School Management</h3>
                         <p>Manage your schools, student admissions, and records securely on the cloud platform.</p>
-                        <p><b>✨ Features:</b> Accurate Auto-Fetch (Marks + PEN/APAR), Dynamic Serial No, 100% Data Safety.</p>
+                        <p><b>✨ Features:</b> Accurate Auto-Fetch, Advanced Class Filter, 100% Data Safety.</p>
                     </div>
 
                     <div class="section-title">📌 Quick Portal Actions</div>
@@ -316,7 +316,7 @@
                     <p style="font-size:12px; margin-top:5px; color:#991b1b; font-weight:bold;">Currently Pending Admin/School Approval.</p>
                 </div>
                 <button class="no-print" style="background:#2563eb; color:white; width:100%; padding:15px; border:none; border-radius:8px; font-weight:bold; font-size:16px; margin-top:20px; cursor:pointer;" onclick="window.print()">🖨️ Print Hard Copy</button>
-                <button class="no-print" style="background:#64748b; color:white; width:100%; padding:10px; border:none; border-radius:8px; font-weight:bold; margin-top:10px; cursor:pointer;" onclick="goHome()">⬅️️ Return Home</button>
+                <button class="no-print" style="background:#64748b; color:white; width:100%; padding:10px; border:none; border-radius:8px; font-weight:bold; margin-top:10px; cursor:pointer;" onclick="goHome()">⬅️ Return Home</button>
             </div>
         </div>
 
@@ -369,10 +369,28 @@
                 <button class="tab-btn" onclick="switchSchoolTab('school-pending-tab', this)" style="position:relative;">🔔 Admission Requests <span id="notif-badge" style="background:red; color:white; border-radius:50%; padding:2px 6px; font-size:12px; display:none;">1</span></button>
             </div>
 
+            <!-- SCHOOL ENROLLED TAB WITH CLASS FILTER -->
             <div id="school-enrolled-tab" class="school-tab-content">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap:10px;">
                     <h3>🎓 Approved Students & Records</h3>
-                    <button style="background:#16a34a; color:white; border:none; padding:10px 20px; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="openAddEditStudentModal(null)">➕ Add Student & Marks manually</button>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <label style="font-weight: bold; color: #0d3b66;">Filter by Class:</label>
+                        <select id="school-class-filter" class="input-box" style="padding: 8px; width: auto; border:1px solid #0d3b66;" onchange="refreshTablesFromStore()">
+                            <option value="ALL">-- All Classes --</option>
+                            <option value="I">Class I</option>
+                            <option value="II">Class II</option>
+                            <option value="III">Class III</option>
+                            <option value="IV">Class IV</option>
+                            <option value="V">Class V</option>
+                            <option value="VI">Class VI</option>
+                            <option value="VII">Class VII</option>
+                            <option value="VIII">Class VIII</option>
+                            <option value="IX">Class IX</option>
+                            <option value="X">Class X</option>
+                            <option value="X Pass Out">X Pass Out</option>
+                        </select>
+                        <button style="background:#16a34a; color:white; border:none; padding:10px 20px; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="openAddEditStudentModal(null)">➕ Add Student & Marks manually</button>
+                    </div>
                 </div>
                 <table>
                     <thead>
@@ -460,7 +478,7 @@
                     <h3>🎓 Complete Student Database</h3>
                     <div style="display: flex; gap: 10px; align-items: center;">
                         <label style="font-weight: bold; color: #0d3b66;">Filter School:</label>
-                        <select id="admin-school-filter" class="input-box" style="padding: 8px; width: auto;" onchange="filterAdminStudents()">
+                        <select id="admin-school-filter" class="input-box" style="padding: 8px; width: auto;" onchange="refreshTablesFromStore()">
                             <option value="ALL">-- All Schools --</option>
                         </select>
                         <button style="background:#16a34a; color:white; border:none; padding:10px 20px; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="openAddEditStudentModal(null)">➕ Add Student</button>
@@ -504,14 +522,14 @@
             <div id="settings-tab" class="admin-tab-content" style="display:none;">
                 <h3>⚙️ Portal Customization Settings</h3>
                 <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1; margin-bottom:20px;">
-                    <h4>🖼 Upload / Change Background Photo</h4>
+                    <h4>🖼️ Upload / Change Background Photo</h4>
                     <input type="file" id="bg-file-input" accept="image/*" style="margin-bottom:10px;"><br>
                     <button style="background:#2563eb; color:white; border:none; padding:8px 20px; border-radius:6px; cursor:pointer;" onclick="changeBackgroundImage()">Update Background 🚀</button>
                 </div>
                 <div style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #cbd5e1;">
                     <h4>📢 Edit / Update Notice Board</h4>
                     <textarea id="notice-input" rows="5" class="input-box" style="margin-bottom:10px;">• Official Marksheet & Portal System is live.
-• <b>Fixed: 100% Accurate Auto-Fetch Data for all 44 Students Active!</b></textarea>
+• Fixed: School Dashboard now has an exclusive Class Filter!</textarea>
                     <button style="background:#16a34a; color:white; border:none; padding:8px 20px; border-radius:6px; cursor:pointer;" onclick="updateNoticeBoard()">Save Notice Board 💾</button>
                 </div>
             </div>
@@ -560,7 +578,6 @@
                     <div><label style="font-size:12px; font-weight:bold;">12. PEN No <span class="req">*</span>:</label><input type="text" id="us-pan" class="input-box" placeholder="e.g. 21349438955"></div>
                     <div><label style="font-size:12px; font-weight:bold;">13. APAR ID <span class="req">*</span>:</label><input type="text" id="us-apar" class="input-box"></div>
                     
-                    <!-- NEW SERIAL NUMBER FIELD -->
                     <div style="grid-column: span 2;"><label style="font-size:12px; font-weight:bold; color:#1e3a8a;">📝 Serial No (SL NO):</label><input type="text" id="us-slno" class="input-box" placeholder="Auto-generated or enter manually"></div>
 
                     <div><label style="font-size:12px; font-weight:bold;">14. Address:</label><input type="text" id="us-address" class="input-box"></div>
@@ -784,7 +801,7 @@
         let adminProfile = loadData('adminProfile', { name: "Master Admin", user: "KULU123", email: "admin@portal.com", pass: "Admin@2026" });
         let adminPaymentConfig = loadData('adminPaymentConfig', { upiId: "kulu123@upi", baseFee: 1000, gstPct: 18 });
         let defaultSchool = { id: "155CB", name: "SRI BAIRAGI SARASWATI SISHU VIDYAMANDIR", pass: "school123", hm: "ANTARYAMI DAS", mobile: "9876543210", state: "Odisha", email: "school@gmail.com", status: "Approved", utr: "MANUAL", upi: "school155@upi", baseFee: 500, hasGst: true, gstPct: 18 };
-        let defaultSchool2 = { id: "257CB", name: "LAXMI NARAYAN GIRLS HIGH SCHOOL, BANASAR", pass: "school456", hm: "HEADMASTER", mobile: "9876543211", state: "Odisha", email: "school2@gmail.com", status: "Approved", utr: "MANUAL2", upi: "school257@upi", baseFee: 500, hasGst: true, gstPct: 18 };
+        let defaultSchool2 = { id: "257CB", name: "LAXMI NARAYAN GIRLS HIGH SCHOOL", pass: "school456", hm: "HEADMASTER", mobile: "9876543211", state: "Odisha", email: "school2@gmail.com", status: "Approved", utr: "MANUAL2", upi: "school257@upi", baseFee: 500, hasGst: true, gstPct: 18 };
         let registeredSchools = loadData('registeredSchools', [defaultSchool, defaultSchool2]);
         let pendingApplications = loadData('pendingApplications', []);
         
@@ -838,6 +855,7 @@
             if(currentVal) filterDropdown.value = currentVal;
         }
 
+        // --- NEW: SCHOOL DASHBOARD CLASS FILTER ---
         function filterAdminStudents() { refreshTablesFromStore(); }
 
         function refreshTablesFromStore() {
@@ -853,6 +871,9 @@
             let filterDropdown = document.getElementById('admin-school-filter');
             let selectedFilter = filterDropdown ? filterDropdown.value : "ALL";
 
+            let classFilterDropdown = document.getElementById('school-class-filter');
+            let selectedClassFilter = classFilterDropdown ? classFilterDropdown.value : "ALL";
+
             studentDataStore.forEach(s => {
                 let statHtml = s.status === "Pass" ? `<span class="badge-pass">Pass ✅</span>` : `<span class="badge-fail">Fail ❌</span>`;
                 let actBtn = `<button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; margin-right:4px;" onclick="openAddEditStudentModal('${s.roll}')">Edit</button> <button style="background:#1e3a8a; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; margin-right:4px;" onclick="printStudent('${s.roll}')">Print / PDF</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="deleteStudent('${s.roll}')">Delete</button>`;
@@ -862,8 +883,12 @@
                 if (adminTbody && (selectedFilter === "ALL" || s.school === selectedFilter)) {
                     adminTbody.innerHTML += `<tr><td>${photoHtml}</td><td><b>${s.roll}</b></td><td>${s.name}</td><td>${studentClass}</td><td>${s.school}</td><td><b style="color:#16a34a;">${s.total} / ${s.max}</b></td><td>${actBtn}</td></tr>`;
                 }
+                
+                // School Table With Class Filter
                 if (schoolTbody && s.school === activeSchoolName && activeSchoolName !== "School Dashboard") {
-                    schoolTbody.innerHTML += `<tr><td>${photoHtml}</td><td><b>${s.roll}</b></td><td>${s.name}</td><td>${studentClass}</td><td><b style="color:#16a34a;">${s.total} / ${s.max}</b></td><td>${((s.total/s.max)*100).toFixed(2)}% (${s.grade})</td><td>${statHtml}</td><td>${actBtn}</td></tr>`;
+                    if (selectedClassFilter === "ALL" || studentClass === selectedClassFilter) {
+                        schoolTbody.innerHTML += `<tr><td>${photoHtml}</td><td><b>${s.roll}</b></td><td>${s.name}</td><td>${studentClass}</td><td><b style="color:#16a34a;">${s.total} / ${s.max}</b></td><td>${((s.total/s.max)*100).toFixed(2)}% (${s.grade})</td><td>${statHtml}</td><td>${actBtn}</td></tr>`;
+                    }
                 }
             });
             renderPendingApplications();
@@ -1002,7 +1027,7 @@
                     document.getElementById('us-name').value = pData.name; 
                     document.getElementById('us-fname').value = pData.fname;
                     document.getElementById('us-mname').value = pData.mname;
-                    document.getElementById('us-dob').value = "15/05/2010"; // Default, adjust as needed
+                    document.getElementById('us-dob').value = "15/05/2010"; 
                     document.getElementById('us-mobile').value = ""; 
                     document.getElementById('us-pan').value = pData.pen; 
                     document.getElementById('us-apar').value = pData.apar;
@@ -1122,7 +1147,7 @@
             let subs = []; let codes = document.querySelectorAll('.sub-code'); let names = document.querySelectorAll('.sub-name'); let maxs = document.querySelectorAll('.sub-max'); let secs = document.querySelectorAll('.sub-sec');
             for(let i=0; i<codes.length; i++){ subs.push({ code: codes[i].value, name: names[i].value, max: parseFloat(maxs[i].value)||0, sec: parseFloat(secs[i].value)||0 }); }
 
-            let activeSchoolName = "LAXMI NARAYAN GIRLS HIGH SCHOOL, BANASAR";
+            let activeSchoolName = "LAXMI NARAYAN GIRLS HIGH SCHOOL";
             if(document.getElementById('school-dashboard').classList.contains('active')) { activeSchoolName = document.getElementById('school-dash-title').innerText.replace('🏫 ', '').trim(); }
 
             let photoData = document.getElementById('us-photo-data').value;
