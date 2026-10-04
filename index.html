@@ -43,7 +43,7 @@
         .header h2 { font-size: 24px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); margin:0;}
         .header p { font-style: italic; font-size: 16px; margin:0;}
         
-        /* NEW: RUNNING NOTICE BOARD (SCROLLING TEXT) */
+        /* SCROLLING NOTICE BOARD */
         .scrolling-notice-container {
             background: rgba(254, 240, 138, 0.9);
             border: 1px solid #f59e0b;
@@ -67,25 +67,18 @@
         }
         @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
 
-        /* RESULTS BUTTON CARD DESIGN (Like user Image) */
-        .results-btn-card { 
-            background: linear-gradient(135deg, rgba(30,58,138,0.85), rgba(37,99,235,0.85)); 
-            backdrop-filter: blur(8px); text-align: center; color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; padding: 40px; margin-bottom: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-        }
-        .results-btn-card h3 { font-size: 24px; margin-bottom: 10px; text-shadow: 1px 1px 3px rgba(0,0,0,0.3); }
-        .results-btn-card p { font-size: 16px; margin-bottom: 25px; opacity: 0.9; }
-        .btn-check-results { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; border: 2px solid white; padding: 15px 40px; font-size: 20px; font-weight: bold; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 20px rgba(0,0,0,0.3);}
-        .btn-check-results:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(34,197,94,0.6); }
-
+        /* NEW COLORFUL BOTTOM ACTION BUTTONS (INCLUDES CHECK RESULTS NOW) */
         .home-action-bar {
-            display: flex; justify-content: center; gap: 20px; margin-top: 10vh; flex-wrap: wrap;
+            display: flex; justify-content: center; gap: 20px; margin-top: 55vh; flex-wrap: wrap; align-items: center;
         }
         .action-pill {
-            padding: 20px 25px; border-radius: 20px; color: white; font-weight: bold; font-size: 16px; text-align: center; cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.3); transition: transform 0.3s, box-shadow 0.3s; flex: 1; min-width: 180px; max-width: 240px; border: 2px solid rgba(255,255,255,0.4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            padding: 20px 20px; border-radius: 20px; color: white; font-weight: bold; font-size: 15px; text-align: center; cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.3); transition: transform 0.3s, box-shadow 0.3s; flex: 1; min-width: 150px; max-width: 220px; border: 2px solid rgba(255,255,255,0.4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
         }
         .action-pill:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.5); }
-        .action-pill .icon-lg { font-size: 35px; margin-bottom: 8px; display: block; }
+        .action-pill .icon-lg { font-size: 30px; margin-bottom: 8px; display: block; }
 
+        /* Distinct color for Check Results to stand out */
+        .pill-magenta { background: linear-gradient(135deg, rgba(219,39,119,0.9), rgba(157,23,77,0.9)); border-color: #fbcfe8;} 
         .pill-blue { background: linear-gradient(135deg, rgba(2,132,199,0.9), rgba(3,105,161,0.9)); }
         .pill-green { background: linear-gradient(135deg, rgba(22,163,74,0.9), rgba(21,128,61,0.9)); }
         .pill-orange { background: linear-gradient(135deg, rgba(245,158,11,0.9), rgba(217,119,6,0.9)); }
@@ -186,21 +179,18 @@
 
         <!-- Home View -->
         <div id="home-view">
-            <!-- NEW: SCROLLING NOTICE BOARD -->
+            <!-- SCROLLING NOTICE BOARD -->
             <div class="scrolling-notice-container">
                 <span class="notice-title">📢 Important Notice Board:</span>
-                <span class="scrolling-text" id="display-notice">• Official Marksheet & Portal System is live. | NEW: Running Notice Board, Big Results Button, and 100% Clear Background active!</span>
+                <span class="scrolling-text" id="display-notice">• Official Marksheet & Portal System is live. | NEW: Blue box removed! Background is clear, and Check Results button is in line with others!</span>
             </div>
 
-            <!-- ENHANCED RESULTS CARD -->
-            <div class="results-btn-card">
-                <h3>🎓 Annual Examination Results</h3>
-                <p>Enter your Roll Number to view and print official student marksheets instantly.</p>
-                <button class="btn-check-results" onclick="openResultsModal()">Check Results 🎯</button>
-            </div>
-
-            <!-- THE 5 COLORFUL BOTTOM BUTTONS -->
+            <!-- THE 6 COLORFUL BOTTOM BUTTONS (INCLUDING CHECK RESULTS ON FAR LEFT) -->
             <div class="home-action-bar">
+                <div class="action-pill pill-magenta" onclick="openResultsModal()">
+                    <span class="icon-lg">📄</span>
+                    Check Results
+                </div>
                 <div class="action-pill pill-blue" onclick="openPage('admin-login')">
                     <span class="icon-lg">👤</span>
                     Admin Login
@@ -226,7 +216,7 @@
 
         <!-- 1. PUBLIC NEW SCHOOL REGISTRATION FLOW -->
         <div id="school-reg" class="content-section glass-panel">
-            <button class="back-btn" onclick="goHome()">⬅️ Back to Home</button>
+            <button class="back-btn" onclick="goHome()">⬅️️ Back to Home</button>
             
             <div id="school-form-step">
                 <h3 style="color: #0d3b66; margin-bottom:15px;">📝 New School Registration Form</h3>
@@ -429,7 +419,7 @@
             <h2 id="school-dash-title" style="color: #0d3b66; margin-bottom: 5px;">🏫 School Dashboard</h2>
             <p id="school-dash-sub" style="color: #64748b; margin-bottom: 20px;"></p>
 
-            <div style="margin-bottom: 20px; display: flex; gap: 10px;">
+            <div style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px;">
                 <button class="tab-btn active-tab" onclick="switchSchoolTab('school-enrolled-tab', this)">🎓 My Students & Marks</button>
                 <button class="tab-btn" onclick="switchSchoolTab('school-promote-tab', this)">🎓 Promote Students</button>
                 <button class="tab-btn" onclick="switchSchoolTab('school-pending-tab', this)" style="position:relative;">🔔 Admission Requests <span id="notif-badge" style="background:red; color:white; border-radius:50%; padding:2px 6px; font-size:12px; display:none;">1</span></button>
@@ -576,7 +566,7 @@
                     <h3>🎓 Complete Student Database</h3>
                     <div style="display: flex; gap: 10px; align-items: center;">
                         <label style="font-weight: bold; color: #0d3b66;">Filter School:</label>
-                        <select id="admin-school-filter" class="input-box" style="padding: 8px; width: auto; border:1px solid #0d3b66;" onchange="refreshTablesFromStore()">
+                        <select id="admin-school-filter" class="input-box" style="padding: 8px; width: auto; border:1px solid #0d3b66;" onchange="filterAdminStudents()">
                             <option value="ALL">-- All Schools --</option>
                         </select>
                         <button style="background:#16a34a; color:white; border:none; padding:10px 20px; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="openAddEditStudentModal(null)">➕ Add Student</button>
@@ -620,14 +610,14 @@
             <div id="settings-tab" class="admin-tab-content" style="display:none;">
                 <h3>⚙️ Portal Customization Settings</h3>
                 <div style="background:rgba(248, 250, 252, 0.9); padding:20px; border-radius:12px; border:1px solid #cbd5e1; margin-bottom:20px;">
-                    <h4>🖼️️ Upload / Change Background Photo</h4>
+                    <h4>🖼️ Upload / Change Background Photo</h4>
                     <input type="file" id="bg-file-input" accept="image/*" style="margin-bottom:10px;"><br>
                     <button style="background:#2563eb; color:white; border:none; padding:8px 20px; border-radius:6px; cursor:pointer;" onclick="saveBackgroundImage()">Update Background 🚀</button>
                 </div>
                 <div style="background:rgba(248, 250, 252, 0.9); padding:20px; border-radius:12px; border:1px solid #cbd5e1;">
                     <h4>📢 Edit / Update Notice Board</h4>
                     <textarea id="notice-input" rows="5" class="input-box" style="margin-bottom:10px;">• Official Marksheet & Portal System is live.
-• NEW: Scrolling Notice, Clear Background, and Bottom Color Buttons Added!</textarea>
+• <b>NEW: Running Notice Board, Big Results Button, and 100% Clear Background active!</b></textarea>
                     <button style="background:#16a34a; color:white; border:none; padding:8px 20px; border-radius:6px; cursor:pointer;" onclick="updateNoticeBoard()">Save Notice Board 💾</button>
                 </div>
             </div>
@@ -743,6 +733,7 @@
             </div>
         </div>
         
+        <!-- ADMIN: Edit School Modal -->
         <div id="editSchoolModal" class="modal">
             <div class="modal-content">
                 <h3 style="color:#0d3b66; margin-bottom:15px;">✏️ Verify & Edit School Application</h3>
@@ -759,6 +750,7 @@
             </div>
         </div>
 
+        <!-- School Payment Setup Modal -->
         <div id="schoolPaymentModal" class="modal">
             <div class="modal-content" style="width:500px;">
                 <h3 style="color:#0d3b66; margin-bottom:10px;">💳 Set School Payment Gateway</h3>
@@ -958,11 +950,8 @@
         }
 
         document.addEventListener("DOMContentLoaded", function() {
-            // Initiate Marquee Text logic safely
             let noticeText = document.getElementById('notice-input') ? document.getElementById('notice-input').value.replace(/\n/g, ' | ') : "";
-            if(document.getElementById('display-notice') && noticeText) {
-                document.getElementById('display-notice').innerHTML = noticeText;
-            }
+            if(document.getElementById('display-notice') && noticeText) { document.getElementById('display-notice').innerHTML = noticeText; }
 
             populateAllDropdowns();
             loadCustomBackground();
@@ -1282,7 +1271,7 @@
                 
                 calculateAutoMarks();
                 btn.innerText = "Fetch Data 📥";
-                alert("Board Data Fetched Successfully! (Exact PEN & APAR Updated)");
+                alert("Board Data Fetched Successfully!");
             }, 1000);
         }
 
@@ -1397,7 +1386,7 @@
         }
         function submitStudentApplication() { 
             let utr = document.getElementById('student-utr').value.trim(); if(!utr) { alert("Please enter Transaction ID to verify payment!"); return; } clearInterval(paymentTimerInterval); 
-            let newApp = { appId: Math.floor(Math.random() * 9000 + 1000), name: document.getElementById('reg-s-name').value, fname: document.getElementById('reg-s-fname').value, mobile: document.getElementById('reg-s-mobile').value, gender: document.getElementById('reg-s-gender').value, schoolId: document.getElementById('reg-s-school').value, schoolName: document.getElementById('reg-s-school').options[document.getElementById('reg-s-school').selectedIndex].text, class_name: document.getElementById('reg-s-class').value, utr: utr, amt: currentStudentFeeTotal, photo: publicRegPhotoBase64 }; 
+            let newApp = { appId: Math.floor(Math.random() * 90000 + 10000), name: document.getElementById('reg-s-name').value, fname: document.getElementById('reg-s-fname').value, mobile: document.getElementById('reg-s-mobile').value, gender: document.getElementById('reg-s-gender').value, schoolId: document.getElementById('reg-s-school').value, schoolName: document.getElementById('reg-s-school').options[document.getElementById('reg-s-school').selectedIndex].text, class_name: document.getElementById('reg-s-class').value, utr: utr, amt: currentStudentFeeTotal, photo: publicRegPhotoBase64 }; 
             pendingApplications.push(newApp); saveLocalData(); document.getElementById('student-reg').classList.remove('active'); document.getElementById('receipt-title').innerText = "🏫 OFFICIAL ADMISSION RECEIPT"; document.getElementById('receipt-sub').innerText = "Submit this Hard Copy to your Respective School"; document.getElementById('rec-school').parentElement.style.display = 'block'; document.getElementById('rec-app-id').innerText = newApp.appId; document.getElementById('rec-date').innerText = new Date().toLocaleDateString(); document.getElementById('rec-name').innerText = newApp.name; document.getElementById('rec-fname').innerText = newApp.fname; document.getElementById('rec-info').innerText = `Mobile: ${newApp.mobile} | Class: ${newApp.class_name}`; document.getElementById('rec-school').innerText = newApp.schoolName; document.getElementById('rec-utr').innerText = utr; document.getElementById('rec-amt').innerText = newApp.amt; document.getElementById('receipt-section').classList.add('active'); updateNotificationBadge(); 
         }
         function updateNotificationBadge() { let badge = document.getElementById('notif-badge'); if(!badge) return; if(pendingApplications.length > 0) { badge.innerText = pendingApplications.length; badge.style.display = 'inline-block'; } else { badge.style.display = 'none'; } }
@@ -1467,7 +1456,7 @@
         function verifyRegSchoolOTP() { let entered = document.getElementById('reg-school-otp').value.trim(); if(entered === generatedSchoolOtp) { isSchoolOtpVerified = true; alert("OTP Verified Successfully!"); document.getElementById('school-otp-div').style.display = 'none'; document.getElementById('school-pass-div').style.display = 'block'; } else { alert("Invalid OTP! Try again."); } }
         function validateSchoolForm() { let reqIds = ['reg-school-name', 'reg-school-id', 'reg-hm-name', 'reg-hm-mobile', 'reg-school-state', 'reg-school-email']; for(let id of reqIds) { if(!document.getElementById(id).value.trim()) { alert('Please fill all Mandatory (*) Fields!'); return; } } if(!isSchoolOtpVerified) { alert("You must Verify Email OTP to proceed!"); return; } if(!document.getElementById('reg-school-pass').value.trim()) { alert("Please Create a Password!"); return; } document.getElementById('school-form-step').style.display = 'none'; document.getElementById('school-payment-step').style.display = 'block'; let timeLeft = 30; document.getElementById('school-payment-timer').innerText = timeLeft; clearInterval(schoolPaymentTimerInterval); schoolPaymentTimerInterval = setInterval(() => { timeLeft--; document.getElementById('school-payment-timer').innerText = timeLeft; if(timeLeft <= 0) { clearInterval(schoolPaymentTimerInterval); alert("Payment Timeout!"); goHome(); } }, 1000); }
         function submitSchoolRegistration() { let utr = document.getElementById('reg-school-utr').value.trim(); if(!utr) { alert("Please enter Transaction ID to verify payment!"); return; } clearInterval(schoolPaymentTimerInterval); let newSchool = { id: document.getElementById('reg-school-id').value.trim(), name: document.getElementById('reg-school-name').value.trim(), hm: document.getElementById('reg-hm-name').value.trim(), mobile: document.getElementById('reg-hm-mobile').value.trim(), state: document.getElementById('reg-school-state').value, email: document.getElementById('reg-school-email').value.trim(), pass: document.getElementById('reg-school-pass').value.trim(), utr: utr, status: "Pending", upi: "", baseFee: 500, hasGst: false, gstPct: 0 }; registeredSchools.push(newSchool); saveLocalData(); updateAdminSchoolFilterDropdown(); renderAdminSchoolsTable(); updatePublicSchoolDropdown(); document.getElementById('school-reg').classList.remove('active'); let d = new Date(); document.getElementById('rec-app-id').innerText = "SCH-" + Math.floor(Math.random()*9000+1000); document.getElementById('rec-date').innerText = d.toLocaleDateString(); document.getElementById('receipt-title').innerText = "🏫 SCHOOL REGISTRATION RECEIPT"; document.getElementById('receipt-sub').innerText = "Awaiting Master Admin Approval."; document.getElementById('rec-name').innerText = newSchool.name + " (" + newSchool.id + ")"; document.getElementById('rec-info').innerText = `HM: ${newSchool.hm} | Mobile: ${newSchool.mobile}`; document.getElementById('rec-school').parentElement.style.display = 'none'; document.getElementById('rec-utr').innerText = utr; document.getElementById('rec-amt').innerText = "1180 (Reg Fee)"; document.getElementById('receipt-section').classList.add('active'); alert('School Registered Successfully! Application sent to Master Admin for approval.'); }
-        function renderAdminSchoolsTable() { let tbody = document.getElementById('school-table-body'); tbody.innerHTML = ""; let pendingCount = 0; registeredSchools.forEach(s => { let statusHtml = ""; let actionsHtml = ""; if(s.status === "Pending") { pendingCount++; statusHtml = `<span style="background:#fef08a; color:#854d0e; padding:4px 10px; border-radius:6px; font-weight:bold;">Pending ⏳</span>`; actionsHtml = `<button style="background:#f59e0b; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openVerifyEditSchool('${s.id}')">Verify/Edit ✏️</button> <button style="background:#16a34a; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="approveSchool('${s.id}')">Approve ✅</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="rejectSchool('${s.id}')">Reject ❌</button>`; } else { statusHtml = `<span class="badge-approved">Approved ✅</span>`; actionsHtml = `<button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; margin-right:4px;" onclick="openSchoolPaymentSetup('${s.id}')">💳 Set Payment</button> <button style="background:#f59e0b; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openVerifyEditSchool('${s.id}')">Edit ✏️</button>`; } tbody.innerHTML += `<tr><td>${s.name}</td><td><b>${s.id}</b></td><td><input type="text" value="${s.pass}" onchange="updateSchoolPassword('${s.id}', this.value)" style="padding:5px; width:90px;"></td><td>${s.hm}</td><td>${s.state || "N/A"}</td><td><b style="color:#16a34a;">${s.utr || "N/A"}</b></td><td>${statusHtml}</td><td>${actionsHtml}</td></tr>`; }); let badge = document.getElementById('admin-notif-badge'); if(pendingCount > 0) { badge.innerText = pendingCount; badge.style.display = 'inline-block'; } else { badge.style.display = 'none'; } }
+        function renderAdminSchoolsTable() { let tbody = document.getElementById('school-table-body'); tbody.innerHTML = ""; let pendingCount = 0; registeredSchools.forEach(s => { let statusHtml = ""; let actionsHtml = ""; if(s.status === "Pending") { pendingCount++; statusHtml = `<span style="background:#fef08a; color:#854d0e; padding:4px 10px; border-radius:6px; font-weight:bold;">Pending ⏳</span>`; actionsHtml = `<button style="background:#f59e0b; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openVerifyEditSchool('${s.id}')">Verify/Edit ✏</button> <button style="background:#16a34a; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="approveSchool('${s.id}')">Approve ✅</button> <button style="background:#dc2626; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="rejectSchool('${s.id}')">Reject ❌</button>`; } else { statusHtml = `<span class="badge-approved">Approved ✅</span>`; actionsHtml = `<button style="background:#2563eb; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; margin-right:4px;" onclick="openSchoolPaymentSetup('${s.id}')">💳 Set Payment</button> <button style="background:#f59e0b; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;" onclick="openVerifyEditSchool('${s.id}')">Edit ✏️</button>`; } tbody.innerHTML += `<tr><td>${s.name}</td><td><b>${s.id}</b></td><td><input type="text" value="${s.pass}" onchange="updateSchoolPassword('${s.id}', this.value)" style="padding:5px; width:90px;"></td><td>${s.hm}</td><td>${s.state || "N/A"}</td><td><b style="color:#16a34a;">${s.utr || "N/A"}</b></td><td>${statusHtml}</td><td>${actionsHtml}</td></tr>`; }); let badge = document.getElementById('admin-notif-badge'); if(pendingCount > 0) { badge.innerText = pendingCount; badge.style.display = 'inline-block'; } else { badge.style.display = 'none'; } }
         function approveSchool(id) { let school = registeredSchools.find(s => s.id === id); if(school) { school.status = "Approved"; saveLocalData(); updateAdminSchoolFilterDropdown(); renderAdminSchoolsTable(); updatePublicSchoolDropdown(); alert(`School "${school.name}" Approved successfully!`); } }
         function rejectSchool(id) { if(confirm("Are you sure you want to Reject and Delete this school?")) { registeredSchools = registeredSchools.filter(s => s.id !== id); saveLocalData(); updateAdminSchoolFilterDropdown(); renderAdminSchoolsTable(); updatePublicSchoolDropdown(); } }
         function openVerifyEditSchool(id) { let school = registeredSchools.find(s => s.id === id); if(school) { document.getElementById('edit-sch-old-id').value = school.id; document.getElementById('edit-sch-name').value = school.name; document.getElementById('edit-sch-id').value = school.id; document.getElementById('edit-sch-hm').value = school.hm || ""; document.getElementById('edit-sch-mobile').value = school.mobile || ""; document.getElementById('edit-sch-state').value = school.state || "Odisha"; document.getElementById('editSchoolModal').style.display = 'flex'; } }
