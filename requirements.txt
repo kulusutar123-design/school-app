@@ -1,2 +1,3 @@
-streamlit
-html2pdf
+fastapi
+uvicorn
+python-multipart
