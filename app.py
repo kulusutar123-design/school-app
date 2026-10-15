@@ -7,8 +7,6 @@ import smtplib
 from email.mime.text import MIMEText
 from typing import Optional
 
-os.system("pip install python-multipart")
-
 from fastapi import FastAPI, Form, File, UploadFile, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 
